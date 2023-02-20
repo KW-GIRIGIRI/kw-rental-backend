@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-@Builder
 @Getter
 @ToString
 @Entity
@@ -61,6 +60,7 @@ public class Equipment {
     protected Equipment() {
     }
 
+    @Builder
     public Equipment(final Long id, final Category category, final String maker, final String modelName,
                      final RentalQuantity rentalQuantity,
                      final RentalDays rentalDays, final RentalTimes rentalTimes, final String imgUrl,
