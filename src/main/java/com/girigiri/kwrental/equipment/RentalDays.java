@@ -5,8 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
-@Embeddable
 @Getter
+@Embeddable
 public class RentalDays {
 
     @Column(nullable = false)
