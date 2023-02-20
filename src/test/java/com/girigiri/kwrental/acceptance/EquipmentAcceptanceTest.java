@@ -2,10 +2,10 @@ package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.girigiri.kwrental.support.DatabaseCleanUp;
 import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
-import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
+import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
+import com.girigiri.kwrental.support.DatabaseCleanUp;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.AfterEach;
@@ -48,10 +48,10 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         equipmentRepository.save(equipment);
 
         // when
-        final EquipmentResponse response = RestAssured.given()
+        final EquipmentDetailResponse response = RestAssured.given()
                 .when().get("/api/equipments/{id}", equipment.getId())
                 .then().statusCode(HttpStatus.OK.value()).log().all()
-                .and().extract().as(EquipmentResponse.class);
+                .and().extract().as(EquipmentDetailResponse.class);
 
         // then
         assertThat(response).usingRecursiveComparison()

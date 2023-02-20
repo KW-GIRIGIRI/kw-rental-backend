@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.girigiri.kwrental.acceptance.TestFixtures;
 import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
-import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
+import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ class EquipmentServiceTest extends ResetDatabaseTest {
         final Equipment equipment = equipmentRepository.save(TestFixtures.createEquipment());
 
         // when
-        final EquipmentResponse response = equipmentService.findById(equipment.getId());
+        final EquipmentDetailResponse response = equipmentService.findById(equipment.getId());
 
         // then
         assertThat(response).usingRecursiveComparison().ignoringFields("id")
