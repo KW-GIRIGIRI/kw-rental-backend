@@ -6,6 +6,7 @@ import com.girigiri.kwrental.equipment.RentalDays;
 import com.girigiri.kwrental.equipment.RentalQuantity;
 import com.girigiri.kwrental.equipment.RentalTimes;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.RentalDaysResponse;
 import com.girigiri.kwrental.equipment.dto.RentalQuantityResponse;
 import com.girigiri.kwrental.equipment.dto.RentalTimesResponse;
@@ -47,7 +48,7 @@ public class TestFixtures {
                 .build();
     }
 
-    public static EquipmentDetailResponse createEquipmentResponse() {
+    public static EquipmentDetailResponse createEquipmentDetailResponse() {
         return EquipmentDetailResponse.builder()
                 .modelName(modelName)
                 .category(Category.CAMERA.name())
@@ -62,4 +63,15 @@ public class TestFixtures {
                 .rentalDays(RentalDaysResponse.from(rentalDays))
                 .build();
     }
+
+    public static EquipmentResponse createEquipmentResponse() {
+        return EquipmentResponse.builder()
+                .modelName(modelName)
+                .category(Category.CAMERA.name())
+                .maker(maker)
+                .imgUrl(imgUrl)
+                .rentalQuantity(RentalQuantityResponse.from(rentalQuantity))
+                .build();
+    }
+
 }

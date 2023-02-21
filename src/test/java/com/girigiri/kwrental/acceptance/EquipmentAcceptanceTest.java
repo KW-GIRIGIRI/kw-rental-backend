@@ -1,10 +1,12 @@
 package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.support.DatabaseCleanUp;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import io.restassured.RestAssured;
@@ -56,6 +58,34 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         // then
         assertThat(response).usingRecursiveComparison()
                 .ignoringFields("id")
-                .isEqualTo(TestFixtures.createEquipmentResponse());
+                .isEqualTo(TestFixtures.createEquipmentDetailResponse());
+    }
+
+    @Test
+    @DisplayName("기자재 목록 조회 API")
+    void getEquipmentsPage() {
+        // given
+        final Equipment equipment1 = TestFixtures.createEquipment();
+        equipmentRepository.save(equipment1);
+        final Equipment equipment2 = TestFixtures.createEquipment();
+        equipmentRepository.save(equipment2);
+        final Equipment equipment3 = TestFixtures.createEquipment();
+        equipmentRepository.save(equipment3);
+        final Equipment equipment4 = TestFixtures.createEquipment();
+        equipmentRepository.save(equipment4);
+
+        // when
+        final EquipmentsPageResponse response = RestAssured.given()
+                .when().get("/api/equipments?size=2")
+                .then().statusCode(HttpStatus.OK.value()).log().all()
+                .and().extract().as(EquipmentsPageResponse.class);
+
+        // then
+        assertAll(
+                () -> assertThat(response.nextLink()).contains("/api/equipments/?size=2&page=1&sort=id,DESC"),
+                () -> assertThat(response.previousLink()).isNull(),
+                () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                        .containsExactly(TestFixtures.createEquipmentResponse(), TestFixtures.createEquipmentResponse())
+        );
     }
 }
