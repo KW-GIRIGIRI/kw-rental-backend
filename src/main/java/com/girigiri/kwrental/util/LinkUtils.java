@@ -29,7 +29,7 @@ public class LinkUtils {
                 .queryParam("size", pageable.getPageSize())
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("sort", sortToString(pageable.getSort()))
-                .build().toUriString();
+                .build().toUriString().replaceFirst("/\\?", "?");
     }
 
     private String sortToString(final Sort sort) {
