@@ -2,6 +2,7 @@ package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
@@ -45,8 +46,11 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        RestAssured.requestSpecification = this.requestSpec;
         this.requestSpec = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
+                .addFilter(documentationConfiguration(restDocumentation).operationPreprocessors()
+                        .withResponseDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
                 .build();
     }
 
