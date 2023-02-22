@@ -3,7 +3,6 @@ plugins {
     id 'org.springframework.boot' version '3.0.2'
     id 'io.spring.dependency-management' version '1.1.0'
     id "org.asciidoctor.jvm.convert" version "3.3.2"
-    id 'com.epages.restdocs-api-spec' version '0.16.0'
 }
 
 group = 'com.girigiri'
@@ -33,7 +32,6 @@ dependencies {
 
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-    implementation 'com.epages:restdocs-api-spec-restassured:0.16.0'
 }
 
 ext {
@@ -61,12 +59,4 @@ bootJar {
     from("${asciidoctor.outputDir}/") {
         into 'static/docs'
     }
-}
-
-openapi3 {
-    server = 'https://localhost:8080'
-    title = 'KW-GIRIGIRI API'
-    description = 'KW-GIRIGIRI backend API spec.'
-    version = '0.1.0'
-    format = 'yaml'
 }
