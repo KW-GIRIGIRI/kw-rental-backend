@@ -10,21 +10,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class LinkUtils {
 
-    public String createIfNextExists(final Slice<?> slice, final UriComponentsBuilder builder) {
+    public static String createIfNextExists(final Slice<?> slice, final UriComponentsBuilder builder) {
         if (slice.hasNext()) {
             return addPageableParameters(builder, slice.nextPageable());
         }
         return null;
     }
 
-    public String createIfPreviousExists(final Slice<?> slice, final UriComponentsBuilder builder) {
+    public static String createIfPreviousExists(final Slice<?> slice, final UriComponentsBuilder builder) {
         if (slice.hasPrevious()) {
             return addPageableParameters(builder, slice.previousPageable());
         }
         return null;
     }
 
-    private String addPageableParameters(final UriComponentsBuilder builder, final Pageable pageable) {
+    private static String addPageableParameters(final UriComponentsBuilder builder, final Pageable pageable) {
         return builder
                 .queryParam("size", pageable.getPageSize())
                 .queryParam("page", pageable.getPageNumber())
@@ -32,7 +32,7 @@ public class LinkUtils {
                 .build().toUriString();
     }
 
-    private String sortToString(final Sort sort) {
+    private static String sortToString(final Sort sort) {
         StringBuilder builder = new StringBuilder();
 
         for (Order order : sort) {
