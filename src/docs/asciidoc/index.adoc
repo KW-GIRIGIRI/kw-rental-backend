@@ -1,0 +1,8 @@
+:doctype: book
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+= KW - GIRIGIRI
+
+include::equipment.adoc[]

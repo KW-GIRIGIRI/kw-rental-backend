@@ -2,6 +2,8 @@ package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
@@ -10,21 +12,29 @@ import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.support.DatabaseCleanUp;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ExtendWith(RestDocumentationExtension.class)
 class EquipmentAcceptanceTest extends ResetDatabaseTest {
 
     @LocalServerPort
     private int port;
+
+    private RequestSpecification requestSpec;
 
     @Autowired
     private EquipmentRepository equipmentRepository;
@@ -33,8 +43,11 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
     private DatabaseCleanUp databaseCleanUp;
 
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        this.requestSpec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @AfterEach
@@ -50,7 +63,8 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         equipmentRepository.save(equipment);
 
         // when
-        final EquipmentDetailResponse response = RestAssured.given()
+        final EquipmentDetailResponse response = RestAssured.given(this.requestSpec)
+                .filter(document("getEquipment"))
                 .when().get("/api/equipments/{id}", equipment.getId())
                 .then().statusCode(HttpStatus.OK.value()).log().all()
                 .and().extract().as(EquipmentDetailResponse.class);
@@ -75,7 +89,8 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         equipmentRepository.save(equipment4);
 
         // when
-        final EquipmentsPageResponse response = RestAssured.given()
+        final EquipmentsPageResponse response = RestAssured.given(this.requestSpec)
+                .filter(document("getEquipmentsPage"))
                 .when().get("/api/equipments?size=2")
                 .then().statusCode(HttpStatus.OK.value()).log().all()
                 .and().extract().as(EquipmentsPageResponse.class);

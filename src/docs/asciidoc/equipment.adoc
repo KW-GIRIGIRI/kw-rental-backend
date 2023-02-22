@@ -1,0 +1,9 @@
+== 기자재 관련 API
+
+=== 기자재 상세 조회
+
+operation::getEquipment[snippets='http-request,http-response']
+
+=== 기자재 목록 페이지 조회
+
+operation::getEquipmentsPage[snippets='http-request,http-response']
