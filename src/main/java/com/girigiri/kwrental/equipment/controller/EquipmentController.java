@@ -21,11 +21,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
-    private final LinkUtils linkUtils;
 
-    public EquipmentController(final EquipmentService equipmentService, final LinkUtils linkUtils) {
+    public EquipmentController(final EquipmentService equipmentService) {
         this.equipmentService = equipmentService;
-        this.linkUtils = linkUtils;
     }
 
     @GetMapping("/{id}")
@@ -42,8 +40,8 @@ public class EquipmentController {
 
         final Slice<EquipmentResponse> equipments = equipmentService.findEquipmentsBy(pageable);
 
-        String nextLink = linkUtils.createIfNextExists(equipments, builder);
-        String previousLink = linkUtils.createIfPreviousExists(equipments, builder);
+        String nextLink = LinkUtils.createIfNextExists(equipments, builder);
+        String previousLink = LinkUtils.createIfPreviousExists(equipments, builder);
         return EquipmentsPageResponse.builder()
                 .nextLink(nextLink).previousLink(previousLink)
                 .page(pageable.getPageNumber())
