@@ -26,9 +26,9 @@ public class LinkUtils {
 
     private static String addPageableParameters(final UriComponentsBuilder builder, final Pageable pageable) {
         return builder
-                .queryParam("size", pageable.getPageSize())
-                .queryParam("page", pageable.getPageNumber())
-                .queryParam("sort", sortToString(pageable.getSort()))
+                .replaceQueryParam("size", pageable.getPageSize())
+                .replaceQueryParam("page", pageable.getPageNumber())
+                .replaceQueryParam("sort", sortToString(pageable.getSort()))
                 .build().toUriString().replaceFirst("/\\?", "?");
     }
 
