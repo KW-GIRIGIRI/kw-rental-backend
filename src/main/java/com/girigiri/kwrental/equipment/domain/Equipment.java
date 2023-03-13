@@ -51,19 +51,13 @@ public class Equipment {
     @Embedded
     private RentalQuantity rentalQuantity;
 
-    @Embedded
-    private RentalDays rentalDays;
-
-    @Embedded
-    private RentalTimes rentalTimes;
-
     protected Equipment() {
     }
 
     @Builder
     public Equipment(final Long id, final Category category, final String maker, final String modelName,
                      final RentalQuantity rentalQuantity,
-                     final RentalDays rentalDays, final RentalTimes rentalTimes, final String imgUrl,
+                     final String imgUrl,
                      final String description, final String components,
                      final String purpose, final String rentalPlace) {
         this.id = id;
@@ -71,8 +65,6 @@ public class Equipment {
         this.maker = maker;
         this.modelName = modelName;
         this.rentalQuantity = rentalQuantity;
-        this.rentalDays = rentalDays;
-        this.rentalTimes = rentalTimes;
         this.imgUrl = imgUrl;
         this.description = description;
         this.components = components;
