@@ -6,8 +6,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
-import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.support.DatabaseCleanUp;

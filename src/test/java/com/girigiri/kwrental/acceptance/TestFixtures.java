@@ -1,10 +1,10 @@
 package com.girigiri.kwrental.acceptance;
 
-import com.girigiri.kwrental.equipment.Category;
-import com.girigiri.kwrental.equipment.Equipment;
-import com.girigiri.kwrental.equipment.RentalDays;
-import com.girigiri.kwrental.equipment.RentalQuantity;
-import com.girigiri.kwrental.equipment.RentalTimes;
+import com.girigiri.kwrental.equipment.domain.Category;
+import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.equipment.domain.RentalDays;
+import com.girigiri.kwrental.equipment.domain.RentalQuantity;
+import com.girigiri.kwrental.equipment.domain.RentalTimes;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.RentalDaysResponse;

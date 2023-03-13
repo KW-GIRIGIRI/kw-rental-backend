@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment;
+package com.girigiri.kwrental.equipment.domain;
 
 import com.girigiri.kwrental.equipment.exception.RentalQualtityException;
 import jakarta.persistence.Column;

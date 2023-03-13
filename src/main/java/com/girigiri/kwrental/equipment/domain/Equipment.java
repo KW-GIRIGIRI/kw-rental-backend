@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment;
+package com.girigiri.kwrental.equipment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

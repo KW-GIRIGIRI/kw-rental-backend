@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.equipment.service;
 
-import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
