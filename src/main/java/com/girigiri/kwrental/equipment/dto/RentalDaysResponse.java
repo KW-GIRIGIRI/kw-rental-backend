@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.equipment.dto;
 
-import com.girigiri.kwrental.equipment.RentalDays;
+import com.girigiri.kwrental.equipment.domain.RentalDays;
 import lombok.Builder;
 
 @Builder
 public record RentalDaysResponse(
         Integer maxRentalDays,
         Integer maxDaysBeforeRental,
-        Integer minDaysBeforeRental) {
+        Integer minDaysBeforeRental
+) {
 
     public static RentalDaysResponse from(final RentalDays rentalDays) {
         return RentalDaysResponse.builder()

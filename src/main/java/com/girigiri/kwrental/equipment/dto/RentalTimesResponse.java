@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.equipment.dto;
 
-import com.girigiri.kwrental.equipment.RentalTimes;
+import com.girigiri.kwrental.equipment.domain.RentalTimes;
 import java.time.LocalTime;
 
 public record RentalTimesResponse(

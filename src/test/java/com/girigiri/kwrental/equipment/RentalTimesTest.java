@@ -2,6 +2,7 @@ package com.girigiri.kwrental.equipment;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.girigiri.kwrental.equipment.domain.RentalTimes;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;

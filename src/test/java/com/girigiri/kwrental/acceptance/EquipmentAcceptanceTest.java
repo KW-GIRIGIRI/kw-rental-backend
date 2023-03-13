@@ -6,8 +6,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
-import com.girigiri.kwrental.equipment.Equipment;
 import com.girigiri.kwrental.equipment.EquipmentRepository;
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.support.DatabaseCleanUp;
@@ -101,8 +101,9 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
 
         // then
         assertAll(
-                () -> assertThat(response.nextLink()).contains("/api/equipments?size=2&page=1&sort=id,DESC"),
-                () -> assertThat(response.previousLink()).isNull(),
+                () -> assertThat(response.endPoints()).hasSize(2)
+                        .containsExactly("/api/equipments?size=2&page=0&sort=id,DESC",
+                                "/api/equipments?size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                         .containsExactly(TestFixtures.createEquipmentResponse(), TestFixtures.createEquipmentResponse())
         );

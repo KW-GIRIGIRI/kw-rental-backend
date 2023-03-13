@@ -4,9 +4,10 @@ import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
-import com.girigiri.kwrental.util.LinkUtils;
+import com.girigiri.kwrental.util.EndPointUtils;
+import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,16 +35,14 @@ public class EquipmentController {
     @GetMapping
     public EquipmentsPageResponse getEquipmentsPage(
             @PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable) {
+        final Page<EquipmentResponse> equipments = equipmentService.findEquipmentsBy(pageable);
 
         final UriComponentsBuilder builder = MvcUriComponentsBuilder.fromMethodName(
                 EquipmentController.class, "getEquipmentsPage", pageable);
+        final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(equipments, builder);
 
-        final Slice<EquipmentResponse> equipments = equipmentService.findEquipmentsBy(pageable);
-
-        String nextLink = LinkUtils.createIfNextExists(equipments, builder);
-        String previousLink = LinkUtils.createIfPreviousExists(equipments, builder);
         return EquipmentsPageResponse.builder()
-                .nextLink(nextLink).previousLink(previousLink)
+                .endPoints(allPageEndPoints)
                 .page(pageable.getPageNumber())
                 .items(equipments.getContent())
                 .build();

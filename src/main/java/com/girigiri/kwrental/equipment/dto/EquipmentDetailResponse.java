@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.equipment.dto;
 
-import com.girigiri.kwrental.equipment.Equipment;
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import lombok.Builder;
 
 @Builder

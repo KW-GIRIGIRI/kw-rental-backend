@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.equipment.dto;
 
-import com.girigiri.kwrental.equipment.RentalQuantity;
+import com.girigiri.kwrental.equipment.domain.RentalQuantity;
 
 public record RentalQuantityResponse(
         int totalQuantity,

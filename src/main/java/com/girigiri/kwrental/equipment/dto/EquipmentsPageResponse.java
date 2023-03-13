@@ -5,8 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record EquipmentsPageResponse(
-        String nextLink,
-        String previousLink,
+        List<String> endPoints,
         Integer page,
         List<EquipmentResponse> items
 ) {
