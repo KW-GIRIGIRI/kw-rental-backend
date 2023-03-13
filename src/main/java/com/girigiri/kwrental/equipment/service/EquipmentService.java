@@ -5,8 +5,8 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<EquipmentResponse> findEquipmentsBy(final Pageable pageable) {
+    public Page<EquipmentResponse> findEquipmentsBy(final Pageable pageable) {
         return equipmentRepository.findEquipmentsBy(pageable)
                 .map(EquipmentResponse::from);
     }

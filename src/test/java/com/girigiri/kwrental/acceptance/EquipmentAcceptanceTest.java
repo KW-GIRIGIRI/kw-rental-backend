@@ -101,8 +101,9 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
 
         // then
         assertAll(
-                () -> assertThat(response.nextLink()).contains("/api/equipments?size=2&page=1&sort=id,DESC"),
-                () -> assertThat(response.previousLink()).isNull(),
+                () -> assertThat(response.endPoints()).hasSize(2)
+                        .containsExactly("/api/equipments?size=2&page=0&sort=id,DESC",
+                                "/api/equipments?size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                         .containsExactly(TestFixtures.createEquipmentResponse(), TestFixtures.createEquipmentResponse())
         );
