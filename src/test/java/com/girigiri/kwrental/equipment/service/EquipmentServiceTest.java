@@ -4,19 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.girigiri.kwrental.acceptance.TestFixtures;
-import com.girigiri.kwrental.equipment.EquipmentRepository;
+import com.girigiri.kwrental.TestFixtures;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
 @SpringBootTest
@@ -39,7 +39,7 @@ class EquipmentServiceTest extends ResetDatabaseTest {
 
         // then
         assertThat(response).usingRecursiveComparison().ignoringFields("id")
-                .isEqualTo(TestFixtures.createEquipmentDetailResponse());
+                .isEqualTo(EquipmentDetailResponse.from(equipment));
     }
 
     @Test
@@ -55,19 +55,19 @@ class EquipmentServiceTest extends ResetDatabaseTest {
     void findEquipmentsBy() {
         // given
         equipmentRepository.save(TestFixtures.createEquipment());
-        equipmentRepository.save(TestFixtures.createEquipment());
+        final Equipment equipment = equipmentRepository.save(TestFixtures.createEquipment());
         equipmentRepository.save(TestFixtures.createEquipment());
 
         // when
-        final Slice<EquipmentResponse> expect = equipmentService.findEquipmentsBy(
-                PageRequest.of(1, 1, Sort.by("id").descending()));
+        final Page<EquipmentResponse> expect = equipmentService.findEquipmentsBy(
+                PageRequest.of(1, 1, Sort.by("id").descending()), null);
 
         // then
         assertAll(
                 () -> assertThat(expect.hasNext()).isTrue(),
                 () -> assertThat(expect.hasPrevious()).isTrue(),
-                () -> assertThat(expect.getContent()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                        .containsExactly(TestFixtures.createEquipmentResponse())
+                () -> assertThat(expect.getContent()).usingRecursiveFieldByFieldElementComparator()
+                        .containsExactly(EquipmentResponse.from(equipment))
         );
     }
 }

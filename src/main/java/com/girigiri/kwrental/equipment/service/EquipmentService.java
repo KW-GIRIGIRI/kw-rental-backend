@@ -1,10 +1,10 @@
 package com.girigiri.kwrental.equipment.service;
 
-import com.girigiri.kwrental.equipment.EquipmentRepository;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EquipmentResponse> findEquipmentsBy(final Pageable pageable) {
-        return equipmentRepository.findEquipmentsBy(pageable)
+    public Page<EquipmentResponse> findEquipmentsBy(final Pageable pageable, final String keyword) {
+        return equipmentRepository.findEquipmentBy(pageable, keyword)
                 .map(EquipmentResponse::from);
     }
 }

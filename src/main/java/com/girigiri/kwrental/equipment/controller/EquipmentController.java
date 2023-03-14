@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,11 +35,12 @@ public class EquipmentController {
 
     @GetMapping
     public EquipmentsPageResponse getEquipmentsPage(
-            @PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable) {
-        final Page<EquipmentResponse> equipments = equipmentService.findEquipmentsBy(pageable);
+            @PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) final String keyword) {
+        final Page<EquipmentResponse> equipments = equipmentService.findEquipmentsBy(pageable, keyword);
 
         final UriComponentsBuilder builder = MvcUriComponentsBuilder.fromMethodName(
-                EquipmentController.class, "getEquipmentsPage", pageable);
+                EquipmentController.class, "getEquipmentsPage", pageable, keyword);
         final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(equipments, builder);
 
         return EquipmentsPageResponse.builder()
