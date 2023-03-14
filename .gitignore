@@ -36,3 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/java/com/girigiri/kwrental/ignore/
+
+/src/main/generated/

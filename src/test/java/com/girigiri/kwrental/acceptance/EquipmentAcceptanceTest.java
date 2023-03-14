@@ -6,10 +6,12 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
-import com.girigiri.kwrental.equipment.EquipmentRepository;
+import com.girigiri.kwrental.TestFixtures;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.support.DatabaseCleanUp;
 import com.girigiri.kwrental.support.ResetDatabaseTest;
 import io.restassured.RestAssured;
@@ -76,7 +78,7 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         // then
         assertThat(response).usingRecursiveComparison()
                 .ignoringFields("id")
-                .isEqualTo(TestFixtures.createEquipmentDetailResponse());
+                .isEqualTo(EquipmentDetailResponse.from(equipment));
     }
 
     @Test
@@ -96,7 +98,8 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
         final EquipmentsPageResponse response = RestAssured.given(this.requestSpec)
                 .filter(document("getEquipmentsPage"))
                 .when().get("/api/equipments?size=2")
-                .then().statusCode(HttpStatus.OK.value()).log().all()
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .and().extract().as(EquipmentsPageResponse.class);
 
         // then
@@ -104,8 +107,42 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
                 () -> assertThat(response.endPoints()).hasSize(2)
                         .containsExactly("/api/equipments?size=2&page=0&sort=id,DESC",
                                 "/api/equipments?size=2&page=1&sort=id,DESC"),
+                () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparator()
+                        .containsExactly(EquipmentResponse.from(equipment4), EquipmentResponse.from(equipment3))
+        );
+    }
+
+    @Test
+    @DisplayName("기자재 목록 조회 API_모델명으로 검색")
+    void getEquipmentsPage_search() {
+        // given
+        final Equipment equipment1 = TestFixtures.getEquipmentBuilder().modelName("key").build();
+        equipmentRepository.save(equipment1);
+        final Equipment equipment2 = TestFixtures.getEquipmentBuilder().modelName("akey").build();
+        equipmentRepository.save(equipment2);
+        final Equipment equipment3 = TestFixtures.getEquipmentBuilder().modelName("akeyb").build();
+        equipmentRepository.save(equipment3);
+        final Equipment equipment4 = TestFixtures.getEquipmentBuilder().modelName("keyb").build();
+        equipmentRepository.save(equipment4);
+
+        final Equipment equipment5 = TestFixtures.getEquipmentBuilder().modelName("notForSearch").build();
+        equipmentRepository.save(equipment5);
+
+        // when
+        final EquipmentsPageResponse response = RestAssured.given(this.requestSpec)
+                .filter(document("getEquipmentsPage"))
+                .when().get("/api/equipments?size=2&keyword=key")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .and().extract().as(EquipmentsPageResponse.class);
+
+        // then
+        assertAll(
+                () -> assertThat(response.endPoints()).hasSize(2)
+                        .containsExactly("/api/equipments?keyword=key&size=2&page=0&sort=id,DESC",
+                                "/api/equipments?keyword=key&size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                        .containsExactly(TestFixtures.createEquipmentResponse(), TestFixtures.createEquipmentResponse())
+                        .containsExactly(EquipmentResponse.from(equipment4), EquipmentResponse.from(equipment3))
         );
     }
 }
