@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.equipment.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
@@ -32,5 +33,17 @@ class EquipmentControllerTest {
         // when, then
         mockMvc.perform(get("/api/equipments/" + notExistsId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("id가 문자열이면 400을 응답한다.")
+    void getEquipment_400_idIsNotNumeric() throws Exception {
+        // given
+        String invalidId = "hi";
+
+        // when, then
+        mockMvc.perform(get("/api/equipments/" + invalidId))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
