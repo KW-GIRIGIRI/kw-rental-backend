@@ -19,7 +19,6 @@ import com.girigiri.kwrental.support.ResetDatabaseTest;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,10 +55,6 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
                         .withResponseDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
-    }
-
-    @AfterEach
-    void tearDown() {
         databaseCleanUp.execute();
     }
 
