@@ -17,7 +17,7 @@ public class TestFixtures {
     private static final String imgUrl = "www.naver.com";
     private static final String description = "description";
 
-    public static EquipmentBuilder getEquipmentBuilder() {
+    public static EquipmentBuilder equipmentBuilder() {
         return Equipment.builder()
                 .category(Category.CAMERA)
                 .maker(maker)
@@ -31,7 +31,7 @@ public class TestFixtures {
     }
 
     public static Equipment createEquipment() {
-        return getEquipmentBuilder()
+        return equipmentBuilder()
                 .build();
     }
 }

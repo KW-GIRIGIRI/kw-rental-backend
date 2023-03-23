@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.equipment.repository;
 
+import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
+import static com.girigiri.kwrental.equipment.domain.Category.ETC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -23,14 +25,14 @@ class EquipmentRepositoryTest {
     private EquipmentRepository equipmentRepository;
 
     @Test
-    @DisplayName("기자재를 모델 이름으로 검색해서 목록 조회한다.")
+    @DisplayName("기자재를 모델 이름과 카테고리로 검색해서 목록 조회한다.")
     void findEquipmentBy() {
         // given
-        final Equipment equipment1 = TestFixtures.getEquipmentBuilder().modelName("key").build();
-        final Equipment equipment2 = TestFixtures.getEquipmentBuilder().modelName("akey").build();
-        final Equipment equipment3 = TestFixtures.getEquipmentBuilder().modelName("keyb").build();
-        final Equipment equipment4 = TestFixtures.getEquipmentBuilder().modelName("akeyb").build();
-        final Equipment equipment5 = TestFixtures.getEquipmentBuilder().modelName("notForSearch").build();
+        final Equipment equipment1 = TestFixtures.equipmentBuilder().modelName("key").category(CAMERA).build();
+        final Equipment equipment2 = TestFixtures.equipmentBuilder().modelName("akey").category(CAMERA).build();
+        final Equipment equipment3 = TestFixtures.equipmentBuilder().modelName("keyb").category(CAMERA).build();
+        final Equipment equipment4 = TestFixtures.equipmentBuilder().modelName("akeyb").category(ETC).build();
+        final Equipment equipment5 = TestFixtures.equipmentBuilder().modelName("notForSearch").category(CAMERA).build();
         equipmentRepository.save(equipment1);
         equipmentRepository.save(equipment2);
         equipmentRepository.save(equipment3);
@@ -38,12 +40,12 @@ class EquipmentRepositoryTest {
         equipmentRepository.save(equipment5);
 
         final Page<Equipment> equipmentsPage = equipmentRepository.findEquipmentBy(
-                PageRequest.of(0, 2, Sort.by("id").descending()), "key");
+                PageRequest.of(0, 2, Sort.by("id").descending()), "key", CAMERA);
 
         assertAll(
                 () -> assertThat(equipmentsPage.getTotalPages()).isEqualTo(2),
-                () -> assertThat(equipmentsPage.getTotalElements()).isEqualTo(4),
-                () -> assertThat(equipmentsPage.getContent()).containsExactly(equipment4, equipment3)
+                () -> assertThat(equipmentsPage.getTotalElements()).isEqualTo(3),
+                () -> assertThat(equipmentsPage.getContent()).containsExactly(equipment3, equipment2)
         );
     }
 }

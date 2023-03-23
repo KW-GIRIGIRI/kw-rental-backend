@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.util;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -8,13 +9,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class EndPointUtils {
 
-    public static List<String> createAllPageEndPoints(final Page<?> page, final UriComponentsBuilder builder) {
+    public static List<String> createAllPageEndPoints(final Page<?> page) {
+        final ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentRequest();
+        if (page == null || page.isEmpty()) {
+            return Collections.emptyList();
+        }
         final int totalPages = page.getTotalPages();
         return IntStream.range(0, totalPages)
                 .mapToObj(pageCount -> mapToEndPoint(builder, page.getPageable(), pageCount))

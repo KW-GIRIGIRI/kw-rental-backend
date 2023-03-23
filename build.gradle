@@ -23,6 +23,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -44,9 +45,9 @@ dependencies {
 
 def querydslDir = "$buildDir/generated/querydsl"
 
-//sourceSets {
-//    main.java.srcDirs += [querydslDir]
-//}
+sourceSets {
+    main.java.srcDirs += [querydslDir]
+}
 
 tasks.withType(JavaCompile).configureEach {
     options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
@@ -56,13 +57,13 @@ compileJava.doFirst {
     file(querydslDir).deleteDir()
 }
 
-//sourceSets {
-//    main {
-//        java {
-//            srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
-//        }
-//    }
-//}
+sourceSets {
+    main {
+        java {
+            srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+        }
+    }
+}
 
 ext {
     snippetsDir = file('build/generated-snippets')
