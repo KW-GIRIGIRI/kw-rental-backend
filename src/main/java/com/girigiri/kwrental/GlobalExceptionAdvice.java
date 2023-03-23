@@ -1,6 +1,7 @@
 package com.girigiri.kwrental;
 
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -36,8 +37,14 @@ public class GlobalExceptionAdvice {
                 .body(builder.toString());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleInternalServerError(final RuntimeException runtimeException) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(runtimeException.getMessage());
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<String> handleInvalidDataAccess(final DataAccessException e) {
+        return ResponseEntity.badRequest()
+                .body("데이터베이스에 잘못된 접근입니다.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleInternalServerError(final Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 }

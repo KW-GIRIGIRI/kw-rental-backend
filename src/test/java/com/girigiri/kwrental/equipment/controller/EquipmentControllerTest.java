@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -91,6 +92,31 @@ class EquipmentControllerTest {
 
         // when, then
         mockMvc.perform(get("/api/equipments?keyword=" + keyword))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("검색 카테고리가 잘못된 경우 예외처리.")
+    void getEquipments_400_categoryNotMatch() throws Exception {
+        // given
+        String category = "notExistsCategory";
+
+        // when, then
+        mockMvc.perform(get("/api/equipments?category=" + category))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("검색 정렬기준이 잘못된 경우 예외처리.")
+    void getEquipments_400_sortNotMatch() throws Exception {
+        // given
+        String sort = "notExistsSort";
+        given(equipmentService.findEquipmentsBy(any(), any())).willThrow(TransientDataAccessResourceException.class);
+
+        // when, then
+        mockMvc.perform(get("/api/equipments?sort=" + sort))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
