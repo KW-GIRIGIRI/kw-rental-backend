@@ -82,4 +82,16 @@ class EquipmentControllerTest {
                 .andExpect(status().isOk());
         verify(equipmentService).findEquipmentsBy(eq(expectPageRequest), any());
     }
+
+    @Test
+    @DisplayName("검색어가 양끝단 공백제외 2글자 이내 예외처리.")
+    void getEquipments_400_trimmedValueOver200() throws Exception {
+        // given
+        String keyword = "  h  ";
+
+        // when, then
+        mockMvc.perform(get("/api/equipments?keyword=" + keyword))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }

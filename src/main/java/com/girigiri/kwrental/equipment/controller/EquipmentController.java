@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/equipments")
-@Validated
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
@@ -34,7 +33,7 @@ public class EquipmentController {
     }
 
     @GetMapping
-    public EquipmentsPageResponse getEquipmentsPage(EquipmentSearchCondition searchCondition,
+    public EquipmentsPageResponse getEquipmentsPage(@Validated EquipmentSearchCondition searchCondition,
                                                     @PageableDefault(sort = {"id"}, direction = Direction.DESC)
                                                     Pageable pageable) {
         final Page<EquipmentResponse> page = equipmentService.findEquipmentsBy(pageable, searchCondition);

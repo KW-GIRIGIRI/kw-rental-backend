@@ -1,9 +1,10 @@
 package com.girigiri.kwrental;
 
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -23,13 +24,14 @@ public class GlobalExceptionAdvice {
                         e.getParameter().getParameter().getName(), e.getValue()));
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> handleConstraintViolation(final ConstraintViolationException e) {
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<String> handleBindException(final BindException e) {
         StringBuilder builder = new StringBuilder();
-        e.getConstraintViolations()
-                .forEach(violation ->
-                        builder.append(violation.getPropertyPath())
-                                .append(String.format("에 %s를(을) 입력하면 안됩니다.", violation.getInvalidValue())));
+        for (ObjectError error : e.getBindingResult().getAllErrors()) {
+            builder.append(
+                    String.format("%s에 데이터를 바인딩하지 못했습니다. 이유 : %s", error.getObjectName(), error.getDefaultMessage())
+            );
+        }
         return ResponseEntity.badRequest()
                 .body(builder.toString());
     }
