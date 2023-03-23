@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/equipments")
+@Validated
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
@@ -33,8 +35,8 @@ public class EquipmentController {
 
     @GetMapping
     public EquipmentsPageResponse getEquipmentsPage(EquipmentSearchCondition searchCondition,
-                                                    @PageableDefault(sort = {
-                                                            "id"}, direction = Direction.DESC) Pageable pageable) {
+                                                    @PageableDefault(sort = {"id"}, direction = Direction.DESC)
+                                                    Pageable pageable) {
         final Page<EquipmentResponse> page = equipmentService.findEquipmentsBy(pageable, searchCondition);
 
         final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);

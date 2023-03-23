@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.util;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,6 +18,9 @@ public class EndPointUtils {
 
     public static List<String> createAllPageEndPoints(final Page<?> page) {
         final ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentRequest();
+        if (page == null || page.isEmpty()) {
+            return Collections.emptyList();
+        }
         final int totalPages = page.getTotalPages();
         return IntStream.range(0, totalPages)
                 .mapToObj(pageCount -> mapToEndPoint(builder, page.getPageable(), pageCount))
