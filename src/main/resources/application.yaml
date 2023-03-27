@@ -12,3 +12,6 @@ logging:
                 type:
                     descriptor:
                         sql: trace
+
+server:
+    shutdown: graceful
