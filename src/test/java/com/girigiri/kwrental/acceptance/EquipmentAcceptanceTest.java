@@ -164,7 +164,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 
         // when
         final EquipmentPageResponse response = RestAssured.given(this.requestSpec)
-                .filter(document("getEquipmentPageWithSearchAndCategory"))
+                .filter(document("admin_getEquipmentPageWithSearchAndCategory"))
                 .when().get("/api/admin/equipments?size=2&keyword=key&category=CAMERA")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
