@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.equipment.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import jakarta.annotation.Nullable;
@@ -29,9 +29,9 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EquipmentResponse> findEquipmentsBy(final Pageable pageable,
-                                                    @Nullable final EquipmentSearchCondition searchCondition) {
+    public Page<SimpleEquipmentWithRentalQuantityResponse> findEquipmentsBy(final Pageable pageable,
+                                                                            @Nullable final EquipmentSearchCondition searchCondition) {
         return equipmentRepository.findEquipmentBy(pageable, searchCondition.keyword(), searchCondition.category())
-                .map(EquipmentResponse::from);
+                .map(SimpleEquipmentWithRentalQuantityResponse::from);
     }
 }

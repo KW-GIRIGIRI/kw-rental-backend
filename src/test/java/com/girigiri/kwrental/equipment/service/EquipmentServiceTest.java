@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.CleanBeforeEach;
@@ -61,7 +61,7 @@ class EquipmentServiceTest {
         equipmentRepository.save(TestFixtures.createEquipment());
 
         // when
-        final Page<EquipmentResponse> expect = equipmentService.findEquipmentsBy(
+        final Page<SimpleEquipmentWithRentalQuantityResponse> expect = equipmentService.findEquipmentsBy(
                 PageRequest.of(1, 1, Sort.by("id").descending()), new EquipmentSearchCondition(null, null));
 
         // then
@@ -69,7 +69,7 @@ class EquipmentServiceTest {
                 () -> assertThat(expect.hasNext()).isTrue(),
                 () -> assertThat(expect.hasPrevious()).isTrue(),
                 () -> assertThat(expect.getContent()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactly(EquipmentResponse.from(equipment))
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment))
         );
     }
 }

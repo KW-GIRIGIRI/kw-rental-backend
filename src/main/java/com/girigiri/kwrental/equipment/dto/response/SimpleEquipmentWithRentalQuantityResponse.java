@@ -1,10 +1,10 @@
-package com.girigiri.kwrental.equipment.dto;
+package com.girigiri.kwrental.equipment.dto.response;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import lombok.Builder;
 
 @Builder
-public record EquipmentResponse(
+public record SimpleEquipmentWithRentalQuantityResponse(
         Long id,
         String category,
         String maker,
@@ -12,8 +12,8 @@ public record EquipmentResponse(
         RentalQuantityResponse rentalQuantity,
         String imgUrl
 ) {
-    public static EquipmentResponse from(final Equipment equipment) {
-        return EquipmentResponse.builder()
+    public static SimpleEquipmentWithRentalQuantityResponse from(final Equipment equipment) {
+        return SimpleEquipmentWithRentalQuantityResponse.builder()
                 .id(equipment.getId())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())

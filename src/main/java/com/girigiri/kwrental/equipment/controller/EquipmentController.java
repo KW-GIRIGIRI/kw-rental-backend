@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.equipment.controller;
 
-import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
-import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.util.EndPointUtils;
 import java.util.List;
@@ -33,14 +33,16 @@ public class EquipmentController {
     }
 
     @GetMapping
-    public EquipmentsPageResponse getEquipmentsPage(@Validated EquipmentSearchCondition searchCondition,
-                                                    @PageableDefault(sort = {"id"}, direction = Direction.DESC)
-                                                    Pageable pageable) {
-        final Page<EquipmentResponse> page = equipmentService.findEquipmentsBy(pageable, searchCondition);
+    public EquipmentsWithRentalQuantityPageResponse getEquipmentsPage(
+            @Validated EquipmentSearchCondition searchCondition,
+            @PageableDefault(sort = {"id"}, direction = Direction.DESC)
+            Pageable pageable) {
+        final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentService.findEquipmentsBy(pageable,
+                searchCondition);
 
         final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
 
-        return EquipmentsPageResponse.builder()
+        return EquipmentsWithRentalQuantityPageResponse.builder()
                 .endPoints(allPageEndPoints)
                 .page(pageable.getPageNumber())
                 .items(page.getContent())
