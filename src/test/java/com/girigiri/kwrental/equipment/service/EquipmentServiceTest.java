@@ -61,7 +61,7 @@ class EquipmentServiceTest {
         equipmentRepository.save(TestFixtures.createEquipment());
 
         // when
-        final Page<SimpleEquipmentWithRentalQuantityResponse> expect = equipmentService.findEquipmentsBy(
+        final Page<SimpleEquipmentWithRentalQuantityResponse> expect = equipmentService.findEquipmentsWIthRentalQuantityBy(
                 PageRequest.of(1, 1, Sort.by("id").descending()), new EquipmentSearchCondition(null, null));
 
         // then
