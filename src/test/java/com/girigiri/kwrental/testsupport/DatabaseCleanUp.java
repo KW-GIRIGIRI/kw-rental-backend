@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.support;
+package com.girigiri.kwrental.testsupport;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

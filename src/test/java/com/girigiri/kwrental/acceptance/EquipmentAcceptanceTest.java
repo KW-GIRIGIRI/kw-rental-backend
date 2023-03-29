@@ -8,14 +8,13 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
-import com.girigiri.kwrental.TestFixtures;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentsPageResponse;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.support.DatabaseCleanUp;
-import com.girigiri.kwrental.support.ResetDatabaseTest;
+import com.girigiri.kwrental.testsupport.CleanBeforeEach;
+import com.girigiri.kwrental.testsupport.TestFixtures;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -33,7 +32,8 @@ import org.springframework.restdocs.RestDocumentationExtension;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(RestDocumentationExtension.class)
-class EquipmentAcceptanceTest extends ResetDatabaseTest {
+@CleanBeforeEach
+class EquipmentAcceptanceTest {
 
     @LocalServerPort
     private int port;
@@ -42,9 +42,6 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
-
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
@@ -55,7 +52,6 @@ class EquipmentAcceptanceTest extends ResetDatabaseTest {
                         .withResponseDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
-        databaseCleanUp.execute();
     }
 
     @Test

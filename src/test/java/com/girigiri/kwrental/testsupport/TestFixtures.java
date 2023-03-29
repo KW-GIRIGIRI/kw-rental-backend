@@ -1,4 +1,4 @@
-package com.girigiri.kwrental;
+package com.girigiri.kwrental.testsupport;
 
 import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;

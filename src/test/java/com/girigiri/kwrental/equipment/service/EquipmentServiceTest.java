@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.girigiri.kwrental.TestFixtures;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.EquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.support.ResetDatabaseTest;
+import com.girigiri.kwrental.testsupport.CleanBeforeEach;
+import com.girigiri.kwrental.testsupport.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 @SpringBootTest
-class EquipmentServiceTest extends ResetDatabaseTest {
+@CleanBeforeEach
+class EquipmentServiceTest {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
