@@ -30,7 +30,7 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SimpleEquipmentWithRentalQuantityResponse> findEquipmentsWIthRentalQuantityBy(final Pageable pageable,
+    public Page<SimpleEquipmentWithRentalQuantityResponse> findEquipmentsWithRentalQuantityBy(final Pageable pageable,
                                                                                               @Nullable final EquipmentSearchCondition searchCondition) {
         return equipmentRepository.findEquipmentBy(pageable, searchCondition.keyword(), searchCondition.category())
                 .map(SimpleEquipmentWithRentalQuantityResponse::from);
@@ -38,6 +38,7 @@ public class EquipmentService {
 
     public Page<SimpleEquipmentResponse> findEquipments(final Pageable pageable,
                                                         final EquipmentSearchCondition searchCondition) {
-        throw new UnsupportedOperationException();
+        return equipmentRepository.findEquipmentBy(pageable, searchCondition.keyword(), searchCondition.category())
+                .map(SimpleEquipmentResponse::from);
     }
 }

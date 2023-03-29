@@ -60,14 +60,14 @@ class EquipmentControllerTest {
         // given
         long size = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipmentsWIthRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
+        given(equipmentService.findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
                 Page.empty());
 
         // when, then
         mockMvc.perform(get("/api/equipments?size=" + size))
                 .andDo(print())
                 .andExpect(status().isOk());
-        verify(equipmentService).findEquipmentsWIthRentalQuantityBy(eq(expectPageRequest), any());
+        verify(equipmentService).findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any());
     }
 
     @Test
@@ -76,14 +76,14 @@ class EquipmentControllerTest {
         // given
         long page = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipmentsWIthRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
+        given(equipmentService.findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
                 Page.empty());
 
         // when, then
         mockMvc.perform(get("/api/equipments?page=" + page))
                 .andDo(print())
                 .andExpect(status().isOk());
-        verify(equipmentService).findEquipmentsWIthRentalQuantityBy(eq(expectPageRequest), any());
+        verify(equipmentService).findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any());
     }
 
     @Test
@@ -115,7 +115,7 @@ class EquipmentControllerTest {
     void getEquipments_400_sortNotMatch() throws Exception {
         // given
         String sort = "notExistsSort";
-        given(equipmentService.findEquipmentsWIthRentalQuantityBy(any(), any())).willThrow(
+        given(equipmentService.findEquipmentsWithRentalQuantityBy(any(), any())).willThrow(
                 TransientDataAccessResourceException.class);
 
         // when, then

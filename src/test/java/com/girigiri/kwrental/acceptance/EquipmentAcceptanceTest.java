@@ -173,8 +173,8 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.endPoints()).hasSize(2)
-                        .containsExactly("/api/equipments?keyword=key&category=CAMERA&size=2&page=0&sort=id,DESC",
-                                "/api/equipments?keyword=key&category=CAMERA&size=2&page=1&sort=id,DESC"),
+                        .containsExactly("/api/admin/equipments?keyword=key&category=CAMERA&size=2&page=0&sort=id,DESC",
+                                "/api/admin/equipments?keyword=key&category=CAMERA&size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                         .containsExactly(SimpleEquipmentResponse.from(equipment3),
                                 SimpleEquipmentResponse.from(equipment2))

@@ -37,7 +37,7 @@ public class EquipmentController {
             @Validated EquipmentSearchCondition searchCondition,
             @PageableDefault(sort = {"id"}, direction = Direction.DESC)
             Pageable pageable) {
-        final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentService.findEquipmentsWIthRentalQuantityBy(
+        final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentService.findEquipmentsWithRentalQuantityBy(
                 pageable,
                 searchCondition);
 
