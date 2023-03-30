@@ -19,7 +19,7 @@ public record SimpleEquipmentResponse(
                 .imgUrl(equipment.getImgUrl())
                 .modelName(equipment.getModelName())
                 .maker(equipment.getMaker())
-                .totalQuantity(equipment.getRentalQuantity().getTotalQuantity())
+                .totalQuantity(equipment.getTotalQuantity())
                 .build();
     }
 }

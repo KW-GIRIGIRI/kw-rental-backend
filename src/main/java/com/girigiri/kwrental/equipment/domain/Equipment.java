@@ -1,7 +1,6 @@
 package com.girigiri.kwrental.equipment.domain;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,11 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
-// TODO: 2023/03/29 대여 일수 추가, 대여 가능 갯수 로직 분리
 @Getter
-@ToString
 @Entity
 public class Equipment {
 
@@ -30,9 +26,8 @@ public class Equipment {
     @Column(nullable = false)
     private String maker;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String modelName;
-
 
     @Column(nullable = false)
     private String imgUrl;
@@ -40,36 +35,32 @@ public class Equipment {
     @Column(nullable = false)
     private String description;
 
-    @Column
     private String components;
 
-    @Column
     private String purpose;
 
     @Column(nullable = false)
     private String rentalPlace;
 
-    @Embedded
-    private RentalQuantity rentalQuantity;
+    private Integer totalQuantity;
 
     protected Equipment() {
     }
 
     @Builder
     public Equipment(final Long id, final Category category, final String maker, final String modelName,
-                     final RentalQuantity rentalQuantity,
-                     final String imgUrl,
-                     final String description, final String components,
-                     final String purpose, final String rentalPlace) {
+                     final String imgUrl, final String description,
+                     final String components, final String purpose, final String rentalPlace,
+                     final Integer totalQuantity) {
         this.id = id;
         this.category = category;
         this.maker = maker;
         this.modelName = modelName;
-        this.rentalQuantity = rentalQuantity;
         this.imgUrl = imgUrl;
         this.description = description;
         this.components = components;
         this.purpose = purpose;
         this.rentalPlace = rentalPlace;
+        this.totalQuantity = totalQuantity;
     }
 }
