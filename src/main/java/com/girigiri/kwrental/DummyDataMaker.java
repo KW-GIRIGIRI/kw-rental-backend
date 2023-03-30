@@ -23,7 +23,7 @@ public class DummyDataMaker {
 
     @PostConstruct
     public void init() {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             final Equipment equipment = equipmentRepository.save(create(i));
             itemRepository.save(new Item(null, "12345678", true, equipment.getId()));
             itemRepository.save(new Item(null, null, false, equipment.getId()));
