@@ -30,7 +30,7 @@ public class AcceptanceTest {
         RestAssured.requestSpecification = this.requestSpec;
         this.requestSpec = new RequestSpecBuilder()
                 .addFilter(documentationConfiguration(restDocumentation).operationPreprocessors()
-                        .withResponseDefaults(prettyPrint())
+                        .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
     }

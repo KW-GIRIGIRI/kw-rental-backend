@@ -1,0 +1,9 @@
+== 품목 관련 API
+
+=== 기자재의 품목 조회 API
+
+operation::getItemsByEquipment[snippets='http-request,http-response']
+
+=== 기자재 단일 조회 API
+
+operation::getItem[snippets='http-request,http-response']
