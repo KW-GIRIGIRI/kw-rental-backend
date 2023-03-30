@@ -4,6 +4,7 @@ import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.util.EndPointUtils;
 import java.net.URI;
@@ -47,8 +48,16 @@ public class AdminEquipmentController {
 
     @PostMapping
     public ResponseEntity<?> saveEquipment(
-            @RequestBody final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+            @RequestBody @Validated final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+        validateTotalQuantity(addEquipmentWithItemsRequest);
         final Long equipmentId = equipmentService.saveEquipment(addEquipmentWithItemsRequest);
         return ResponseEntity.created(URI.create("/api/equipments/" + equipmentId)).build();
+    }
+
+    private void validateTotalQuantity(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+        if (addEquipmentWithItemsRequest.items().size() != addEquipmentWithItemsRequest.equipment()
+                .getTotalQuantity()) {
+            throw new EquipmentException("품목 갯수와 기자재의 총 갯수가 맞지 않습니다.");
+        }
     }
 }

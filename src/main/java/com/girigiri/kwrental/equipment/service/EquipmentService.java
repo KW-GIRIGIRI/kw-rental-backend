@@ -59,14 +59,14 @@ public class EquipmentService {
 
     private Equipment mapToEquipment(final AddEquipmentRequest addEquipmentRequest) {
         return Equipment.builder()
-                .modelName(addEquipmentRequest.modelName())
-                .maker(addEquipmentRequest.maker())
-                .imgUrl(addEquipmentRequest.imgUrl())
-                .purpose(addEquipmentRequest.purpose())
-                .category(Category.from(addEquipmentRequest.category()))
-                .description(addEquipmentRequest.description())
-                .components(addEquipmentRequest.components())
-                .rentalPlace(addEquipmentRequest.rentalPlace())
+                .modelName(addEquipmentRequest.getModelName())
+                .maker(addEquipmentRequest.getMaker())
+                .imgUrl(addEquipmentRequest.getImgUrl())
+                .purpose(addEquipmentRequest.getPurpose())
+                .category(Category.from(addEquipmentRequest.getCategory()))
+                .description(addEquipmentRequest.getDescription())
+                .components(addEquipmentRequest.getComponents())
+                .rentalPlace(addEquipmentRequest.getRentalPlace())
                 .build();
     }
 }

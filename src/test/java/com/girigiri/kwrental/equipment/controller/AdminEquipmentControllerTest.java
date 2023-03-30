@@ -4,30 +4,56 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest.AddEquipmentRequestBuilder;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AdminEquipmentController.class)
 class AdminEquipmentControllerTest {
 
     private static final String PREFIX = "/api/admin/equipments";
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private EquipmentService equipmentService;
+
+    final List<AddItemRequest> addItemRequests = List.of(
+            new AddItemRequest("propertyNumber"), new AddItemRequest(null));
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    AddEquipmentRequestBuilder addEquipmentRequestBuilder = AddEquipmentRequest.builder()
+            .rentalPlace("rentalDays")
+            .maker("maker")
+            .modelName("modelName")
+            .category("CAMERA")
+            .description("description")
+            .components("component")
+            .purpose("purpose")
+            .imgUrl("imgUrl")
+            .maxRentalDays(1)
+            .totalQuantity(2);
 
     @Test
     @DisplayName("Pageable의 size가 양수가 아닌 경우 10으로 변환된다.")
@@ -93,5 +119,142 @@ class AdminEquipmentControllerTest {
         mockMvc.perform(get(PREFIX + "?sort=" + sort))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 이름이 없는 경우 예외처리")
+    void saveEquipment_400_nameIsEmpty() throws Exception {
+        // given
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .modelName(null).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 제조사가 없는 경우 예외처리")
+    void saveEquipment_400_makerIsEmpty() throws Exception {
+        // given
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .maker(null).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 구성품 문자열 길이가 200 초과 시 예외처리")
+    void saveEquipment_400_componentOver200() throws Exception {
+        // given
+        String components = "a".repeat(201);
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .components(components).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 목적 문자열 길이가 100 초과 시 예외처리")
+    void saveEquipment_400_purposeOver100() throws Exception {
+        // given
+        String purpose = "a".repeat(101);
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .purpose(purpose).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 대여장소가 없을 시 예외처리")
+    void saveEquipment_400_rentalPlaceIsNull() throws Exception {
+        // given
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .rentalPlace(null).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 최대 대여 일 수가 양수가 아닌 경우 예외처리")
+    void saveEquipment_400_maxRentalDaysNegative() throws Exception {
+        // given
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .maxRentalDays(0).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 안내사항 문자열 길이가 500 초과 시 예외처리")
+    void saveEquipment_400_descriptionOver500() throws Exception {
+        // given
+        String description = "a".repeat(501);
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .description(description).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("기자재 추가 시 총 갯수와 품목 갯수가 맞지 않을 시 예외처리")
+    void saveEquipment_400_totalQuantityNotMatch() throws Exception {
+        // given
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder
+                .totalQuantity(1).build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("데이터베이스 제약조건(unique 조건)을 위배한 경우 예외 처리")
+    void saveEquipment_duplicatedModelName() throws Exception {
+        // given
+        given(equipmentService.saveEquipment(any())).willThrow(DataIntegrityViolationException.class);
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentRequestBuilder.build();
+        final String requestBody = createAddEquipmentAndDefaultItemsRequestBody(
+                addEquipmentRequest);
+
+        // when, then
+        mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    private String createAddEquipmentAndDefaultItemsRequestBody(final AddEquipmentRequest addEquipmentRequest)
+            throws JsonProcessingException {
+        final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest = new AddEquipmentWithItemsRequest(
+                addEquipmentRequest, addItemRequests);
+        return objectMapper.writeValueAsString(addEquipmentWithItemsRequest);
     }
 }

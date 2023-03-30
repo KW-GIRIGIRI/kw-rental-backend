@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 
-// TODO: 2023/03/29 대여 일수 추가, 대여 가능 갯수 로직 분리
 @Getter
 @Entity
 public class Equipment {
@@ -27,7 +26,7 @@ public class Equipment {
     @Column(nullable = false)
     private String maker;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String modelName;
 
     @Column(nullable = false)

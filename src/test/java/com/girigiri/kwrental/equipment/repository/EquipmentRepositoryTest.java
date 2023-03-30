@@ -3,6 +3,7 @@ package com.girigiri.kwrental.equipment.repository;
 import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
 import static com.girigiri.kwrental.equipment.domain.Category.ETC;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.girigiri.kwrental.config.JpaConfig;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -47,5 +49,18 @@ class EquipmentRepositoryTest {
                 () -> assertThat(equipmentsPage.getTotalElements()).isEqualTo(3),
                 () -> assertThat(equipmentsPage.getContent()).containsExactly(equipment3, equipment2)
         );
+    }
+
+    @Test
+    @DisplayName("중복된 모델이름으로 기자재를 등록하려면 예외가 발생한다.")
+    void save_duplicatedModelName() {
+        // given
+        final Equipment equipment = EquipmentFixture.create();
+        equipmentRepository.save(equipment);
+        final Equipment duplicatedModelNameEquipment = EquipmentFixture.create();
+
+        // when, then
+        assertThatThrownBy(() -> equipmentRepository.save(duplicatedModelNameEquipment))
+                .isExactlyInstanceOf(DataIntegrityViolationException.class);
     }
 }

@@ -123,7 +123,7 @@ class EquipmentServiceTest {
     void saveEquipment() {
         // given
         AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest("rentalPlace", "modelName", "CAMERA",
-                "maker", "imgUrl", "component", "purpose", "description", 1);
+                "maker", "imgUrl", "component", "purpose", "description", 1, 2);
         final AddItemRequest addItemRequest = new AddItemRequest("propertyNumber");
         final AddEquipmentWithItemsRequest request = new AddEquipmentWithItemsRequest(addEquipmentRequest,
                 List.of(addItemRequest));
@@ -146,7 +146,7 @@ class EquipmentServiceTest {
         AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest(
                 "rentalPlace", "modelName", "invalidCategory",
                 "maker", "imgUrl", "component",
-                "purpose", "description", 1);
+                "purpose", "description", 1, 1);
         final AddItemRequest addItemRequest = new AddItemRequest("propertyNumber");
         final AddEquipmentWithItemsRequest request = new AddEquipmentWithItemsRequest(addEquipmentRequest,
                 List.of(addItemRequest));

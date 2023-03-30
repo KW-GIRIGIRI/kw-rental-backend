@@ -56,13 +56,13 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("기자재 목록 조회 API")
     void getEquipmentsPage() {
         // given
-        final Equipment equipment1 = EquipmentFixture.create();
+        final Equipment equipment1 = EquipmentFixture.builder().modelName("name1").build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.create();
+        final Equipment equipment2 = EquipmentFixture.builder().modelName("name2").build();
         equipmentRepository.save(equipment2);
-        final Equipment equipment3 = EquipmentFixture.create();
+        final Equipment equipment3 = EquipmentFixture.builder().modelName("name3").build();
         equipmentRepository.save(equipment3);
-        final Equipment equipment4 = EquipmentFixture.create();
+        final Equipment equipment4 = EquipmentFixture.builder().modelName("name4").build();
         equipmentRepository.save(equipment4);
 
         // when
@@ -195,7 +195,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         final AddEquipmentRequest equipment = new AddEquipmentRequest(
                 "rentalDays", "modelName",
                 "CAMERA", "maker", "imgUrl",
-                "component", "purpose", "description", 1);
+                "component", "purpose", "description", 1, 2);
         final List<AddItemRequest> items = List.of(new AddItemRequest("propertyNumber"), new AddItemRequest(null));
         final AddEquipmentWithItemsRequest requestBody = new AddEquipmentWithItemsRequest(equipment, items);
 

@@ -1,7 +1,9 @@
 package com.girigiri.kwrental;
 
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -41,6 +43,16 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<String> handleInvalidDataAccess(final DataAccessException e) {
         return ResponseEntity.badRequest()
                 .body("데이터베이스에 잘못된 접근입니다.");
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<String> handleDuplicateKey(final DuplicateKeyException e) {
+        return ResponseEntity.badRequest().body("중복되서는 안되는 값이 중복된 요청입니다.");
+    }
+
+    @ExceptionHandler(EquipmentException.class)
+    public ResponseEntity<String> handleEquipmentException(final EquipmentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

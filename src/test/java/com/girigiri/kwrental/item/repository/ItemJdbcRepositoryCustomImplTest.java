@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.item.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @DataJpaTest
@@ -39,5 +41,17 @@ class ItemJdbcRepositoryCustomImplTest {
 
         // then
         assertThat(expect).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("품목의 자산 번호가 중복되면 예외가 발생한다.")
+    void saveAll_duplicatedPropertyNumber() {
+        // given
+        final Item item1 = ItemFixture.builder().propertyNumber("12345678").build();
+        final Item item2 = ItemFixture.builder().propertyNumber("12345678").build();
+
+        // when, then
+        assertThatThrownBy(() -> itemJdbcRepositoryCustomImpl.saveAll(List.of(item1, item2)))
+                .isExactlyInstanceOf(DuplicateKeyException.class);
     }
 }
