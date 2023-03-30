@@ -15,3 +15,7 @@ operation::getEquipmentsPageWithSearch[snippets='http-request,http-response']
 === 기자재 목록 페이지 모델명과 카테고리로 필터링해서 조회
 
 operation::admin_getEquipmentPageWithSearchAndCategory[snippets='http-request,http-response']
+
+=== 기자재 추가
+
+operation::admin_addEquipment[snippets='http-request,http-response']

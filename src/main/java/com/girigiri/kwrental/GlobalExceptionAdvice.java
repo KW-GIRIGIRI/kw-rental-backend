@@ -1,7 +1,7 @@
 package com.girigiri.kwrental;
 
+import com.girigiri.kwrental.common.exception.NotFoundException;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -15,9 +15,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
 
-    @ExceptionHandler(EquipmentNotFoundException.class)
-    public ResponseEntity<String> handleEquipmentNotFound(final EquipmentNotFoundException equipmentNotFoundException) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(equipmentNotFoundException.getMessage());
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFound(final NotFoundException notFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundException.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
