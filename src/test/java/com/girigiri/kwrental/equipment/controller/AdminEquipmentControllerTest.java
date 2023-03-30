@@ -3,12 +3,10 @@ package com.girigiri.kwrental.equipment.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +19,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = {EquipmentController.class})
-class EquipmentControllerTest {
+@WebMvcTest(AdminEquipmentController.class)
+class AdminEquipmentControllerTest {
 
+    private static final String PREFIX = "/api/admin/equipments";
     @Autowired
     private MockMvc mockMvc;
 
@@ -31,43 +30,17 @@ class EquipmentControllerTest {
     private EquipmentService equipmentService;
 
     @Test
-    @DisplayName("등록되지 않은 기자재 id로 기자재 상세 조회 요청하면 404를 응답한다.")
-    void getEquipment_404_notFoundId() throws Exception {
-        // given
-        long notExistsId = 1L;
-        given(equipmentService.findById(notExistsId)).willThrow(EquipmentNotFoundException.class);
-
-        // when, then
-        mockMvc.perform(get("/api/equipments/" + notExistsId))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("id가 문자열이면 400을 응답한다.")
-    void getEquipment_400_idIsNotNumeric() throws Exception {
-        // given
-        String invalidId = "hi";
-
-        // when, then
-        mockMvc.perform(get("/api/equipments/" + invalidId))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     @DisplayName("Pageable의 size가 양수가 아닌 경우 10으로 변환된다.")
     void getEquipments_200_sizeNotPositive() throws Exception {
         // given
         long size = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
-                Page.empty());
+        given(equipmentService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
 
         // when, then
-        mockMvc.perform(get("/api/equipments?size=" + size))
+        mockMvc.perform(get(PREFIX + "?size=" + size))
                 .andDo(print())
                 .andExpect(status().isOk());
-        verify(equipmentService).findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any());
     }
 
     @Test
@@ -76,14 +49,12 @@ class EquipmentControllerTest {
         // given
         long page = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any())).willReturn(
-                Page.empty());
+        given(equipmentService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
 
         // when, then
-        mockMvc.perform(get("/api/equipments?page=" + page))
+        mockMvc.perform(get(PREFIX + "?page=" + page))
                 .andDo(print())
                 .andExpect(status().isOk());
-        verify(equipmentService).findEquipmentsWithRentalQuantityBy(eq(expectPageRequest), any());
     }
 
     @Test
@@ -93,7 +64,7 @@ class EquipmentControllerTest {
         String keyword = "  h  ";
 
         // when, then
-        mockMvc.perform(get("/api/equipments?keyword=" + keyword))
+        mockMvc.perform(get(PREFIX + "?keyword=" + keyword))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -105,7 +76,7 @@ class EquipmentControllerTest {
         String category = "notExistsCategory";
 
         // when, then
-        mockMvc.perform(get("/api/equipments?category=" + category))
+        mockMvc.perform(get(PREFIX + "?category=" + category))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -115,11 +86,11 @@ class EquipmentControllerTest {
     void getEquipments_400_sortNotMatch() throws Exception {
         // given
         String sort = "notExistsSort";
-        given(equipmentService.findEquipmentsWithRentalQuantityBy(any(), any())).willThrow(
+        given(equipmentService.findEquipments(any(), any())).willThrow(
                 TransientDataAccessResourceException.class);
 
         // when, then
-        mockMvc.perform(get("/api/equipments?sort=" + sort))
+        mockMvc.perform(get(PREFIX + "?sort=" + sort))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }

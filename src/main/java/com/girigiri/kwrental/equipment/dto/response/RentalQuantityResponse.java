@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment.dto;
+package com.girigiri.kwrental.equipment.dto.response;
 
 import com.girigiri.kwrental.equipment.domain.RentalQuantity;
 

@@ -1,10 +1,10 @@
-package com.girigiri.kwrental.equipment.dto;
+package com.girigiri.kwrental.equipment.dto.response;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import lombok.Builder;
 
 @Builder
-public record EquipmentDetailResponse(long id, String rentalPlace, String modelName,
+public record EquipmentDetailResponse(Long id, String rentalPlace, String modelName,
                                       String category, String maker, String imgUrl,
                                       String components, String purpose, String description,
                                       RentalQuantityResponse rentalQuantity) {
