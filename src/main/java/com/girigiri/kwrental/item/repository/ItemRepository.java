@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.repository.Repository;
 import org.springframework.lang.NonNull;
 
-public interface ItemRepository extends Repository<Item, Long>, ItemJdbcRepositoryCustom {
+public interface ItemRepository extends Repository<Item, Long>, ItemJdbcRepositoryCustom, ItemQueryDslRepositoryCustom {
 
     List<Item> findByEquipmentId(@NonNull Long equipmentId);
 

@@ -7,3 +7,11 @@ operation::getItemsByEquipment[snippets='http-request,http-response']
 === 기자재 단일 조회 API
 
 operation::getItem[snippets='http-request,http-response']
+
+=== 관리자 품목 대여 가능 상태 변경 API
+
+operation::admin_updateRentalAvailable[snippets='http-request,http-response']
+
+=== 관리자 품목 자산 번호 변경 API
+
+operation::admin_updatePropertyNumber[snippets='http-request,http-response']

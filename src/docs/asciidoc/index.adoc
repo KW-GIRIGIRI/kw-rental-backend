@@ -6,3 +6,4 @@
 = KW - GIRIGIRI
 
 include::equipment.adoc[]
+include::item.adoc[]
