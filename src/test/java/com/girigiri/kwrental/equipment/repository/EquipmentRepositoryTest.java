@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.testsupport.TestFixtures;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ class EquipmentRepositoryTest {
     @DisplayName("기자재를 모델 이름과 카테고리로 검색해서 목록 조회한다.")
     void findEquipmentBy() {
         // given
-        final Equipment equipment1 = TestFixtures.equipmentBuilder().modelName("key").category(CAMERA).build();
-        final Equipment equipment2 = TestFixtures.equipmentBuilder().modelName("akey").category(CAMERA).build();
-        final Equipment equipment3 = TestFixtures.equipmentBuilder().modelName("keyb").category(CAMERA).build();
-        final Equipment equipment4 = TestFixtures.equipmentBuilder().modelName("akeyb").category(ETC).build();
-        final Equipment equipment5 = TestFixtures.equipmentBuilder().modelName("notForSearch").category(CAMERA).build();
+        final Equipment equipment1 = EquipmentFixture.builder().modelName("key").category(CAMERA).build();
+        final Equipment equipment2 = EquipmentFixture.builder().modelName("akey").category(CAMERA).build();
+        final Equipment equipment3 = EquipmentFixture.builder().modelName("keyb").category(CAMERA).build();
+        final Equipment equipment4 = EquipmentFixture.builder().modelName("akeyb").category(ETC).build();
+        final Equipment equipment5 = EquipmentFixture.builder().modelName("notForSearch").category(CAMERA).build();
         equipmentRepository.save(equipment1);
         equipmentRepository.save(equipment2);
         equipmentRepository.save(equipment3);

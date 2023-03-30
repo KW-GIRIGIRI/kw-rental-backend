@@ -5,15 +5,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.testsupport.TestFixtures;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +37,9 @@ class EquipmentServiceTest {
     @Mock
     private EquipmentRepository equipmentRepository;
 
+    @Mock
+    private ItemService itemService;
+
     @InjectMocks
     private EquipmentService equipmentService;
 
@@ -40,7 +47,7 @@ class EquipmentServiceTest {
     @DisplayName("등록된 기자재를 조회할 수 있다.")
     void findById() {
         // given
-        final Equipment equipment = TestFixtures.createEquipment();
+        final Equipment equipment = EquipmentFixture.create();
         final long id = 1L;
         given(equipmentRepository.findById(id)).willReturn(Optional.of(equipment));
 
@@ -70,7 +77,7 @@ class EquipmentServiceTest {
         // given
         final PageRequest pageable = PageRequest.of(1, 1, Sort.by("id").descending());
 
-        final Equipment equipment = TestFixtures.equipmentBuilder().id(2L).build();
+        final Equipment equipment = EquipmentFixture.builder().id(2L).build();
         given(equipmentRepository.findEquipmentBy(any(), any(), any()))
                 .willReturn(new PageImpl<>(List.of(equipment), pageable, 3));
 
@@ -93,7 +100,7 @@ class EquipmentServiceTest {
         // given
         final PageRequest pageable = PageRequest.of(1, 1, Sort.by("id").descending());
 
-        final Equipment equipment = TestFixtures.equipmentBuilder().id(2L).build();
+        final Equipment equipment = EquipmentFixture.builder().id(2L).build();
         given(equipmentRepository.findEquipmentBy(any(), any(), any()))
                 .willReturn(new PageImpl<>(List.of(equipment), pageable, 3));
 
@@ -108,5 +115,25 @@ class EquipmentServiceTest {
                 () -> assertThat(expect.getContent()).usingRecursiveFieldByFieldElementComparator()
                         .containsExactly(SimpleEquipmentResponse.from(equipment))
         );
+    }
+
+    @Test
+    @DisplayName("기자재 저장 API")
+    void saveEquipment() {
+        // given
+        AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest("rentalPlace", "modelName", "CAMERA",
+                "maker", "imgUrl", "component", "purpose", "description", 1);
+        final AddItemRequest addItemRequest = new AddItemRequest("propertyNumber");
+        final AddEquipmentWithItemsRequest request = new AddEquipmentWithItemsRequest(addEquipmentRequest,
+                List.of(addItemRequest));
+        final Equipment equipment = EquipmentFixture.builder().id(1L).build();
+        given(equipmentRepository.save(any())).willReturn(equipment);
+
+        // when
+        equipmentService.saveEquipment(request);
+
+        // then
+        verify(equipmentRepository).save(any());
+        verify(itemService).saveItems(any(), any());
     }
 }

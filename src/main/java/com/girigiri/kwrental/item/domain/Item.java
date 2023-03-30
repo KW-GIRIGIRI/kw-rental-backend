@@ -20,6 +20,7 @@ public class Item {
     @Column(unique = true)
     private String propertyNumber;
 
+    @Builder.Default
     private boolean rentalAvailable = true;
 
     @Column(nullable = false)

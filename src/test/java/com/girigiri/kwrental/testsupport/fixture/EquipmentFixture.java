@@ -1,11 +1,11 @@
-package com.girigiri.kwrental.testsupport;
+package com.girigiri.kwrental.testsupport.fixture;
 
 import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.domain.Equipment.EquipmentBuilder;
 import com.girigiri.kwrental.equipment.domain.RentalQuantity;
 
-public class TestFixtures {
+public class EquipmentFixture {
     private static final String modelName = "modelName";
     private static final String maker = "sony";
     private static final int totalQuantity = 2;
@@ -17,7 +17,7 @@ public class TestFixtures {
     private static final String imgUrl = "www.naver.com";
     private static final String description = "description";
 
-    public static EquipmentBuilder equipmentBuilder() {
+    public static EquipmentBuilder builder() {
         return Equipment.builder()
                 .category(Category.CAMERA)
                 .maker(maker)
@@ -30,8 +30,8 @@ public class TestFixtures {
                 .rentalPlace(rentalPlace);
     }
 
-    public static Equipment createEquipment() {
-        return equipmentBuilder()
+    public static Equipment create() {
+        return builder()
                 .build();
     }
 }

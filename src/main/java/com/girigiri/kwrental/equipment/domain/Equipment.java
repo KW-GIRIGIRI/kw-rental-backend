@@ -10,11 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 // TODO: 2023/03/29 대여 일수 추가, 대여 가능 갯수 로직 분리
 @Getter
-@ToString
 @Entity
 public class Equipment {
 
