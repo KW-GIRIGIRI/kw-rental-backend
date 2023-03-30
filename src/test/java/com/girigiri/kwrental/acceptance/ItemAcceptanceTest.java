@@ -6,6 +6,8 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
+import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
@@ -13,6 +15,7 @@ import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import io.restassured.RestAssured;
 import java.util.List;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +72,41 @@ class ItemAcceptanceTest extends AcceptanceTest {
         assertThat(response).usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(ItemResponse.from(item1));
+    }
+
+    @Test
+    @DisplayName("관리자 품목 대여 가능 상태 변경 API")
+    void updateRentalAvailable() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        itemRepository.save(item1);
+        final ItemRentalAvailableRequest requestBody = new ItemRentalAvailableRequest(false);
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_updateRentalAvailable"))
+                .contentType(ContentType.APPLICATION_JSON.getMimeType())
+                .body(requestBody)
+                .when().log().all().patch("/api/items/" + item1.getId() + "/rentalAvailable")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("관리자 품목 자산번호 변경 API")
+    void updatePropertyNumber() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        itemRepository.save(item1);
+        final ItemPropertyNumberRequest requestBody = new ItemPropertyNumberRequest("updatedNumber");
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_updatePropertyNumber"))
+                .contentType(ContentType.APPLICATION_JSON.getMimeType())
+                .body(requestBody)
+                .when().log().all().patch("/api/items/" + item1.getId() + "/propertyNumber")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
