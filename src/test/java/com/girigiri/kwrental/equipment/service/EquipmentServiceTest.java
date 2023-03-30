@@ -16,6 +16,7 @@ import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import java.util.List;
@@ -130,10 +131,28 @@ class EquipmentServiceTest {
         given(equipmentRepository.save(any())).willReturn(equipment);
 
         // when
-        equipmentService.saveEquipment(request);
+        final Long id = equipmentService.saveEquipment(request);
 
         // then
+        assertThat(id).isOne();
         verify(equipmentRepository).save(any());
         verify(itemService).saveItems(any(), any());
+    }
+
+    @Test
+    @DisplayName("기자재 저장에서 잘못된 카테고리 예외 처리")
+    void saveEquipment_invalidCategory() {
+        // given
+        AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest(
+                "rentalPlace", "modelName", "invalidCategory",
+                "maker", "imgUrl", "component",
+                "purpose", "description", 1);
+        final AddItemRequest addItemRequest = new AddItemRequest("propertyNumber");
+        final AddEquipmentWithItemsRequest request = new AddEquipmentWithItemsRequest(addEquipmentRequest,
+                List.of(addItemRequest));
+
+        // when, then
+        assertThatThrownBy(() -> equipmentService.saveEquipment(request))
+                .isExactlyInstanceOf(InvalidCategoryException.class);
     }
 }

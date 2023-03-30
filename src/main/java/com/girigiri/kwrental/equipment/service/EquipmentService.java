@@ -50,10 +50,11 @@ public class EquipmentService {
     }
 
     @Transactional
-    public void saveEquipment(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
-        final Equipment equipment = mapToEquipment(addEquipmentWithItemsRequest.equipment());
-        equipmentRepository.save(equipment);
+    public Long saveEquipment(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+        final AddEquipmentRequest addEquipmentRequest = addEquipmentWithItemsRequest.equipment();
+        final Equipment equipment = equipmentRepository.save(mapToEquipment(addEquipmentRequest));
         itemService.saveItems(equipment.getId(), addEquipmentWithItemsRequest.items());
+        return equipment.getId();
     }
 
     private Equipment mapToEquipment(final AddEquipmentRequest addEquipmentRequest) {
@@ -62,7 +63,7 @@ public class EquipmentService {
                 .maker(addEquipmentRequest.maker())
                 .imgUrl(addEquipmentRequest.imgUrl())
                 .purpose(addEquipmentRequest.purpose())
-                .category(Category.valueOf(addEquipmentRequest.category()))
+                .category(Category.from(addEquipmentRequest.category()))
                 .description(addEquipmentRequest.description())
                 .components(addEquipmentRequest.components())
                 .rentalPlace(addEquipmentRequest.rentalPlace())
