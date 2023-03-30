@@ -88,7 +88,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
                 .filter(document("admin_updateRentalAvailable"))
                 .contentType(ContentType.APPLICATION_JSON.getMimeType())
                 .body(requestBody)
-                .when().log().all().patch("/api/items/" + item1.getId() + "/rentalAvailable")
+                .when().log().all().patch("/api/admin/items/" + item1.getId() + "/rentalAvailable")
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
     }
 
@@ -106,7 +106,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
                 .filter(document("admin_updatePropertyNumber"))
                 .contentType(ContentType.APPLICATION_JSON.getMimeType())
                 .body(requestBody)
-                .when().log().all().patch("/api/items/" + item1.getId() + "/propertyNumber")
+                .when().log().all().patch("/api/admin/items/" + item1.getId() + "/propertyNumber")
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
