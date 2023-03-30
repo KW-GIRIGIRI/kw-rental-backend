@@ -47,4 +47,27 @@ class ItemAcceptanceTest extends AcceptanceTest {
         assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .contains(ItemResponse.from(item1), ItemResponse.from(item2));
     }
+
+    @Test
+    @DisplayName("품목 조회 API")
+    void getItem() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber(null).build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+
+        // when
+        final ItemResponse response = RestAssured.given(requestSpec)
+                .filter(document("getItem"))
+                .when().get("/api/items/" + item1.getId())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .and().extract().as(ItemResponse.class);
+
+        // then
+        assertThat(response).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(ItemResponse.from(item1));
+    }
 }

@@ -5,7 +5,9 @@ import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.equipment.service.ItemService;
 import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
+import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -44,5 +46,11 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(EquipmentNotFoundException::new);
         final List<Item> items = itemRepository.findByEquipmentId(equipmentId);
         return ItemsResponse.of(items);
+    }
+
+    public ItemResponse getItem(final Long id) {
+        final Item item = itemRepository.findById(id)
+                .orElseThrow(ItemNotFoundException::new);
+        return ItemResponse.from(item);
     }
 }
