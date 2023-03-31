@@ -208,4 +208,20 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/equipments/"));
     }
+
+    @Test
+    @DisplayName("관리자가 기자재 삭제 API")
+    void deleteEquipment() {
+        // given
+        final Equipment equipment = EquipmentFixture.create();
+        equipmentRepository.save(equipment);
+
+        // when
+        RestAssured.given(this.requestSpec)
+                .filter(document("admin_deleteEquipment"))
+                .contentType(ContentType.JSON)
+                .when().log().all().delete("/api/admin/equipments/" + equipment.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
 }
