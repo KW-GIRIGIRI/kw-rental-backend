@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,5 +61,11 @@ public class AdminEquipmentController {
                 .getTotalQuantity()) {
             throw new EquipmentException("품목 갯수와 기자재의 총 갯수가 맞지 않습니다.");
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteEquipment(@PathVariable Long id) {
+        equipmentService.deleteEquipment(id);
+        return ResponseEntity.noContent().build();
     }
 }

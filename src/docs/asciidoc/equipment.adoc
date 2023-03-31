@@ -19,3 +19,9 @@ operation::admin_getEquipmentPageWithSearchAndCategory[snippets='http-request,ht
 === 기자재 추가
 
 operation::admin_addEquipment[snippets='http-request,http-response']
+
+=== 기자재 삭제
+
+==== 기자재와 관련된 품목, 대여가 삭제된다.
+
+operation::admin_deleteEquipment[snippets='http-request,http-response']

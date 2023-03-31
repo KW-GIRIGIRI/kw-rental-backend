@@ -11,6 +11,7 @@ import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQua
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import jakarta.annotation.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,13 @@ public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
     private final ItemService itemService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public EquipmentService(final EquipmentRepository equipmentRepository, final ItemService itemService) {
+    public EquipmentService(final EquipmentRepository equipmentRepository, final ItemService itemService,
+                            final ApplicationEventPublisher eventPublisher) {
         this.equipmentRepository = equipmentRepository;
         this.itemService = itemService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -68,5 +72,10 @@ public class EquipmentService {
                 .components(addEquipmentRequest.getComponents())
                 .rentalPlace(addEquipmentRequest.getRentalPlace())
                 .build();
+    }
+
+    public void deleteEquipment(final Long id) {
+        equipmentRepository.deleteById(id);
+        eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
     }
 }
