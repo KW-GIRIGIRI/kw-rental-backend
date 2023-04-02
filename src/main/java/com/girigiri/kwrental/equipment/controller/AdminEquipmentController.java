@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.equipment.controller;
 
+import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
@@ -7,21 +8,20 @@ import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.util.EndPointUtils;
-import java.net.URI;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/equipments")
@@ -29,8 +29,11 @@ public class AdminEquipmentController {
 
     private final EquipmentService equipmentService;
 
-    public AdminEquipmentController(final EquipmentService equipmentService) {
+    private final MultiPartFileHandler multiPartFileHandler;
+
+    public AdminEquipmentController(final EquipmentService equipmentService, MultiPartFileHandler multiPartFileHandler) {
         this.equipmentService = equipmentService;
+        this.multiPartFileHandler = multiPartFileHandler;
     }
 
     @GetMapping
@@ -67,5 +70,13 @@ public class AdminEquipmentController {
     public ResponseEntity<?> deleteEquipment(@PathVariable Long id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/images")
+    public ResponseEntity<?> uploadImage(@RequestPart("file") final MultipartFile multipartFile) throws IOException, URISyntaxException {
+        URL url = multiPartFileHandler.upload(multipartFile);
+        return ResponseEntity.noContent()
+                .location(url.toURI())
+                .build();
     }
 }

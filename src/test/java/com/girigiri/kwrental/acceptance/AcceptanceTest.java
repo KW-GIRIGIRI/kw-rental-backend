@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.girigiri.kwrental.testsupport.databasecleanup.CleanBeforeEach;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -20,6 +22,8 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 @CleanBeforeEach
 public class AcceptanceTest {
 
+    @MockBean
+    protected AmazonS3 amazonS3;
     protected RequestSpecification requestSpec;
     @LocalServerPort
     private int port;
