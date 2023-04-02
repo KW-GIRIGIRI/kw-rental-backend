@@ -1,11 +1,12 @@
-package com.girigiri.kwrental.testsupport;
+package com.girigiri.kwrental.testsupport.databasecleanup;
+
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestExecutionListeners.MergeMode;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

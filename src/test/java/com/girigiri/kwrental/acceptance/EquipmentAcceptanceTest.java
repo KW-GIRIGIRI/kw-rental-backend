@@ -1,31 +1,33 @@
 package com.girigiri.kwrental.acceptance;
 
-import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
-import static com.girigiri.kwrental.equipment.domain.Category.ETC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+
+import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
+import static com.girigiri.kwrental.equipment.domain.Category.ETC;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class EquipmentAcceptanceTest extends AcceptanceTest {
 
@@ -223,5 +225,24 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                 .when().log().all().delete("/api/admin/equipments/" + equipment.getId())
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("관리자가 이미지 등록 API")
+    void uploadEquipmentImage() throws IOException {
+        // given
+        given(amazonS3.getUrl(any(), any())).willReturn(new URL("http://localhost:8001/mock.png"));
+
+        MockMultipartFile file = new MockMultipartFile("test", "test.png", "image/png", "test".getBytes());
+
+        // when
+        RestAssured.given(this.requestSpec)
+                .filter(document("admin_uploadImage"))
+                .contentType(ContentType.MULTIPART)
+                .multiPart("file", "file.png", file.getInputStream())
+                .when().log().all().post("/api/admin/equipments/images")
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .header(HttpHeaders.LOCATION, containsString(".png"));
     }
 }

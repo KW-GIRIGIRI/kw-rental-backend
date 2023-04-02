@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.equipment.domain;
 
-import com.girigiri.kwrental.equipment.exception.RentalQualtityException;
+import com.girigiri.kwrental.equipment.exception.RentalQuantityException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -26,13 +26,13 @@ public class RentalQuantity {
 
     private static void validateQuantity(final int totalQuantity, final int remainingQuantity) {
         if (remainingQuantity < 0) {
-            throw new RentalQualtityException("남은 갯수가 음수일 수 없습니다.");
+            throw new RentalQuantityException("남은 갯수가 음수일 수 없습니다.");
         }
         if (totalQuantity < 0) {
-            throw new RentalQualtityException("전체 갯수가 음수일 수 없습니다.");
+            throw new RentalQuantityException("전체 갯수가 음수일 수 없습니다.");
         }
         if (totalQuantity < remainingQuantity) {
-            throw new RentalQualtityException("전체 갯수가 남은 갯수보다 적으면 안됩니다.");
+            throw new RentalQuantityException("전체 갯수가 남은 갯수보다 적으면 안됩니다.");
         }
     }
 }
