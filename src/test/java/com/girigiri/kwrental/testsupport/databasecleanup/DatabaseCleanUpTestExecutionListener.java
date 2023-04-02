@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.testsupport;
+package com.girigiri.kwrental.testsupport.databasecleanup;
 
 import org.junit.jupiter.api.Order;
 import org.springframework.beans.factory.annotation.Autowired;

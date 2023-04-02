@@ -1,15 +1,16 @@
-package com.girigiri.kwrental.testsupport;
+package com.girigiri.kwrental.testsupport.databasecleanup;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DatabaseCleanUp implements InitializingBean {
