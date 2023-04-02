@@ -1,10 +1,10 @@
 package com.girigiri.kwrental.equipment.domain;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.girigiri.kwrental.equipment.exception.RentalQualtityException;
+import com.girigiri.kwrental.equipment.exception.RentalQuantityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RentalQuantityTest {
 
@@ -16,7 +16,7 @@ class RentalQuantityTest {
 
         // when, then
         assertThatThrownBy(() -> new RentalQuantity(1, invalidRemainingQuantity))
-                .isInstanceOf(RentalQualtityException.class)
+                .isInstanceOf(RentalQuantityException.class)
                 .hasMessageContaining("남은 갯수가 음수");
     }
 
@@ -28,7 +28,7 @@ class RentalQuantityTest {
 
         // when, then
         assertThatThrownBy(() -> new RentalQuantity(invalidTotalQuantity, 1))
-                .isInstanceOf(RentalQualtityException.class)
+                .isInstanceOf(RentalQuantityException.class)
                 .hasMessageContaining("전체 갯수가 음수");
     }
 
@@ -41,7 +41,7 @@ class RentalQuantityTest {
 
         // when, then
         assertThatThrownBy(() -> new RentalQuantity(totalQuantity, remainingQuantity))
-                .isInstanceOf(RentalQualtityException.class)
+                .isInstanceOf(RentalQuantityException.class)
                 .hasMessageContaining("전체 갯수가 남은 갯수보다 적으면 안됩니다.");
     }
 }

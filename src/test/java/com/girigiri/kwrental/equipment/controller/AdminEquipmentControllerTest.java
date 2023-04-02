@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.equipment.controller;
 
+import com.amazonaws.services.kms.model.AWSKMSException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
@@ -254,6 +255,17 @@ class AdminEquipmentControllerTest {
         mockMvc.perform(post(PREFIX).content(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("이미지 업로드 중 AWS 예외가 발생한 경우 예외 처리")
+    void uploadImage_AmazonServiceException() throws Exception {
+        given(multiPartFileHandler.upload(any())).willThrow(AWSKMSException.class);
+
+        // when, then
+        mockMvc.perform(post(PREFIX + "/images").contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isInternalServerError());
     }
 
     private String createAddEquipmentAndDefaultItemsRequestBody(final AddEquipmentRequest addEquipmentRequest)

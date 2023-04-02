@@ -1,5 +1,7 @@
 package com.girigiri.kwrental;
 
+import com.amazonaws.AmazonServiceException;
+import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import org.springframework.dao.DataAccessException;
@@ -52,6 +54,16 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(EquipmentException.class)
     public ResponseEntity<String> handleEquipmentException(final EquipmentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(AmazonServiceException.class)
+    public ResponseEntity<String> handleAmazonServiceException(final AmazonServiceException e) {
+        return ResponseEntity.internalServerError().body("AWS에 문제가 생겼습니다!!" + e.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequest(final BadRequestException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 

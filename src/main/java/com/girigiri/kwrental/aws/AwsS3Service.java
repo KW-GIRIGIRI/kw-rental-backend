@@ -4,6 +4,7 @@ package com.girigiri.kwrental.aws;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
+import com.girigiri.kwrental.common.exception.EmptyMultiPartFileException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,9 @@ public class AwsS3Service implements MultiPartFileHandler {
 
     @Override
     public URL upload(MultipartFile multipartFile) throws IOException {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            throw new EmptyMultiPartFileException();
+        }
         ObjectMetadata objectMetadata = createObjectMetadata(multipartFile);
         String fileName = createFileName(multipartFile);
         amazonS3.putObject(bucketName, fileName, multipartFile.getInputStream(), objectMetadata);
