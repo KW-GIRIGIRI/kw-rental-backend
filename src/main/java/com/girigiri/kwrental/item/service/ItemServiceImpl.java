@@ -60,11 +60,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     public int updateRentalAvailable(final Long id, final ItemRentalAvailableRequest rentalAvailableRequest) {
+        itemRepository.findById(id)
+                .orElseThrow(ItemNotFoundException::new);
         return itemRepository.updateRentalAvailable(id, rentalAvailableRequest.rentalAvailable());
     }
 
     @Transactional
     public int updatePropertyNumber(final Long id, final ItemPropertyNumberRequest propertyNumberRequest) {
+        itemRepository.findById(id)
+                .orElseThrow(ItemNotFoundException::new);
         return itemRepository.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
     }
 }

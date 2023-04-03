@@ -18,13 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemControllerTest {
 
     public static final String PREFIX = "/api/items";
-    @MockBean
-    ItemServiceImpl itemServiceImpl;
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    ItemServiceImpl itemServiceImpl;
+
     @Test
-    @DisplayName("존재하지 않는 기자재 품목 목록 조회 API")
+    @DisplayName("존재하지 않는 기자재 품목 목록 조회 예외 처리")
     void getItems_notFound() throws Exception {
         long notExistsId = 1L;
         given(itemServiceImpl.getItems(notExistsId)).willThrow(EquipmentNotFoundException.class);
@@ -35,7 +36,9 @@ class ItemControllerTest {
     }
 
     @Test
-    void getItem() throws Exception {
+    @DisplayName("존재하지 않는 품목 조회 예외 처리")
+    void getItem_notFound() throws Exception {
+        // given
         long notExistsId = 1L;
         given(itemServiceImpl.getItem(notExistsId)).willThrow(ItemNotFoundException.class);
 

@@ -3,6 +3,8 @@ package com.girigiri.kwrental.item.service;
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
+import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -67,5 +69,27 @@ class ItemServiceImplTest {
         // when, then
         assertThatThrownBy(() -> itemService.getItem(1L))
                 .isExactlyInstanceOf(ItemNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 품목의 자산 번호 수정하려면 예외")
+    void updatePropertyNumber_Notfound() {
+        // given
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> itemService.updatePropertyNumber(1L, new ItemPropertyNumberRequest("12345678")))
+                .isInstanceOf(ItemNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 품목의 대여 가능 상태를 수정하려면 예외")
+    void updateRentalAvailable_Notfound() {
+        // given
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> itemService.updateRentalAvailable(1L, new ItemRentalAvailableRequest(false)))
+                .isInstanceOf(ItemNotFoundException.class);
     }
 }
