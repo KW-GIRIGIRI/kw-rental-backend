@@ -1,12 +1,5 @@
 package com.girigiri.kwrental.equipment.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
@@ -19,18 +12,27 @@ import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EquipmentServiceTest {
@@ -40,6 +42,9 @@ class EquipmentServiceTest {
 
     @Mock
     private ItemService itemService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private EquipmentService equipmentService;
@@ -154,5 +159,31 @@ class EquipmentServiceTest {
         // when, then
         assertThatThrownBy(() -> equipmentService.saveEquipment(request))
                 .isExactlyInstanceOf(InvalidCategoryException.class);
+    }
+
+    @Test
+    @DisplayName("기자재 삭제")
+    void deleteEquipment() {
+        // given
+        given(equipmentRepository.findById(1L)).willReturn(Optional.of(EquipmentFixture.create()));
+
+        // when
+        equipmentService.deleteEquipment(1L);
+
+        // then
+        verify(equipmentRepository).findById(1L);
+        verify(equipmentRepository).deleteById(1L);
+        verify(eventPublisher).publishEvent(any(EquipmentDeleteEvent.class));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 기자재 삭제 예외 처리")
+    void deleteEquipment_notFound() {
+        // given
+        given(equipmentRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> equipmentService.deleteEquipment(1L))
+                .isExactlyInstanceOf(EquipmentNotFoundException.class);
     }
 }

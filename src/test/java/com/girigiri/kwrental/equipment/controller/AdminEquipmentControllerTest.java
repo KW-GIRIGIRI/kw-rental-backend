@@ -8,6 +8,7 @@ import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest.AddEquipmentRequestBuilder;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -266,6 +267,17 @@ class AdminEquipmentControllerTest {
         mockMvc.perform(post(PREFIX + "/images").contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 기자재 삭제하려는 예외 처리")
+    void deleteEquipment_notFound() throws Exception {
+        doThrow(EquipmentNotFoundException.class).when(equipmentService).deleteEquipment(1L);
+
+        // when, then
+        mockMvc.perform(delete(PREFIX + "/1").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     private String createAddEquipmentAndDefaultItemsRequestBody(final AddEquipmentRequest addEquipmentRequest)
