@@ -11,12 +11,12 @@ import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-@Transactional
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -58,10 +58,12 @@ public class ItemServiceImpl implements ItemService {
         return ItemResponse.from(item);
     }
 
+    @Transactional
     public int updateRentalAvailable(final Long id, final ItemRentalAvailableRequest rentalAvailableRequest) {
         return itemRepository.updateRentalAvailable(id, rentalAvailableRequest.rentalAvailable());
     }
 
+    @Transactional
     public int updatePropertyNumber(final Long id, final ItemPropertyNumberRequest propertyNumberRequest) {
         return itemRepository.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
     }

@@ -1,24 +1,33 @@
 package com.girigiri.kwrental.item.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceImplTest {
 
     @Mock
     ItemRepository itemRepository;
+
+    @Mock
+    EquipmentRepository equipmentRepository;
 
     @InjectMocks
     ItemServiceImpl itemService;
@@ -27,7 +36,7 @@ class ItemServiceImplTest {
     @DisplayName("품목 Bulk Update")
     void saveItems() {
         // given
-        BDDMockito.given(itemRepository.saveAll(any()))
+        given(itemRepository.saveAll(any()))
                 .willReturn(1);
         final AddItemRequest addItemRequest = new AddItemRequest("12345678");
 
@@ -36,5 +45,27 @@ class ItemServiceImplTest {
 
         // then
         verify(itemRepository).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않은 기자재의 품목 목록 조회 예외")
+    void getItems_notFound() {
+        // given
+        given(equipmentRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> itemService.getItems(1L))
+                .isExactlyInstanceOf(EquipmentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 품목 조회 예외")
+    void getItem_notFound() {
+        // given
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> itemService.getItem(1L))
+                .isExactlyInstanceOf(ItemNotFoundException.class);
     }
 }
