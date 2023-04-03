@@ -4,6 +4,7 @@ import com.amazonaws.AmazonServiceException;
 import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -19,19 +20,19 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionAdvice {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFound(final NotFoundException notFoundException) {
+    public ResponseEntity<?> handleNotFound(final NotFoundException notFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundException.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<String> handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<?> handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException e) {
         return ResponseEntity.badRequest()
                 .body(String.format("%s이 잘못된 타입으로 입력됐습니다. 입력값 : %s",
                         e.getParameter().getParameter().getName(), e.getValue()));
     }
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<String> handleBindException(final BindException e) {
+    public ResponseEntity<?> handleBindException(final BindException e) {
         StringBuilder builder = new StringBuilder();
         for (ObjectError error : e.getBindingResult().getAllErrors()) {
             builder.append(
@@ -43,39 +44,44 @@ public class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<String> handleInvalidDataAccess(final DataAccessException e) {
+    public ResponseEntity<?> handleInvalidDataAccess() {
         return ResponseEntity.badRequest()
                 .body("데이터베이스에 잘못된 접근입니다.");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<?> handleDataIntegrityViolation(final DataIntegrityViolationException e) {
+    public ResponseEntity<?> handleDataIntegrityViolation() {
         return ResponseEntity.badRequest()
                 .body("데이터의 조건이 맞지 않습니다. 유일값이나 null 조건을 확인하세요.");
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<String> handleDuplicateKey(final DuplicateKeyException e) {
+    public ResponseEntity<?> handleDuplicateKey() {
         return ResponseEntity.badRequest().body("중복되서는 안되는 값이 중복된 요청입니다.");
     }
 
     @ExceptionHandler(EquipmentException.class)
-    public ResponseEntity<String> handleEquipmentException(final EquipmentException e) {
+    public ResponseEntity<?> handleEquipmentException(final EquipmentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(AmazonServiceException.class)
-    public ResponseEntity<String> handleAmazonServiceException(final AmazonServiceException e) {
+    public ResponseEntity<?> handleAmazonServiceException(final AmazonServiceException e) {
         return ResponseEntity.internalServerError().body("AWS에 문제가 생겼습니다!!" + e.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequest(final BadRequestException e) {
+    public ResponseEntity<?> handleBadRequest(final BadRequestException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolation(final ConstraintViolationException e) {
+        return ResponseEntity.badRequest().body("입력값 검증을 통과하지 못했습니다." + e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleInternalServerError(final Exception e) {
+    public ResponseEntity<?> handleInternalServerError() {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상하지 못한 예외가 발생했습니다.");
     }
 }

@@ -78,6 +78,8 @@ public class EquipmentService {
 
     @Transactional
     public void deleteEquipment(final Long id) {
+        equipmentRepository.findById(id)
+                .orElseThrow(EquipmentNotFoundException::new);
         equipmentRepository.deleteById(id);
         eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
     }
