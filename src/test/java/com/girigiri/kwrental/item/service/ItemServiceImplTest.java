@@ -92,4 +92,15 @@ class ItemServiceImplTest {
         assertThatThrownBy(() -> itemService.updateRentalAvailable(1L, new ItemRentalAvailableRequest(false)))
                 .isInstanceOf(ItemNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("삭제할 품목이 존재하지 않으면 예외")
+    void delete() {
+        // givne
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> itemService.delete(1L))
+                .isInstanceOf(ItemNotFoundException.class);
+    }
 }
