@@ -5,6 +5,7 @@ import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,12 @@ public class GlobalExceptionAdvice {
                 .body("데이터베이스에 잘못된 접근입니다.");
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(final DataIntegrityViolationException e) {
+        return ResponseEntity.badRequest()
+                .body("데이터의 조건이 맞지 않습니다. 유일값이나 null 조건을 확인하세요.");
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<String> handleDuplicateKey(final DuplicateKeyException e) {
         return ResponseEntity.badRequest().body("중복되서는 안되는 값이 중복된 요청입니다.");
@@ -69,6 +76,6 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleInternalServerError(final Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상하지 못한 예외가 발생했습니다.");
     }
 }

@@ -71,9 +71,12 @@ public class EquipmentService {
                 .description(addEquipmentRequest.getDescription())
                 .components(addEquipmentRequest.getComponents())
                 .rentalPlace(addEquipmentRequest.getRentalPlace())
+                .totalQuantity(addEquipmentRequest.getTotalQuantity())
+                .maxRentalDays(addEquipmentRequest.getMaxRentalDays())
                 .build();
     }
 
+    @Transactional
     public void deleteEquipment(final Long id) {
         equipmentRepository.deleteById(id);
         eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));

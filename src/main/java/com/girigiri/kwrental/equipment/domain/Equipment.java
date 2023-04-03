@@ -1,12 +1,6 @@
 package com.girigiri.kwrental.equipment.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -42,7 +36,11 @@ public class Equipment {
     @Column(nullable = false)
     private String rentalPlace;
 
+    @Column(nullable = false)
     private Integer totalQuantity;
+
+    @Column(nullable = false)
+    private Integer maxRentalDays;
 
     protected Equipment() {
     }
@@ -51,7 +49,7 @@ public class Equipment {
     public Equipment(final Long id, final Category category, final String maker, final String modelName,
                      final String imgUrl, final String description,
                      final String components, final String purpose, final String rentalPlace,
-                     final Integer totalQuantity) {
+                     final Integer totalQuantity, final Integer maxRentalDays) {
         this.id = id;
         this.category = category;
         this.maker = maker;
@@ -62,5 +60,6 @@ public class Equipment {
         this.purpose = purpose;
         this.rentalPlace = rentalPlace;
         this.totalQuantity = totalQuantity;
+        this.maxRentalDays = maxRentalDays;
     }
 }
