@@ -76,6 +76,7 @@ public class EquipmentService {
                 .build();
     }
 
+    @Transactional
     public void deleteEquipment(final Long id) {
         equipmentRepository.deleteById(id);
         eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
