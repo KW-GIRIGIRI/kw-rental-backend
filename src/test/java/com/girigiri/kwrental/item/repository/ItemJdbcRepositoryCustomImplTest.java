@@ -1,12 +1,8 @@
 package com.girigiri.kwrental.item.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +11,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -34,7 +35,7 @@ class ItemJdbcRepositoryCustomImplTest {
     void saveAll() {
         // given
         final Item item1 = ItemFixture.builder().propertyNumber("12345678").build();
-        final Item item2 = ItemFixture.builder().propertyNumber(null).build();
+        final Item item2 = ItemFixture.builder().propertyNumber("87654321").build();
 
         // when
         final int expect = itemJdbcRepositoryCustomImpl.saveAll(List.of(item1, item2));

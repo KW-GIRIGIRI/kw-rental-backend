@@ -198,7 +198,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                 "rentalDays", "modelName",
                 "CAMERA", "maker", "imgUrl",
                 "component", "purpose", "description", 1, 2);
-        final List<AddItemRequest> items = List.of(new AddItemRequest("propertyNumber"), new AddItemRequest(null));
+        final List<AddItemRequest> items = List.of(new AddItemRequest("12345678"), new AddItemRequest("8765421"));
         final AddEquipmentWithItemsRequest requestBody = new AddEquipmentWithItemsRequest(equipment, items);
 
         // when, then

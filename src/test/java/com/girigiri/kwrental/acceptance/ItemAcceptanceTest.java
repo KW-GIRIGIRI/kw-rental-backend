@@ -1,8 +1,5 @@
 package com.girigiri.kwrental.acceptance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
@@ -14,12 +11,16 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import io.restassured.RestAssured;
-import java.util.List;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class ItemAcceptanceTest extends AcceptanceTest {
 
@@ -35,8 +36,8 @@ class ItemAcceptanceTest extends AcceptanceTest {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
-        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId()).propertyNumber(null).build();
-        final Item item3 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber(null).build();
+        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId()).propertyNumber("13579").build();
+        final Item item3 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber("24680").build();
         itemRepository.saveAll(List.of(item1, item2, item3));
 
         // when
@@ -57,7 +58,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
-        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber(null).build();
+        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber("1346778").build();
         itemRepository.save(item1);
         itemRepository.save(item2);
 

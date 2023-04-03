@@ -1,10 +1,6 @@
 package com.girigiri.kwrental.item.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,7 +13,7 @@ public class Item {
     @Id
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String propertyNumber;
 
     @Builder.Default
