@@ -280,6 +280,15 @@ class AdminEquipmentControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("삭제하려는 기자재 ID 음수 예외 처리")
+    void deleteEquipment_negativeId() throws Exception {
+        // given, when, then
+        mockMvc.perform(delete(PREFIX + "/-1").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
     private String createAddEquipmentAndDefaultItemsRequestBody(final AddEquipmentRequest addEquipmentRequest)
             throws JsonProcessingException {
         final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest = new AddEquipmentWithItemsRequest(

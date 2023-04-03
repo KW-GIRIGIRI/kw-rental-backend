@@ -8,6 +8,7 @@ import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.util.EndPointUtils;
+import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/admin/equipments")
 public class AdminEquipmentController {
 
@@ -67,7 +69,7 @@ public class AdminEquipmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEquipment(@PathVariable Long id) {
+    public ResponseEntity<?> deleteEquipment(@PathVariable @Positive Long id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.noContent().build();
     }
