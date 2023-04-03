@@ -71,4 +71,11 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(ItemNotFoundException::new);
         return itemRepository.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
     }
+
+    @Transactional
+    public void delete(final Long id) {
+        itemRepository.findById(id)
+                .orElseThrow(ItemNotFoundException::new);
+        itemRepository.deleteById(id);
+    }
 }

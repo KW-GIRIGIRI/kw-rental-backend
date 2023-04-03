@@ -81,7 +81,7 @@ public class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleInternalServerError() {
+    public ResponseEntity<?> handleInternalServerError(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상하지 못한 예외가 발생했습니다.");
     }
 }

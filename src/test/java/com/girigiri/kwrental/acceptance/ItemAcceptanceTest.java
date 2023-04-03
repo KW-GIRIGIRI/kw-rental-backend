@@ -110,4 +110,20 @@ class ItemAcceptanceTest extends AcceptanceTest {
                 .when().log().all().patch("/api/admin/items/" + item1.getId() + "/propertyNumber")
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    @DisplayName("관리자 품목 삭제 API")
+    void deleteItem() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        itemRepository.save(item);
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_deleteItem"))
+                .contentType(ContentType.APPLICATION_JSON.getMimeType())
+                .when().log().all().delete("/api/admin/items/" + item.getId())
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+    }
 }
