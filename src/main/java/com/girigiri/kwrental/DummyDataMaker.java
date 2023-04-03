@@ -26,7 +26,7 @@ public class DummyDataMaker {
         for (int i = 0; i < 100; i++) {
             final Equipment equipment = equipmentRepository.save(create(i));
             itemRepository.save(new Item(null, "12345678" + i, true, equipment.getId()));
-            itemRepository.save(new Item(null, null, false, equipment.getId()));
+            itemRepository.save(new Item(null, "87654321" + i, false, equipment.getId()));
         }
     }
 
