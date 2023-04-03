@@ -5,6 +5,7 @@ import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,12 @@ public class GlobalExceptionAdvice {
     public ResponseEntity<String> handleInvalidDataAccess(final DataAccessException e) {
         return ResponseEntity.badRequest()
                 .body("데이터베이스에 잘못된 접근입니다.");
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolation(final DataIntegrityViolationException e) {
+        return ResponseEntity.badRequest()
+                .body("데이터의 조건이 맞지 않습니다. 유일값이나 null 조건을 확인하세요.");
     }
 
     @ExceptionHandler(DuplicateKeyException.class)

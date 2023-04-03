@@ -71,6 +71,8 @@ public class EquipmentService {
                 .description(addEquipmentRequest.getDescription())
                 .components(addEquipmentRequest.getComponents())
                 .rentalPlace(addEquipmentRequest.getRentalPlace())
+                .totalQuantity(addEquipmentRequest.getTotalQuantity())
+                .maxRentalDays(addEquipmentRequest.getMaxRentalDays())
                 .build();
     }
 

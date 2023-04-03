@@ -7,7 +7,7 @@ import lombok.Builder;
 public record EquipmentDetailResponse(Long id, String rentalPlace, String modelName,
                                       String category, String maker, String imgUrl,
                                       String components, String purpose, String description,
-                                      Integer totalQauntity) {
+                                      Integer totalQuantity, Integer maxRentalDays) {
 
     public static EquipmentDetailResponse from(final Equipment equipment) {
         return EquipmentDetailResponse.builder()
@@ -20,7 +20,8 @@ public record EquipmentDetailResponse(Long id, String rentalPlace, String modelN
                 .components(equipment.getComponents())
                 .rentalPlace(equipment.getRentalPlace())
                 .purpose(equipment.getPurpose())
-                .totalQauntity((equipment.getTotalQuantity()))
+                .totalQuantity((equipment.getTotalQuantity()))
+                .maxRentalDays(equipment.getMaxRentalDays())
                 .build();
     }
 }
