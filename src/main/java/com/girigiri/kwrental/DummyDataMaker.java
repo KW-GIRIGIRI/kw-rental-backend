@@ -41,6 +41,7 @@ public class DummyDataMaker {
                 .rentalPlace("양동주 자택")
                 .description("더미데이터의 안내사항")
                 .components("이영현, 박다은, 김효리")
+                .maxRentalDays(1)
                 .build();
     }
 }
