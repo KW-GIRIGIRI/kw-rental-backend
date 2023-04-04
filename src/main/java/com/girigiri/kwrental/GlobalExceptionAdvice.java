@@ -3,7 +3,7 @@ package com.girigiri.kwrental;
 import com.amazonaws.AmazonServiceException;
 import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
-import com.girigiri.kwrental.equipment.exception.EquipmentException;
+import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -49,7 +50,7 @@ public class GlobalExceptionAdvice {
                 .body("데이터베이스에 잘못된 접근입니다.");
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler({DataIntegrityViolationException.class, PersistenceException.class})
     public ResponseEntity<?> handleDataIntegrityViolation() {
         return ResponseEntity.badRequest()
                 .body("데이터의 조건이 맞지 않습니다. 유일값이나 null 조건을 확인하세요.");
@@ -58,11 +59,6 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<?> handleDuplicateKey() {
         return ResponseEntity.badRequest().body("중복되서는 안되는 값이 중복된 요청입니다.");
-    }
-
-    @ExceptionHandler(EquipmentException.class)
-    public ResponseEntity<?> handleEquipmentException(final EquipmentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(AmazonServiceException.class)
@@ -78,6 +74,11 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolation(final ConstraintViolationException e) {
         return ResponseEntity.badRequest().body("입력값 검증을 통과하지 못했습니다." + e.getMessage());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpMethodNotSupported() {
+        return ResponseEntity.badRequest().body("해당 HTTP METHOD는 처리할 수 없습니다.");
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,6 +1,8 @@
 package com.girigiri.kwrental.equipment.exception;
 
-public class RentalQuantityException extends RuntimeException {
+import com.girigiri.kwrental.common.exception.DomainException;
+
+public class RentalQuantityException extends DomainException {
     public RentalQuantityException(final String message) {
         super(message);
     }

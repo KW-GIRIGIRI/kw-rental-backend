@@ -1,10 +1,7 @@
 package com.girigiri.kwrental.equipment.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.request.*;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
@@ -145,7 +142,7 @@ class EquipmentServiceTest {
     }
 
     @Test
-    @DisplayName("기자재 저장에서 잘못된 카테고리 예외 처리")
+    @DisplayName("기자재 저장에서 잘못된 카테고리 예외")
     void saveEquipment_invalidCategory() {
         // given
         AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest(
@@ -177,13 +174,47 @@ class EquipmentServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 기자재 삭제 예외 처리")
+    @DisplayName("존재하지 않는 기자재 삭제 예외")
     void deleteEquipment_notFound() {
         // given
         given(equipmentRepository.findById(1L)).willReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> equipmentService.deleteEquipment(1L))
+                .isExactlyInstanceOf(EquipmentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("기자재 수정 ")
+    void updateEquipment() {
+        // given
+        Equipment equipment = EquipmentFixture.create();
+        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+        UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
+                "updatedDays", "updatedName",
+                "ETC", "updatedMaker", "updatedImgUrl",
+                "updatedComponent", "updatedPurpose", "updatedDescription", 2, 2);
+
+        // when
+        EquipmentDetailResponse expect = equipmentService.update(1L, updateEquipmentRequest);
+
+        // then
+        assertThat(expect).usingRecursiveComparison()
+                .isEqualTo(EquipmentDetailResponse.from(equipment));
+    }
+
+    @Test
+    @DisplayName("존재하지 않은 기자재 수정 예외")
+    void updateEquipment_notFound() {
+        // given
+        given(equipmentRepository.findById(any())).willReturn(Optional.empty());
+        UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
+                "rentalDays", "modelName",
+                "CAMERA", "maker", "imgUrl",
+                "component", "purpose", "description", 1, 2);
+
+        // when, then
+        assertThatThrownBy(() -> equipmentService.update(1L, updateEquipmentRequest))
                 .isExactlyInstanceOf(EquipmentNotFoundException.class);
     }
 }

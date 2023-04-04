@@ -3,6 +3,8 @@ package com.girigiri.kwrental.equipment.controller;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
@@ -79,6 +81,14 @@ public class AdminEquipmentController {
         URL url = multiPartFileHandler.upload(multipartFile);
         return ResponseEntity.noContent()
                 .location(url.toURI())
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable final Long id, @Validated @RequestBody final UpdateEquipmentRequest updateEquipmentRequest) {
+        EquipmentDetailResponse updatedResponse = equipmentService.update(id, updateEquipmentRequest);
+        return ResponseEntity.noContent()
+                .location(URI.create("/api/equipments/" + updatedResponse.id()))
                 .build();
     }
 }

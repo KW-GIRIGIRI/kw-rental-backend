@@ -5,6 +5,8 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
+import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
+import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
@@ -15,11 +17,13 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class ItemAcceptanceTest extends AcceptanceTest {
@@ -125,5 +129,27 @@ class ItemAcceptanceTest extends AcceptanceTest {
                 .contentType(ContentType.APPLICATION_JSON.getMimeType())
                 .when().log().all().delete("/api/admin/items/" + item.getId())
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("관리자가 기자재의 품목들 수정 API")
+    void updateByEquipment() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        itemRepository.save(item);
+
+        UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
+        UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "22222222");
+        UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_updateItemsByEquipment"))
+                .contentType(ContentType.APPLICATION_JSON.getMimeType())
+                .body(updateItemsRequest)
+                .when().log().all().put("/api/admin/items?equipmentId=" + equipment.getId())
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
+                .header(HttpHeaders.LOCATION, containsString("/api/items?equipmentId=" + equipment.getId()));
     }
 }

@@ -5,6 +5,7 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
@@ -82,5 +83,23 @@ public class EquipmentService {
                 .orElseThrow(EquipmentNotFoundException::new);
         equipmentRepository.deleteById(id);
         eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
+    }
+
+    @Transactional
+    public EquipmentDetailResponse update(final Long id, final UpdateEquipmentRequest updateEquipmentRequest) {
+        Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(EquipmentNotFoundException::new);
+
+        equipment.setModelName(updateEquipmentRequest.modelName());
+        equipment.setComponents(updateEquipmentRequest.component());
+        equipment.setCategory(Category.from(updateEquipmentRequest.category()));
+        equipment.setMaker(updateEquipmentRequest.maker());
+        equipment.setDescription(updateEquipmentRequest.description());
+        equipment.setPurpose(updateEquipmentRequest.purpose());
+        equipment.setImgUrl(updateEquipmentRequest.imgUrl());
+        equipment.setRentalPlace(updateEquipmentRequest.rentalDays());
+        equipment.setMaxRentalDays(updateEquipmentRequest.maxRentalDays());
+        equipment.setTotalQuantity(updateEquipmentRequest.totalQuantity());
+        return EquipmentDetailResponse.from(equipment);
     }
 }
