@@ -125,7 +125,7 @@ class ItemServiceImplTest {
         long equipmentId = 1L;
 
         // when
-        ItemsResponse itemsResponse = itemService.updateOrSave(equipmentId, updateItemsRequest);
+        ItemsResponse itemsResponse = itemService.saveOrUpdate(equipmentId, updateItemsRequest);
 
         // then
         assertThat(itemsResponse.items()).hasSize(2);

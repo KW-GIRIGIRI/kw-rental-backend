@@ -3,7 +3,7 @@ package com.girigiri.kwrental;
 import com.amazonaws.AmazonServiceException;
 import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
-import com.girigiri.kwrental.equipment.exception.EquipmentException;
+import jakarta.persistence.PersistenceException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,7 +50,7 @@ public class GlobalExceptionAdvice {
                 .body("데이터베이스에 잘못된 접근입니다.");
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler({DataIntegrityViolationException.class, PersistenceException.class})
     public ResponseEntity<?> handleDataIntegrityViolation() {
         return ResponseEntity.badRequest()
                 .body("데이터의 조건이 맞지 않습니다. 유일값이나 null 조건을 확인하세요.");
@@ -59,11 +59,6 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<?> handleDuplicateKey() {
         return ResponseEntity.badRequest().body("중복되서는 안되는 값이 중복된 요청입니다.");
-    }
-
-    @ExceptionHandler(EquipmentException.class)
-    public ResponseEntity<?> handleEquipmentException(final EquipmentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(AmazonServiceException.class)

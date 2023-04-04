@@ -4,6 +4,7 @@ import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,5 +69,21 @@ class ItemQueryDslRepositoryCustomImplTest {
         // when, then
         assertThatThrownBy(() -> itemRepository.updatePropertyNumber(item.getId(), propertyNumber))
                 .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    @DisplayName("중복된 자산 번호로 더티체킹 될 경우 예외")
+    void updatePropertyNumber_dirtyCheck() {
+        // given
+        String propertyNumber = "87654321";
+        Item item = ItemFixture.builder().propertyNumber("12345678").build();
+        Item item2 = ItemFixture.builder().propertyNumber(propertyNumber).build();
+        itemRepository.save(item);
+        itemRepository.save(item2);
+
+        // when
+        item.updatePropertyNumber(propertyNumber);
+        assertThatThrownBy(() -> entityManager.flush())
+                .isExactlyInstanceOf(PersistenceException.class);
     }
 }

@@ -1,8 +1,10 @@
 package com.girigiri.kwrental.item.dto.request;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 public record UpdateItemsRequest(
-        List<UpdateItemRequest> items
+        @Valid List<UpdateItemRequest> items
 ) {
 }

@@ -86,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Transactional
-    public ItemsResponse updateOrSave(final Long equipmentId, final UpdateItemsRequest updateItemsRequest) {
+    public ItemsResponse saveOrUpdate(final Long equipmentId, final UpdateItemsRequest updateItemsRequest) {
         Map<Boolean, List<UpdateItemRequest>> updateItemRequestsGroup = groupByIdNull(updateItemsRequest);
         List<UpdateItemRequest> saveItemRequests = updateItemRequestsGroup.get(true);
         save(equipmentId, saveItemRequests);

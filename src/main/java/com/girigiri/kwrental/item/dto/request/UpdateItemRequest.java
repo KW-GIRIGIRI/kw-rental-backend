@@ -1,4 +1,6 @@
 package com.girigiri.kwrental.item.dto.request;
 
-public record UpdateItemRequest(Long id, String propertyNumber) {
+import jakarta.validation.constraints.NotEmpty;
+
+public record UpdateItemRequest(Long id, @NotEmpty String propertyNumber) {
 }
