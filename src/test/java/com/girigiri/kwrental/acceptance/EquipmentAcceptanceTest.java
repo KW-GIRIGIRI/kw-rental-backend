@@ -4,6 +4,7 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -244,5 +245,27 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .header(HttpHeaders.LOCATION, containsString(".png"));
+    }
+
+    @Test
+    @DisplayName("관리자가 기자재 수정 API")
+    void updateEquipmentAndItems() {
+        // given
+        Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+
+        UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
+                "rentalDays", "modelName",
+                "CAMERA", "maker", "imgUrl",
+                "component", "purpose", "description", 1, 1);
+
+        // when
+        RestAssured.given(this.requestSpec)
+                .filter(document("admin_updateEquipment"))
+                .body(updateEquipmentRequest)
+                .contentType(ContentType.JSON)
+                .when().log().all().put("/api/admin/equipments/" + equipment.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .header(HttpHeaders.LOCATION, containsString("/api/equipments/" + equipment.getId()));
     }
 }

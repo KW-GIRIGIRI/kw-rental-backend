@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -78,6 +79,11 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolation(final ConstraintViolationException e) {
         return ResponseEntity.badRequest().body("입력값 검증을 통과하지 못했습니다." + e.getMessage());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpMethodNotSupported() {
+        return ResponseEntity.badRequest().body("해당 HTTP METHOD는 처리할 수 없습니다.");
     }
 
     @ExceptionHandler(Exception.class)
