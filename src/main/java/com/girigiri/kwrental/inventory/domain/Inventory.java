@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.inventory.domain;
 
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,17 +20,16 @@ public class Inventory {
 
     @Column(nullable = false)
     private Integer amount;
-
-    @Column(nullable = false)
-    private Long equipmentId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Equipment equipment;
 
     protected Inventory() {
     }
 
-    public Inventory(final Long id, final RentalPeriod rentalPeriod, final Integer amount, final Long equipmentId) {
+    public Inventory(final Long id, final RentalPeriod rentalPeriod, final Integer amount, final Equipment equipment) {
         this.id = id;
         this.rentalPeriod = rentalPeriod;
         this.amount = amount;
-        this.equipmentId = equipmentId;
+        this.equipment = equipment;
     }
 }

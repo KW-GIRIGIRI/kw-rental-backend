@@ -1,8 +1,10 @@
 package com.girigiri.kwrental.inventory.service;
 
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,8 +40,9 @@ class InventoryServiceTest {
     void saveInventory() {
         // given
         doNothing().when(amountValidator).validateAmount(any(), any(), any());
-        doNothing().when(equipmentService).validateRentalDays(any(), any());
-        given(inventoryRepository.save(any())).willReturn(InventoryFixture.builder().id(1L).build());
+        final Equipment equipment = EquipmentFixture.builder().id(1L).build();
+        given(equipmentService.validateRentalDays(any(), any())).willReturn(equipment);
+        given(inventoryRepository.save(any())).willReturn(InventoryFixture.builder(equipment).id(1L).build());
         final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()
                 .equipmentId(1L)
                 .amount(1)
