@@ -5,6 +5,7 @@ import com.girigiri.kwrental.equipment.dto.request.*;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
@@ -24,8 +25,7 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -216,5 +216,40 @@ class EquipmentServiceTest {
         // when, then
         assertThatThrownBy(() -> equipmentService.update(1L, updateEquipmentRequest))
                 .isExactlyInstanceOf(EquipmentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("가능한 대여일 수 인지 검증할 때 존재하지 않은 기자재 예외")
+    void validateRentalDays_notFound() {
+        // given
+        given(equipmentRepository.findById(any())).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> equipmentService.validateRentalDays(1L, 1))
+                .isExactlyInstanceOf(EquipmentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("최대 대여일보다 긴 기간은 예외가 발생")
+    void validateRentalDays_invalid() {
+        // given
+        final Equipment equipment = EquipmentFixture.builder().maxRentalDays(1).build();
+        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+
+        // when, then
+        assertThatThrownBy(() -> equipmentService.validateRentalDays(1L, 2))
+                .isExactlyInstanceOf(EquipmentException.class);
+    }
+
+    @Test
+    @DisplayName("최대 대여일보다 짧거나 같은 기간은 검증을 통과")
+    void validateRentalDays() {
+        // given
+        final Equipment equipment = EquipmentFixture.builder().maxRentalDays(1).build();
+        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+
+        // when, then
+        assertThatCode(() -> equipmentService.validateRentalDays(1L, 1))
+                .doesNotThrowAnyException();
     }
 }
