@@ -9,6 +9,7 @@ import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import jakarta.annotation.Nullable;
@@ -101,5 +102,14 @@ public class EquipmentService {
         equipment.setMaxRentalDays(updateEquipmentRequest.maxRentalDays());
         equipment.setTotalQuantity(updateEquipmentRequest.totalQuantity());
         return EquipmentDetailResponse.from(equipment);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateRentalDays(final Long id, final Integer rentalDays) {
+        final Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(EquipmentNotFoundException::new);
+        if (!equipment.canRentFor(rentalDays)) {
+            throw new EquipmentException("최대 대여일 보다 더 길게 대여할 수 없습니다.");
+        }
     }
 }

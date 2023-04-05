@@ -64,4 +64,8 @@ public class Equipment {
         this.totalQuantity = totalQuantity;
         this.maxRentalDays = maxRentalDays;
     }
+
+    public boolean canRentFor(final Integer rentalDays) {
+        return this.maxRentalDays.compareTo(rentalDays) >= 0;
+    }
 }
