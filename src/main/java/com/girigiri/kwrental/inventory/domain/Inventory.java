@@ -15,7 +15,7 @@ public class Inventory {
     private Long id;
 
     @Embedded
-    private RentalDates rentalDates;
+    private RentalPeriod rentalPeriod;
 
     @Column(nullable = false)
     private Integer amount;
@@ -26,9 +26,9 @@ public class Inventory {
     protected Inventory() {
     }
 
-    public Inventory(final Long id, final RentalDates rentalDates, final Integer amount, final Long equipmentId) {
+    public Inventory(final Long id, final RentalPeriod rentalPeriod, final Integer amount, final Long equipmentId) {
         this.id = id;
-        this.rentalDates = rentalDates;
+        this.rentalPeriod = rentalPeriod;
         this.amount = amount;
         this.equipmentId = equipmentId;
     }

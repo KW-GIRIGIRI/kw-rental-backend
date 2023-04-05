@@ -37,7 +37,7 @@ class InventoryServiceTest {
     @DisplayName("담은 기자재를 저장한다")
     void saveInventory() {
         // given
-        doNothing().when(amountValidator).validateAmount(any(), any());
+        doNothing().when(amountValidator).validateAmount(any(), any(), any());
         doNothing().when(equipmentService).validateRentalDays(any(), any());
         given(inventoryRepository.save(any())).willReturn(InventoryFixture.builder().id(1L).build());
         final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()

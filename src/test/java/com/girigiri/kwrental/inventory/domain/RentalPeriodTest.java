@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class RentalDatesTest {
+class RentalPeriodTest {
 
 
     @Test
@@ -20,7 +20,7 @@ class RentalDatesTest {
         final LocalDate end = LocalDate.now().plusDays(1);
 
         // when, then
-        assertThatThrownBy(() -> new RentalDates(start, end))
+        assertThatThrownBy(() -> new RentalPeriod(start, end))
                 .isExactlyInstanceOf(RentalDateException.class);
     }
 
@@ -30,10 +30,10 @@ class RentalDatesTest {
         // given
         final LocalDate start = LocalDate.now().plusDays(1);
         final LocalDate end = LocalDate.now().plusDays(1);
-        final RentalDates rentalDates = new RentalDates(start, end);
+        final RentalPeriod rentalPeriod = new RentalPeriod(start, end);
 
         // when
-        final Integer expect = rentalDates.getRentalDays();
+        final Integer expect = rentalPeriod.getRentalDays();
 
         // then
         assertThat(expect).isZero();

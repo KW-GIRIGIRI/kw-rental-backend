@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 @Embeddable
 @Getter
-public class RentalDates {
+public class RentalPeriod {
 
     @Column(nullable = false)
     private LocalDate rentalStartDate;
@@ -18,10 +18,10 @@ public class RentalDates {
     @Column(nullable = false)
     private LocalDate rentalEndDate;
 
-    protected RentalDates() {
+    protected RentalPeriod() {
     }
 
-    public RentalDates(LocalDate rentalStartDate, LocalDate rentalEndDate) {
+    public RentalPeriod(LocalDate rentalStartDate, LocalDate rentalEndDate) {
         if (rentalStartDate == null || rentalEndDate == null) {
             throw new RentalDateException("일자에 빈 값이 올 수 없습니다.");
         }

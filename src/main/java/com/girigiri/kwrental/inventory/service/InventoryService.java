@@ -2,7 +2,7 @@ package com.girigiri.kwrental.inventory.service;
 
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalDates;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
@@ -22,20 +22,20 @@ public class InventoryService {
     }
 
     public Long save(final AddInventoryRequest addInventoryRequest) {
-        final RentalDates rentalDates = new RentalDates(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
+        final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         final Long equipmentId = addInventoryRequest.getEquipmentId();
-        equipmentService.validateRentalDays(equipmentId, rentalDates.getRentalDays());
-        amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount());
+        equipmentService.validateRentalDays(equipmentId, rentalPeriod.getRentalDays());
+        amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
         final Inventory mapedInventory = mapToInventory(addInventoryRequest);
         final Inventory inventory = inventoryRepository.save(mapedInventory);
         return inventory.getId();
     }
 
     private Inventory mapToInventory(final AddInventoryRequest addInventoryRequest) {
-        final RentalDates rentalDates = new RentalDates(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
+        final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         return Inventory.builder()
                 .equipmentId(addInventoryRequest.getEquipmentId())
-                .rentalDates(rentalDates)
+                .rentalPeriod(rentalPeriod)
                 .amount(addInventoryRequest.getAmount())
                 .build();
     }
