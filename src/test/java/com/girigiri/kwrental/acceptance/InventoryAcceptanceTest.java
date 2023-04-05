@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class InventoryAcceptanceTest extends AcceptanceTest {
 
@@ -42,6 +43,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
 
         // when
         RestAssured.given(requestSpec)
+                .filter(document("addInventory"))
                 .body(request)
                 .contentType(ContentType.JSON)
                 .when().log().all().post("/api/inventories")
