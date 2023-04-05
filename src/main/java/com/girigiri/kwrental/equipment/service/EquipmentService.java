@@ -105,11 +105,12 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    public void validateRentalDays(final Long id, final Integer rentalDays) {
+    public Equipment validateRentalDays(final Long id, final Integer rentalDays) {
         final Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(EquipmentNotFoundException::new);
         if (!equipment.canRentFor(rentalDays)) {
             throw new EquipmentException("최대 대여일 보다 더 길게 대여할 수 없습니다.");
         }
+        return equipment;
     }
 }
