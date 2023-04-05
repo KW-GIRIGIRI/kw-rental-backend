@@ -1,11 +1,13 @@
 package com.girigiri.kwrental.inventory.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 // TODO: 2023/04/05 회원 관련 코드가 필요하다
 @Entity
 @Getter
+@Builder
 public class Inventory {
 
     @Id

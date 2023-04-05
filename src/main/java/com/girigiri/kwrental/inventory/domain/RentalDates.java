@@ -6,6 +6,7 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Embeddable
 @Getter
@@ -29,5 +30,9 @@ public class RentalDates {
         }
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;
+    }
+
+    public Integer getRentalDays() {
+        return (int) rentalStartDate.until(rentalEndDate, ChronoUnit.DAYS);
     }
 }

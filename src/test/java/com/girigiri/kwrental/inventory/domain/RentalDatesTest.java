@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class RentalDatesTest {
@@ -21,5 +22,20 @@ class RentalDatesTest {
         // when, then
         assertThatThrownBy(() -> new RentalDates(start, end))
                 .isExactlyInstanceOf(RentalDateException.class);
+    }
+
+    @Test
+    @DisplayName("대여 가능한 일 수를 계산한다")
+    void getRentalDays() {
+        // given
+        final LocalDate start = LocalDate.now().plusDays(1);
+        final LocalDate end = LocalDate.now().plusDays(1);
+        final RentalDates rentalDates = new RentalDates(start, end);
+
+        // when
+        final Integer expect = rentalDates.getRentalDays();
+
+        // then
+        assertThat(expect).isZero();
     }
 }
