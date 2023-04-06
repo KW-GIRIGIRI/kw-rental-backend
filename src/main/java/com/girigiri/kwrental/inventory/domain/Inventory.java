@@ -33,4 +33,12 @@ public class Inventory {
         this.rentalAmount = rentalAmount;
         this.equipment = equipment;
     }
+
+    public void setRentalPeriod(final RentalPeriod rentalPeriod) {
+        this.rentalPeriod = rentalPeriod;
+    }
+
+    public void setRentalAmount(final RentalAmount rentalAmount) {
+        this.rentalAmount = rentalAmount;
+    }
 }

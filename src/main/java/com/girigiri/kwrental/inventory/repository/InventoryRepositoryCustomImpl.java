@@ -4,6 +4,7 @@ import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.inventory.domain.QInventory.inventory;
@@ -28,5 +29,15 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     public int deleteAll() {
         return (int) jpaQueryFactory.delete(inventory)
                 .execute();
+    }
+
+    @Override
+    public Optional<Inventory> findWithEquipmentById(final Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory.selectFrom(inventory)
+                        .leftJoin(equipment).fetchJoin()
+                        .where(inventory.id.eq(id))
+                        .fetchOne()
+        );
     }
 }
