@@ -1,7 +1,9 @@
 package com.girigiri.kwrental.inventory.controller;
 
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
+import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,5 +44,11 @@ public class InventoryController {
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
         inventoryService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public InventoryResponse update(@PathVariable final Long id,
+                                    @RequestBody @Validated final UpdateInventoryRequest updateInventoryRequest) {
+        return inventoryService.update(id, updateInventoryRequest);
     }
 }

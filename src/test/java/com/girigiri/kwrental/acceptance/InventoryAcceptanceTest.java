@@ -4,6 +4,7 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
+import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
@@ -91,10 +92,10 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         // given
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("bbbbbbbb").build());
-        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        final Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
-        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
-        final Inventory inventory2 = inventoryRepository.save(InventoryFixture.create(equipment2));
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
+        inventoryRepository.save(InventoryFixture.create(equipment1));
+        inventoryRepository.save(InventoryFixture.create(equipment2));
 
         // when, then
         RestAssured.given(requestSpec)
@@ -109,7 +110,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     void deleteInventory() {
         // given
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
-        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
         final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
 
         // when, then
@@ -118,5 +119,27 @@ class InventoryAcceptanceTest extends AcceptanceTest {
                 .when().log().all().delete("/api/inventories/" + inventory1.getId())
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("특정 담은 기자재를 수정한다.")
+    void updateInventory() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
+        final UpdateInventoryRequest request = UpdateInventoryRequest.builder()
+                .rentalStartDate(LocalDate.now().plusDays(2))
+                .rentalEndDate(LocalDate.now().plusDays(3))
+                .amount(1)
+                .build();
+
+        // when, then
+        RestAssured.given(requestSpec)
+                .filter(document("updateInventory"))
+                .body(request).contentType(ContentType.JSON)
+                .when().log().all().patch("/api/inventories/" + inventory1.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 }

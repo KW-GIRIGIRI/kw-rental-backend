@@ -15,3 +15,7 @@ operation::deleteAllInventories[snippets='http-request,http-response']
 === 특정 담은 기자재 삭제
 
 operation::deleteInventory[snippets='http-request,http-response']
+
+=== 특정 담은 기자재 수정
+
+operation::updateInventory[snippets='http-request,http-response']
