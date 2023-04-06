@@ -2,6 +2,7 @@ package com.girigiri.kwrental.testsupport.fixture;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class InventoryFixture {
         final LocalDate rentalEndDate = rentalStartDate.plusDays(1);
 
         return Inventory.builder()
-                .amount(1)
+                .rentalAmount(new RentalAmount(1))
                 .rentalPeriod(new RentalPeriod(rentalStartDate, rentalEndDate))
                 .equipment(equipment);
     }

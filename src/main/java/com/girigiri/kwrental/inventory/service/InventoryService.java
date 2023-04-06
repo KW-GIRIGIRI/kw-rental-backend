@@ -3,12 +3,16 @@ package com.girigiri.kwrental.inventory.service;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
+import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFound;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +30,7 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
     }
 
+    @Transactional
     public Long save(final AddInventoryRequest addInventoryRequest) {
         final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         final Long equipmentId = addInventoryRequest.getEquipmentId();
@@ -40,23 +45,35 @@ public class InventoryService {
         return Inventory.builder()
                 .equipment(equipment)
                 .rentalPeriod(rentalPeriod)
-                .amount(addInventoryRequest.getAmount())
+                .rentalAmount(new RentalAmount(addInventoryRequest.getAmount()))
                 .build();
     }
 
     // TODO: 2023/04/06 회원이 담은 기자재를 조회해야 된다.
+    @Transactional(readOnly = true)
     public InventoriesResponse getInventories() {
         final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
         return InventoriesResponse.from(inventories);
     }
 
+    @Transactional
     public void deleteAll() {
         inventoryRepository.deleteAll();
     }
 
+    @Transactional
     public void deleteById(final Long id) {
         inventoryRepository.findById(id)
                 .orElseThrow(InventoryNotFound::new);
         inventoryRepository.deleteById(id);
+    }
+
+    @Transactional
+    public InventoryResponse update(final Long id, final UpdateInventoryRequest request) {
+        final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
+                .orElseThrow(InventoryNotFound::new);
+        inventory.setRentalAmount(new RentalAmount(request.getAmount()));
+        inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
+        return InventoryResponse.from(inventory);
     }
 }

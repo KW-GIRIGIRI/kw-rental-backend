@@ -4,6 +4,9 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
+import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
+import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.exception.InventoryNotFound;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
@@ -17,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -82,5 +85,44 @@ class InventoryServiceTest {
         // when, then
         assertThatCode(() -> inventoryService.deleteById(1L))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("특정 기자재 수정 시 없으면 예외")
+    void update_notFound() {
+        // given
+        given(inventoryRepository.findWithEquipmentById(any())).willThrow(InventoryNotFound.class);
+
+        // when, then
+        assertThatThrownBy(() -> inventoryService.update(1L, null))
+                .isExactlyInstanceOf(InventoryNotFound.class);
+
+    }
+
+    @Test
+    @DisplayName("특정 기자재 수정")
+    void update() {
+        // given
+        final Inventory inventory = InventoryFixture.create(EquipmentFixture.create());
+        final int amount = 2;
+        final LocalDate rentalStartDate = LocalDate.now().plusDays(2);
+        final LocalDate rentalEndDate = LocalDate.now().plusDays(3);
+        final UpdateInventoryRequest updateInventoryRequest = UpdateInventoryRequest.builder()
+                .amount(amount)
+                .rentalStartDate(rentalStartDate)
+                .rentalEndDate(rentalEndDate)
+                .build();
+        given(inventoryRepository.findWithEquipmentById(any())).willReturn(Optional.of(inventory));
+
+        // when
+        final InventoryResponse response = inventoryService.update(1L, updateInventoryRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getAmount()).isEqualTo(amount),
+                () -> assertThat(response.getRentalStartDate()).isEqualTo(rentalStartDate),
+                () -> assertThat(response.getRentalEndDate()).isEqualTo(rentalEndDate)
+
+        );
     }
 }

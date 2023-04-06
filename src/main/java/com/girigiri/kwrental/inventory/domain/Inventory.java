@@ -18,18 +18,27 @@ public class Inventory {
     @Embedded
     private RentalPeriod rentalPeriod;
 
-    @Column(nullable = false)
-    private Integer amount;
+    @Embedded
+    private RentalAmount rentalAmount;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Equipment equipment;
 
     protected Inventory() {
     }
 
-    public Inventory(final Long id, final RentalPeriod rentalPeriod, final Integer amount, final Equipment equipment) {
+    public Inventory(final Long id, final RentalPeriod rentalPeriod, final RentalAmount rentalAmount, final Equipment equipment) {
         this.id = id;
         this.rentalPeriod = rentalPeriod;
-        this.amount = amount;
+        this.rentalAmount = rentalAmount;
         this.equipment = equipment;
+    }
+
+    public void setRentalPeriod(final RentalPeriod rentalPeriod) {
+        this.rentalPeriod = rentalPeriod;
+    }
+
+    public void setRentalAmount(final RentalAmount rentalAmount) {
+        this.rentalAmount = rentalAmount;
     }
 }
