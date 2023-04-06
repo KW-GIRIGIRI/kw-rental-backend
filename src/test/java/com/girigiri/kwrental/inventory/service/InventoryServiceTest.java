@@ -2,6 +2,7 @@ package com.girigiri.kwrental.inventory.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
+import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -14,8 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -55,5 +58,29 @@ class InventoryServiceTest {
 
         // then
         assertThat(id).isNotNull();
+    }
+
+    @Test
+    @DisplayName("담은 기자재를 모두 삭제한다.")
+    void deleteAll() {
+        // given
+        given(inventoryRepository.deleteAll()).willReturn(1);
+
+        // when
+        assertThatCode(() -> inventoryService.deleteAll())
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("특정 담은 기자재를 삭제할 때 존재하지 않으면 예외")
+    void delete() {
+        // given
+        final Inventory inventory = InventoryFixture.create(EquipmentFixture.create());
+        given(inventoryRepository.findById(any())).willReturn(Optional.of(inventory));
+        doNothing().when(inventoryRepository).deleteById(any());
+
+        // when, then
+        assertThatCode(() -> inventoryService.deleteById(1L))
+                .doesNotThrowAnyException();
     }
 }

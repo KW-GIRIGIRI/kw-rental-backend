@@ -6,6 +6,7 @@ import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
+import com.girigiri.kwrental.inventory.exception.InventoryNotFound;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,15 @@ public class InventoryService {
     public InventoriesResponse getInventories() {
         final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
         return InventoriesResponse.from(inventories);
+    }
+
+    public void deleteAll() {
+        inventoryRepository.deleteAll();
+    }
+
+    public void deleteById(final Long id) {
+        inventoryRepository.findById(id)
+                .orElseThrow(InventoryNotFound::new);
+        inventoryRepository.deleteById(id);
     }
 }

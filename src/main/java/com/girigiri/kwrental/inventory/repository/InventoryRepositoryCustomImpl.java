@@ -23,4 +23,10 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
                 .leftJoin(equipment).fetchJoin()
                 .fetch();
     }
+
+    @Override
+    public int deleteAll() {
+        return (int) jpaQueryFactory.delete(inventory)
+                .execute();
+    }
 }

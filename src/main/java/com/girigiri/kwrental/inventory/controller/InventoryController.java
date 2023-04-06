@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+// TODO: 2023/04/06 회원관련 기능이 포함되어야 한다.
 @RestController
 @RequestMapping("/api/inventories")
 public class InventoryController {
@@ -29,5 +30,17 @@ public class InventoryController {
     @GetMapping
     public InventoriesResponse find() {
         return inventoryService.getInventories();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteAll() {
+        inventoryService.deleteAll();
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
+        inventoryService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

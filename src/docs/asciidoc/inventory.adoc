@@ -7,3 +7,11 @@ operation::addInventory[snippets='http-request,http-response']
 === 담은 기자재들 조회
 
 operation::getInventories[snippets='http-request,http-response']
+
+=== 담은 기자재 전체 삭제
+
+operation::deleteAllInventories[snippets='http-request,http-response']
+
+=== 특정 담은 기자재 삭제
+
+operation::deleteInventory[snippets='http-request,http-response']
