@@ -48,4 +48,8 @@ public class InventoryService {
         final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
         return InventoriesResponse.from(inventories);
     }
+
+    public void deleteAll() {
+        inventoryRepository.deleteAll();
+    }
 }

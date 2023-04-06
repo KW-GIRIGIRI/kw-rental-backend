@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface InventoryRepositoryCustom {
     List<Inventory> findAllWithEquipment();
+
+    int deleteAll();
 }

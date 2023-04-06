@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -55,5 +56,16 @@ class InventoryServiceTest {
 
         // then
         assertThat(id).isNotNull();
+    }
+
+    @Test
+    @DisplayName("담은 기자재를 모두 삭제한다.")
+    void deleteAll() {
+        // given
+        given(inventoryRepository.deleteAll()).willReturn(1);
+
+        // when
+        assertThatCode(() -> inventoryService.deleteAll())
+                .doesNotThrowAnyException();
     }
 }
