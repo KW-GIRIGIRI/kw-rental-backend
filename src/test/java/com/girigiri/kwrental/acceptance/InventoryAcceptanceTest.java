@@ -103,4 +103,20 @@ class InventoryAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    @DisplayName("특정 담은 기자재를 모두 제거한다.")
+    void deleteInventory() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
+        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
+
+        // when, then
+        RestAssured.given(requestSpec)
+                .filter(document("deleteInventory"))
+                .when().log().all().delete("/api/inventories/" + inventory1.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
 }
