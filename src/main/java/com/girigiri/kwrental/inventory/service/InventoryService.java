@@ -3,6 +3,7 @@ package com.girigiri.kwrental.inventory.service;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
@@ -40,7 +41,7 @@ public class InventoryService {
         return Inventory.builder()
                 .equipment(equipment)
                 .rentalPeriod(rentalPeriod)
-                .amount(addInventoryRequest.getAmount())
+                .rentalAmount(new RentalAmount(addInventoryRequest.getAmount()))
                 .build();
     }
 

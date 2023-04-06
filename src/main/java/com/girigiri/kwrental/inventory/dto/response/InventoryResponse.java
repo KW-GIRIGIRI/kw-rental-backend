@@ -46,7 +46,7 @@ public class InventoryResponse {
                 .imgUrl(equipment.getImgUrl())
                 .rentalStartDate(inventory.getRentalPeriod().getRentalStartDate())
                 .rentalEndDate(inventory.getRentalPeriod().getRentalEndDate())
-                .amount(inventory.getAmount())
+                .amount(inventory.getRentalAmount().getAmount())
                 .build();
     }
 }
