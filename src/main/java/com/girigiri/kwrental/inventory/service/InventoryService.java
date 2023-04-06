@@ -72,6 +72,8 @@ public class InventoryService {
     public InventoryResponse update(final Long id, final UpdateInventoryRequest request) {
         final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
                 .orElseThrow(InventoryNotFound::new);
+        amountValidator.validateAmount(inventory.getEquipment().getId(), request.getAmount(),
+                new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         inventory.setRentalAmount(new RentalAmount(request.getAmount()));
         inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         return InventoryResponse.from(inventory);

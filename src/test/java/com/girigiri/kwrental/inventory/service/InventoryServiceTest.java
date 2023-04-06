@@ -113,6 +113,7 @@ class InventoryServiceTest {
                 .rentalEndDate(rentalEndDate)
                 .build();
         given(inventoryRepository.findWithEquipmentById(any())).willReturn(Optional.of(inventory));
+        doNothing().when(amountValidator).validateAmount(any(), any(), any());
 
         // when
         final InventoryResponse response = inventoryService.update(1L, updateInventoryRequest);
