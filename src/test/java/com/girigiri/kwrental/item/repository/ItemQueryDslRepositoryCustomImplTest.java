@@ -86,4 +86,20 @@ class ItemQueryDslRepositoryCustomImplTest {
         assertThatThrownBy(() -> entityManager.flush())
                 .isExactlyInstanceOf(PersistenceException.class);
     }
+
+    @Test
+    @DisplayName("대여 가능 갯수를 구한다")
+    void countAvailable() {
+        // given
+        Item item1 = ItemFixture.builder().propertyNumber("12345678").rentalAvailable(true).build();
+        Item item2 = ItemFixture.builder().propertyNumber("87654321").rentalAvailable(false).build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+
+        // when
+        final int expect = itemRepository.countAvailable(item1.getEquipmentId());
+
+        // then
+        assertThat(expect).isOne();
+    }
 }

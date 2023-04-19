@@ -1,8 +1,10 @@
 package com.girigiri.kwrental.item.repository;
 
-import static com.girigiri.kwrental.item.domain.QItem.item;
-
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import java.util.Objects;
+
+import static com.girigiri.kwrental.item.domain.QItem.item;
 
 public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryCustom {
 
@@ -26,5 +28,13 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
                 .where(item.id.eq(id))
                 .set(item.propertyNumber, propertyNumber)
                 .execute();
+    }
+
+    @Override
+    public int countAvailable(final Long equipmentId) {
+        return Objects.requireNonNull(jpaQueryFactory.select(item.count())
+                .from(item)
+                .where(item.equipmentId.eq(equipmentId).and(item.rentalAvailable.isTrue()))
+                .fetchOne()).intValue();
     }
 }
