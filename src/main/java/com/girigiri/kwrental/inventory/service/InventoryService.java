@@ -9,9 +9,10 @@ import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
 import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
-import com.girigiri.kwrental.inventory.exception.InventoryNotFound;
+import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -64,18 +65,27 @@ public class InventoryService {
     @Transactional
     public void deleteById(final Long id) {
         inventoryRepository.findById(id)
-                .orElseThrow(InventoryNotFound::new);
+                .orElseThrow(InventoryNotFoundException::new);
         inventoryRepository.deleteById(id);
     }
 
     @Transactional
     public InventoryResponse update(final Long id, final UpdateInventoryRequest request) {
         final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
-                .orElseThrow(InventoryNotFound::new);
+                .orElseThrow(InventoryNotFoundException::new);
         amountValidator.validateAmount(inventory.getEquipment().getId(), request.getAmount(),
                 new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         inventory.setRentalAmount(new RentalAmount(request.getAmount()));
         inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         return InventoryResponse.from(inventory);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public List<Inventory> getInventoriesWithEquipment() {
+        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
+        if (inventories.isEmpty()) {
+            throw new InventoryNotFoundException();
+        }
+        return inventories;
     }
 }

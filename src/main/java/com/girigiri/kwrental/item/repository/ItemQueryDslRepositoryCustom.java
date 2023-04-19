@@ -5,4 +5,6 @@ public interface ItemQueryDslRepositoryCustom {
     int updateRentalAvailable(Long id, boolean rentalAvailable);
 
     int updatePropertyNumber(Long id, String propertyNumber);
+
+    int countAvailable(Long equipmentId);
 }

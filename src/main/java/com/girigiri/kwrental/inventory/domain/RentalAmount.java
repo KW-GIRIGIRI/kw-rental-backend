@@ -3,10 +3,12 @@ package com.girigiri.kwrental.inventory.domain;
 import com.girigiri.kwrental.inventory.exception.RentalAmountException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Embeddable
 @Getter
+@EqualsAndHashCode
 public class RentalAmount {
 
     @Column(nullable = false)

@@ -10,6 +10,7 @@ import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
+import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -129,5 +130,16 @@ class ItemServiceImplTest {
 
         // then
         assertThat(itemsResponse.items()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("운영 중인 품목 갯수를 검증한다.")
+    void validateAvailableCount() {
+        // given
+        given(itemRepository.countAvailable(any())).willReturn(10);
+
+        // when
+        assertThatThrownBy(() -> itemService.validateAvailableCount(1L, 11))
+                .isExactlyInstanceOf(NotEnoughAvailableItemException.class);
     }
 }

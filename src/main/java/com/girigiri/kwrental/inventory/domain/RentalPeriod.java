@@ -3,6 +3,7 @@ package com.girigiri.kwrental.inventory.domain;
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 
 @Embeddable
 @Getter
+@EqualsAndHashCode
 public class RentalPeriod {
 
     @Column(nullable = false)
