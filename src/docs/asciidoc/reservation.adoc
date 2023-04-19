@@ -1,0 +1,5 @@
+== 대여 예약 관련 API
+
+=== 대여 예약 API
+
+operation::addReservations[snippets='http-request,http-response']
