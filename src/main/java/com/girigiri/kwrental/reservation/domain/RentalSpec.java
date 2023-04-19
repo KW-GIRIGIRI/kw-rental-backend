@@ -31,10 +31,15 @@ public class RentalSpec {
     }
 
     @Builder
-    private RentalSpec(final Long id, final RentalAmount amount, final RentalPeriod period, final Equipment equipment) {
+    private RentalSpec(final Long id, final RentalAmount amount, final RentalPeriod period, final Equipment equipment, final Reservation reservation) {
         this.id = id;
         this.amount = amount;
         this.period = period;
         this.equipment = equipment;
+        this.reservation = reservation;
+    }
+
+    public void setReservation(final Reservation reservation) {
+        this.reservation = reservation;
     }
 }

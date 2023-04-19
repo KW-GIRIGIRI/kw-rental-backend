@@ -38,6 +38,7 @@ public class Reservation {
     private Reservation(final Long id, final List<RentalSpec> rentalSpecs, final String name, final String email, final String phoneNumber, final String purpose) {
         this.id = id;
         this.rentalSpecs = rentalSpecs;
+        rentalSpecs.forEach(it -> it.setReservation(this));
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
