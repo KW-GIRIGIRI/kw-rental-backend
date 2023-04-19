@@ -13,8 +13,10 @@ import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
+import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -124,5 +126,13 @@ public class ItemServiceImpl implements ItemService {
                 .propertyNumber(updateItemRequest.propertyNumber())
                 .equipmentId(equipmentId)
                 .build();
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public void validateAvailableCount(final Long equipmentId, final int amount) {
+        final int availableCount = itemRepository.countAvailable(equipmentId);
+        if (availableCount < amount) {
+            throw new NotEnoughAvailableItemException();
+        }
     }
 }
