@@ -6,7 +6,7 @@ import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
-import com.girigiri.kwrental.inventory.exception.InventoryNotFound;
+import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -91,16 +92,16 @@ class InventoryServiceTest {
     @DisplayName("특정 기자재 수정 시 없으면 예외")
     void update_notFound() {
         // given
-        given(inventoryRepository.findWithEquipmentById(any())).willThrow(InventoryNotFound.class);
+        given(inventoryRepository.findWithEquipmentById(any())).willThrow(InventoryNotFoundException.class);
 
         // when, then
         assertThatThrownBy(() -> inventoryService.update(1L, null))
-                .isExactlyInstanceOf(InventoryNotFound.class);
+                .isExactlyInstanceOf(InventoryNotFoundException.class);
 
     }
 
     @Test
-    @DisplayName("특정 기자재 수정")
+    @DisplayName("특정 담은 기자재 수정")
     void update() {
         // given
         final Inventory inventory = InventoryFixture.create(EquipmentFixture.create());
@@ -125,5 +126,16 @@ class InventoryServiceTest {
                 () -> assertThat(response.getRentalEndDate()).isEqualTo(rentalEndDate)
 
         );
+    }
+
+    @Test
+    @DisplayName("담은 기자재 전원 조회 시 없을 경우 예외")
+    void getInventories_notFound() {
+        // given
+        given(inventoryRepository.findAllWithEquipment()).willReturn(Collections.emptyList());
+
+        // when, then
+        assertThatThrownBy(() -> inventoryService.getInventoriesWithEquipment())
+                .isExactlyInstanceOf(InventoryNotFoundException.class);
     }
 }
