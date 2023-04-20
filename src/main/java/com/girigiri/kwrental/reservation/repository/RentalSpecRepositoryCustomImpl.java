@@ -1,7 +1,9 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.QReservedAmount;
 import com.girigiri.kwrental.reservation.domain.RentalSpec;
+import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
@@ -34,5 +36,16 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .fetch();
         return Stream.concat(overlappedLeft.stream(), overLappedRight.stream())
                 .distinct().toList();
+    }
+
+    @Override
+    public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
+        return queryFactory
+                .select(
+                        new QReservedAmount(rentalSpec.equipment.id, rentalSpec.equipment.totalQuantity, rentalSpec.amount.amount.sum())
+                )
+                .from(rentalSpec)
+                .where(rentalSpec.period.rentalStartDate.loe(date).and(rentalSpec.period.rentalEndDate.after(date)).and(rentalSpec.equipment.id.in(equipmentIds)))
+                .fetch();
     }
 }
