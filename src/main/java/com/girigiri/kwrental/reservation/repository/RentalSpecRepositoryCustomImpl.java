@@ -1,15 +1,16 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.QReservedAmount;
 import com.girigiri.kwrental.reservation.domain.RentalSpec;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.dto.QReservedAmount;
+import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.reservation.domain.QRentalSpec.rentalSpec;
 
 public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
@@ -42,10 +43,14 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
     public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
         return queryFactory
                 .select(
-                        new QReservedAmount(rentalSpec.equipment.id, rentalSpec.equipment.totalQuantity, rentalSpec.amount.amount.sum())
+                        new QReservedAmount(equipment.id, equipment.totalQuantity, rentalSpec.amount.amount.sum().coalesce(0))
                 )
                 .from(rentalSpec)
-                .where(rentalSpec.period.rentalStartDate.loe(date).and(rentalSpec.period.rentalEndDate.after(date)).and(rentalSpec.equipment.id.in(equipmentIds)))
+                .rightJoin(equipment).on(rentalSpec.equipment.id.eq(equipment.id).
+                        and(rentalSpec.period.rentalStartDate.loe(date))
+                        .and(rentalSpec.period.rentalEndDate.after(date)))
+                .where(equipment.id.in(equipmentIds))
+                .groupBy(equipment.id)
                 .fetch();
     }
 }

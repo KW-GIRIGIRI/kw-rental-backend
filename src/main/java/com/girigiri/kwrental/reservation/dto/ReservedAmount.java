@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.domain;
+package com.girigiri.kwrental.reservation.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 
@@ -16,5 +16,13 @@ public class ReservedAmount {
         this.equipmentId = equipmentId;
         this.totalAmount = totalAmount;
         this.reservedAmount = reservedAmount;
+    }
+
+    public Long getEquipmentId() {
+        return equipmentId;
+    }
+
+    public int getRemainingAmount() {
+        return totalAmount - reservedAmount;
     }
 }

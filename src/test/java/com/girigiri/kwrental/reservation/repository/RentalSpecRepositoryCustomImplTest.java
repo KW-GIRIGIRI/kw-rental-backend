@@ -6,7 +6,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.RentalSpec;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -64,6 +64,7 @@ class RentalSpecRepositoryCustomImplTest {
         // given
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름1").totalQuantity(4).build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름2").totalQuantity(4).build());
+        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름3").totalQuantity(4).build());
 
         final RentalSpec.RentalSpecBuilder rentalSpec1Builder = RentalSpecFixture.builder(equipment1);
         final RentalSpec rentalSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
@@ -74,13 +75,17 @@ class RentalSpecRepositoryCustomImplTest {
         rentalSpecRepository.save(rentalSpec3);
 
         // when
-        final List<ReservedAmount> expect = rentalSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId()), NOW);
+        final List<ReservedAmount> expect = rentalSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
 
         // then
-        final ReservedAmount actual = new ReservedAmount(equipment1.getId(), 4, 3);
+        final ReservedAmount reservedAmount1 = new ReservedAmount(equipment1.getId(), 4, 3);
+        final ReservedAmount reservedAmount2 = new ReservedAmount(equipment2.getId(), 4, 0);
+        final ReservedAmount reservedAmount3 = new ReservedAmount(equipment3.getId(), 4, 0);
         assertAll(
-                () -> assertThat(expect).hasSize(1),
-                () -> assertThat(expect.get(0)).usingRecursiveComparison().isEqualTo(actual)
+                () -> assertThat(expect).hasSize(3),
+                () -> assertThat(expect.get(0)).usingRecursiveComparison().isEqualTo(reservedAmount1),
+                () -> assertThat(expect.get(1)).usingRecursiveComparison().isEqualTo(reservedAmount2),
+                () -> assertThat(expect.get(2)).usingRecursiveComparison().isEqualTo(reservedAmount3)
         );
     }
 }
