@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -42,6 +43,9 @@ class EquipmentServiceTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private RemainingQuantityService remainingQuantityService;
 
     @InjectMocks
     private EquipmentService equipmentService;
@@ -73,7 +77,6 @@ class EquipmentServiceTest {
                 .isExactlyInstanceOf(EquipmentNotFoundException.class);
     }
 
-    // TODO: 2023/03/29  대여 가능 횟수 로직이 포함되지 않았다.
     @Test
     @DisplayName("등록된 기자재들을 대여 가능 횟수를 포함해서 페이지로 조건 없이 조회할 수 있다.")
     void findEquipmentsWithRentalQuantityBy() {
@@ -83,17 +86,19 @@ class EquipmentServiceTest {
         final Equipment equipment = EquipmentFixture.builder().id(2L).build();
         given(equipmentRepository.findEquipmentBy(any(), any(), any()))
                 .willReturn(new PageImpl<>(List.of(equipment), pageable, 3));
+        given(remainingQuantityService.getRemainingQuantityByEquipmentIdAndDate(any(), any()))
+                .willReturn(Map.of(equipment.getId(), equipment.getTotalQuantity()));
 
         // when
         final Page<SimpleEquipmentWithRentalQuantityResponse> expect = equipmentService.findEquipmentsWithRentalQuantityBy(
-                pageable, new EquipmentSearchCondition(null, null));
+                pageable, new EquipmentSearchCondition(null, null, null));
 
         // then
         assertAll(
                 () -> assertThat(expect.hasNext()).isTrue(),
                 () -> assertThat(expect.hasPrevious()).isTrue(),
                 () -> assertThat(expect.getContent()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment))
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment, equipment.getTotalQuantity()))
         );
     }
 
@@ -109,7 +114,7 @@ class EquipmentServiceTest {
 
         // when
         final Page<SimpleEquipmentResponse> expect = equipmentService.findEquipments(
-                pageable, new EquipmentSearchCondition(null, null));
+                pageable, new EquipmentSearchCondition(null, null, null));
 
         // then
         assertAll(

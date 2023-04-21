@@ -19,18 +19,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
     private final ItemService itemService;
     private final ApplicationEventPublisher eventPublisher;
+    private final RemainingQuantityService remainingQuantityService;
 
     public EquipmentService(final EquipmentRepository equipmentRepository, final ItemService itemService,
-                            final ApplicationEventPublisher eventPublisher) {
+                            final ApplicationEventPublisher eventPublisher, final RemainingQuantityService remainingQuantityService) {
         this.equipmentRepository = equipmentRepository;
         this.itemService = itemService;
         this.eventPublisher = eventPublisher;
+        this.remainingQuantityService = remainingQuantityService;
     }
 
     @Transactional(readOnly = true)
@@ -41,11 +47,19 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
-    // TODO: 2023/03/30 대여가능 갯수 로직 구현해야 함
     public Page<SimpleEquipmentWithRentalQuantityResponse> findEquipmentsWithRentalQuantityBy(final Pageable pageable,
                                                                                               @Nullable final EquipmentSearchCondition searchCondition) {
-        return equipmentRepository.findEquipmentBy(pageable, searchCondition.keyword(), searchCondition.category())
-                .map(SimpleEquipmentWithRentalQuantityResponse::from);
+        final Page<Equipment> page = equipmentRepository.findEquipmentBy(pageable, searchCondition.keyword(), searchCondition.category());
+        final LocalDate date = searchCondition.date() == null ? LocalDate.now() : searchCondition.date();
+        final Map<Long, Integer> remainingQuantities = getRemainingQuantities(page.getContent(), date);
+        return page.map(equipment -> SimpleEquipmentWithRentalQuantityResponse.from(equipment, remainingQuantities.get(equipment.getId())));
+    }
+
+    private Map<Long, Integer> getRemainingQuantities(final List<Equipment> equipments, final LocalDate date) {
+        final List<Long> ids = equipments.stream()
+                .map(Equipment::getId)
+                .toList();
+        return remainingQuantityService.getRemainingQuantityByEquipmentIdAndDate(ids, date);
     }
 
     @Transactional(readOnly = true)
