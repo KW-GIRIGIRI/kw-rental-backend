@@ -2,11 +2,9 @@ package com.girigiri.kwrental.reservation.service;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
 import com.girigiri.kwrental.reservation.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +15,14 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final RentalSpecRepository rentalSpecRepository;
     private final InventoryService inventoryService;
-    private final ItemServiceImpl itemService;
+    private final RemainingQuantityServiceImpl remainingQuantityService;
 
-    public ReservationService(final ReservationRepository reservationRepository, final RentalSpecRepository rentalSpecRepository,
-                              final InventoryService inventoryService, final ItemServiceImpl itemService) {
+    public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
+                              final RemainingQuantityServiceImpl remainingQuantityService) {
         this.reservationRepository = reservationRepository;
-        this.rentalSpecRepository = rentalSpecRepository;
         this.inventoryService = inventoryService;
-        this.itemService = itemService;
+        this.remainingQuantityService = remainingQuantityService;
     }
 
     @Transactional
@@ -41,16 +37,8 @@ public class ReservationService {
     }
 
     private boolean isAvailableCountValid(final Inventory inventory) {
-        final int rentedCount = getRentedCount(inventory);
-        itemService.validateAvailableCount(inventory.getEquipment().getId(), rentedCount + inventory.getRentalAmount().getAmount());
+        remainingQuantityService.validateAmount(inventory.getEquipment().getId(), inventory.getRentalAmount().getAmount(), inventory.getRentalPeriod());
         return true;
-    }
-
-    private int getRentedCount(final Inventory inventory) {
-        final List<RentalSpec> overlappedRentalSpec = rentalSpecRepository.findOverlappedByPeriod(inventory.getEquipment().getId(), inventory.getRentalPeriod());
-        return overlappedRentalSpec.stream()
-                .mapToInt(it -> it.getAmount().getAmount())
-                .sum();
     }
 
     private RentalSpec mapToRentalSpec(final Inventory inventory) {

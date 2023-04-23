@@ -3,11 +3,8 @@ package com.girigiri.kwrental.reservation.service;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
@@ -31,13 +28,10 @@ class ReservationServiceTest {
     private InventoryService inventoryService;
 
     @Mock
-    private ItemServiceImpl itemService;
+    private RemainingQuantityServiceImpl remainingQuantityService;
 
     @Mock
     private ReservationRepository reservationRepository;
-
-    @Mock
-    private RentalSpecRepository rentalSpecRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -49,10 +43,8 @@ class ReservationServiceTest {
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
         final Inventory inventory = InventoryFixture.create(equipment);
         given(inventoryService.getInventoriesWithEquipment()).willReturn(List.of(inventory));
+        doNothing().when(remainingQuantityService).validateAmount(any(), any(), any());
 
-        final RentalSpec rentalSpec = RentalSpecFixture.create(equipment);
-        given(rentalSpecRepository.findOverlappedByPeriod(eq(1L), any())).willReturn(List.of(rentalSpec));
-        doNothing().when(itemService).validateAvailableCount(1L, rentalSpec.getAmount().getAmount() + 1);
         final AddReservationRequest addReservationRequest = AddReservationRequest.builder()
                 .renterEmail("email@email.com")
                 .rentalPurpose("purpose")
