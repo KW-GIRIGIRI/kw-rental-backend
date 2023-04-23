@@ -37,4 +37,9 @@ public class RentalPeriod {
     public Integer getRentalDays() {
         return (int) rentalStartDate.until(rentalEndDate, ChronoUnit.DAYS);
     }
+
+    public boolean contains(final LocalDate date) {
+        if (date == null) return false;
+        return date.isEqual(rentalStartDate) || (date.isAfter(getRentalStartDate()) && date.isBefore(getRentalEndDate()));
+    }
 }
