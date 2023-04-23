@@ -21,3 +21,7 @@ operation::admin_updatePropertyNumber[snippets='http-request,http-response']
 ==== `id` 값이 null이면 품목이 추가된다. `id` 값이 null이 아니면 전달받은 값으로 수정한다.
 
 operation::admin_updateItemsByEquipment[snippets='http-request,http-response']
+
+=== 관리자 기자재 품목 삭제 API
+
+operation::admin_deleteItem[snippets='http-request,http-response']

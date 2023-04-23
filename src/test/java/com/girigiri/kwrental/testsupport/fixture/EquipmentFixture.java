@@ -25,8 +25,7 @@ public class EquipmentFixture {
                 .components(components)
                 .purpose(purpose)
                 .rentalPlace(rentalPlace)
-                .maxRentalDays(1)
-                .totalQuantity(1);
+                .maxRentalDays(1);
     }
 
     public static Equipment create() {

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 public class RentalSpec {
@@ -41,5 +43,9 @@ public class RentalSpec {
 
     public void setReservation(final Reservation reservation) {
         this.reservation = reservation;
+    }
+
+    public boolean containsDate(final LocalDate date) {
+        return this.period.contains(date);
     }
 }

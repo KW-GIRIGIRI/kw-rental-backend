@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class RentalPeriodTest {
 
@@ -37,5 +38,35 @@ class RentalPeriodTest {
 
         // then
         assertThat(expect).isZero();
+    }
+
+    @Test
+    @DisplayName("대여 기간 중 특정 일자가 포함되는 지 판단한다.")
+    void contains() {
+        // given
+        final LocalDate start = LocalDate.now();
+        final LocalDate end = LocalDate.now().plusDays(2);
+        final RentalPeriod rentalPeriod = new RentalPeriod(start, end);
+
+        final LocalDate beforeStart = LocalDate.now().minusDays(1);
+        final LocalDate equalsStart = LocalDate.now();
+        final LocalDate midOfPeriod = LocalDate.now().plusDays(1);
+        final LocalDate equalsEnd = LocalDate.now().plusDays(2);
+
+        // when
+        final boolean beforeStartExpect = rentalPeriod.contains(beforeStart);
+        final boolean equalsStartExpect = rentalPeriod.contains(equalsStart);
+        final boolean midOfPeriodExpect = rentalPeriod.contains(midOfPeriod);
+        final boolean equalsEndExpect = rentalPeriod.contains(equalsEnd);
+        final boolean afterEndExpect = rentalPeriod.contains(end.plusDays(1));
+
+        // then
+        assertAll(
+                () -> assertThat(beforeStartExpect).isFalse(),
+                () -> assertThat(equalsStartExpect).isTrue(),
+                () -> assertThat(midOfPeriodExpect).isTrue(),
+                () -> assertThat(equalsEndExpect).isFalse(),
+                () -> assertThat(afterEndExpect).isFalse()
+        );
     }
 }

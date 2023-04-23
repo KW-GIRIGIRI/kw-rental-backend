@@ -7,7 +7,11 @@ import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +23,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
@@ -34,6 +39,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
+
+    @Autowired
+    private RentalSpecRepository rentalSpecRepository;
 
     @Test
     @DisplayName("기자재 세부 내역 조회 API")
@@ -82,8 +90,8 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                         .containsExactly("/api/equipments?size=2&page=0&sort=id,DESC",
                                 "/api/equipments?size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment4),
-                                SimpleEquipmentWithRentalQuantityResponse.from(equipment3))
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment4, equipment4.getTotalQuantity()),
+                                SimpleEquipmentWithRentalQuantityResponse.from(equipment3, equipment3.getTotalQuantity()))
         );
     }
 
@@ -117,8 +125,8 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                         .containsExactly("/api/equipments?keyword=key&size=2&page=0&sort=id,DESC",
                                 "/api/equipments?keyword=key&size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment4),
-                                SimpleEquipmentWithRentalQuantityResponse.from(equipment3))
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment4, equipment4.getTotalQuantity()),
+                                SimpleEquipmentWithRentalQuantityResponse.from(equipment3, equipment3.getTotalQuantity()))
         );
     }
 
@@ -152,8 +160,39 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                         .containsExactly("/api/equipments?keyword=key&category=CAMERA&size=2&page=0&sort=id,DESC",
                                 "/api/equipments?keyword=key&category=CAMERA&size=2&page=1&sort=id,DESC"),
                 () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment3),
-                                SimpleEquipmentWithRentalQuantityResponse.from(equipment2))
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment3, equipment3.getTotalQuantity()),
+                                SimpleEquipmentWithRentalQuantityResponse.from(equipment2, equipment2.getTotalQuantity()))
+        );
+    }
+
+    @Test
+    @DisplayName("기자재 목록 조회 API_날짜에 따라 대여 가능한 갯수 다르게 보여짐.")
+    void getEquipmentsPage_withDate() {
+        // given
+        final Equipment equipment1 = EquipmentFixture.builder().modelName("equipment1").totalQuantity(10).build();
+        equipmentRepository.save(equipment1);
+        final Equipment equipment2 = EquipmentFixture.builder().modelName("equipment2").totalQuantity(10).build();
+        equipmentRepository.save(equipment2);
+        LocalDate date = LocalDate.of(2023, 1, 1);
+        rentalSpecRepository.save(RentalSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        rentalSpecRepository.save(RentalSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        rentalSpecRepository.save(RentalSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+
+        // when
+        final EquipmentsWithRentalQuantityPageResponse response = RestAssured.given(this.requestSpec)
+                .filter(document("getEquipmentsPageWithDate"))
+                .when().get("/api/equipments?size=2&date=2023-01-01")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .and().extract().as(EquipmentsWithRentalQuantityPageResponse.class);
+
+        // then
+        assertAll(
+                () -> assertThat(response.endPoints()).hasSize(1)
+                        .containsExactly("/api/equipments?date=2023-01-01&size=2&page=0&sort=id,DESC"),
+                () -> assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                        .containsExactly(SimpleEquipmentWithRentalQuantityResponse.from(equipment2, 5),
+                                SimpleEquipmentWithRentalQuantityResponse.from(equipment1, 3))
         );
     }
 

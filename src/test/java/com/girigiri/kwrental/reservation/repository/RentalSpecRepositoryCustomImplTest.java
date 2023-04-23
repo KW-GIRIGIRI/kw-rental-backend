@@ -3,8 +3,10 @@ package com.girigiri.kwrental.reservation.repository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.RentalSpec;
+import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -53,5 +56,36 @@ class RentalSpecRepositoryCustomImplTest {
         assertThat(expect).usingRecursiveFieldByFieldElementComparator()
                 .extracting(RentalSpec::getPeriod)
                 .containsExactlyInAnyOrder(overlappedLeft, overlappedMid, overlappedRight, overlappedBoth);
+    }
+
+    @Test
+    @DisplayName("기자재들의 특정 날짜에 대여 예약된 갯수를 구한다.")
+    void findRentalAmountsByEquipmentIds() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름1").totalQuantity(4).build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름2").totalQuantity(4).build());
+        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름3").totalQuantity(4).build());
+
+        final RentalSpec.RentalSpecBuilder rentalSpec1Builder = RentalSpecFixture.builder(equipment1);
+        final RentalSpec rentalSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
+        final RentalSpec rentalSpec2 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
+        final RentalSpec rentalSpec3 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
+        rentalSpecRepository.save(rentalSpec1);
+        rentalSpecRepository.save(rentalSpec2);
+        rentalSpecRepository.save(rentalSpec3);
+
+        // when
+        final List<ReservedAmount> expect = rentalSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
+
+        // then
+        final ReservedAmount reservedAmount1 = new ReservedAmount(equipment1.getId(), 4, 3);
+        final ReservedAmount reservedAmount2 = new ReservedAmount(equipment2.getId(), 4, 0);
+        final ReservedAmount reservedAmount3 = new ReservedAmount(equipment3.getId(), 4, 0);
+        assertAll(
+                () -> assertThat(expect).hasSize(3),
+                () -> assertThat(expect.get(0)).usingRecursiveComparison().isEqualTo(reservedAmount1),
+                () -> assertThat(expect.get(1)).usingRecursiveComparison().isEqualTo(reservedAmount2),
+                () -> assertThat(expect.get(2)).usingRecursiveComparison().isEqualTo(reservedAmount3)
+        );
     }
 }
