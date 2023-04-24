@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,5 +88,22 @@ class RentalSpecRepositoryCustomImplTest {
                 () -> assertThat(expect.get(1)).usingRecursiveComparison().isEqualTo(reservedAmount2),
                 () -> assertThat(expect.get(2)).usingRecursiveComparison().isEqualTo(reservedAmount3)
         );
+    }
+
+    @Test
+    @DisplayName("특정 기간에 대여 수령하는 대여 상세를 조회한다.")
+    void findByStartDateBetween() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final YearMonth now = YearMonth.now();
+        final RentalSpec rentalSpec1 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
+        final RentalSpec rentalSpec2 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
+        final RentalSpec rentalSpec3 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
+
+        // when
+        final List<RentalSpec> expect = rentalSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
+
+        // then
+        assertThat(expect).containsExactlyInAnyOrder(rentalSpec1, rentalSpec2);
     }
 }
