@@ -53,4 +53,15 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .groupBy(equipment.id)
                 .fetch();
     }
+
+    @Override
+    public List<RentalSpec> findByStartDateBetween(final Long equipmentId, final LocalDate start, final LocalDate end) {
+        return queryFactory
+                .selectFrom(rentalSpec)
+                .leftJoin(rentalSpec.reservation).fetchJoin()
+                .where(
+                        rentalSpec.period.rentalStartDate.goe(start)
+                                .and(rentalSpec.period.rentalStartDate.loe(end)))
+                .fetch();
+    }
 }

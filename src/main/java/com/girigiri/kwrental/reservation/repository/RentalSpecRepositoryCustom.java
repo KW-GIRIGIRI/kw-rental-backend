@@ -11,4 +11,6 @@ public interface RentalSpecRepositoryCustom {
     List<RentalSpec> findOverlappedByPeriod(Long equipmentId, RentalPeriod rentalPeriod);
 
     List<ReservedAmount> findRentalAmountsByEquipmentIds(List<Long> equipmentIds, LocalDate date);
+
+    List<RentalSpec> findByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);
 }
