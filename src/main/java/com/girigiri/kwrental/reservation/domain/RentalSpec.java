@@ -48,4 +48,8 @@ public class RentalSpec {
     public boolean containsDate(final LocalDate date) {
         return this.period.contains(date);
     }
+
+    public LocalDate getStartDate() {
+        return period.getRentalStartDate();
+    }
 }
