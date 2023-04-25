@@ -29,7 +29,7 @@ class ReservationSpecRepositoryCustomImplTest {
 
     public static final LocalDate NOW = LocalDate.now();
     @Autowired
-    private RentalSpecRepository rentalSpecRepository;
+    private ReservationSpecRepository reservationSpecRepository;
 
     @Autowired
     private EquipmentRepository equipmentRepository;
@@ -48,11 +48,11 @@ class ReservationSpecRepositoryCustomImplTest {
 
 
         List.of(notOverlappedLeft, overlappedLeft, overlappedMid, overlappedRight, notOverlappedRight, overlappedBoth)
-                .forEach(it -> rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(it).build()));
+                .forEach(it -> reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(it).build()));
 
         // when
         final RentalPeriod period = new RentalPeriod(NOW.plusDays(1), NOW.plusDays(4));
-        final List<ReservationSpec> expect = rentalSpecRepository.findOverlappedByPeriod(equipment.getId(), period);
+        final List<ReservationSpec> expect = reservationSpecRepository.findOverlappedByPeriod(equipment.getId(), period);
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator()
@@ -72,12 +72,12 @@ class ReservationSpecRepositoryCustomImplTest {
         final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
         final ReservationSpec reservationSpec2 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
         final ReservationSpec reservationSpec3 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
-        rentalSpecRepository.save(reservationSpec1);
-        rentalSpecRepository.save(reservationSpec2);
-        rentalSpecRepository.save(reservationSpec3);
+        reservationSpecRepository.save(reservationSpec1);
+        reservationSpecRepository.save(reservationSpec2);
+        reservationSpecRepository.save(reservationSpec3);
 
         // when
-        final List<ReservedAmount> expect = rentalSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
+        final List<ReservedAmount> expect = reservationSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
 
         // then
         final ReservedAmount reservedAmount1 = new ReservedAmount(equipment1.getId(), 4, 3);
@@ -97,12 +97,12 @@ class ReservationSpecRepositoryCustomImplTest {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final YearMonth now = YearMonth.now();
-        final ReservationSpec reservationSpec1 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
-        final ReservationSpec reservationSpec2 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
-        final ReservationSpec reservationSpec3 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
+        final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
+        final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
+        final ReservationSpec reservationSpec3 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
 
         // when
-        final List<ReservationSpec> expect = rentalSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
+        final List<ReservationSpec> expect = reservationSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
 
         // then
         assertThat(expect).containsExactlyInAnyOrder(reservationSpec1, reservationSpec2);

@@ -9,7 +9,7 @@ import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import io.restassured.RestAssured;
@@ -41,7 +41,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     private EquipmentRepository equipmentRepository;
 
     @Autowired
-    private RentalSpecRepository rentalSpecRepository;
+    private ReservationSpecRepository reservationSpecRepository;
 
     @Test
     @DisplayName("기자재 세부 내역 조회 API")
@@ -174,9 +174,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         final Equipment equipment2 = EquipmentFixture.builder().modelName("equipment2").totalQuantity(10).build();
         equipmentRepository.save(equipment2);
         LocalDate date = LocalDate.of(2023, 1, 1);
-        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
 
         // when
         final EquipmentsWithRentalQuantityPageResponse response = RestAssured.given(this.requestSpec)

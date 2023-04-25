@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
 
-public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
+public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public RentalSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
+    public ReservationSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 

@@ -7,8 +7,8 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
@@ -39,7 +39,7 @@ class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Mock
-    private RentalSpecRepository rentalSpecRepository;
+    private ReservationSpecRepository reservationSpecRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -82,7 +82,7 @@ class ReservationServiceTest {
         final Equipment equipment = EquipmentFixture.create();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-        given(rentalSpecRepository.findByStartDateBetween(any(), any(), any()))
+        given(reservationSpecRepository.findByStartDateBetween(any(), any(), any()))
                 .willReturn(List.of(reservationSpec));
 
         // when
