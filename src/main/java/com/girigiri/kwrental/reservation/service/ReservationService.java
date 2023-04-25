@@ -7,9 +7,10 @@ import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepositoryCustom;
+import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepositoryCustom;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +24,11 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final InventoryService inventoryService;
     private final RemainingQuantityServiceImpl remainingQuantityService;
-    private final RentalSpecRepositoryCustom rentalSpecRepository;
+    private final ReservationSpecRepositoryCustom rentalSpecRepository;
 
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
                               final RemainingQuantityServiceImpl remainingQuantityService,
-                              @Qualifier("rentalSpecRepository") final RentalSpecRepositoryCustom rentalSpecRepository) {
+                              final ReservationSpecRepository rentalSpecRepository) {
         this.reservationRepository = reservationRepository;
         this.inventoryService = inventoryService;
         this.remainingQuantityService = remainingQuantityService;
@@ -75,5 +76,11 @@ public class ReservationService {
         final ReservationCalendar calendar = ReservationCalendar.from(startOfMonth, endOfMonth);
         calendar.addAll(reservationSpecs);
         return ReservationsByEquipmentPerYearMonthResponse.from(calendar);
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationsByStartDateResponse getReservationsByStartDate(final LocalDate startDate) {
+        final List<Reservation> reservations = reservationRepository.findReservationsWithSpecsByStartDate(startDate);
+        return ReservationsByStartDateResponse.from(reservations);
     }
 }
