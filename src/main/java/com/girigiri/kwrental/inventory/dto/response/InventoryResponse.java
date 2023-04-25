@@ -21,9 +21,9 @@ public class InventoryResponse {
     private LocalDate rentalEndDate;
     private Integer amount;
 
-    private InventoryResponse(final Long id, final String rentalPlace, final String modelName,
-                              final String category, final String maker, final String imgUrl,
-                              final LocalDate rentalStartDate, final LocalDate rentalEndDate, final Integer amount) {
+    private Long equipmentId;
+
+    private InventoryResponse(final Long id, final String rentalPlace, final String modelName, final String category, final String maker, final String imgUrl, final LocalDate rentalStartDate, final LocalDate rentalEndDate, final Integer amount, final Long equipmentId) {
         this.id = id;
         this.rentalPlace = rentalPlace;
         this.modelName = modelName;
@@ -33,6 +33,7 @@ public class InventoryResponse {
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;
         this.amount = amount;
+        this.equipmentId = equipmentId;
     }
 
     public static InventoryResponse from(final Inventory inventory) {
@@ -43,6 +44,7 @@ public class InventoryResponse {
                 .modelName(equipment.getModelName())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())
+                .equipmentId(equipment.getId())
                 .imgUrl(equipment.getImgUrl())
                 .rentalStartDate(inventory.getRentalPeriod().getRentalStartDate())
                 .rentalEndDate(inventory.getRentalPeriod().getRentalEndDate())

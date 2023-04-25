@@ -6,7 +6,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 
-import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.inventory.domain.QInventory.inventory;
 
 public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom {
@@ -21,7 +20,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public List<Inventory> findAllWithEquipment() {
         return jpaQueryFactory.selectFrom(inventory)
-                .leftJoin(equipment).fetchJoin()
+                .join(inventory.equipment).fetchJoin()
                 .fetch();
     }
 
@@ -35,7 +34,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     public Optional<Inventory> findWithEquipmentById(final Long id) {
         return Optional.ofNullable(
                 jpaQueryFactory.selectFrom(inventory)
-                        .leftJoin(equipment).fetchJoin()
+                        .leftJoin(inventory.equipment).fetchJoin()
                         .where(inventory.id.eq(id))
                         .fetchOne()
         );
