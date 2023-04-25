@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.reservation.domain;
 
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.exception.ReservationException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,11 +39,22 @@ public class Reservation {
     @Builder
     private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose) {
         this.id = id;
+        validateReservationSpec(reservationSpecs);
         this.reservationSpecs = reservationSpecs;
         reservationSpecs.forEach(it -> it.setReservation(this));
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.purpose = purpose;
+    }
+
+    private void validateReservationSpec(final List<ReservationSpec> reservationSpecs) {
+        if (reservationSpecs == null || reservationSpecs.isEmpty()) {
+            throw new ReservationException("대여 상세 내용이 없습니다.");
+        }
+        final RentalPeriod period = reservationSpecs.get(0).getPeriod();
+        reservationSpecs.forEach(spec -> {
+            if (!spec.hasPeriod(period)) throw new ReservationException("대여 상세 내용들의 대여 기간이 통일되지 않았습니다.");
+        });
     }
 }

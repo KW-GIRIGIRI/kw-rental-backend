@@ -6,7 +6,7 @@ import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 class RemainingQuantityServiceImplTest {
 
     @Mock
-    private RentalSpecRepository rentalSpecRepository;
+    private ReservationSpecRepository reservationSpecRepository;
 
     @Mock
     private EquipmentRepository equipmentRepository;
@@ -48,7 +48,7 @@ class RemainingQuantityServiceImplTest {
                 .period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
 
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
-        given(rentalSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
+        given(reservationSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
 
         // when, then
         assertThatCode(() -> remainingQuantityService.validateAmount(1L, 1, new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))))
@@ -66,7 +66,7 @@ class RemainingQuantityServiceImplTest {
                 .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
 
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
-        given(rentalSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
+        given(reservationSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
 
         // when, then
         assertThatThrownBy(() -> remainingQuantityService.validateAmount(1L, 1, new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))))

@@ -9,7 +9,7 @@ import com.girigiri.kwrental.inventory.service.AmountValidator;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,18 +23,18 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
 
-    private final RentalSpecRepository rentalSpecRepository;
+    private final ReservationSpecRepository reservationSpecRepository;
     private final EquipmentRepository equipmentRepository;
 
-    public RemainingQuantityServiceImpl(final RentalSpecRepository rentalSpecRepository, final EquipmentRepository equipmentRepository) {
-        this.rentalSpecRepository = rentalSpecRepository;
+    public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository, final EquipmentRepository equipmentRepository) {
+        this.reservationSpecRepository = reservationSpecRepository;
         this.equipmentRepository = equipmentRepository;
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> equipmentIds, final LocalDate date) {
-        return rentalSpecRepository.findRentalAmountsByEquipmentIds(equipmentIds, date)
+        return reservationSpecRepository.findRentalAmountsByEquipmentIds(equipmentIds, date)
                 .stream()
                 .collect(toMap(ReservedAmount::getEquipmentId, ReservedAmount::getRemainingAmount));
     }
@@ -44,7 +44,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
     public void validateAmount(final Long equipmentId, final Integer amount, final RentalPeriod rentalPeriod) {
         final Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(EquipmentNotFoundException::new);
-        final List<ReservationSpec> overlappedReservationSpecs = rentalSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
+        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
         for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
             final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
             validateTotalAmount(amount + rentedAmountByDate, equipment);

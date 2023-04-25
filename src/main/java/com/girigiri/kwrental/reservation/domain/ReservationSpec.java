@@ -52,4 +52,8 @@ public class ReservationSpec {
     public LocalDate getStartDate() {
         return period.getRentalStartDate();
     }
+
+    public boolean hasPeriod(final RentalPeriod period) {
+        return this.period.equals(period);
+    }
 }

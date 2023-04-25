@@ -6,9 +6,11 @@ import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
+import com.girigiri.kwrental.reservation.dto.response.ReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
@@ -20,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -39,7 +42,7 @@ class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Mock
-    private RentalSpecRepository rentalSpecRepository;
+    private ReservationSpecRepository reservationSpecRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -82,7 +85,7 @@ class ReservationServiceTest {
         final Equipment equipment = EquipmentFixture.create();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-        given(rentalSpecRepository.findByStartDateBetween(any(), any(), any()))
+        given(reservationSpecRepository.findByStartDateBetween(any(), any(), any()))
                 .willReturn(List.of(reservationSpec));
 
         // when
@@ -90,5 +93,23 @@ class ReservationServiceTest {
 
         // then
         assertThat(expect.getReservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(reservation.getName());
+    }
+
+    @Test
+    @DisplayName("특정 날짜에 수령하는 대여 예약을 조회한다.")
+    void getReservationsByStartDate() {
+        // given
+        final Equipment equipment = EquipmentFixture.create();
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
+        final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
+        given(reservationRepository.findReservationsWithSpecsByStartDate(any()))
+                .willReturn(List.of(reservation));
+
+        // when
+        final ReservationsByStartDateResponse reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
+
+        // then
+        assertThat(reservationsByStartDate.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(ReservationResponse.from(reservation));
     }
 }

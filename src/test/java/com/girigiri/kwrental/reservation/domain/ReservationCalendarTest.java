@@ -28,7 +28,9 @@ class ReservationCalendarTest {
                 .period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build();
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment)
                 .period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build();
-        final Reservation reservation = ReservationFixture.create(List.of(reservationSpec1, reservationSpec2, reservationSpec3));
+        final Reservation reservation1 = ReservationFixture.create(List.of(reservationSpec1));
+        final Reservation reservation2 = ReservationFixture.create(List.of(reservationSpec2));
+        final Reservation reservation3 = ReservationFixture.create(List.of(reservationSpec3));
         final ReservationCalendar calendar = ReservationCalendar.from(now.atDay(1), now.atEndOfMonth());
 
         // when
@@ -36,8 +38,8 @@ class ReservationCalendarTest {
 
         // then
         assertAll(
-                () -> assertThat(calendar.getCalendar().get(1)).containsOnly(reservation.getName()),
-                () -> assertThat(calendar.getCalendar().get(now.atEndOfMonth().getDayOfMonth())).containsOnly(reservation.getName())
+                () -> assertThat(calendar.getCalendar().get(1)).containsOnly(reservation1.getName()),
+                () -> assertThat(calendar.getCalendar().get(now.atEndOfMonth().getDayOfMonth())).containsOnly(reservation1.getName())
         );
     }
 }
