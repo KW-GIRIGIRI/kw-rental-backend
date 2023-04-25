@@ -15,7 +15,7 @@ public class Reservation {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.PERSIST, mappedBy = "reservation")
-    private List<RentalSpec> rentalSpecs;
+    private List<ReservationSpec> reservationSpecs;
 
     @Column(nullable = false)
     private String name;
@@ -35,10 +35,10 @@ public class Reservation {
     }
 
     @Builder
-    private Reservation(final Long id, final List<RentalSpec> rentalSpecs, final String name, final String email, final String phoneNumber, final String purpose) {
+    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose) {
         this.id = id;
-        this.rentalSpecs = rentalSpecs;
-        rentalSpecs.forEach(it -> it.setReservation(this));
+        this.reservationSpecs = reservationSpecs;
+        reservationSpecs.forEach(it -> it.setReservation(this));
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;

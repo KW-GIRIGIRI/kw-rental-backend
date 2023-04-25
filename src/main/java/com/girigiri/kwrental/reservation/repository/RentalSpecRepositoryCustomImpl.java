@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
-import static com.girigiri.kwrental.reservation.domain.QRentalSpec.rentalSpec;
+import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
 
 public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
 
@@ -22,18 +22,18 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
     }
 
     @Override
-    public List<RentalSpec> findOverlappedByPeriod(final Long equipmentId, final RentalPeriod rentalPeriod) {
+    public List<ReservationSpec> findOverlappedByPeriod(final Long equipmentId, final RentalPeriod rentalPeriod) {
         final LocalDate start = rentalPeriod.getRentalStartDate();
         final LocalDate end = rentalPeriod.getRentalEndDate();
-        final List<RentalSpec> overlappedLeft = queryFactory.selectFrom(rentalSpec)
-                .where(rentalSpec.equipment.id.eq(equipmentId)
-                        .and(rentalSpec.period.rentalStartDate.loe(start))
-                        .and(rentalSpec.period.rentalEndDate.after(start)))
+        final List<ReservationSpec> overlappedLeft = queryFactory.selectFrom(reservationSpec)
+                .where(reservationSpec.equipment.id.eq(equipmentId)
+                        .and(reservationSpec.period.rentalStartDate.loe(start))
+                        .and(reservationSpec.period.rentalEndDate.after(start)))
                 .fetch();
-        final List<RentalSpec> overLappedRight = queryFactory.selectFrom(rentalSpec)
-                .where(rentalSpec.equipment.id.eq(equipmentId)
-                        .and(rentalSpec.period.rentalStartDate.after(start))
-                        .and(rentalSpec.period.rentalStartDate.before(end)))
+        final List<ReservationSpec> overLappedRight = queryFactory.selectFrom(reservationSpec)
+                .where(reservationSpec.equipment.id.eq(equipmentId)
+                        .and(reservationSpec.period.rentalStartDate.after(start))
+                        .and(reservationSpec.period.rentalStartDate.before(end)))
                 .fetch();
         return Stream.concat(overlappedLeft.stream(), overLappedRight.stream())
                 .distinct().toList();
@@ -43,25 +43,25 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
     public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
         return queryFactory
                 .select(
-                        new QReservedAmount(equipment.id, equipment.totalQuantity, rentalSpec.amount.amount.sum().coalesce(0))
+                        new QReservedAmount(equipment.id, equipment.totalQuantity, reservationSpec.amount.amount.sum().coalesce(0))
                 )
-                .from(rentalSpec)
-                .rightJoin(equipment).on(rentalSpec.equipment.id.eq(equipment.id).
-                        and(rentalSpec.period.rentalStartDate.loe(date))
-                        .and(rentalSpec.period.rentalEndDate.after(date)))
+                .from(reservationSpec)
+                .rightJoin(equipment).on(reservationSpec.equipment.id.eq(equipment.id).
+                        and(reservationSpec.period.rentalStartDate.loe(date))
+                        .and(reservationSpec.period.rentalEndDate.after(date)))
                 .where(equipment.id.in(equipmentIds))
                 .groupBy(equipment.id)
                 .fetch();
     }
 
     @Override
-    public List<RentalSpec> findByStartDateBetween(final Long equipmentId, final LocalDate start, final LocalDate end) {
+    public List<ReservationSpec> findByStartDateBetween(final Long equipmentId, final LocalDate start, final LocalDate end) {
         return queryFactory
-                .selectFrom(rentalSpec)
-                .leftJoin(rentalSpec.reservation).fetchJoin()
+                .selectFrom(reservationSpec)
+                .leftJoin(reservationSpec.reservation).fetchJoin()
                 .where(
-                        rentalSpec.period.rentalStartDate.goe(start)
-                                .and(rentalSpec.period.rentalStartDate.loe(end)))
+                        reservationSpec.period.rentalStartDate.goe(start)
+                                .and(reservationSpec.period.rentalStartDate.loe(end)))
                 .fetch();
     }
 }

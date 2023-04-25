@@ -29,10 +29,10 @@ public class ReservationCalendar {
         return calendar;
     }
 
-    public void addAll(final List<RentalSpec> rentalSpecs) {
-        for (RentalSpec rentalSpec : rentalSpecs) {
-            final int dayOfMonth = rentalSpec.getStartDate().getDayOfMonth();
-            calendar.get(dayOfMonth).add(rentalSpec.getReservation().getName());
+    public void addAll(final List<ReservationSpec> reservationSpecs) {
+        for (ReservationSpec reservationSpec : reservationSpecs) {
+            final int dayOfMonth = reservationSpec.getStartDate().getDayOfMonth();
+            calendar.get(dayOfMonth).add(reservationSpec.getReservation().getName());
         }
     }
 }

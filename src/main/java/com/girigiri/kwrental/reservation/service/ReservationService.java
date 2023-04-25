@@ -2,9 +2,9 @@ package com.girigiri.kwrental.reservation.service;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.repository.RentalSpecRepositoryCustom;
@@ -37,11 +37,11 @@ public class ReservationService {
     @Transactional
     public Long reserve(final AddReservationRequest addReservationRequest) {
         final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment();
-        final List<RentalSpec> rentalSpecs = inventories.stream()
+        final List<ReservationSpec> reservationSpecs = inventories.stream()
                 .filter(this::isAvailableCountValid)
                 .map(this::mapToRentalSpec)
                 .toList();
-        final Reservation reservation = mapToReservation(addReservationRequest, rentalSpecs);
+        final Reservation reservation = mapToReservation(addReservationRequest, reservationSpecs);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -50,16 +50,16 @@ public class ReservationService {
         return true;
     }
 
-    private RentalSpec mapToRentalSpec(final Inventory inventory) {
-        return RentalSpec.builder().period(inventory.getRentalPeriod())
+    private ReservationSpec mapToRentalSpec(final Inventory inventory) {
+        return ReservationSpec.builder().period(inventory.getRentalPeriod())
                 .amount(inventory.getRentalAmount())
                 .equipment(inventory.getEquipment())
                 .build();
     }
 
-    private Reservation mapToReservation(final AddReservationRequest addReservationRequest, final List<RentalSpec> rentalSpecs) {
+    private Reservation mapToReservation(final AddReservationRequest addReservationRequest, final List<ReservationSpec> reservationSpecs) {
         return Reservation.builder()
-                .rentalSpecs(rentalSpecs)
+                .reservationSpecs(reservationSpecs)
                 .email(addReservationRequest.getRenterEmail())
                 .name(addReservationRequest.getRenterName())
                 .purpose(addReservationRequest.getRentalPurpose())
@@ -71,9 +71,9 @@ public class ReservationService {
     public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentsPerYearMonth(final Long equipmentId, final YearMonth yearMonth) {
         LocalDate startOfMonth = yearMonth.atDay(1);
         LocalDate endOfMonth = yearMonth.atEndOfMonth();
-        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByStartDateBetween(equipmentId, startOfMonth, endOfMonth);
+        final List<ReservationSpec> reservationSpecs = rentalSpecRepository.findByStartDateBetween(equipmentId, startOfMonth, endOfMonth);
         final ReservationCalendar calendar = ReservationCalendar.from(startOfMonth, endOfMonth);
-        calendar.addAll(rentalSpecs);
+        calendar.addAll(reservationSpecs);
         return ReservationsByEquipmentPerYearMonthResponse.from(calendar);
     }
 }

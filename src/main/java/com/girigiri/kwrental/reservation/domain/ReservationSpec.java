@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-public class RentalSpec {
+public class ReservationSpec {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +29,11 @@ public class RentalSpec {
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    protected RentalSpec() {
+    protected ReservationSpec() {
     }
 
     @Builder
-    private RentalSpec(final Long id, final RentalAmount amount, final RentalPeriod period, final Equipment equipment, final Reservation reservation) {
+    private ReservationSpec(final Long id, final RentalAmount amount, final RentalPeriod period, final Equipment equipment, final Reservation reservation) {
         this.id = id;
         this.amount = amount;
         this.period = period;

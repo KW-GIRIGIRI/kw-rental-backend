@@ -3,16 +3,16 @@ package com.girigiri.kwrental.reservation.service;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +64,7 @@ class ReservationServiceTest {
                 .purpose(addReservationRequest.getRentalPurpose())
                 .email(addReservationRequest.getRenterEmail())
                 .name(addReservationRequest.getRenterName())
-                .rentalSpecs(List.of(RentalSpecFixture.create(equipment)))
+                .reservationSpecs(List.of(ReservationSpecFixture.create(equipment)))
                 .build();
         given(reservationRepository.save(any())).willReturn(reservation);
 
@@ -80,15 +80,15 @@ class ReservationServiceTest {
     void getReservationsByEquipmentsPerYearMonth() {
         // given
         final Equipment equipment = EquipmentFixture.create();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder(equipment).build();
-        final Reservation reservation = ReservationFixture.create(List.of(rentalSpec));
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
+        final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
         given(rentalSpecRepository.findByStartDateBetween(any(), any(), any()))
-                .willReturn(List.of(rentalSpec));
+                .willReturn(List.of(reservationSpec));
 
         // when
         final ReservationsByEquipmentPerYearMonthResponse expect = reservationService.getReservationsByEquipmentsPerYearMonth(equipment.getId(), YearMonth.now());
 
         // then
-        assertThat(expect.getReservations().get(rentalSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(reservation.getName());
+        assertThat(expect.getReservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(reservation.getName());
     }
 }

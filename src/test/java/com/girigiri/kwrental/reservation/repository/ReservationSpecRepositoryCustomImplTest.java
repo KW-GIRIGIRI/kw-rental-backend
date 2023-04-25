@@ -5,10 +5,11 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
 import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(JpaConfig.class)
-class RentalSpecRepositoryCustomImplTest {
+class ReservationSpecRepositoryCustomImplTest {
 
     public static final LocalDate NOW = LocalDate.now();
     @Autowired
@@ -47,15 +48,15 @@ class RentalSpecRepositoryCustomImplTest {
 
 
         List.of(notOverlappedLeft, overlappedLeft, overlappedMid, overlappedRight, notOverlappedRight, overlappedBoth)
-                .forEach(it -> rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(it).build()));
+                .forEach(it -> rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(it).build()));
 
         // when
         final RentalPeriod period = new RentalPeriod(NOW.plusDays(1), NOW.plusDays(4));
-        final List<RentalSpec> expect = rentalSpecRepository.findOverlappedByPeriod(equipment.getId(), period);
+        final List<ReservationSpec> expect = rentalSpecRepository.findOverlappedByPeriod(equipment.getId(), period);
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator()
-                .extracting(RentalSpec::getPeriod)
+                .extracting(ReservationSpec::getPeriod)
                 .containsExactlyInAnyOrder(overlappedLeft, overlappedMid, overlappedRight, overlappedBoth);
     }
 
@@ -67,13 +68,13 @@ class RentalSpecRepositoryCustomImplTest {
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름2").totalQuantity(4).build());
         final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름3").totalQuantity(4).build());
 
-        final RentalSpec.RentalSpecBuilder rentalSpec1Builder = RentalSpecFixture.builder(equipment1);
-        final RentalSpec rentalSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
-        final RentalSpec rentalSpec2 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
-        final RentalSpec rentalSpec3 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
-        rentalSpecRepository.save(rentalSpec1);
-        rentalSpecRepository.save(rentalSpec2);
-        rentalSpecRepository.save(rentalSpec3);
+        final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
+        final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
+        final ReservationSpec reservationSpec2 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
+        final ReservationSpec reservationSpec3 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
+        rentalSpecRepository.save(reservationSpec1);
+        rentalSpecRepository.save(reservationSpec2);
+        rentalSpecRepository.save(reservationSpec3);
 
         // when
         final List<ReservedAmount> expect = rentalSpecRepository.findRentalAmountsByEquipmentIds(List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
@@ -96,14 +97,14 @@ class RentalSpecRepositoryCustomImplTest {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final YearMonth now = YearMonth.now();
-        final RentalSpec rentalSpec1 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
-        final RentalSpec rentalSpec2 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
-        final RentalSpec rentalSpec3 = rentalSpecRepository.save(RentalSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
+        final ReservationSpec reservationSpec1 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
+        final ReservationSpec reservationSpec2 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
+        final ReservationSpec reservationSpec3 = rentalSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
 
         // when
-        final List<RentalSpec> expect = rentalSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
+        final List<ReservationSpec> expect = rentalSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
 
         // then
-        assertThat(expect).containsExactlyInAnyOrder(rentalSpec1, rentalSpec2);
+        assertThat(expect).containsExactlyInAnyOrder(reservationSpec1, reservationSpec2);
     }
 }

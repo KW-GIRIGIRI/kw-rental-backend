@@ -7,8 +7,8 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -74,9 +74,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
-        final RentalSpec rentalSpec1 = RentalSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
-        final Reservation reservation = reservationRepository.save(ReservationFixture.create(List.of(rentalSpec1, rentalSpec2)));
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1, reservationSpec2)));
 
         // when
         final ReservationsByEquipmentPerYearMonthResponse response = RestAssured.given(requestSpec)

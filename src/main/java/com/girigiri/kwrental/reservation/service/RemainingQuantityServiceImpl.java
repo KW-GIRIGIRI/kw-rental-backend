@@ -6,7 +6,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.equipment.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
-import com.girigiri.kwrental.reservation.domain.RentalSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.ReservedAmount;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
@@ -44,9 +44,9 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
     public void validateAmount(final Long equipmentId, final Integer amount, final RentalPeriod rentalPeriod) {
         final Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(EquipmentNotFoundException::new);
-        final List<RentalSpec> overlappedRentalSpecs = rentalSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
+        final List<ReservationSpec> overlappedReservationSpecs = rentalSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
         for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
-            final int rentedAmountByDate = sumRentedAmountByDate(overlappedRentalSpecs, i);
+            final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
             validateTotalAmount(amount + rentedAmountByDate, equipment);
         }
     }
@@ -57,8 +57,8 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
         }
     }
 
-    private int sumRentedAmountByDate(final List<RentalSpec> overlappedRentalSpecs, final LocalDate date) {
-        return overlappedRentalSpecs.stream()
+    private int sumRentedAmountByDate(final List<ReservationSpec> overlappedReservationSpecs, final LocalDate date) {
+        return overlappedReservationSpecs.stream()
                 .filter(rentalSpec -> rentalSpec.containsDate(date))
                 .mapToInt(rentalSpec -> rentalSpec.getAmount().getAmount())
                 .sum();

@@ -11,7 +11,7 @@ import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.repository.RentalSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -174,9 +174,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         final Equipment equipment2 = EquipmentFixture.builder().modelName("equipment2").totalQuantity(10).build();
         equipmentRepository.save(equipment2);
         LocalDate date = LocalDate.of(2023, 1, 1);
-        rentalSpecRepository.save(RentalSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        rentalSpecRepository.save(RentalSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        rentalSpecRepository.save(RentalSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        rentalSpecRepository.save(ReservationSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
 
         // when
         final EquipmentsWithRentalQuantityPageResponse response = RestAssured.given(this.requestSpec)
