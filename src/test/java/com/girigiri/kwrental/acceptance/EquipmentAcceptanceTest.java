@@ -235,7 +235,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     void addEquipment() {
         // given
         final AddEquipmentRequest equipment = new AddEquipmentRequest(
-                "rentalDays", "modelName",
+                "rentalPlace", "modelName",
                 "CAMERA", "maker", "imgUrl",
                 "component", "purpose", "description", 1, 2);
         final List<AddItemRequest> items = List.of(new AddItemRequest("12345678"), new AddItemRequest("8765421"));
@@ -293,7 +293,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
 
         UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
-                "rentalDays", "modelName",
+                "rentalPlace", "modelName",
                 "CAMERA", "maker", "imgUrl",
                 "component", "purpose", "description", 1, 1);
 

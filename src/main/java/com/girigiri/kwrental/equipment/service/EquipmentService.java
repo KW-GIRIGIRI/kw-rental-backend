@@ -112,7 +112,7 @@ public class EquipmentService {
         equipment.setDescription(updateEquipmentRequest.description());
         equipment.setPurpose(updateEquipmentRequest.purpose());
         equipment.setImgUrl(updateEquipmentRequest.imgUrl());
-        equipment.setRentalPlace(updateEquipmentRequest.rentalDays());
+        equipment.setRentalPlace(updateEquipmentRequest.rentalPlace());
         equipment.setMaxRentalDays(updateEquipmentRequest.maxRentalDays());
         equipment.setTotalQuantity(updateEquipmentRequest.totalQuantity());
         return EquipmentDetailResponse.from(equipment);
