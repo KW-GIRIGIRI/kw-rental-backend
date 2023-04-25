@@ -25,6 +25,7 @@ public class ReservationResponse {
         final List<ReservationSpecResponse> reservationSpecResponses = reservation.getReservationSpecs().stream()
                 .map(ReservationSpecResponse::from)
                 .toList();
+        // TODO: 2023/04/26 학번을 제대로 적용해줘야 함
         return new ReservationResponse(reservation.getName(), "11111111", reservationSpecResponses);
     }
 }

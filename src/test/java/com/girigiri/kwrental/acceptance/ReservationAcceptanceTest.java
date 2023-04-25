@@ -78,7 +78,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
-        final Reservation reservation = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1, reservationSpec2)));
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec2)));
 
         // when
         final ReservationsByEquipmentPerYearMonthResponse response = RestAssured.given(requestSpec)
@@ -90,7 +91,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.getReservations().get(LocalDate.now().getDayOfMonth()))
-                        .usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation.getName())
+                        .usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1.getName())
         );
     }
 
