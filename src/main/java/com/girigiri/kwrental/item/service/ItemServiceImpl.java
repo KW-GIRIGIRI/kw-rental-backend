@@ -6,6 +6,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.equipment.service.ItemService;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,6 +135,16 @@ public class ItemServiceImpl implements ItemService {
         final int availableCount = itemRepository.countAvailable(equipmentId);
         if (availableCount < amount) {
             throw new NotEnoughAvailableItemException();
+        }
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public void validatePropertyNumbers(final Map<Long, Set<String>> propertyNumbersPerEquipmentId) {
+        final Set<Long> equipmentIds = propertyNumbersPerEquipmentId.keySet();
+        List<Item> itemsByEquipmentIds = itemRepository.findByEquipmentIds(equipmentIds);
+        ItemsPerEquipments items = ItemsPerEquipments.from(itemsByEquipmentIds);
+        for (Long equipmentId : propertyNumbersPerEquipmentId.keySet()) {
+            items.validatePropertyNumbersAvailable(equipmentId, propertyNumbersPerEquipmentId.get(equipmentId));
         }
     }
 }
