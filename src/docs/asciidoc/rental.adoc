@@ -1,0 +1,5 @@
+== 대여 관련 API
+
+=== 대여 생성 API
+
+operation::admin_createRental[snippets='http-request,http-response']

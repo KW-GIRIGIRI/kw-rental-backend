@@ -44,7 +44,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     @Override
     public List<Item> findByEquipmentIds(final Set<Long> equipmentIds) {
         return jpaQueryFactory.selectFrom(item)
-                .where(item.id.in(equipmentIds))
+                .where(item.equipmentId.in(equipmentIds))
                 .fetch();
     }
 }
