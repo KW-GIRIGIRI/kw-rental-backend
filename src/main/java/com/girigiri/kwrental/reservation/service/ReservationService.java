@@ -8,15 +8,22 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
+import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepositoryCustom;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -82,5 +89,27 @@ public class ReservationService {
     public ReservationsByStartDateResponse getReservationsByStartDate(final LocalDate startDate) {
         final List<Reservation> reservations = reservationRepository.findReservationsWithSpecsByStartDate(startDate);
         return ReservationsByStartDateResponse.from(reservations);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId, final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
+        final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+        validateReservationSpecIdContainsAll(reservation, propertyNumbersByReservationSpecId.keySet());
+        Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
+        for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+            reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
+            collectedByEquipmentId.put(reservationSpec.getEquipment().getId(), propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
+        }
+        return collectedByEquipmentId;
+    }
+
+    private void validateReservationSpecIdContainsAll(final Reservation reservation, final Set<Long> reservationSpecIdsFromInput) {
+        final Set<Long> reservationSpecIdsFromReservation = reservation.getReservationSpecs().stream()
+                .map(ReservationSpec::getId)
+                .collect(Collectors.toSet());
+        if (reservationSpecIdsFromInput.containsAll(reservationSpecIdsFromReservation) &&
+                reservationSpecIdsFromReservation.containsAll(reservationSpecIdsFromInput)) return;
+        throw new ReservationSpecException("입력된 대여 예약 상세가 맞지 않습니다.");
     }
 }

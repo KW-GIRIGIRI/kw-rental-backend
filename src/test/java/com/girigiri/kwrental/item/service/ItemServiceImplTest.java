@@ -21,9 +21,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -141,5 +144,18 @@ class ItemServiceImplTest {
         // when
         assertThatThrownBy(() -> itemService.validateAvailableCount(1L, 11))
                 .isExactlyInstanceOf(NotEnoughAvailableItemException.class);
+    }
+
+    @Test
+    @DisplayName("기자재 ID들과 그에 해당하는 자산번호를 검증한다.")
+    void validatePropertyNumbers() {
+        // given
+        final Item item = ItemFixture.builder().equipmentId(1L).propertyNumber("11111111").build();
+        given(itemRepository.findByEquipmentIds(any()))
+                .willReturn(List.of(item));
+
+        // when, then
+        assertThatCode(() -> itemService.validatePropertyNumbers(Map.of(item.getEquipmentId(), Set.of(item.getPropertyNumber()))))
+                .doesNotThrowAnyException();
     }
 }

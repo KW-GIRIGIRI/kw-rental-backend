@@ -25,6 +25,7 @@ class ItemQueryDslRepositoryCustomImplTest {
     @Autowired
     private EntityManager entityManager;
 
+
     @Test
     @DisplayName("대여 가능여부 업데이트")
     void updateRentalAvailable() {

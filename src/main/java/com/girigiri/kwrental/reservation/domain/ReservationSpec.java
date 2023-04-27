@@ -3,6 +3,7 @@ package com.girigiri.kwrental.reservation.domain;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,5 +56,9 @@ public class ReservationSpec {
 
     public boolean hasPeriod(final RentalPeriod period) {
         return this.period.equals(period);
+    }
+
+    public void validateAmount(final int amount) {
+        if (this.amount.getAmount() != amount) throw new ReservationSpecException("대여 신청 갯수가 맞지 않습니다.");
     }
 }
