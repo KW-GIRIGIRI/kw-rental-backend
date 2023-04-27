@@ -8,6 +8,7 @@ import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -29,14 +30,15 @@ public class RentalService {
         this.rentalSpecRepository = rentalSpecRepository;
     }
 
-    public Long rent(final CreateRentalRequest createRentalRequest) {
+    @Transactional
+    public void rent(final CreateRentalRequest createRentalRequest) {
         final Map<Long, Set<String>> propertyNumbersByReservationSpecId = createRentalRequest.getRentalSpecsRequests().stream()
                 .collect(toMap(RentalSpecsRequest::getReservationSpecId, it -> Set.copyOf(it.getPropertyNumbers())));
         Map<Long, Set<String>> collectedByEquipmentId = reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(createRentalRequest.getReservationId(), propertyNumbersByReservationSpecId);
         itemService.validatePropertyNumbers(collectedByEquipmentId);
         validateNowRental(collectedByEquipmentId);
         final List<RentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
-        return null;
+        rentalSpecRepository.saveAll(rentalSpecs);
     }
 
     private void validateNowRental(final Map<Long, Set<String>> collectedByEquipmentId) {

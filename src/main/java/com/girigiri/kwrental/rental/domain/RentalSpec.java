@@ -2,12 +2,14 @@ package com.girigiri.kwrental.rental.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @EntityListeners(AuditingEntityListener.class)
 public class RentalSpec {
 
@@ -36,10 +38,6 @@ public class RentalSpec {
         this.propertyNumber = propertyNumber;
         this.acceptedDateTime = acceptedDateTime;
         this.returnDateTime = returnDateTime;
-    }
-
-    public boolean isReturned() {
-        return returnDateTime != null;
     }
 
     public boolean isNowRental() {

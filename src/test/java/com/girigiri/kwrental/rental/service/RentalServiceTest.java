@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
@@ -14,10 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -56,5 +59,29 @@ class RentalServiceTest {
         // when, then
         assertThatThrownBy(() -> rentalService.rent(request))
                 .isExactlyInstanceOf(DuplicateRentalException.class);
+    }
+
+    @Test
+    @DisplayName("대여를 생성한다.")
+    void rent() {
+        // given
+        final Long reservationId = 1L;
+        final String propertyNumber = "12345678";
+        final Long reservationSpecId = 2L;
+        final CreateRentalRequest request = new CreateRentalRequest(
+                reservationId, List.of(new RentalSpecsRequest(reservationSpecId, List.of(propertyNumber)))
+        );
+        given(reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(any(), any()))
+                .willReturn(Map.of(1L, Set.of(propertyNumber)));
+        doNothing().when(itemService).validatePropertyNumbers(any());
+        given(rentalSpecRepository.findByPropertyNumbers(any()))
+                .willReturn(Collections.emptyList());
+        final List<RentalSpec> rentalSpecs = List.of(RentalSpecFixture.builder().id(1L).reservationSpecId(reservationSpecId).build());
+        given(rentalSpecRepository.saveAll(any()))
+                .willReturn(rentalSpecs);
+
+        // when, then
+        assertThatCode(() -> rentalService.rent(request))
+                .doesNotThrowAnyException();
     }
 }
