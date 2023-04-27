@@ -1,0 +1,5 @@
+== 회원 관련 API
+
+=== 회원가입 API
+
+operation::registerMember[snippets='http-request,http-response']
