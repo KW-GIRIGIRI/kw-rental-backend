@@ -8,10 +8,12 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
+import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepositoryCustom;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -82,5 +84,11 @@ public class ReservationService {
     public ReservationsByStartDateResponse getReservationsByStartDate(final LocalDate startDate) {
         final List<Reservation> reservations = reservationRepository.findReservationsWithSpecsByStartDate(startDate);
         return ReservationsByStartDateResponse.from(reservations);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Reservation getReservationByIdWithSpecs(final Long id) {
+        return reservationRepository.findByIdWithSpecs(id)
+                .orElseThrow(ReservationNotFoundException::new);
     }
 }
