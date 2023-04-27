@@ -1,7 +1,10 @@
 package com.girigiri.kwrental.acceptance;
 
+import com.girigiri.kwrental.member.domain.Member;
+import com.girigiri.kwrental.member.dto.request.LoginRequest;
 import com.girigiri.kwrental.member.dto.request.RegisterMemberRequest;
 import com.girigiri.kwrental.member.repository.MemberRepository;
+import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -40,5 +43,26 @@ class MemberAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/members/"));
+    }
+
+    @Test
+    @DisplayName("로그인한다.")
+    void login() {
+        // given
+        final Member member = memberRepository.save(MemberFixture.builder("12345678").build());
+        final LoginRequest request = LoginRequest.builder()
+                .memberNumber(member.getMemberNumber())
+                .password("12345678")
+                .build();
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("login"))
+                .body(request)
+                .contentType(ContentType.JSON)
+                .when().log().all().post("/api/members/login")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .header(HttpHeaders.SET_COOKIE, containsString("JSESSIONID="));
     }
 }

@@ -1,7 +1,9 @@
 package com.girigiri.kwrental.member.controller;
 
+import com.girigiri.kwrental.member.dto.request.LoginRequest;
 import com.girigiri.kwrental.member.dto.request.RegisterMemberRequest;
 import com.girigiri.kwrental.member.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,5 +28,12 @@ public class MemberController {
         final Long memberId = memberService.register(registerMemberRequest);
         return ResponseEntity
                 .created(URI.create("/api/members/" + memberId)).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Validated final LoginRequest loginRequest, HttpSession session) {
+        final Long id = memberService.login(loginRequest);
+        session.setAttribute("memberId", id);
+        return ResponseEntity.ok().build();
     }
 }
