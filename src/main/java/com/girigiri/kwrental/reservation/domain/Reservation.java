@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -31,14 +32,17 @@ public class Reservation {
     @Column(nullable = false)
     private String purpose;
 
+    private LocalDateTime acceptDateTime;
+
 
     protected Reservation() {
 
     }
 
     @Builder
-    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose) {
+    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final LocalDateTime acceptDateTime) {
         this.id = id;
+        this.acceptDateTime = acceptDateTime;
         validateReservationSpec(reservationSpecs);
         this.reservationSpecs = reservationSpecs;
         reservationSpecs.forEach(it -> it.setReservation(this));
@@ -56,5 +60,9 @@ public class Reservation {
         reservationSpecs.forEach(spec -> {
             if (!spec.hasPeriod(period)) throw new ReservationException("대여 상세 내용들의 대여 기간이 통일되지 않았습니다.");
         });
+    }
+
+    public void acceptAt(final LocalDateTime acceptDateTime) {
+        this.acceptDateTime = acceptDateTime;
     }
 }

@@ -39,6 +39,7 @@ public class RentalService {
         validateNowRental(collectedByEquipmentId);
         final List<RentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
         rentalSpecRepository.saveAll(rentalSpecs);
+        reservationService.acceptReservation(createRentalRequest.getReservationId());
     }
 
     private void validateNowRental(final Map<Long, Set<String>> collectedByEquipmentId) {

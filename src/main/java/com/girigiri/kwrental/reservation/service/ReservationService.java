@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
@@ -111,5 +112,11 @@ public class ReservationService {
         if (reservationSpecIdsFromInput.containsAll(reservationSpecIdsFromReservation) &&
                 reservationSpecIdsFromReservation.containsAll(reservationSpecIdsFromInput)) return;
         throw new ReservationSpecException("입력된 대여 예약 상세가 맞지 않습니다.");
+    }
+
+    public void acceptReservation(final Long id) {
+        reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new)
+                .acceptAt(LocalDateTime.now());
     }
 }

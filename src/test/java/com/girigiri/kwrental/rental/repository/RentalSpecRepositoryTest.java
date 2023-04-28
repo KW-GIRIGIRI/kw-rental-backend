@@ -25,8 +25,8 @@ class RentalSpecRepositoryTest {
     @DisplayName("대여 상세를 모두 저장한다.")
     void saveAll() {
         // given
-        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().acceptedDateTime(null).propertyNumber("12345678").build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().acceptedDateTime(null).propertyNumber("87654321").build();
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().acceptDateTime(null).propertyNumber("12345678").build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().acceptDateTime(null).propertyNumber("87654321").build();
 
         // when
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
@@ -35,8 +35,8 @@ class RentalSpecRepositoryTest {
         assertAll(
                 () -> assertThat(rentalSpec1.getId()).isNotNull(),
                 () -> assertThat(rentalSpec2.getId()).isNotNull(),
-                () -> assertThat(rentalSpec1.getAcceptedDateTime()).isNotNull(),
-                () -> assertThat(rentalSpec2.getAcceptedDateTime()).isNotNull()
+                () -> assertThat(rentalSpec1.getAcceptDateTime()).isNotNull(),
+                () -> assertThat(rentalSpec2.getAcceptDateTime()).isNotNull()
         );
     }
 }
