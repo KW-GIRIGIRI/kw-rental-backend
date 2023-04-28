@@ -9,4 +9,4 @@ include::equipment.adoc[]
 include::item.adoc[]
 include::inventory.adoc[]
 include::reservation.adoc[]
-include::member.adoc
+include::member.adoc[]
