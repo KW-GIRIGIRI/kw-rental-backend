@@ -4,12 +4,17 @@ import com.girigiri.kwrental.item.service.ItemServiceImpl;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecResponse;
+import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,5 +69,25 @@ public class RentalService {
                 .propertyNumber(propertyNumber)
                 .reservationSpecId(reservationSpecId)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationsWithRentalSpecsByStartDateResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
+        final List<Reservation> reservations = reservationService.getReservationsByStartDate(localDate);
+        final List<Long> reservationSpecIds = reservations.stream()
+                .filter(Reservation::isAccepted)
+                .map(Reservation::getReservationSpecs)
+                .flatMap(List::stream)
+                .map(ReservationSpec::getId)
+                .toList();
+        final List<RentalSpecResponse> rentalSpecResponses = findByReservationSpecId(reservationSpecIds);
+        return ReservationsWithRentalSpecsByStartDateResponse.of(reservations, rentalSpecResponses);
+    }
+
+    private List<RentalSpecResponse> findByReservationSpecId(final List<Long> reservationSpecId) {
+        return rentalSpecRepository.findByReservationId(Set.copyOf(reservationSpecId))
+                .stream()
+                .map(it -> new RentalSpecResponse(it.getReservationSpecId(), it.getId(), it.getPropertyNumber()))
+                .toList();
     }
 }

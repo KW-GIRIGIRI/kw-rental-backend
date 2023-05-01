@@ -1,5 +1,16 @@
 == 대여 관련 API
 
+=== 용어 설명
+
+- 대여 : 대여 예약 상세의 각 갯수 하나하나에 적절한 기자재 품목이 할당된 경우.
+- 대여 상세(`rentalSpec`) : 대여 예약 상세의 신청 갯수 중 하나에 품목을 할당 한 것.
+
 === 대여 생성 API
 
 operation::admin_createRental[snippets='http-request,http-response']
+
+=== 특정 날짜에 대여 수령되어야 할 대여 예약들을 대여 상세와 함께 조회 API
+
+`acceptDateTime` 과 `rentalSpecs` 가 `null` 이면 아직 수령되지 않음(즉 대여되지 않음)을 의미.
+
+operation::admin_getReservationsWithRentalSpecsByStartDate[snippets='http-request,http-response']

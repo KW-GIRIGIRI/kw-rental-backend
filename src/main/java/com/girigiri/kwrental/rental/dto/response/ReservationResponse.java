@@ -1,10 +1,13 @@
-package com.girigiri.kwrental.reservation.dto.response;
+package com.girigiri.kwrental.rental.dto.response;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 public class ReservationResponse {
@@ -24,11 +27,20 @@ public class ReservationResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static ReservationResponse from(final Reservation reservation) {
+    public static ReservationResponse of(final Reservation reservation, final List<RentalSpecResponse> rentalSpecResponses) {
+        final Map<Long, List<RentalSpecResponse>> groupedByReservationSpecId = rentalSpecResponses.stream()
+                .collect(groupingBy(RentalSpecResponse::getReservationSpecId));
         final List<ReservationSpecResponse> reservationSpecResponses = reservation.getReservationSpecs().stream()
-                .map(ReservationSpecResponse::from)
+                .map(it -> ReservationSpecResponse.of(it, groupedByReservationSpecId.get(it.getId())))
                 .toList();
         // TODO: 2023/04/26 학번을 제대로 적용해줘야 함
+        return new ReservationResponse(reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecResponses);
+    }
+
+    public static ReservationResponse from(final Reservation reservation) {
+        final List<ReservationSpecResponse> reservationSpecResponses = reservation.getReservationSpecs().stream()
+                .map(it -> ReservationSpecResponse.of(it, null))
+                .toList();
         return new ReservationResponse(reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecResponses);
     }
 }

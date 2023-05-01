@@ -65,4 +65,8 @@ public class Reservation {
     public void acceptAt(final LocalDateTime acceptDateTime) {
         this.acceptDateTime = acceptDateTime;
     }
+
+    public boolean isAccepted() {
+        return this.acceptDateTime != null;
+    }
 }

@@ -7,7 +7,6 @@ import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -86,10 +85,9 @@ public class ReservationService {
         return ReservationsByEquipmentPerYearMonthResponse.from(calendar);
     }
 
-    @Transactional(readOnly = true)
-    public ReservationsByStartDateResponse getReservationsByStartDate(final LocalDate startDate) {
-        final List<Reservation> reservations = reservationRepository.findReservationsWithSpecsByStartDate(startDate);
-        return ReservationsByStartDateResponse.from(reservations);
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public List<Reservation> getReservationsByStartDate(final LocalDate startDate) {
+        return reservationRepository.findReservationsWithSpecsByStartDate(startDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
