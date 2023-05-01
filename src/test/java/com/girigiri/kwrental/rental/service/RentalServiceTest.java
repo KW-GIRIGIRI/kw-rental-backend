@@ -1,13 +1,22 @@
 package com.girigiri.kwrental.rental.service;
 
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.item.service.ItemServiceImpl;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecResponse;
+import com.girigiri.kwrental.rental.dto.response.ReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +24,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,5 +95,38 @@ class RentalServiceTest {
         // when, then
         assertThatCode(() -> rentalService.rent(request))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("특정 날짜가 대여 수령일인 대여 예약을 대여 수령 시간과 대여 상세를 함께 조회한다.")
+    void getReservationsWithRentalSpecsByStartDate() {
+        // given
+        final Equipment equipment1 = EquipmentFixture.create();
+        final Equipment equipment2 = EquipmentFixture.create();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).id(1L).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).id(2L).build();
+        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(1L).acceptDateTime(LocalDateTime.now()).build();
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).build();
+        given(reservationService.getReservationsByStartDate(any())).willReturn(List.of(reservation));
+        given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec2.getId()))).willReturn(List.of(rentalSpec1, rentalSpec2));
+
+        // when
+        final ReservationsWithRentalSpecsByStartDateResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
+
+        final RentalSpecResponse rentalSpecResponse1 = RentalSpecResponse.builder()
+                .rentalSpecId(rentalSpec1.getId())
+                .reservationSpecId(reservationSpec1.getId())
+                .propertyNumber(rentalSpec1.getPropertyNumber())
+                .build();
+
+        final RentalSpecResponse rentalSpecResponse2 = RentalSpecResponse.builder()
+                .rentalSpecId(rentalSpec2.getId())
+                .reservationSpecId(reservationSpec2.getId())
+                .propertyNumber(rentalSpec2.getPropertyNumber())
+                .build();
+
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(ReservationResponse.of(reservation, List.of(rentalSpecResponse1, rentalSpecResponse2)));
     }
 }

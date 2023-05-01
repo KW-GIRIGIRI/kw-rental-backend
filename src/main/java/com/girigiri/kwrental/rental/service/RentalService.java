@@ -85,7 +85,7 @@ public class RentalService {
     }
 
     private List<RentalSpecResponse> findByReservationSpecId(final List<Long> reservationSpecId) {
-        return rentalSpecRepository.findByReservationId(Set.copyOf(reservationSpecId))
+        return rentalSpecRepository.findByReservationSpecIds(Set.copyOf(reservationSpecId))
                 .stream()
                 .map(it -> new RentalSpecResponse(it.getReservationSpecId(), it.getId(), it.getPropertyNumber()))
                 .toList();

@@ -8,5 +8,5 @@ import java.util.Set;
 public interface RentalSpecRepositoryCustom {
     List<RentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
 
-    List<RentalSpec> findByReservationId(Set<Long> reservationSpecIds);
+    List<RentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 }
