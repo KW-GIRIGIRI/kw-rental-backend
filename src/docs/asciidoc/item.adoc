@@ -25,3 +25,7 @@ operation::admin_updateItemsByEquipment[snippets='http-request,http-response']
 === 관리자 기자재 품목 삭제 API
 
 operation::admin_deleteItem[snippets='http-request,http-response']
+
+=== 현 시점 수령 가능한 품목 조회 API
+
+operation::admin_getAcceptableItems[snippets='http-request,http-response']

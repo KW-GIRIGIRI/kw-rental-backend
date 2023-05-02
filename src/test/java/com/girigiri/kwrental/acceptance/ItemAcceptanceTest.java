@@ -10,8 +10,13 @@ import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
+import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import io.restassured.RestAssured;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,9 +36,12 @@ class ItemAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private ItemRepository itemRepository;
-
     @Autowired
     private EquipmentRepository equipmentRepository;
+    @Autowired
+    private RentalSpecRepository rentalSpecRepository;
+    @Autowired
+    private ReservationSpecRepository reservationSpecRepository;
 
     @Test
     @DisplayName("기자재 품목 조회 API")
@@ -151,5 +160,29 @@ class ItemAcceptanceTest extends AcceptanceTest {
                 .when().log().all().put("/api/admin/items?equipmentId=" + equipment.getId())
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/items?equipmentId=" + equipment.getId()));
+    }
+
+    @Test
+    @DisplayName("관리자가 현재 수령 가능한 품목 조회 API")
+    void getAcceptableItems() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item.ItemBuilder itemBuilder = ItemFixture.builder().equipmentId(equipment.getId());
+        final Item item1 = itemRepository.save(itemBuilder.propertyNumber("111111111").build());
+        final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
+        final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).build());
+        rentalSpecRepository.saveAll(List.of(
+                RentalSpecFixture.builder().reservationSpecId(reservationSpec.getId()).propertyNumber(item1.getPropertyNumber()).acceptDateTime(LocalDateTime.now()).build()));
+
+        // when
+        final ItemsResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getAcceptableItems"))
+                .when().log().all().get("/api/admin/items/rentalAvailability?equipmentId={equipmentId}", equipment.getId())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(ItemsResponse.class);
+
+        assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .containsOnly(ItemResponse.from(item2));
+
     }
 }
