@@ -3,7 +3,7 @@ package com.girigiri.kwrental.item.controller;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.item.service.ItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,9 @@ import java.net.URI;
 @RequestMapping("/api/admin/items")
 public class AdminItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
-    public AdminItemController(final ItemServiceImpl itemService) {
+    public AdminItemController(final ItemService itemService) {
         this.itemService = itemService;
     }
 

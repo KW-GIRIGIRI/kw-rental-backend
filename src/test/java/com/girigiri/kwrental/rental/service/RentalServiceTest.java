@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.doNothing;
 class RentalServiceTest {
 
     @Mock
-    private ItemServiceImpl itemService;
+    private ItemService itemService;
     @Mock
     private ReservationService reservationService;
     @Mock

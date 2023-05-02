@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.rental.service;
 
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
@@ -25,11 +25,11 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class RentalService {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
     private final ReservationService reservationService;
     private final RentalSpecRepository rentalSpecRepository;
 
-    public RentalService(final ItemServiceImpl itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository) {
+    public RentalService(final ItemService itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository) {
         this.itemService = itemService;
         this.reservationService = reservationService;
         this.rentalSpecRepository = rentalSpecRepository;

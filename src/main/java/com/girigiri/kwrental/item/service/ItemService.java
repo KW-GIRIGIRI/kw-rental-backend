@@ -1,9 +1,6 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.equipment.service.ItemService;
+import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
@@ -26,37 +23,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ItemServiceImpl implements ItemService {
+public class ItemService {
 
     private final ItemRepository itemRepository;
-    private final EquipmentRepository equipmentRepository;
+    private final EquipmentService equipmentService;
+    private final RentedItemService rentedItemService;
 
-    public ItemServiceImpl(final ItemRepository itemRepository, final EquipmentRepository equipmentRepository) {
+    public ItemService(final ItemRepository itemRepository, final EquipmentService equipmentService, final RentedItemService rentedItemService) {
         this.itemRepository = itemRepository;
-        this.equipmentRepository = equipmentRepository;
-    }
-
-    @Override
-    @Transactional
-    public void saveItems(final Long equipmentId, final List<AddItemRequest> itemRequests) {
-        final List<Item> items = itemRequests.stream()
-                .map(it -> mapToItem(equipmentId, it))
-                .toList();
-        itemRepository.saveAll(items);
-    }
-
-    private Item mapToItem(final Long equipmentId, final AddItemRequest addItemRequest) {
-        return Item.builder()
-                .equipmentId(equipmentId)
-                .propertyNumber(addItemRequest.propertyNumber())
-                .rentalAvailable(true)
-                .build();
+        this.equipmentService = equipmentService;
+        this.rentedItemService = rentedItemService;
     }
 
     @Transactional(readOnly = true)
     public ItemsResponse getItems(final Long equipmentId) {
-        equipmentRepository.findById(equipmentId)
-                .orElseThrow(EquipmentNotFoundException::new);
+        equipmentService.validateExistsById(equipmentId);
         final List<Item> items = itemRepository.findByEquipmentId(equipmentId);
         return ItemsResponse.of(items);
     }

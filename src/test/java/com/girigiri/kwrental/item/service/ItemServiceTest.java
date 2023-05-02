@@ -1,8 +1,6 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
@@ -30,44 +28,28 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceImplTest {
+class ItemServiceTest {
 
     @Mock
     ItemRepository itemRepository;
 
     @Mock
-    EquipmentRepository equipmentRepository;
+    EquipmentService equipmentService;
 
     @InjectMocks
-    ItemServiceImpl itemService;
+    ItemService itemService;
 
     @Test
-    @DisplayName("품목 Bulk Update")
-    void saveItems() {
+    @DisplayName("품목 조회")
+    void getItem() {
         // given
-        given(itemRepository.saveAll(any()))
-                .willReturn(1);
-        final AddItemRequest addItemRequest = new AddItemRequest("12345678");
-
-        // when
-        itemService.saveItems(1L, List.of(addItemRequest));
-
-        // then
-        verify(itemRepository).saveAll(any());
-    }
-
-    @Test
-    @DisplayName("존재하지 않은 기자재의 품목 목록 조회 예외")
-    void getItems_notFound() {
-        // given
-        given(equipmentRepository.findById(any())).willReturn(Optional.empty());
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> itemService.getItems(1L))
-                .isExactlyInstanceOf(EquipmentNotFoundException.class);
+        assertThatThrownBy(() -> itemService.getItem(1L))
+                .isExactlyInstanceOf(ItemNotFoundException.class);
     }
 
     @Test
