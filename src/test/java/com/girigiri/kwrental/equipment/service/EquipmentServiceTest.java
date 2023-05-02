@@ -39,7 +39,7 @@ class EquipmentServiceTest {
     private EquipmentRepository equipmentRepository;
 
     @Mock
-    private ItemService itemService;
+    private SaveItemService saveItemService;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -143,7 +143,7 @@ class EquipmentServiceTest {
         // then
         assertThat(id).isOne();
         verify(equipmentRepository).save(any());
-        verify(itemService).saveItems(any(), any());
+        verify(saveItemService).saveItems(any(), any());
     }
 
     @Test

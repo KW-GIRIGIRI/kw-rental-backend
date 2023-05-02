@@ -1,13 +1,12 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
+import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
@@ -29,45 +28,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceImplTest {
+class ItemServiceTest {
 
     @Mock
     ItemRepository itemRepository;
 
     @Mock
-    EquipmentRepository equipmentRepository;
+    EquipmentService equipmentService;
+
+    @Mock
+    RentedItemService rentedItemService;
 
     @InjectMocks
-    ItemServiceImpl itemService;
+    ItemService itemService;
 
     @Test
-    @DisplayName("품목 Bulk Update")
-    void saveItems() {
+    @DisplayName("품목 조회")
+    void getItem() {
         // given
-        given(itemRepository.saveAll(any()))
-                .willReturn(1);
-        final AddItemRequest addItemRequest = new AddItemRequest("12345678");
-
-        // when
-        itemService.saveItems(1L, List.of(addItemRequest));
-
-        // then
-        verify(itemRepository).saveAll(any());
-    }
-
-    @Test
-    @DisplayName("존재하지 않은 기자재의 품목 목록 조회 예외")
-    void getItems_notFound() {
-        // given
-        given(equipmentRepository.findById(any())).willReturn(Optional.empty());
+        given(itemRepository.findById(any())).willReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> itemService.getItems(1L))
-                .isExactlyInstanceOf(EquipmentNotFoundException.class);
+        assertThatThrownBy(() -> itemService.getItem(1L))
+                .isExactlyInstanceOf(ItemNotFoundException.class);
     }
 
     @Test
@@ -157,5 +145,24 @@ class ItemServiceImplTest {
         // when, then
         assertThatCode(() -> itemService.validatePropertyNumbers(Map.of(item.getEquipmentId(), Set.of(item.getPropertyNumber()))))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("대여 가능한 품목을 조회한다.")
+    void getRentalAvailableItems() {
+        // given
+        doNothing().when(equipmentService).validateExistsById(anyLong());
+        given(rentedItemService.getRentedPropertyNumbers(anyLong(), any())).willReturn(Set.of("11111111"));
+        final Item item1 = ItemFixture.builder().id(1L).propertyNumber("11111111").available(true).build();
+        final Item item2 = ItemFixture.builder().id(2L).propertyNumber("22222222").available(true).build();
+        final Item item3 = ItemFixture.builder().id(3L).propertyNumber("33333333").available(false).build();
+        given(itemRepository.findByEquipmentId(any())).willReturn(List.of(item1, item2, item3));
+
+        // when
+        final ItemsResponse itemsResponse = itemService.getRentalAvailableItems(1L);
+
+        // then
+        assertThat(itemsResponse.items()).usingRecursiveFieldByFieldElementComparator()
+                .containsOnly(ItemResponse.from(item2));
     }
 }

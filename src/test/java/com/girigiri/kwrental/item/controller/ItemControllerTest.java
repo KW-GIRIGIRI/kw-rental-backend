@@ -2,7 +2,7 @@ package com.girigiri.kwrental.item.controller;
 
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.item.service.ItemService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ class ItemControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    ItemServiceImpl itemServiceImpl;
+    ItemService itemService;
 
     @Test
     @DisplayName("존재하지 않는 기자재 품목 목록 조회 예외 처리")
     void getItems_notFound() throws Exception {
         long notExistsId = 1L;
-        given(itemServiceImpl.getItems(notExistsId)).willThrow(EquipmentNotFoundException.class);
+        given(itemService.getItems(notExistsId)).willThrow(EquipmentNotFoundException.class);
 
         // when, then
         mockMvc.perform(get(PREFIX + "?equipmentId=" + notExistsId))
@@ -40,7 +40,7 @@ class ItemControllerTest {
     void getItem_notFound() throws Exception {
         // given
         long notExistsId = 1L;
-        given(itemServiceImpl.getItem(notExistsId)).willThrow(ItemNotFoundException.class);
+        given(itemService.getItem(notExistsId)).willThrow(ItemNotFoundException.class);
 
         // when, then
         mockMvc.perform(get(PREFIX + "/" + notExistsId))

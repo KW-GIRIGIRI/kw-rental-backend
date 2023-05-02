@@ -18,7 +18,7 @@ public class Item {
     private String propertyNumber;
 
     @Builder.Default
-    private boolean rentalAvailable = true;
+    private boolean available = true;
 
     @Column(nullable = false)
     private Long equipmentId;
@@ -26,10 +26,10 @@ public class Item {
     protected Item() {
     }
 
-    public Item(final Long id, final String propertyNumber, final boolean rentalAvailable, final Long equipmentId) {
+    public Item(final Long id, final String propertyNumber, final boolean available, final Long equipmentId) {
         this.id = id;
         this.propertyNumber = propertyNumber;
-        this.rentalAvailable = rentalAvailable;
+        this.available = available;
         this.equipmentId = equipmentId;
     }
 

@@ -38,7 +38,7 @@ class ItemQueryDslRepositoryCustomImplTest {
         entityManager.clear();
 
         // then
-        assertThat(itemRepository.findById(item.getId()).get().isRentalAvailable()).isFalse();
+        assertThat(itemRepository.findById(item.getId()).get().isAvailable()).isFalse();
     }
 
     @Test
@@ -92,8 +92,8 @@ class ItemQueryDslRepositoryCustomImplTest {
     @DisplayName("대여 가능 갯수를 구한다")
     void countAvailable() {
         // given
-        Item item1 = ItemFixture.builder().propertyNumber("12345678").rentalAvailable(true).build();
-        Item item2 = ItemFixture.builder().propertyNumber("87654321").rentalAvailable(false).build();
+        Item item1 = ItemFixture.builder().propertyNumber("12345678").available(true).build();
+        Item item2 = ItemFixture.builder().propertyNumber("87654321").available(false).build();
         itemRepository.save(item1);
         itemRepository.save(item2);
 

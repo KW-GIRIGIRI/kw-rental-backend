@@ -41,7 +41,7 @@ class ItemsPerEquipmentsTest {
     @DisplayName("품목이 대여 불가능한 상황일 경우 예외 발생")
     void validatePropertyNumbersAvailable_notAvailableItem() {
         // given
-        final Item item = ItemFixture.builder().equipmentId(1L).rentalAvailable(false).build();
+        final Item item = ItemFixture.builder().equipmentId(1L).available(false).build();
         final ItemsPerEquipments items = ItemsPerEquipments.from(List.of(item));
 
         // when, then

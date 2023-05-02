@@ -30,7 +30,7 @@ public class ItemsPerEquipments {
         for (String propertyNumber : propertyNumbers) {
             final Item item = itemsPerPropertyNumber.get(propertyNumber);
             if (item == null) throw new ItemNotFoundException();
-            if (!item.isRentalAvailable()) throw new ItemNotAvailableException();
+            if (!item.isAvailable()) throw new ItemNotAvailableException();
         }
     }
 

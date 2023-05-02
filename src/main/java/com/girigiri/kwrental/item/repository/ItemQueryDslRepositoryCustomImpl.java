@@ -18,10 +18,10 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     }
 
     @Override
-    public int updateRentalAvailable(final Long id, final boolean rentalAvailable) {
+    public int updateRentalAvailable(final Long id, final boolean available) {
         return (int) jpaQueryFactory.update(item)
                 .where(item.id.eq(id))
-                .set(item.rentalAvailable, rentalAvailable)
+                .set(item.available, available)
                 .execute();
     }
 
@@ -37,7 +37,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     public int countAvailable(final Long equipmentId) {
         return Objects.requireNonNull(jpaQueryFactory.select(item.count())
                 .from(item)
-                .where(item.equipmentId.eq(equipmentId).and(item.rentalAvailable.isTrue()))
+                .where(item.equipmentId.eq(equipmentId).and(item.available.isTrue()))
                 .fetchOne()).intValue();
     }
 

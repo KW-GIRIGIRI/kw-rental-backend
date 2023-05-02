@@ -12,7 +12,7 @@ public class ItemFixture {
         return Item.builder()
                 .equipmentId(EQUIPMENT_ID)
                 .propertyNumber(PROPERTY_NUMBER)
-                .rentalAvailable(true);
+                .available(true);
     }
 
     public static Item create() {

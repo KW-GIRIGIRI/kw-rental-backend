@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
-import com.girigiri.kwrental.item.service.ItemServiceImpl;
+import com.girigiri.kwrental.item.service.ItemService;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,13 +31,13 @@ class AdminItemControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private ItemServiceImpl itemServiceImpl;
+    private ItemService itemService;
 
     @Test
     @DisplayName("중복된 품목 자산번호로 수정할 때 예외 처리")
     void updatePropertyNumber_duplicatedKey() throws Exception {
         // given
-        given(itemServiceImpl.updatePropertyNumber(any(), any())).willThrow(DataIntegrityViolationException.class);
+        given(itemService.updatePropertyNumber(any(), any())).willThrow(DataIntegrityViolationException.class);
         String body = objectMapper.writeValueAsString(new ItemPropertyNumberRequest("12345678"));
 
         // when, then
@@ -70,7 +70,7 @@ class AdminItemControllerTest {
         UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(
                 List.of(new UpdateItemRequest(1L, "1234567")));
         String body = objectMapper.writeValueAsString(updateItemsRequest);
-        given(itemServiceImpl.updateRentalAvailable(any(), any())).willThrow(PersistenceException.class);
+        given(itemService.updateRentalAvailable(any(), any())).willThrow(PersistenceException.class);
 
         // when, then
         mockMvc.perform(patch(PREFIX + "?equipmentId=1")

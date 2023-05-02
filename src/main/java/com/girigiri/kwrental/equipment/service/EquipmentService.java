@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -27,14 +28,14 @@ import java.util.Map;
 public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
-    private final ItemService itemService;
+    private final SaveItemService saveitemService;
     private final ApplicationEventPublisher eventPublisher;
     private final RemainingQuantityService remainingQuantityService;
 
-    public EquipmentService(final EquipmentRepository equipmentRepository, final ItemService itemService,
+    public EquipmentService(final EquipmentRepository equipmentRepository, final SaveItemService SaveitemService,
                             final ApplicationEventPublisher eventPublisher, final RemainingQuantityService remainingQuantityService) {
         this.equipmentRepository = equipmentRepository;
-        this.itemService = itemService;
+        this.saveitemService = SaveitemService;
         this.eventPublisher = eventPublisher;
         this.remainingQuantityService = remainingQuantityService;
     }
@@ -44,6 +45,12 @@ public class EquipmentService {
         final Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(EquipmentNotFoundException::new);
         return EquipmentDetailResponse.from(equipment);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public void validateExistsById(final Long id) {
+        equipmentRepository.findById(id)
+                .orElseThrow(EquipmentNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +80,7 @@ public class EquipmentService {
     public Long saveEquipment(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
         final AddEquipmentRequest addEquipmentRequest = addEquipmentWithItemsRequest.equipment();
         final Equipment equipment = equipmentRepository.save(mapToEquipment(addEquipmentRequest));
-        itemService.saveItems(equipment.getId(), addEquipmentWithItemsRequest.items());
+        saveitemService.saveItems(equipment.getId(), addEquipmentWithItemsRequest.items());
         return equipment.getId();
     }
 
