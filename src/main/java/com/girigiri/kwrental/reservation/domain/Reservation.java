@@ -32,6 +32,9 @@ public class Reservation {
     @Column(nullable = false)
     private String purpose;
 
+    @Column(nullable = false)
+    private boolean terminated = false;
+
     private LocalDateTime acceptDateTime;
 
 
@@ -40,8 +43,9 @@ public class Reservation {
     }
 
     @Builder
-    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final LocalDateTime acceptDateTime) {
+    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final boolean terminated, final LocalDateTime acceptDateTime) {
         this.id = id;
+        this.terminated = terminated;
         this.acceptDateTime = acceptDateTime;
         validateReservationSpec(reservationSpecs);
         this.reservationSpecs = reservationSpecs;
