@@ -90,6 +90,9 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
         final LocalDateTime acceptDateTime = LocalDateTime.now();
         final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).acceptDateTime(acceptDateTime).build());
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber(item1.getPropertyNumber()).reservationSpecId(reservationSpec1.getId()).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber(item3.getPropertyNumber()).reservationSpecId(reservationSpec2.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(2))).build();
         final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(2))).build();
@@ -99,9 +102,6 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
         final Reservation reservation3 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec5, reservationSpec6)));
 
-        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber(item1.getPropertyNumber()).reservationSpecId(reservationSpec1.getId()).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber(item3.getPropertyNumber()).reservationSpecId(reservationSpec2.getId()).build();
-        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
 
         // when
@@ -114,17 +114,18 @@ class RentalAcceptanceTest extends AcceptanceTest {
         // then
         final RentalSpecResponse rentalSpecResponse1 = RentalSpecResponse.builder()
                 .rentalSpecId(rentalSpec1.getId())
-                .reservationSpecId(reservationSpec1.getId())
+                .reservationSpecId(rentalSpec1.getReservationSpecId())
                 .propertyNumber(rentalSpec1.getPropertyNumber())
                 .build();
 
         final RentalSpecResponse rentalSpecResponse2 = RentalSpecResponse.builder()
                 .rentalSpecId(rentalSpec2.getId())
-                .reservationSpecId(reservationSpec2.getId())
+                .reservationSpecId(rentalSpec2.getReservationSpecId())
                 .propertyNumber(rentalSpec2.getPropertyNumber())
                 .build();
+
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservationSpecs.rentalSpecs.reservationSpecId")
-                .containsExactly(ReservationResponse.of(reservation1, List.of(rentalSpecResponse1, rentalSpecResponse2)), ReservationResponse.from(reservation2))
+                .containsOnly(ReservationResponse.of(reservation1, List.of(rentalSpecResponse1, rentalSpecResponse2)), ReservationResponse.from(reservation2))
                 .extracting("acceptDateTime").containsExactly(acceptDateTime, null);
     }
 }
