@@ -6,6 +6,7 @@ import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
+import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
@@ -27,7 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -37,6 +40,9 @@ class ItemServiceTest {
 
     @Mock
     EquipmentService equipmentService;
+
+    @Mock
+    RentedItemService rentedItemService;
 
     @InjectMocks
     ItemService itemService;
@@ -139,5 +145,24 @@ class ItemServiceTest {
         // when, then
         assertThatCode(() -> itemService.validatePropertyNumbers(Map.of(item.getEquipmentId(), Set.of(item.getPropertyNumber()))))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("대여 가능한 품목을 조회한다.")
+    void getRentalAvailableItems() {
+        // given
+        doNothing().when(equipmentService).validateExistsById(anyLong());
+        given(rentedItemService.getRentedPropertyNumbers(anyLong(), any())).willReturn(Set.of("11111111"));
+        final Item item1 = ItemFixture.builder().id(1L).propertyNumber("11111111").available(true).build();
+        final Item item2 = ItemFixture.builder().id(2L).propertyNumber("22222222").available(true).build();
+        final Item item3 = ItemFixture.builder().id(3L).propertyNumber("33333333").available(false).build();
+        given(itemRepository.findByEquipmentId(any())).willReturn(List.of(item1, item2, item3));
+
+        // when
+        final ItemsResponse itemsResponse = itemService.getRentalAvailableItems(1L);
+
+        // then
+        assertThat(itemsResponse.items()).usingRecursiveFieldByFieldElementComparator()
+                .containsOnly(ItemResponse.from(item2));
     }
 }

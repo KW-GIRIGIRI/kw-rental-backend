@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,5 +128,20 @@ public class ItemService {
         for (Long equipmentId : propertyNumbersPerEquipmentId.keySet()) {
             items.validatePropertyNumbersAvailable(equipmentId, propertyNumbersPerEquipmentId.get(equipmentId));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ItemsResponse getRentalAvailableItems(final Long equipmentId) {
+        equipmentService.validateExistsById(equipmentId);
+        final Set<String> rentedPropertyNumbers = rentedItemService.getRentedPropertyNumbers(equipmentId, LocalDateTime.now());
+        final List<Item> items = itemRepository.findByEquipmentId(equipmentId);
+        final List<Item> rentalAvailableItems = items.stream()
+                .filter(it -> canRentalAvailable(rentedPropertyNumbers, it))
+                .toList();
+        return ItemsResponse.of(rentalAvailableItems);
+    }
+
+    private static boolean canRentalAvailable(final Set<String> rentedPropertyNumbers, final Item it) {
+        return !rentedPropertyNumbers.contains(it.getPropertyNumber()) && it.isAvailable();
     }
 }

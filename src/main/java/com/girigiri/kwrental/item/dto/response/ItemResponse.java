@@ -9,7 +9,7 @@ public record ItemResponse(
         Long equipmentId
 ) {
     public static ItemResponse from(final Item item) {
-        return new ItemResponse(item.getId(), item.getPropertyNumber(), item.isRentalAvailable(),
+        return new ItemResponse(item.getId(), item.getPropertyNumber(), item.isAvailable(),
                 item.getEquipmentId());
     }
 }

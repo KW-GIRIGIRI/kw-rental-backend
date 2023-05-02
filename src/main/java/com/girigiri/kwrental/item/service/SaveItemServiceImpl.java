@@ -32,7 +32,7 @@ public class SaveItemServiceImpl implements SaveItemService {
         return Item.builder()
                 .equipmentId(equipmentId)
                 .propertyNumber(addItemRequest.propertyNumber())
-                .rentalAvailable(true)
+                .available(true)
                 .build();
     }
 }
