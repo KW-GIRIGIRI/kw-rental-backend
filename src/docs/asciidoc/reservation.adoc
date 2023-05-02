@@ -7,8 +7,3 @@ operation::addReservations[snippets='http-request,http-response']
 === 관리자 특정 기자재 품목 대여 현황 API
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']
-
-=== 관리자 특정 날짜에 수령 예정인 대여 예약 조회 API
-
-==== 수령한 대여 예약일 경우, 수령일자에 데이터 값이 존재.
-operation::admin_getReservationsByStartDate[snippets='http-request,http-response']
