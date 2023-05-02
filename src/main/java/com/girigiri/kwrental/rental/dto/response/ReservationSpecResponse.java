@@ -15,7 +15,6 @@ public class ReservationSpecResponse {
     private String category;
     private String modelName;
     private Integer amount;
-
     private List<RentalSpecResponse> rentalSpecs;
 
     private ReservationSpecResponse() {

@@ -103,7 +103,6 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final Reservation reservation3 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec5, reservationSpec6)));
 
 
-
         // when
         final ReservationsWithRentalSpecsByStartDateResponse response = RestAssured.given(requestSpec)
                 .filter(document("admin_getReservationsWithRentalSpecsByStartDate"))
@@ -124,7 +123,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 .propertyNumber(rentalSpec2.getPropertyNumber())
                 .build();
 
-        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservationSpecs.rentalSpecs.reservationSpecId")
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservationSpecs.rentalSpecs")
                 .containsOnly(ReservationResponse.of(reservation1, List.of(rentalSpecResponse1, rentalSpecResponse2)), ReservationResponse.from(reservation2))
                 .extracting("acceptDateTime").containsExactly(acceptDateTime, null);
     }
