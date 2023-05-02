@@ -3,3 +3,7 @@
 === 회원가입 API
 
 operation::registerMember[snippets='http-request,http-response']
+
+=== 로그인 API
+
+operation::login[snippets='http-request,http-response']

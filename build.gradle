@@ -92,3 +92,10 @@ bootJar {
         into 'static/docs'
     }
 }
+
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
+}

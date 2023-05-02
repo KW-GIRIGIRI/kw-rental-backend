@@ -24,7 +24,7 @@ public class RentalSpec {
     private String propertyNumber;
 
     @CreatedDate
-    private LocalDateTime acceptedDateTime;
+    private LocalDateTime acceptDateTime;
 
     private LocalDateTime returnDateTime;
 
@@ -32,15 +32,15 @@ public class RentalSpec {
     }
 
     @Builder
-    private RentalSpec(final Long id, final Long reservationSpecId, final String propertyNumber, final LocalDateTime acceptedDateTime, final LocalDateTime returnDateTime) {
+    private RentalSpec(final Long id, final Long reservationSpecId, final String propertyNumber, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
         this.id = id;
         this.reservationSpecId = reservationSpecId;
         this.propertyNumber = propertyNumber;
-        this.acceptedDateTime = acceptedDateTime;
+        this.acceptDateTime = acceptDateTime;
         this.returnDateTime = returnDateTime;
     }
 
     public boolean isNowRental() {
-        return acceptedDateTime != null && returnDateTime == null;
+        return acceptDateTime != null && returnDateTime == null;
     }
 }

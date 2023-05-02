@@ -22,4 +22,11 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .where(rentalSpec.propertyNumber.in(propertyNumbers))
                 .fetch();
     }
+
+    @Override
+    public List<RentalSpec> findByReservationSpecIds(final Set<Long> reservationSpecIds) {
+        return jpaQueryFactory.selectFrom(rentalSpec)
+                .where(rentalSpec.reservationSpecId.in(reservationSpecIds))
+                .fetch();
+    }
 }

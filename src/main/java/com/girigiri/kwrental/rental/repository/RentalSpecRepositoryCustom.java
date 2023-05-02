@@ -7,4 +7,6 @@ import java.util.Set;
 
 public interface RentalSpecRepositoryCustom {
     List<RentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
+
+    List<RentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 }

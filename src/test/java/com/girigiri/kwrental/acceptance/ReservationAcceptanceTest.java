@@ -7,12 +7,11 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.dto.response.ReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -45,6 +44,9 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private RentalSpecRepository rentalSpecRepository;
 
     @Test
     @DisplayName("대여 예약를 등록한다.")
@@ -93,34 +95,5 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.getReservations().get(LocalDate.now().getDayOfMonth()))
                         .usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1.getName())
         );
-    }
-
-    @Test
-    @DisplayName("특절 날짜에 수령일인 대여 예약을 조회한다.")
-    void getReservationsByStartDate() {
-        // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
-        final Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
-
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
-        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1, reservationSpec2)));
-
-        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
-        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
-        final Reservation reservation2 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec3, reservationSpec4)));
-
-        // when
-        final ReservationsByStartDateResponse response = RestAssured.given(requestSpec)
-                .filter(document("admin_getReservationsByStartDate"))
-                .when().log().all().get("/api/admin/reservations?startDate={startDate}", LocalDate.now().toString())
-                .then().log().all().statusCode(HttpStatus.OK.value())
-                .extract().as(ReservationsByStartDateResponse.class);
-
-        // then
-        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservationResponse.from(reservation1));
     }
 }

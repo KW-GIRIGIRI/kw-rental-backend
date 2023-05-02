@@ -7,9 +7,7 @@ import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.dto.response.ReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByStartDateResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -113,11 +111,11 @@ class ReservationServiceTest {
                 .willReturn(List.of(reservation));
 
         // when
-        final ReservationsByStartDateResponse reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
+        final List<Reservation> reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
 
         // then
-        assertThat(reservationsByStartDate.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservationResponse.from(reservation));
+        assertThat(reservationsByStartDate).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(reservation);
     }
 
     @Test
