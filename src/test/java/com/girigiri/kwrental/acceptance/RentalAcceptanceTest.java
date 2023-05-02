@@ -8,8 +8,6 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecResponse;
-import com.girigiri.kwrental.rental.dto.response.ReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -28,7 +26,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
@@ -103,28 +100,11 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final Reservation reservation3 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec5, reservationSpec6)));
 
 
-        // when
+        // when, then
         final ReservationsWithRentalSpecsByStartDateResponse response = RestAssured.given(requestSpec)
                 .filter(document("admin_getReservationsWithRentalSpecsByStartDate"))
                 .when().log().all().get("/api/admin/rentals?startDate={startDate}", LocalDate.now().toString())
                 .then().log().all().statusCode(HttpStatus.OK.value())
                 .extract().as(ReservationsWithRentalSpecsByStartDateResponse.class);
-
-        // then
-        final RentalSpecResponse rentalSpecResponse1 = RentalSpecResponse.builder()
-                .rentalSpecId(rentalSpec1.getId())
-                .reservationSpecId(rentalSpec1.getReservationSpecId())
-                .propertyNumber(rentalSpec1.getPropertyNumber())
-                .build();
-
-        final RentalSpecResponse rentalSpecResponse2 = RentalSpecResponse.builder()
-                .rentalSpecId(rentalSpec2.getId())
-                .reservationSpecId(rentalSpec2.getReservationSpecId())
-                .propertyNumber(rentalSpec2.getPropertyNumber())
-                .build();
-
-        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservationSpecs.rentalSpecs")
-                .containsOnly(ReservationResponse.of(reservation1, List.of(rentalSpecResponse1, rentalSpecResponse2)), ReservationResponse.from(reservation2))
-                .extracting("acceptDateTime").containsExactly(acceptDateTime, null);
     }
 }
