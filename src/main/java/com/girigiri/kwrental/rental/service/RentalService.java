@@ -4,7 +4,6 @@ import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -80,14 +79,7 @@ public class RentalService {
                 .flatMap(List::stream)
                 .map(ReservationSpec::getId)
                 .toList();
-        final List<RentalSpecResponse> rentalSpecResponses = findByReservationSpecId(reservationSpecIds);
-        return ReservationsWithRentalSpecsByStartDateResponse.of(reservations, rentalSpecResponses);
-    }
-
-    private List<RentalSpecResponse> findByReservationSpecId(final List<Long> reservationSpecId) {
-        return rentalSpecRepository.findByReservationSpecIds(Set.copyOf(reservationSpecId))
-                .stream()
-                .map(it -> new RentalSpecResponse(it.getReservationSpecId(), it.getId(), it.getPropertyNumber()))
-                .toList();
+        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(Set.copyOf(reservationSpecIds));
+        return ReservationsWithRentalSpecsByStartDateResponse.of(reservations, rentalSpecs);
     }
 }
