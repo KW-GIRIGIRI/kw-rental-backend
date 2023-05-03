@@ -45,4 +45,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                         .and(reservationSpec.period.rentalEndDate.before(returnDate)))
                 .fetch();
     }
+
+    @Override
+    public List<Reservation> findReservationsWithSpecsByEndDate(final LocalDate endDate) {
+        return jpaQueryFactory.selectFrom(reservation)
+                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .join(reservationSpec.equipment).fetchJoin()
+                .where(reservationSpec.period.rentalEndDate.eq(endDate))
+                .fetch();
+    }
 }

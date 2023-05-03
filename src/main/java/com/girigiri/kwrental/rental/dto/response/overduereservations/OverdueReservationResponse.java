@@ -31,6 +31,7 @@ public class OverdueReservationResponse {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
         final List<OverdueReservationSpecsResponse> reservationSpecByStartDateResponses = reservation.getReservationSpecs().stream()
+                .filter(it -> groupedRentalSpecsByReservationSpecId.get(it.getId()) != null)
                 .map(it -> OverdueReservationSpecsResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
         // TODO: 2023/05/03 학번이 가짜

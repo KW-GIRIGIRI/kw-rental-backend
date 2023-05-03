@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class ReservationSpecRepositoryCustomImplTest {
 
     public static final LocalDate NOW = LocalDate.now();
+
     @Autowired
     private ReservationSpecRepository reservationSpecRepository;
 

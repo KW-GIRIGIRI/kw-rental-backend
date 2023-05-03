@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.rental.dto.response.reservationsbystartdate;
+package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
@@ -9,20 +9,20 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class ReservationSpecByStartDateResponse {
+public class ReservationSpecWithRentalSpecsResponse {
 
     private Long reservationSpecId;
     private String imgUrl;
     private String category;
     private String modelName;
     private Integer amount;
-    private List<RentalSpecByStartDateResponse> rentalSpecs;
+    private List<RentalSpecResponse> rentalSpecs;
 
-    private ReservationSpecByStartDateResponse() {
+    private ReservationSpecWithRentalSpecsResponse() {
     }
 
     @Builder
-    private ReservationSpecByStartDateResponse(final Long reservationSpecId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<RentalSpecByStartDateResponse> rentalSpecs) {
+    private ReservationSpecWithRentalSpecsResponse(final Long reservationSpecId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<RentalSpecResponse> rentalSpecs) {
         this.reservationSpecId = reservationSpecId;
         this.imgUrl = imgUrl;
         this.category = category;
@@ -31,10 +31,10 @@ public class ReservationSpecByStartDateResponse {
         this.rentalSpecs = rentalSpecs;
     }
 
-    public static ReservationSpecByStartDateResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
+    public static ReservationSpecWithRentalSpecsResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
         final Equipment equipment = reservationSpec.getEquipment();
-        final List<RentalSpecByStartDateResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
-        return ReservationSpecByStartDateResponse.builder()
+        final List<RentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
+        return ReservationSpecWithRentalSpecsResponse.builder()
                 .reservationSpecId(reservationSpec.getId())
                 .imgUrl(equipment.getImgUrl())
                 .category(equipment.getCategory().name())
@@ -44,10 +44,10 @@ public class ReservationSpecByStartDateResponse {
                 .build();
     }
 
-    private static List<RentalSpecByStartDateResponse> mapToRentalSpecDto(final List<RentalSpec> rentalSpecs) {
+    private static List<RentalSpecResponse> mapToRentalSpecDto(final List<RentalSpec> rentalSpecs) {
         if (rentalSpecs == null) return null;
         return rentalSpecs.stream()
-                .map(RentalSpecByStartDateResponse::from)
+                .map(RentalSpecResponse::from)
                 .toList();
     }
 }

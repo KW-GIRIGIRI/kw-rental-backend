@@ -18,7 +18,7 @@ public class OverdueReservationsWithRentalSpecsResponse {
         this.reservations = reservations;
     }
 
-    public OverdueReservationsWithRentalSpecsResponse of(final List<Reservation> reservations, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationsWithRentalSpecsResponse of(final List<Reservation> reservations, final List<RentalSpec> rentalSpecs) {
         final List<OverdueReservationResponse> reservationResponses = reservations.stream()
                 .map(it -> OverdueReservationResponse.of(it, rentalSpecs))
                 .toList();

@@ -5,8 +5,8 @@ import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.response.reservationsbystartdate.ReservationByStartDateResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsbystartdate.ReservationsWithRentalSpecsByStartDateResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -111,9 +111,9 @@ class RentalServiceTest {
         given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec2.getId()))).willReturn(List.of(rentalSpec1, rentalSpec2));
 
         // when
-        final ReservationsWithRentalSpecsByStartDateResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
+        final ReservationsWithRentalSpecsResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
 
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservationByStartDateResponse.of(reservation, List.of(rentalSpec1, rentalSpec2)));
+                .containsExactly(ReservationWithRentalSpecsResponse.of(reservation, List.of(rentalSpec1, rentalSpec2)));
     }
 }

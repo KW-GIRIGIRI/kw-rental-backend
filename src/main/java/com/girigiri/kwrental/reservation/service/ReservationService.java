@@ -121,4 +121,8 @@ public class ReservationService {
     public List<Reservation> getOverdueReservations(final LocalDate localDate) {
         return reservationRepository.findOverdueReservationWithSpecs(localDate);
     }
+
+    public List<Reservation> getReservationsByEndDate(final LocalDate localDate) {
+        return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
+    }
 }

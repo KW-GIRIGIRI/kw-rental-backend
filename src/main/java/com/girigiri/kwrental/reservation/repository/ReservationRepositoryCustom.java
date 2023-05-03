@@ -13,4 +13,6 @@ public interface ReservationRepositoryCustom {
     Optional<Reservation> findByIdWithSpecs(Long id);
 
     List<Reservation> findOverdueReservationWithSpecs(LocalDate returnDate);
+
+    List<Reservation> findReservationsWithSpecsByEndDate(LocalDate localDate);
 }
