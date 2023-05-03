@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
+@Builder
 public class RentalSpec {
 
     @Id
@@ -26,6 +27,11 @@ public class RentalSpec {
     @Column(nullable = false)
     private String propertyNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private RentalStatus status = RentalStatus.RENTED;
+
     @CreatedDate
     private LocalDateTime acceptDateTime;
 
@@ -34,17 +40,21 @@ public class RentalSpec {
     protected RentalSpec() {
     }
 
-    @Builder
-    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
+    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalStatus status, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
         this.id = id;
         this.reservationSpecId = reservationSpecId;
         this.reservationId = reservationId;
         this.propertyNumber = propertyNumber;
+        this.status = status;
         this.acceptDateTime = acceptDateTime;
         this.returnDateTime = returnDateTime;
     }
 
     public boolean isNowRental() {
         return acceptDateTime != null && returnDateTime == null;
+    }
+
+    public void setStatus(final RentalStatus status) {
+        this.status = status;
     }
 }
