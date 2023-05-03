@@ -14,3 +14,10 @@ operation::admin_createRental[snippets='http-request,http-response']
 `acceptDateTime` 과 `rentalSpecs` 가 `null` 이면 아직 수령되지 않음(즉 대여되지 않음)을 의미.
 
 operation::admin_getReservationsWithRentalSpecsByStartDate[snippets='http-request,http-response']
+
+=== 특정 날짜에 반납되어야 할 대여 예약과 연체된 대여 예약을 대여 상세와 함께 조회 API
+
+`overdueReservations` 는 연체된 예약을 의미한다.
+`reservationsByEndDate` 는 반납되어야 할 예정인 대여 예약을 의미한다.
+
+operation::admin_getReservationsWithRentalSpecsByEndDate[snippets='http-request,http-response']

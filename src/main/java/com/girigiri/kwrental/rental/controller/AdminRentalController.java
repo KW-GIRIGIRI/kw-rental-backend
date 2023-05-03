@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.rental.controller;
 
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
+import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,13 @@ public class AdminRentalController {
         this.rentalService = rentalService;
     }
 
-    @GetMapping
-    public ReservationsWithRentalSpecsByStartDateResponse getReservationsWithRentalSpecsByStartDate(final LocalDate startDate) {
+    @GetMapping(params = "startDate")
+    public ReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(final LocalDate startDate) {
         return rentalService.getReservationsWithRentalSpecsByStartDate(startDate);
+    }
+
+    @GetMapping(params = "endDate")
+    public ReservationsWithRentalSpecsByEndDateResponse getReservationWithRentalSpecsByEndDate(final LocalDate endDate) {
+        return rentalService.getReservationsWithRentalSpecsByEndDate(endDate);
     }
 }

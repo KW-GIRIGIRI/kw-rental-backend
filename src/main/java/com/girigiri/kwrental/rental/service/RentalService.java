@@ -4,12 +4,13 @@ import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecResponse;
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
+import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
+import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.Reservations;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,22 +73,39 @@ public class RentalService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationsWithRentalSpecsByStartDateResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
+    public ReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
         final List<Reservation> reservations = reservationService.getReservationsByStartDate(localDate);
-        final List<Long> reservationSpecIds = reservations.stream()
-                .filter(Reservation::isAccepted)
-                .map(Reservation::getReservationSpecs)
-                .flatMap(List::stream)
-                .map(ReservationSpec::getId)
-                .toList();
-        final List<RentalSpecResponse> rentalSpecResponses = findByReservationSpecId(reservationSpecIds);
-        return ReservationsWithRentalSpecsByStartDateResponse.of(reservations, rentalSpecResponses);
+        final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
+        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
+        return ReservationsWithRentalSpecsResponse.of(reservations, rentalSpecs);
     }
 
-    private List<RentalSpecResponse> findByReservationSpecId(final List<Long> reservationSpecId) {
-        return rentalSpecRepository.findByReservationSpecIds(Set.copyOf(reservationSpecId))
+    private Set<Long> getAcceptedReservationSpecIds(final List<Reservation> reservations) {
+        return Set.copyOf(new Reservations(reservations)
+                .getAcceptedReservationSpecIds());
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationsWithRentalSpecsByEndDateResponse getReservationsWithRentalSpecsByEndDate(final LocalDate endDate) {
+        final OverdueReservationsWithRentalSpecsResponse overdueReservationsWithRentalSpecs = getOverdueReservationsWithRentalSpecs(endDate);
+        final ReservationsWithRentalSpecsResponse reservationWithRentalSpecsByEndDate = getReservationWithRentalSpecsByEndDate(endDate);
+        return new ReservationsWithRentalSpecsByEndDateResponse(overdueReservationsWithRentalSpecs, reservationWithRentalSpecsByEndDate);
+    }
+
+    private OverdueReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(final LocalDate localDate) {
+        List<Reservation> overdueReservations = reservationService.getOverdueReservations(localDate);
+        final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueReservations);
+        final List<RentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds)
                 .stream()
-                .map(it -> new RentalSpecResponse(it.getReservationSpecId(), it.getId(), it.getPropertyNumber()))
+                .filter(RentalSpec::isNowRental)
                 .toList();
+        return OverdueReservationsWithRentalSpecsResponse.of(overdueReservations, overdueRentalSpecs);
+    }
+
+    private ReservationsWithRentalSpecsResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
+        List<Reservation> reservations = reservationService.getReservationsByEndDate(localDate);
+        final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
+        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
+        return ReservationsWithRentalSpecsResponse.of(reservations, rentalSpecs);
     }
 }

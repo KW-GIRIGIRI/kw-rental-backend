@@ -117,4 +117,12 @@ public class ReservationService {
                 .orElseThrow(ReservationNotFoundException::new)
                 .acceptAt(LocalDateTime.now());
     }
+
+    public List<Reservation> getOverdueReservations(final LocalDate localDate) {
+        return reservationRepository.findOverdueReservationWithSpecs(localDate);
+    }
+
+    public List<Reservation> getReservationsByEndDate(final LocalDate localDate) {
+        return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
+    }
 }

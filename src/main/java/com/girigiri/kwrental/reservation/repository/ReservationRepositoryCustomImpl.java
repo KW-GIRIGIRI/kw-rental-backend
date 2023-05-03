@@ -35,4 +35,23 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .where(reservation.id.eq(id))
                 .fetchOne());
     }
+
+    @Override
+    public List<Reservation> findOverdueReservationWithSpecs(final LocalDate returnDate) {
+        return jpaQueryFactory.selectFrom(reservation)
+                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .join(reservationSpec.equipment).fetchJoin()
+                .where(reservation.terminated.isFalse()
+                        .and(reservationSpec.period.rentalEndDate.before(returnDate)))
+                .fetch();
+    }
+
+    @Override
+    public List<Reservation> findReservationsWithSpecsByEndDate(final LocalDate endDate) {
+        return jpaQueryFactory.selectFrom(reservation)
+                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .join(reservationSpec.equipment).fetchJoin()
+                .where(reservationSpec.period.rentalEndDate.eq(endDate))
+                .fetch();
+    }
 }
