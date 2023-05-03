@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.rental.dto.response;
+package com.girigiri.kwrental.rental.dto.response.reservationsbystartdate;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;

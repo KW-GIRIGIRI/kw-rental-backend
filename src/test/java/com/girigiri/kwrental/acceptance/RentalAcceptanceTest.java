@@ -8,7 +8,7 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsbystartdate.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;

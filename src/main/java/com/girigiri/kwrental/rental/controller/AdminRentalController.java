@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.rental.controller;
 
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByStartDateResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsbystartdate.ReservationsWithRentalSpecsByStartDateResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
