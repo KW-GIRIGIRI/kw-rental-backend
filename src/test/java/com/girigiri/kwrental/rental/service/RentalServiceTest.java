@@ -19,6 +19,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,12 +34,15 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 class RentalServiceTest {
+
+    private final ArgumentCaptor<List<RentalSpec>> rentalSpecListArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
     @Mock
     private ItemService itemService;
@@ -87,13 +91,20 @@ class RentalServiceTest {
         doNothing().when(itemService).validatePropertyNumbers(any());
         given(rentalSpecRepository.findByPropertyNumbers(any()))
                 .willReturn(Collections.emptyList());
-        final List<RentalSpec> rentalSpecs = List.of(RentalSpecFixture.builder().id(1L).reservationSpecId(reservationSpecId).build());
-        given(rentalSpecRepository.saveAll(any()))
-                .willReturn(rentalSpecs);
+        final List<RentalSpec> output = List.of(RentalSpecFixture.builder().reservationId(reservationId)
+                .propertyNumber(propertyNumber).reservationSpecId(reservationSpecId).id(1L).build());
+        given(rentalSpecRepository.saveAll(rentalSpecListArgumentCaptor.capture()))
+                .willReturn(output);
 
         // when, then
-        assertThatCode(() -> rentalService.rent(request))
-                .doesNotThrowAnyException();
+        final RentalSpec expect = RentalSpecFixture.builder().reservationId(reservationId)
+                .propertyNumber(propertyNumber).reservationSpecId(reservationSpecId).acceptDateTime(null).build();
+        assertAll(
+                () -> assertThatCode(() -> rentalService.rent(request))
+                        .doesNotThrowAnyException(),
+                () -> assertThat(rentalSpecListArgumentCaptor.getValue())
+                        .usingRecursiveFieldByFieldElementComparator().containsExactly(expect)
+        );
     }
 
     @Test

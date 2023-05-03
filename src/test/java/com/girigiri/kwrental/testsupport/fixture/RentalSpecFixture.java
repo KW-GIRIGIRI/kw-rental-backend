@@ -14,7 +14,8 @@ public class RentalSpecFixture {
         return RentalSpec.builder()
                 .acceptDateTime(LocalDateTime.now())
                 .propertyNumber("12345678")
-                .reservationSpecId(1L)
+                .reservationSpecId(0L)
+                .reservationId(0L)
                 .returnDateTime(null);
     }
 }

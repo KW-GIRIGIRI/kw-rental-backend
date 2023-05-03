@@ -59,16 +59,23 @@ public class RentalService {
 
     private List<RentalSpec> mapToRentalSpecs(final CreateRentalRequest createRentalRequest) {
         return createRentalRequest.getRentalSpecsRequests().stream()
-                .map(RentalSpecsRequest::getPropertyNumbers)
+                .map(it -> mapToRentalSpecPerReservationSpec(createRentalRequest.getReservationId(), it))
                 .flatMap(List::stream)
-                .map(propertyNumber -> mapToRentalSpec(createRentalRequest.getReservationId(), propertyNumber))
                 .toList();
     }
 
-    private RentalSpec mapToRentalSpec(final Long reservationSpecId, final String propertyNumber) {
+    private List<RentalSpec> mapToRentalSpecPerReservationSpec(final Long reservationId, final RentalSpecsRequest rentalSpecsRequest) {
+        final Long reservationSpecId = rentalSpecsRequest.getReservationSpecId();
+        return rentalSpecsRequest.getPropertyNumbers().stream()
+                .map(propertyNumber -> mapToRentalSpec(reservationId, reservationSpecId, propertyNumber))
+                .toList();
+    }
+
+    private RentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId, final String propertyNumber) {
         return RentalSpec.builder()
-                .propertyNumber(propertyNumber)
+                .reservationId(reservationId)
                 .reservationSpecId(reservationSpecId)
+                .propertyNumber(propertyNumber)
                 .build();
     }
 

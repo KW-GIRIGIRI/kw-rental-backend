@@ -21,6 +21,9 @@ public class RentalSpec {
     private Long reservationSpecId;
 
     @Column(nullable = false)
+    private Long reservationId;
+
+    @Column(nullable = false)
     private String propertyNumber;
 
     @CreatedDate
@@ -32,9 +35,10 @@ public class RentalSpec {
     }
 
     @Builder
-    private RentalSpec(final Long id, final Long reservationSpecId, final String propertyNumber, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
+    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
         this.id = id;
         this.reservationSpecId = reservationSpecId;
+        this.reservationId = reservationId;
         this.propertyNumber = propertyNumber;
         this.acceptDateTime = acceptDateTime;
         this.returnDateTime = returnDateTime;
