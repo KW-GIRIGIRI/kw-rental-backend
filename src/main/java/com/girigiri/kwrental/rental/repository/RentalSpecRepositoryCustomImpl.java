@@ -42,4 +42,11 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                                 .and(rentalSpec.returnDateTime.isNull()))
                         .fetch());
     }
+
+    @Override
+    public List<RentalSpec> findByReservationId(final Long reservationId) {
+        return jpaQueryFactory.selectFrom(rentalSpec)
+                .where(rentalSpec.reservationId.eq(reservationId))
+                .fetch();
+    }
 }

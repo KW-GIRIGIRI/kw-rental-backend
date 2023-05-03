@@ -12,4 +12,6 @@ public interface RentalSpecRepositoryCustom {
     List<RentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 
     Set<RentalSpec> findRentedRentalSpecs(Long equipmentId, LocalDateTime date);
+
+    List<RentalSpec> findByReservationId(Long reservationId);
 }

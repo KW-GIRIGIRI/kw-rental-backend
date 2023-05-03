@@ -75,4 +75,20 @@ class RentalSpecRepositoryTest {
         // then
         assertThat(rentedRentalSpecs).containsExactlyInAnyOrder(rentalSpec1);
     }
+
+    @Test
+    @DisplayName("여러 ID로 조회한다.")
+    void findByIds() {
+        // given
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(1L).reservationId(1L).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(2L).reservationId(1L).build();
+        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().propertyNumber("33333333").reservationSpecId(3L).reservationId(1L).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3));
+
+        // when
+        final List<RentalSpec> expect = rentalSpecRepository.findByReservationId(1L);
+
+        // then
+        assertThat(expect).containsExactlyInAnyOrder(rentalSpec1, rentalSpec2, rentalSpec3);
+    }
 }
