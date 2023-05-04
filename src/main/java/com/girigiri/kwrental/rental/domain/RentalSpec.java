@@ -57,4 +57,10 @@ public class RentalSpec {
     public void setStatus(final RentalSpecStatus status) {
         this.status = status;
     }
+
+    public void setReturnDateTimeIfAnyReturned(final LocalDateTime returnDateTime) {
+        if (this.status.isReturnedOrAbnormalReturned()) {
+            this.returnDateTime = returnDateTime;
+        }
+    }
 }
