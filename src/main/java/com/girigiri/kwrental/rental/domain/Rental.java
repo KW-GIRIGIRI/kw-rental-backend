@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.rental.domain;
 
 import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
+import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class Rental {
     }
 
     private void setStatus(final RentalSpec rentalSpec, final RentalSpecStatus status) {
+        if (status == RentalSpecStatus.RENTED) throw new RentedStatusForReturnException();
         final boolean nowIsLegalForReturn = reservationFromRental.nowIsLegalForReturn(rentalSpec.getReservationSpecId());
         if (status == RentalSpecStatus.RETURNED && !nowIsLegalForReturn) {
             rentalSpec.setStatus(RentalSpecStatus.OVERDUE_RETURNED);
