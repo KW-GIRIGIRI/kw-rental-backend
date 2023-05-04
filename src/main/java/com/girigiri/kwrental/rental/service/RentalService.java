@@ -1,9 +1,13 @@
 package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.rental.domain.Rental;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
@@ -114,5 +118,19 @@ public class RentalService {
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
         return ReservationsWithRentalSpecsResponse.of(reservations, rentalSpecs);
+    }
+
+    @Transactional
+    public void returnRental(final ReturnRentalRequest returnRentalRequest) {
+        Rental rental = getRental(returnRentalRequest);
+        final Map<Long, RentalSpecStatus> returnRequest = returnRentalRequest.getRentalSpecs().stream()
+                .collect(toMap(ReturnRentalSpecRequest::getId, ReturnRentalSpecRequest::getStatus));
+        rental.returnAll(returnRequest);
+    }
+
+    private Rental getRental(final ReturnRentalRequest returnRentalRequest) {
+        final List<RentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(returnRentalRequest.getReservationId());
+        final Reservation reservation = reservationService.getReservationWithReservationSpecsById(returnRentalRequest.getReservationId());
+        return Rental.of(rentalSpecList, reservation);
     }
 }

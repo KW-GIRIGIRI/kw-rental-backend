@@ -6,8 +6,11 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -148,5 +151,45 @@ class RentalAcceptanceTest extends AcceptanceTest {
 //                () -> assertThat(response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
 //                        .containsExactlyInAnyOrder(ReservationWithRentalSpecsResponse.of(reservation1, List.of(rentalSpec1, rentalSpec2)))
 //        );
+    }
+
+    @Test
+    @DisplayName("반납한다.")
+    void returnRentals() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+
+        final LocalDateTime acceptDateTime = LocalDateTime.now();
+        final LocalDate now = LocalDate.now();
+        final LocalDate yesterday = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(yesterday, now)).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(yesterday, now)).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).acceptDateTime(acceptDateTime).build());
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(reservationSpec1.getId()).reservationId(reservation.getId()).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).reservationId(reservation.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        final ReturnRentalSpecRequest returnRentalSpecRequest1 = ReturnRentalSpecRequest.builder()
+                .id(rentalSpec1.getId())
+                .status(RentalSpecStatus.RETURNED)
+                .build();
+        final ReturnRentalSpecRequest returnRentalSpecRequest2 = ReturnRentalSpecRequest.builder()
+                .id(rentalSpec2.getId())
+                .status(RentalSpecStatus.RETURNED)
+                .build();
+        final ReturnRentalRequest returnRentalRequest = ReturnRentalRequest.builder()
+                .reservationId(reservation.getId())
+                .rentalSpecs(List.of(returnRentalSpecRequest1, returnRentalSpecRequest2))
+                .build();
+
+        // when, then
+        RestAssured.given(requestSpec)
+                .filter(document("admin_returnRentals"))
+                .body(returnRentalRequest)
+                .contentType(ContentType.JSON)
+                .when().log().all().patch("/api/admin/rentals/returns")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
     }
 }

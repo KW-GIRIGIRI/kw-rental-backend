@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.rental.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.util.List;
@@ -7,7 +9,10 @@ import java.util.List;
 @Getter
 public class RentalSpecsRequest {
 
+    @NotNull
     private Long reservationSpecId;
+
+    @NotEmpty
     private List<String> propertyNumbers;
 
     private RentalSpecsRequest() {
