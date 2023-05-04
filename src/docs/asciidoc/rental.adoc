@@ -21,3 +21,15 @@ operation::admin_getReservationsWithRentalSpecsByStartDate[snippets='http-reques
 `reservationsByEndDate` 는 반납되어야 할 예정인 대여 예약을 의미한다.
 
 operation::admin_getReservationsWithRentalSpecsByEndDate[snippets='http-request,http-response']
+
+=== 대여 반납
+
+==== `status` 는 반납이 어떤 상태인지 의미한다.
+
+- `RETURNED` : 정상 반납 (만약 반납 당시가 반납일보다 늦은 경우 자동으로 연체 반납 처리됨)
+- `LOST` : 분실
+- `BROKEN` : 파손
+- `OVERDUE_RENTED` : 연체 (연체가 시작됨을 의미.
+아직 반납되지 않음)
+
+operation::admin_returnRentals[snippets='http-request,http-response']
