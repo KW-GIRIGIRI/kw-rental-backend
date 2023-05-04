@@ -177,4 +177,16 @@ class ReservationServiceTest {
                 1L, Map.of(1L, Set.of("1111111", "222222222"))))
                 .isExactlyInstanceOf(ReservationNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("존재하지 않은 대여 예약 조회 시 예외 발생")
+    void getReservationWithReservationSpecsById() {
+        // given
+        given(reservationRepository.findByIdWithSpecs(any()))
+                .willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> reservationService.getReservationWithReservationSpecsById(1L))
+                .isExactlyInstanceOf(ReservationNotFoundException.class);
+    }
 }

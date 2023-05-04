@@ -73,4 +73,14 @@ public class Reservation {
     public boolean isAccepted() {
         return this.acceptDateTime != null;
     }
+
+    public void updateIfTerminated() {
+        this.terminated = reservationSpecs.stream()
+                .map(ReservationSpec::getStatus)
+                .allMatch(it ->
+                        it != ReservationSpecStatus.RESERVED
+                                && it != ReservationSpecStatus.RENTED
+                                && it != ReservationSpecStatus.OVERDUE_RENTED
+                );
+    }
 }

@@ -42,4 +42,8 @@ public class RentalPeriod {
         if (date == null) return false;
         return date.isEqual(rentalStartDate) || (date.isAfter(getRentalStartDate()) && date.isBefore(getRentalEndDate()));
     }
+
+    public boolean isLegalReturnIn(final LocalDate date) {
+        return this.contains(date) || rentalEndDate.isEqual(date);
+    }
 }

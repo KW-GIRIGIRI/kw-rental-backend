@@ -125,4 +125,9 @@ public class ReservationService {
     public List<Reservation> getReservationsByEndDate(final LocalDate localDate) {
         return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
     }
+
+    public Reservation getReservationWithReservationSpecsById(final Long id) {
+        return reservationRepository.findByIdWithSpecs(id)
+                .orElseThrow(ReservationNotFoundException::new);
+    }
 }
