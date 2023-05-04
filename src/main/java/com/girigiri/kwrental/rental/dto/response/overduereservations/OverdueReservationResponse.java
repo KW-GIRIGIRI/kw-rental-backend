@@ -15,12 +15,12 @@ public class OverdueReservationResponse {
     private String name;
     private String memberNumber;
     private LocalDateTime returnDate;
-    private List<OverdueReservationSpecsResponse> reservationSpecs;
+    private List<OverdueReservationSpecResponse> reservationSpecs;
 
     private OverdueReservationResponse() {
     }
 
-    private OverdueReservationResponse(final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecsResponse> reservationSpecs) {
+    private OverdueReservationResponse(final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
         this.name = name;
         this.memberNumber = memberNumber;
         this.returnDate = returnDate;
@@ -30,9 +30,9 @@ public class OverdueReservationResponse {
     public static OverdueReservationResponse of(final Reservation reservation, final List<RentalSpec> rentalSpecs) {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
-        final List<OverdueReservationSpecsResponse> reservationSpecByStartDateResponses = reservation.getReservationSpecs().stream()
+        final List<OverdueReservationSpecResponse> reservationSpecByStartDateResponses = reservation.getReservationSpecs().stream()
                 .filter(it -> groupedRentalSpecsByReservationSpecId.get(it.getId()) != null)
-                .map(it -> OverdueReservationSpecsResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
+                .map(it -> OverdueReservationSpecResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
         // TODO: 2023/05/03 학번이 가짜
         return new OverdueReservationResponse(reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecByStartDateResponses);

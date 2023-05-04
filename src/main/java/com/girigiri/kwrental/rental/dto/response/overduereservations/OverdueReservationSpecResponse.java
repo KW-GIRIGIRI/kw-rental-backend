@@ -9,21 +9,23 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class OverdueReservationSpecsResponse {
+public class OverdueReservationSpecResponse {
 
     private Long reservationSpecId;
+    private Long equipmentId;
     private String imgUrl;
     private String category;
     private String modelName;
     private Integer amount;
     private List<OverdueRentalSpecResponse> rentalSpecs;
 
-    private OverdueReservationSpecsResponse() {
+    private OverdueReservationSpecResponse() {
     }
 
     @Builder
-    private OverdueReservationSpecsResponse(final Long reservationSpecId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<OverdueRentalSpecResponse> rentalSpecs) {
+    private OverdueReservationSpecResponse(final Long reservationSpecId, final Long equipmentId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<OverdueRentalSpecResponse> rentalSpecs) {
         this.reservationSpecId = reservationSpecId;
+        this.equipmentId = equipmentId;
         this.imgUrl = imgUrl;
         this.category = category;
         this.modelName = modelName;
@@ -31,11 +33,12 @@ public class OverdueReservationSpecsResponse {
         this.rentalSpecs = rentalSpecs;
     }
 
-    public static OverdueReservationSpecsResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationSpecResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
         final Equipment equipment = reservationSpec.getEquipment();
         final List<OverdueRentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
-        return OverdueReservationSpecsResponse.builder()
+        return OverdueReservationSpecResponse.builder()
                 .reservationSpecId(reservationSpec.getId())
+                .equipmentId(equipment.getId())
                 .imgUrl(equipment.getImgUrl())
                 .category(equipment.getCategory().name())
                 .modelName(equipment.getModelName())

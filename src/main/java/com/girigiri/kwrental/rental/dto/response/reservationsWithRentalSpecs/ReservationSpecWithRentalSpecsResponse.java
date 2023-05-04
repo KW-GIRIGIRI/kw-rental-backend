@@ -12,6 +12,8 @@ import java.util.List;
 public class ReservationSpecWithRentalSpecsResponse {
 
     private Long reservationSpecId;
+
+    private Long equipmentId;
     private String imgUrl;
     private String category;
     private String modelName;
@@ -22,8 +24,9 @@ public class ReservationSpecWithRentalSpecsResponse {
     }
 
     @Builder
-    private ReservationSpecWithRentalSpecsResponse(final Long reservationSpecId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<RentalSpecResponse> rentalSpecs) {
+    private ReservationSpecWithRentalSpecsResponse(final Long reservationSpecId, final Long equipmentId, final String imgUrl, final String category, final String modelName, final Integer amount, final List<RentalSpecResponse> rentalSpecs) {
         this.reservationSpecId = reservationSpecId;
+        this.equipmentId = equipmentId;
         this.imgUrl = imgUrl;
         this.category = category;
         this.modelName = modelName;
@@ -37,6 +40,7 @@ public class ReservationSpecWithRentalSpecsResponse {
         return ReservationSpecWithRentalSpecsResponse.builder()
                 .reservationSpecId(reservationSpec.getId())
                 .imgUrl(equipment.getImgUrl())
+                .equipmentId(equipment.getId())
                 .category(equipment.getCategory().name())
                 .modelName(equipment.getModelName())
                 .amount(reservationSpec.getAmount().getAmount())
