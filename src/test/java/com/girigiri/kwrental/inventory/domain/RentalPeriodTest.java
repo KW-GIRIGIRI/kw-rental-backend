@@ -69,4 +69,27 @@ class RentalPeriodTest {
                 () -> assertThat(afterEndExpect).isFalse()
         );
     }
+
+    @Test
+    @DisplayName("특정 날짜가 정상 반납할 수 있는 지 판단한다.")
+    void isLegalReturnIn() {
+        // given
+        final LocalDate start = LocalDate.now();
+        final LocalDate end = LocalDate.now().plusDays(2);
+        final RentalPeriod rentalPeriod = new RentalPeriod(start, end);
+
+        final LocalDate illegal = end.plusDays(1);
+
+        // when
+        final boolean illegalReturn = rentalPeriod.isLegalReturnIn(illegal);
+        final boolean legalReturn1 = rentalPeriod.isLegalReturnIn(end);
+        final boolean legalReturn2 = rentalPeriod.isLegalReturnIn(start);
+
+        // then
+        assertAll(
+                () -> assertThat(illegalReturn).isFalse(),
+                () -> assertThat(legalReturn1).isTrue(),
+                () -> assertThat(legalReturn2).isTrue()
+        );
+    }
 }

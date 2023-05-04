@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
-import com.girigiri.kwrental.rental.domain.RentalStatus;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,7 @@ public class RentalSpecFixture {
                 .propertyNumber("12345678")
                 .reservationSpecId(0L)
                 .reservationId(0L)
-                .status(RentalStatus.RENTED)
+                .status(RentalSpecStatus.RENTED)
                 .returnDateTime(null);
     }
 }

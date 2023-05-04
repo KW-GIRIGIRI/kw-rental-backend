@@ -30,7 +30,7 @@ public class RentalSpec {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private RentalStatus status = RentalStatus.RENTED;
+    private RentalSpecStatus status = RentalSpecStatus.RENTED;
 
     @CreatedDate
     private LocalDateTime acceptDateTime;
@@ -40,7 +40,7 @@ public class RentalSpec {
     protected RentalSpec() {
     }
 
-    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalStatus status, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
+    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalSpecStatus status, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
         this.id = id;
         this.reservationSpecId = reservationSpecId;
         this.reservationId = reservationId;
@@ -54,7 +54,7 @@ public class RentalSpec {
         return acceptDateTime != null && returnDateTime == null;
     }
 
-    public void setStatus(final RentalStatus status) {
+    public void setStatus(final RentalSpecStatus status) {
         this.status = status;
     }
 }

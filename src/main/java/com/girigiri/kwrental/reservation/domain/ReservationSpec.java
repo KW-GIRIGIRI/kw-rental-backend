@@ -12,6 +12,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
+@Builder
 public class ReservationSpec {
 
     @Id
@@ -24,6 +25,11 @@ public class ReservationSpec {
     @Column(nullable = false)
     private RentalPeriod period;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ReservationSpecStatus status = ReservationSpecStatus.RESERVED;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Equipment equipment;
 
@@ -33,11 +39,12 @@ public class ReservationSpec {
     protected ReservationSpec() {
     }
 
-    @Builder
-    private ReservationSpec(final Long id, final RentalAmount amount, final RentalPeriod period, final Equipment equipment, final Reservation reservation) {
+    private ReservationSpec(final Long id, final RentalAmount amount, final RentalPeriod period,
+                            final ReservationSpecStatus status, final Equipment equipment, final Reservation reservation) {
         this.id = id;
         this.amount = amount;
         this.period = period;
+        this.status = status;
         this.equipment = equipment;
         this.reservation = reservation;
     }
@@ -60,5 +67,13 @@ public class ReservationSpec {
 
     public void validateAmount(final int amount) {
         if (this.amount.getAmount() != amount) throw new ReservationSpecException("대여 신청 갯수가 맞지 않습니다.");
+    }
+
+    public boolean isLegalReturnIn(final LocalDate date) {
+        return period.isLegalReturnIn(date);
+    }
+
+    public void setStatus(final ReservationSpecStatus status) {
+        this.status = status;
     }
 }
