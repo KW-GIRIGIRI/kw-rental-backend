@@ -1,5 +1,8 @@
 package com.girigiri.kwrental;
 
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.domain.Role;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
@@ -15,10 +18,12 @@ public class DummyDataMaker {
 
     private final EquipmentRepository equipmentRepository;
     private final ItemRepository itemRepository;
+    private final MemberRepository memberRepository;
 
-    public DummyDataMaker(final EquipmentRepository equipmentRepository, final ItemRepository itemRepository) {
+    public DummyDataMaker(final EquipmentRepository equipmentRepository, final ItemRepository itemRepository, final MemberRepository memberRepository) {
         this.equipmentRepository = equipmentRepository;
         this.itemRepository = itemRepository;
+        this.memberRepository = memberRepository;
     }
 
     @PostConstruct
@@ -28,6 +33,16 @@ public class DummyDataMaker {
             itemRepository.save(new Item(null, "12345678" + i, true, equipment.getId()));
             itemRepository.save(new Item(null, "87654321" + i, false, equipment.getId()));
         }
+        memberRepository.save(
+                Member.builder()
+                        .memberNumber("00000000")
+                        .name("관리자")
+                        .email("admin@admin@naver.com")
+                        .password("admin")
+                        .birthDate("000000")
+                        .role(Role.ADMIN)
+                        .build()
+        );
     }
 
     private Equipment create(int i) {

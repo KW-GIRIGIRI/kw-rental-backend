@@ -1,6 +1,8 @@
 package com.girigiri.kwrental;
 
 import com.amazonaws.AmazonServiceException;
+import com.girigiri.kwrental.auth.exception.ForbiddenException;
+import com.girigiri.kwrental.auth.exception.UnauthorizedException;
 import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.common.exception.NotFoundException;
 import jakarta.persistence.PersistenceException;
@@ -81,8 +83,19 @@ public class GlobalExceptionAdvice {
         return ResponseEntity.badRequest().body("해당 HTTP METHOD는 처리할 수 없습니다.");
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorizedException(final UnauthorizedException unauthorizedException) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(unauthorizedException.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handleForbiddenException(final ForbiddenException forbiddenException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(forbiddenException.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleInternalServerError(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상하지 못한 예외가 발생했습니다.");
     }
+
 }

@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.member.domain.Member;
-import com.girigiri.kwrental.member.domain.Role;
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.domain.Role;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

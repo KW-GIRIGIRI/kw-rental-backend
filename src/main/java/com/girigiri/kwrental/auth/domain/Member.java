@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.member.domain;
+package com.girigiri.kwrental.auth.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;

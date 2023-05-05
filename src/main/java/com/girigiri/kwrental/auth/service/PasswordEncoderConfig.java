@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.member.service;
+package com.girigiri.kwrental.auth.service;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

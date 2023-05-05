@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.member.exception;
+package com.girigiri.kwrental.auth.exception;
 
 import com.girigiri.kwrental.common.exception.BadRequestException;
 

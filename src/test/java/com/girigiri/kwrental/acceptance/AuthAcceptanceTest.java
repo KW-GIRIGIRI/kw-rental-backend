@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.acceptance;
 
-import com.girigiri.kwrental.member.domain.Member;
-import com.girigiri.kwrental.member.dto.request.LoginRequest;
-import com.girigiri.kwrental.member.dto.request.RegisterMemberRequest;
-import com.girigiri.kwrental.member.repository.MemberRepository;
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.dto.request.LoginRequest;
+import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
-class MemberAcceptanceTest extends AcceptanceTest {
+class AuthAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private MemberRepository memberRepository;
