@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Getter
 public class OverdueReservationResponse {
+    private Long reservationId;
     private String name;
     private String memberNumber;
     private LocalDateTime returnDate;
@@ -20,7 +21,8 @@ public class OverdueReservationResponse {
     private OverdueReservationResponse() {
     }
 
-    private OverdueReservationResponse(final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
+    private OverdueReservationResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
+        this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
         this.returnDate = returnDate;
@@ -35,6 +37,6 @@ public class OverdueReservationResponse {
                 .map(it -> OverdueReservationSpecResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
         // TODO: 2023/05/03 학번이 가짜
-        return new OverdueReservationResponse(reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecByStartDateResponses);
+        return new OverdueReservationResponse(reservation.getId(), reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecByStartDateResponses);
     }
 }

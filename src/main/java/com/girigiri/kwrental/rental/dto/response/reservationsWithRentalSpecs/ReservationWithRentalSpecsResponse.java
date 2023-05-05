@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Getter
 public class ReservationWithRentalSpecsResponse {
 
+    private Long reservationId;
     private String name;
     private String memberNumber;
     private LocalDateTime acceptDateTime;
@@ -21,7 +22,8 @@ public class ReservationWithRentalSpecsResponse {
     private ReservationWithRentalSpecsResponse() {
     }
 
-    private ReservationWithRentalSpecsResponse(final String name, final String memberNumber, final LocalDateTime acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
+    private ReservationWithRentalSpecsResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
+        this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
         this.acceptDateTime = acceptDateTime;
@@ -35,6 +37,6 @@ public class ReservationWithRentalSpecsResponse {
                 .map(it -> ReservationSpecWithRentalSpecsResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
         // TODO: 2023/05/03 학번이 가짜
-        return new ReservationWithRentalSpecsResponse(reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecWithRentalSpecsRespons);
+        return new ReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecWithRentalSpecsRespons);
     }
 }
