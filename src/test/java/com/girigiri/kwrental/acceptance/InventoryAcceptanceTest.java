@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.acceptance;
 
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
@@ -12,6 +14,7 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
+import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
@@ -37,10 +40,17 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     @Autowired
     InventoryRepository inventoryRepository;
 
+    @Autowired
+    MemberRepository memberRepository;
+
     @Test
     @DisplayName("기자재를 담는 기자재로 등록한다.")
     void addInventory() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
 
@@ -54,6 +64,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         // when
         RestAssured.given(requestSpec)
                 .filter(document("addInventory"))
+                .sessionId(sessionId)
                 .body(request)
                 .contentType(ContentType.JSON)
                 .when().log().all().post("/api/inventories")
@@ -66,15 +77,20 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     @DisplayName("담은 기자재를 조회한다.")
     void getInventory() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("bbbbbbbb").build());
         final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
         final Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
-        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
-        final Inventory inventory2 = inventoryRepository.save(InventoryFixture.create(equipment2));
+        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
+        final Inventory inventory2 = inventoryRepository.save(InventoryFixture.create(equipment2, member.getId()));
         // when
         final InventoriesResponse response = RestAssured.given(requestSpec)
                 .filter(document("getInventories"))
+                .sessionId(sessionId)
                 .when().log().all().get("/api/inventories")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
@@ -90,16 +106,21 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     @DisplayName("담은 기자재를 모두 제거한다.")
     void deleteAllInventories() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("bbbbbbbb").build());
         itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
         itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
-        inventoryRepository.save(InventoryFixture.create(equipment1));
-        inventoryRepository.save(InventoryFixture.create(equipment2));
+        inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
+        inventoryRepository.save(InventoryFixture.create(equipment2, member.getId()));
 
         // when, then
         RestAssured.given(requestSpec)
                 .filter(document("deleteAllInventories"))
+                .sessionId(sessionId)
                 .when().log().all().delete("/api/inventories")
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -109,13 +130,18 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 담은 기자재를 모두 제거한다.")
     void deleteInventory() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
         itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
+        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
 
         // when, then
         RestAssured.given(requestSpec)
                 .filter(document("deleteInventory"))
+                .sessionId(sessionId)
                 .when().log().all().delete("/api/inventories/" + inventory1.getId())
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
@@ -125,9 +151,13 @@ class InventoryAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 담은 기자재를 수정한다.")
     void updateInventory() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("aaaaaaaa").build());
         itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1));
+        final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
         final UpdateInventoryRequest request = UpdateInventoryRequest.builder()
                 .rentalStartDate(LocalDate.now().plusDays(2))
                 .rentalEndDate(LocalDate.now().plusDays(3))
@@ -137,6 +167,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         // when, then
         RestAssured.given(requestSpec)
                 .filter(document("updateInventory"))
+                .sessionId(sessionId)
                 .body(request).contentType(ContentType.JSON)
                 .when().log().all().patch("/api/inventories/" + inventory1.getId())
                 .then().log().all()

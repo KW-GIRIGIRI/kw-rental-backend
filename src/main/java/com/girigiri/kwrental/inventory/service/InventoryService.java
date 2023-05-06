@@ -9,6 +9,7 @@ import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
 import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
@@ -32,47 +33,55 @@ public class InventoryService {
     }
 
     @Transactional
-    public Long save(final AddInventoryRequest addInventoryRequest) {
+    public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
         final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         final Long equipmentId = addInventoryRequest.getEquipmentId();
         final Equipment equipment = equipmentService.validateRentalDays(equipmentId, rentalPeriod.getRentalDays());
         amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
-        final Inventory inventory = inventoryRepository.save(mapToInventory(equipment, addInventoryRequest));
+        final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
         return inventory.getId();
     }
 
-    private Inventory mapToInventory(final Equipment equipment, final AddInventoryRequest addInventoryRequest) {
+    private Inventory mapToInventory(final Long memberId, final Equipment equipment, final AddInventoryRequest addInventoryRequest) {
         final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         return Inventory.builder()
                 .equipment(equipment)
                 .rentalPeriod(rentalPeriod)
                 .rentalAmount(new RentalAmount(addInventoryRequest.getAmount()))
+                .memberId(memberId)
                 .build();
     }
 
-    // TODO: 2023/04/06 회원이 담은 기자재를 조회해야 된다.
     @Transactional(readOnly = true)
-    public InventoriesResponse getInventories() {
-        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
+    public InventoriesResponse getInventories(final Long memberId) {
+        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
         return InventoriesResponse.from(inventories);
     }
 
     @Transactional
-    public void deleteAll() {
-        inventoryRepository.deleteAll();
+    public void deleteAll(final Long memberId) {
+        inventoryRepository.deleteAll(memberId);
     }
 
     @Transactional
-    public void deleteById(final Long id) {
-        inventoryRepository.findById(id)
+    public void deleteById(final Long memberId, final Long id) {
+        final Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(InventoryNotFoundException::new);
+        validateInventoryMemberId(memberId, inventory);
         inventoryRepository.deleteById(id);
     }
 
+    private void validateInventoryMemberId(final Long memberId, final Inventory inventory) {
+        if (!inventory.hasMemberId(memberId)) {
+            throw new InventoryInvalidAccessException();
+        }
+    }
+
     @Transactional
-    public InventoryResponse update(final Long id, final UpdateInventoryRequest request) {
+    public InventoryResponse update(final Long memberId, final Long id, final UpdateInventoryRequest request) {
         final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
                 .orElseThrow(InventoryNotFoundException::new);
+        validateInventoryMemberId(memberId, inventory);
         amountValidator.validateAmount(inventory.getEquipment().getId(), request.getAmount(),
                 new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         inventory.setRentalAmount(new RentalAmount(request.getAmount()));
@@ -81,8 +90,8 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public List<Inventory> getInventoriesWithEquipment() {
-        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment();
+    public List<Inventory> getInventoriesWithEquipment(final Long memberId) {
+        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
         if (inventories.isEmpty()) {
             throw new InventoryNotFoundException();
         }

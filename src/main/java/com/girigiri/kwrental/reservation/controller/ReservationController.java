@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.reservation.controller;
 
+import com.girigiri.kwrental.auth.domain.SessionMember;
+import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +23,8 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> reserve(@RequestBody final AddReservationRequest addReservationRequest) {
-        final Long id = reservationService.reserve(addReservationRequest);
+    public ResponseEntity<?> reserve(@UserMember final SessionMember sessionMember, @RequestBody final AddReservationRequest addReservationRequest) {
+        final Long id = reservationService.reserve(sessionMember.getId(), addReservationRequest);
         return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
     }
 }

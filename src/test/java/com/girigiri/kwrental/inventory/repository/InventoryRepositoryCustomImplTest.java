@@ -28,12 +28,12 @@ class InventoryRepositoryCustomImplTest {
     void deleteAll() {
         // given
         final Equipment equipment = EquipmentFixture.builder().build();
-        final Inventory inventory = InventoryFixture.create(equipment);
+        final Inventory inventory = InventoryFixture.create(equipment, 1L);
         equipmentRepository.save(equipment);
         inventoryRepository.save(inventory);
 
         // when
-        final int expect = inventoryRepository.deleteAll();
+        final int expect = inventoryRepository.deleteAll(1L);
 
         // then
         assertThat(expect).isOne();

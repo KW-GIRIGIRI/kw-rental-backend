@@ -43,8 +43,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public Long reserve(final AddReservationRequest addReservationRequest) {
-        final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment();
+    public Long reserve(final Long memberId, final AddReservationRequest addReservationRequest) {
+        final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
         final List<ReservationSpec> reservationSpecs = inventories.stream()
                 .filter(this::isAvailableCountValid)
                 .map(this::mapToRentalSpec)

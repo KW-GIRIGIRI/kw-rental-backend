@@ -12,6 +12,10 @@ public class MemberFixture {
         return builder().build();
     }
 
+    public static Member create(final String password) {
+        return builder(password).build();
+    }
+
     public static Member.MemberBuilder builder() {
         return Member.builder()
                 .memberNumber("2016317016")
