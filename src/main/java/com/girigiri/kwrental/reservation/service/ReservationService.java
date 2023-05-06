@@ -49,7 +49,7 @@ public class ReservationService {
                 .filter(this::isAvailableCountValid)
                 .map(this::mapToRentalSpec)
                 .toList();
-        final Reservation reservation = mapToReservation(addReservationRequest, reservationSpecs);
+        final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -65,13 +65,14 @@ public class ReservationService {
                 .build();
     }
 
-    private Reservation mapToReservation(final AddReservationRequest addReservationRequest, final List<ReservationSpec> reservationSpecs) {
+    private Reservation mapToReservation(final Long memberId, final AddReservationRequest addReservationRequest, final List<ReservationSpec> reservationSpecs) {
         return Reservation.builder()
                 .reservationSpecs(reservationSpecs)
                 .email(addReservationRequest.getRenterEmail())
                 .name(addReservationRequest.getRenterName())
                 .purpose(addReservationRequest.getRentalPurpose())
                 .phoneNumber(addReservationRequest.getRenterPhoneNumber())
+                .memberId(memberId)
                 .build();
     }
 
