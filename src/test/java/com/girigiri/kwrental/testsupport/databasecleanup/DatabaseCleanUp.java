@@ -44,6 +44,7 @@ public class DatabaseCleanUp implements InitializingBean {
 
     private void truncateAllTables(final Statement statement) throws SQLException {
         for (String tableName : tableNames) {
+            if (tableName.equalsIgnoreCase("FLYWAY_SCHEMA_HISTORY")) continue;
             statement.executeUpdate("TRUNCATE TABLE " + tableName);
         }
     }
@@ -53,6 +54,7 @@ public class DatabaseCleanUp implements InitializingBean {
              final Statement statement = connection.createStatement()) {
             consumer.consume(statement);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("데이터 초기화 실패");
         }
     }
