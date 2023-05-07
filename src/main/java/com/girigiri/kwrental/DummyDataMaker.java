@@ -40,6 +40,7 @@ public class DummyDataMaker {
                         .email("admin@admin@naver.com")
                         .password("admin")
                         .birthDate("000000")
+                        .phoneNumber("01000000000")
                         .role(Role.ADMIN)
                         .build()
         );
