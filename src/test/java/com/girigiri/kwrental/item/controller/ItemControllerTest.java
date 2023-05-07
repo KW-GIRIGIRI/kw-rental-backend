@@ -2,27 +2,17 @@ package com.girigiri.kwrental.item.controller;
 
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
-import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.testsupport.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ItemController.class)
-class ItemControllerTest {
+class ItemControllerTest extends ControllerTest {
 
     public static final String PREFIX = "/api/items";
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    ItemService itemService;
 
     @Test
     @DisplayName("존재하지 않는 기자재 품목 목록 조회 예외 처리")

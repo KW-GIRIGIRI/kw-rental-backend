@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.config;
 
-import com.girigiri.kwrental.auth.interceptor.UserMemberArgumentResolver;
+import com.girigiri.kwrental.common.CustomHandlerMethodArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -14,6 +14,12 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    private final List<CustomHandlerMethodArgumentResolver> argumentResolvers;
+
+    public WebConfig(final List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
+        this.argumentResolvers = argumentResolvers;
+    }
+
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/api/**")
@@ -25,6 +31,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new UserMemberArgumentResolver());
+        resolvers.addAll(argumentResolvers);
     }
 }

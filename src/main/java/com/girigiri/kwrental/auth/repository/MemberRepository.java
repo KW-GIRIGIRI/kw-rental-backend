@@ -9,4 +9,6 @@ public interface MemberRepository extends Repository<Member, Long> {
     Member save(Member member);
 
     Optional<Member> findByMemberNumber(String memberNumber);
+
+    Optional<Member> findById(Long id);
 }

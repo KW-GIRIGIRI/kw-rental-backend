@@ -1,8 +1,10 @@
 package com.girigiri.kwrental.auth.domain;
 
+import com.girigiri.kwrental.auth.exception.SessionMemberInconsistencyException;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Getter
 public class SessionMember implements Serializable {
@@ -23,5 +25,13 @@ public class SessionMember implements Serializable {
 
     public static SessionMember from(final Member member) {
         return new SessionMember(member.getId(), member.getMemberNumber(), member.getRole());
+    }
+
+    public void validateConsistency(final Member member) {
+        if (!Objects.equals(this.id, member.getId())
+                || !Objects.equals(this.memberNumber, member.getMemberNumber())
+                || !Objects.equals(this.role, member.getRole())) {
+            throw new SessionMemberInconsistencyException();
+        }
     }
 }

@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
-import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.testsupport.ControllerTest;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -23,15 +19,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AdminItemController.class)
-class AdminItemControllerTest {
+class AdminItemControllerTest extends ControllerTest {
 
     public static final String PREFIX = "/api/admin/items";
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private ItemService itemService;
 
     @Test
     @DisplayName("중복된 품목 자산번호로 수정할 때 예외 처리")
