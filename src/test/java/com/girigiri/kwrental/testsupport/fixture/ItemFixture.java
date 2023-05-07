@@ -5,7 +5,7 @@ import com.girigiri.kwrental.item.domain.Item.ItemBuilder;
 
 public class ItemFixture {
 
-    private static final long EQUIPMENT_ID = 1L;
+    private static final long EQUIPMENT_ID = 0L;
     private static final String PROPERTY_NUMBER = "123456789";
 
     public static ItemBuilder builder() {

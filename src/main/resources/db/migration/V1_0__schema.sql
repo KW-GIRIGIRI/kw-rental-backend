@@ -3,10 +3,10 @@ create table if not exists equipment
     id              bigint auto_increment,
     category        varchar(15)  not null,
     components      varchar(100),
-    description     varchar(100) not null,
+    description     varchar(100),
     img_url         varchar(255) not null,
     maker           varchar(20)  not null,
-    max_rental_days integer      not null,
+    max_rental_days integer      not null default 1,
     model_name      varchar(50)  not null unique,
     purpose         varchar(100),
     rental_place    varchar(20)  not null,
@@ -28,7 +28,7 @@ create table if not exists inventory
 create table if not exists item
 (
     id              bigint auto_increment,
-    available       boolean     not null,
+    available       boolean     not null default true,
     equipment_id    bigint      not null,
     property_number varchar(20) not null unique,
     primary key (id)
