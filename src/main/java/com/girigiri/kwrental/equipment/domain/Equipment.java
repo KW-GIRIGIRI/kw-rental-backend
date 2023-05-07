@@ -28,7 +28,7 @@ public class Equipment {
     @Column(nullable = false)
     private String imgUrl;
 
-    @Column(nullable = false)
+
     private String description;
 
     private String components;
