@@ -3,25 +3,20 @@ package com.girigiri.kwrental.equipment.controller;
 import com.amazonaws.services.kms.model.AWSKMSException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest.AddEquipmentRequestBuilder;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.service.EquipmentService;
+import com.girigiri.kwrental.testsupport.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -33,19 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AdminEquipmentController.class)
-class AdminEquipmentControllerTest {
+class AdminEquipmentControllerTest extends ControllerTest {
 
     private static final String PREFIX = "/api/admin/equipments";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private EquipmentService equipmentService;
-
-    @MockBean
-    private MultiPartFileHandler multiPartFileHandler;
 
     final List<AddItemRequest> addItemRequests = List.of(
             new AddItemRequest("propertyNumber"), new AddItemRequest(null));

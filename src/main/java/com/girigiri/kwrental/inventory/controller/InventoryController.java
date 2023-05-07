@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.inventory.controller;
 
+import com.girigiri.kwrental.auth.domain.SessionMember;
+import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
@@ -23,32 +25,32 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody @Validated AddInventoryRequest addInventoryRequest) {
-        final Long id = inventoryService.save(addInventoryRequest);
+    public ResponseEntity<?> save(@UserMember final SessionMember sessionMember, @RequestBody @Validated final AddInventoryRequest addInventoryRequest) {
+        final Long id = inventoryService.save(sessionMember.getId(), addInventoryRequest);
         return ResponseEntity.created(URI.create("/api/inventories/" + id))
                 .build();
     }
 
     @GetMapping
-    public InventoriesResponse find() {
-        return inventoryService.getInventories();
+    public InventoriesResponse find(@UserMember final SessionMember sessionMember) {
+        return inventoryService.getInventories(sessionMember.getId());
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteAll() {
-        inventoryService.deleteAll();
+    public ResponseEntity<?> deleteAll(@UserMember final SessionMember sessionMember) {
+        inventoryService.deleteAll(sessionMember.getId());
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
-        inventoryService.deleteById(id);
+    public ResponseEntity<?> deleteById(@UserMember final SessionMember sessionMember, @PathVariable Long id) {
+        inventoryService.deleteById(sessionMember.getId(), id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public InventoryResponse update(@PathVariable final Long id,
+    public InventoryResponse update(@UserMember final SessionMember sessionMember, @PathVariable final Long id,
                                     @RequestBody @Validated final UpdateInventoryRequest updateInventoryRequest) {
-        return inventoryService.update(id, updateInventoryRequest);
+        return inventoryService.update(sessionMember.getId(), id, updateInventoryRequest);
     }
 }

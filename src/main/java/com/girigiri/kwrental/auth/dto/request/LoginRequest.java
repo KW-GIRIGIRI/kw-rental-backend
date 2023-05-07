@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.member.dto.request;
+package com.girigiri.kwrental.auth.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;

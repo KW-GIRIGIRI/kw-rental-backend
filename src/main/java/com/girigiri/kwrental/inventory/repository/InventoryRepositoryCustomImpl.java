@@ -16,17 +16,18 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-    // TODO: 2023/04/06 회원으로 필터링 해야 한다.
     @Override
-    public List<Inventory> findAllWithEquipment() {
+    public List<Inventory> findAllWithEquipment(final Long memberId) {
         return jpaQueryFactory.selectFrom(inventory)
                 .join(inventory.equipment).fetchJoin()
+                .where(inventory.memberId.eq(memberId))
                 .fetch();
     }
 
     @Override
-    public int deleteAll() {
+    public int deleteAll(final Long memberId) {
         return (int) jpaQueryFactory.delete(inventory)
+                .where(inventory.memberId.eq(memberId))
                 .execute();
     }
 

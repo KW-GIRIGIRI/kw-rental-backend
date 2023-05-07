@@ -1,22 +1,23 @@
-package com.girigiri.kwrental.member.service;
+package com.girigiri.kwrental.auth.service;
 
-import com.girigiri.kwrental.member.domain.Member;
-import com.girigiri.kwrental.member.domain.Role;
-import com.girigiri.kwrental.member.dto.request.LoginRequest;
-import com.girigiri.kwrental.member.dto.request.RegisterMemberRequest;
-import com.girigiri.kwrental.member.exception.MemberNotFoundException;
-import com.girigiri.kwrental.member.exception.PasswordNotMatchesException;
-import com.girigiri.kwrental.member.repository.MemberRepository;
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.domain.Role;
+import com.girigiri.kwrental.auth.domain.SessionMember;
+import com.girigiri.kwrental.auth.dto.request.LoginRequest;
+import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
+import com.girigiri.kwrental.auth.exception.PasswordNotMatchesException;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MemberService {
+public class AuthService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder) {
+    public AuthService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -35,11 +36,11 @@ public class MemberService {
         return member.getId();
     }
 
-    public Long login(final LoginRequest loginRequest) {
+    public SessionMember login(final LoginRequest loginRequest) {
         final Member member = memberRepository.findByMemberNumber(loginRequest.getMemberNumber())
                 .orElseThrow(MemberNotFoundException::new);
         final boolean matches = passwordEncoder.matches(loginRequest.getPassword(), member.getPassword());
         if (!matches) throw new PasswordNotMatchesException();
-        return member.getId();
+        return SessionMember.from(member);
     }
 }

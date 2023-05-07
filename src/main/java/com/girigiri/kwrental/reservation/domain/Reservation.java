@@ -37,16 +37,20 @@ public class Reservation {
 
     private LocalDateTime acceptDateTime;
 
+    @Column(nullable = false)
+    private Long memberId;
+
 
     protected Reservation() {
 
     }
 
     @Builder
-    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final boolean terminated, final LocalDateTime acceptDateTime) {
+    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final boolean terminated, final LocalDateTime acceptDateTime, final Long memberId) {
         this.id = id;
         this.terminated = terminated;
         this.acceptDateTime = acceptDateTime;
+        this.memberId = memberId;
         validateReservationSpec(reservationSpecs);
         this.reservationSpecs = reservationSpecs;
         reservationSpecs.forEach(it -> it.setReservation(this));

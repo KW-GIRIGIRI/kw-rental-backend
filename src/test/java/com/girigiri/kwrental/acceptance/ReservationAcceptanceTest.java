@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.acceptance;
 
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
@@ -7,7 +9,6 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
@@ -46,15 +47,20 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private RentalSpecRepository rentalSpecRepository;
+    private MemberRepository memberRepository;
+
 
     @Test
     @DisplayName("대여 예약를 등록한다.")
     void reserve() {
         // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
-        final Inventory inventory = inventoryRepository.save(InventoryFixture.create(equipment));
+        final Inventory inventory = inventoryRepository.save(InventoryFixture.create(equipment, member.getId()));
 
         final AddReservationRequest request = AddReservationRequest.builder()
                 .renterName("대여자")
@@ -67,6 +73,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         RestAssured.given(requestSpec)
                 .filter(document("addReservations"))
                 .body(request).contentType(ContentType.JSON)
+                .sessionId(sessionId)
                 .when().log().all().post("/api/reservations")
                 .then().log().all().statusCode(HttpStatus.CREATED.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/reservations/"));

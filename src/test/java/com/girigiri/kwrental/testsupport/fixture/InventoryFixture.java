@@ -11,8 +11,8 @@ import static com.girigiri.kwrental.inventory.domain.Inventory.InventoryBuilder;
 
 public class InventoryFixture {
 
-    public static Inventory create(final Equipment equipment) {
-        return builder(equipment).build();
+    public static Inventory create(final Equipment equipment, final Long memberId) {
+        return builder(equipment).memberId(memberId).build();
     }
 
     public static InventoryBuilder builder(final Equipment equipment) {
@@ -22,6 +22,7 @@ public class InventoryFixture {
         return Inventory.builder()
                 .rentalAmount(new RentalAmount(1))
                 .rentalPeriod(new RentalPeriod(rentalStartDate, rentalEndDate))
-                .equipment(equipment);
+                .equipment(equipment)
+                .memberId(0L);
     }
 }

@@ -43,13 +43,13 @@ public class ReservationService {
     }
 
     @Transactional
-    public Long reserve(final AddReservationRequest addReservationRequest) {
-        final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment();
+    public Long reserve(final Long memberId, final AddReservationRequest addReservationRequest) {
+        final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
         final List<ReservationSpec> reservationSpecs = inventories.stream()
                 .filter(this::isAvailableCountValid)
                 .map(this::mapToRentalSpec)
                 .toList();
-        final Reservation reservation = mapToReservation(addReservationRequest, reservationSpecs);
+        final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -65,13 +65,14 @@ public class ReservationService {
                 .build();
     }
 
-    private Reservation mapToReservation(final AddReservationRequest addReservationRequest, final List<ReservationSpec> reservationSpecs) {
+    private Reservation mapToReservation(final Long memberId, final AddReservationRequest addReservationRequest, final List<ReservationSpec> reservationSpecs) {
         return Reservation.builder()
                 .reservationSpecs(reservationSpecs)
                 .email(addReservationRequest.getRenterEmail())
                 .name(addReservationRequest.getRenterName())
                 .purpose(addReservationRequest.getRentalPurpose())
                 .phoneNumber(addReservationRequest.getRenterPhoneNumber())
+                .memberId(memberId)
                 .build();
     }
 

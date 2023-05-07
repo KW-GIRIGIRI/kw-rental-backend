@@ -1,8 +1,9 @@
-package com.girigiri.kwrental.member.controller;
+package com.girigiri.kwrental.auth.controller;
 
-import com.girigiri.kwrental.member.dto.request.LoginRequest;
-import com.girigiri.kwrental.member.dto.request.RegisterMemberRequest;
-import com.girigiri.kwrental.member.service.MemberService;
+import com.girigiri.kwrental.auth.domain.SessionMember;
+import com.girigiri.kwrental.auth.dto.request.LoginRequest;
+import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,25 +16,25 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/members")
-public class MemberController {
+public class AuthController {
 
-    private final MemberService memberService;
+    private final AuthService authService;
 
-    public MemberController(final MemberService memberService) {
-        this.memberService = memberService;
+    public AuthController(final AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping
     public ResponseEntity<?> register(@RequestBody @Validated final RegisterMemberRequest registerMemberRequest) {
-        final Long memberId = memberService.register(registerMemberRequest);
+        final Long memberId = authService.register(registerMemberRequest);
         return ResponseEntity
                 .created(URI.create("/api/members/" + memberId)).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Validated final LoginRequest loginRequest, HttpSession session) {
-        final Long id = memberService.login(loginRequest);
-        session.setAttribute("memberId", id);
+        final SessionMember sessionMember = authService.login(loginRequest);
+        session.setAttribute("member", sessionMember);
         return ResponseEntity.ok().build();
     }
 }

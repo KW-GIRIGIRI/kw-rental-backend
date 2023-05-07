@@ -57,8 +57,8 @@ class ReservationServiceTest {
     void reserve() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
-        final Inventory inventory = InventoryFixture.create(equipment);
-        given(inventoryService.getInventoriesWithEquipment()).willReturn(List.of(inventory));
+        final Inventory inventory = InventoryFixture.create(equipment, 0L);
+        given(inventoryService.getInventoriesWithEquipment(any())).willReturn(List.of(inventory));
         doNothing().when(remainingQuantityService).validateAmount(any(), any(), any());
 
         final AddReservationRequest addReservationRequest = AddReservationRequest.builder()
@@ -77,7 +77,7 @@ class ReservationServiceTest {
         given(reservationRepository.save(any())).willReturn(reservation);
 
         // when
-        final Long expect = reservationService.reserve(addReservationRequest);
+        final Long expect = reservationService.reserve(1L, addReservationRequest);
 
         // then
         assertThat(expect).isOne();
