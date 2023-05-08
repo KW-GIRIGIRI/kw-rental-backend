@@ -32,7 +32,7 @@ public class Reservation {
     @Column(nullable = false)
     private String purpose;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "is_terminated")
     private boolean terminated = false;
 
     private LocalDateTime acceptDateTime;
