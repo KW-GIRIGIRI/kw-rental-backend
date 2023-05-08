@@ -7,3 +7,11 @@ operation::registerMember[snippets='http-request,http-response']
 === 로그인 API
 
 operation::login[snippets='http-request,http-response']
+
+=== 회원정보 조회 API
+
+operation::getMember[snippets='http-request,http-response']
+
+=== 회원 학번 조회 API
+
+operation::getMemberNumber[snippets='http-request,http-response']

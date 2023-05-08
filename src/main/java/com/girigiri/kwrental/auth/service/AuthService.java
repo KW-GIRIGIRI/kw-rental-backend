@@ -5,6 +5,7 @@ import com.girigiri.kwrental.auth.domain.Role;
 import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.response.MemberResponse;
 import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
 import com.girigiri.kwrental.auth.exception.PasswordNotMatchesException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -42,5 +43,11 @@ public class AuthService {
         final boolean matches = passwordEncoder.matches(loginRequest.getPassword(), member.getPassword());
         if (!matches) throw new PasswordNotMatchesException();
         return SessionMember.from(member);
+    }
+
+    public MemberResponse getMember(final Long id) {
+        final Member member = memberRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
+        return MemberResponse.from(member);
     }
 }
