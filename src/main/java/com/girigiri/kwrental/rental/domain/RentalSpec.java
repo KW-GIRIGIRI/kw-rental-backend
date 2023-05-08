@@ -63,4 +63,12 @@ public class RentalSpec {
             this.returnDateTime = returnDateTime;
         }
     }
+
+    public boolean isUnavailableAfterReturn() {
+        return this.status == RentalSpecStatus.LOST || this.status == RentalSpecStatus.BROKEN || this.status == RentalSpecStatus.OVERDUE_RENTED;
+    }
+
+    public boolean isOverdueReturned() {
+        return this.status == RentalSpecStatus.OVERDUE_RETURNED;
+    }
 }

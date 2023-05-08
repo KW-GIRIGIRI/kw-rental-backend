@@ -39,4 +39,8 @@ public class Item {
         }
         this.propertyNumber = propertyNumber;
     }
+
+    public void setAvailable(final boolean available) {
+        this.available = available;
+    }
 }
