@@ -3,14 +3,15 @@ package com.girigiri.kwrental.auth.controller;
 import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.response.MemberResponse;
+import com.girigiri.kwrental.auth.exception.SessionNotFoundException;
+import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -36,5 +37,17 @@ public class AuthController {
         final SessionMember sessionMember = authService.login(loginRequest);
         session.setAttribute("member", sessionMember);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public MemberResponse getMember(@UserMember final SessionMember sessionMember) {
+        return authService.getMember(sessionMember.getId());
+    }
+
+    @GetMapping("/memberNumber")
+    public SessionMember getMemberNumber(final HttpServletRequest request) {
+        final HttpSession session = request.getSession(false);
+        if (session == null) throw new SessionNotFoundException();
+        return (SessionMember) session.getAttribute("member");
     }
 }
