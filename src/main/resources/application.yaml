@@ -17,3 +17,8 @@ logging:
 
 server:
     shutdown: graceful
+    servlet:
+        session:
+            cookie:
+                same-site: none
+                secure: true

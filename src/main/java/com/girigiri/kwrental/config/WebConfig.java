@@ -1,10 +1,6 @@
 package com.girigiri.kwrental.config;
 
-import com.girigiri.kwrental.auth.interceptor.CookieSameSiteFilter;
 import com.girigiri.kwrental.common.CustomHandlerMethodArgumentResolver;
-import jakarta.servlet.Filter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -37,12 +33,5 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.addAll(argumentResolvers);
-    }
-
-    @Bean
-    public FilterRegistrationBean<?> cookieSameSiteFilter() {
-        FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>(new CookieSameSiteFilter());
-        registrationBean.setOrder(1);
-        return registrationBean;
     }
 }
