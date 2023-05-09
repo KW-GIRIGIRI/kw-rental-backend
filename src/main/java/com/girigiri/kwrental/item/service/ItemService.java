@@ -144,4 +144,11 @@ public class ItemService {
     private static boolean canRentalAvailable(final Set<String> rentedPropertyNumbers, final Item it) {
         return !rentedPropertyNumbers.contains(it.getPropertyNumber()) && it.isAvailable();
     }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void setAvailable(final String propertyNumber, final boolean available) {
+        Item item = itemRepository.findByPropertyNumber(propertyNumber)
+                .orElseThrow(ItemNotFoundException::new);
+        item.setAvailable(available);
+    }
 }

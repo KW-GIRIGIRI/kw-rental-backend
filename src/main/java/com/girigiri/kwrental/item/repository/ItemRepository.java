@@ -16,4 +16,6 @@ public interface ItemRepository extends Repository<Item, Long>, ItemJdbcReposito
     Item save(Item item);
 
     void deleteById(Long id);
+
+    Optional<Item> findByPropertyNumber(String propertyNumber);
 }

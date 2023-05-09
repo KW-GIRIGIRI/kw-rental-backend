@@ -28,15 +28,11 @@ public class Rental {
         return new Rental(rentalSpecMap, reservationFromRental);
     }
 
-    public void returnAll(final Map<Long, RentalSpecStatus> statusesPerRentalSpecId) {
+    public void returnByRentalSpecId(final Long rentalSpecId, final RentalSpecStatus status) {
         final LocalDateTime returnDateTime = LocalDateTime.now();
-        for (Long rentalSpecId : statusesPerRentalSpecId.keySet()) {
-            final RentalSpec rentalSpec = getRentalSpec(rentalSpecId);
-            setStatus(rentalSpec, statusesPerRentalSpecId.get(rentalSpecId));
-            rentalSpec.setReturnDateTimeIfAnyReturned(returnDateTime);
-        }
-        final Map<Long, List<RentalSpecStatus>> rentalStatusPerReservationSpecId = groupRentalStatusByReservationSpecId();
-        reservationFromRental.setStatusAfterReturn(rentalStatusPerReservationSpecId);
+        final RentalSpec rentalSpec = getRentalSpec(rentalSpecId);
+        setStatus(rentalSpec, status);
+        rentalSpec.setReturnDateTimeIfAnyReturned(returnDateTime);
     }
 
     private void setStatus(final RentalSpec rentalSpec, final RentalSpecStatus status) {
@@ -49,10 +45,15 @@ public class Rental {
         rentalSpec.setStatus(status);
     }
 
-    private RentalSpec getRentalSpec(final Long id) {
+    public RentalSpec getRentalSpec(final Long id) {
         final RentalSpec rentalSpec = rentalSpecMap.get(id);
         if (rentalSpec == null) throw new RentalSpecNotFoundException();
         return rentalSpec;
+    }
+
+    public void setReservationStatusAfterReturn() {
+        final Map<Long, List<RentalSpecStatus>> rentalStatusPerReservationSpecId = groupRentalStatusByReservationSpecId();
+        reservationFromRental.setStatusAfterReturn(rentalStatusPerReservationSpecId);
     }
 
     private Map<Long, List<RentalSpecStatus>> groupRentalStatusByReservationSpecId() {

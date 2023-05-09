@@ -45,4 +45,32 @@ class RentalSpecTest {
         // then
         assertThat(rentalSpec.getReturnDateTime() != null).isEqualTo(isNotNull);
     }
+
+    @ParameterizedTest
+    @CsvSource({"RETURNED,false", "OVERDUE_RETURNED,true", "LOST,false", "BROKEN,false", "RENTED,false", "OVERDUE_RENTED,false"})
+    @DisplayName("대여 상세가 반납이 된 상태인 경우 반납 시간을 기록한다")
+    void isOverdueReturned(final RentalSpecStatus status, final boolean expect) {
+        // given
+        final RentalSpec rentalSpec = RentalSpecFixture.builder().status(status).build();
+
+        // when
+        final boolean actual = rentalSpec.isOverdueReturned();
+
+        // then
+        assertThat(actual).isEqualTo(expect);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"RETURNED,false", "OVERDUE_RETURNED,false", "LOST,true", "BROKEN,true", "RENTED,false", "OVERDUE_RENTED,true"})
+    @DisplayName("대여 상세가 반납이 된 상태인 경우 반납 시간을 기록한다")
+    void isUnavailableAfterReturn(final RentalSpecStatus status, final boolean expect) {
+        // given
+        final RentalSpec rentalSpec = RentalSpecFixture.builder().status(status).build();
+
+        // when
+        final boolean actual = rentalSpec.isUnavailableAfterReturn();
+
+        // then
+        assertThat(actual).isEqualTo(expect);
+    }
 }

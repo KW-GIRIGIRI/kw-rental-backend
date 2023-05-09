@@ -125,12 +125,26 @@ public class RentalService {
         Rental rental = getRental(returnRentalRequest);
         final Map<Long, RentalSpecStatus> returnRequest = returnRentalRequest.getRentalSpecs().stream()
                 .collect(toMap(ReturnRentalSpecRequest::getId, ReturnRentalSpecRequest::getStatus));
-        rental.returnAll(returnRequest);
+        for (Long rentalSpecId : returnRequest.keySet()) {
+            final RentalSpecStatus status = returnRequest.get(rentalSpecId);
+            rental.returnByRentalSpecId(rentalSpecId, status);
+            setPenaltyAndItemAvailable(rental.getRentalSpec(rentalSpecId));
+        }
+        rental.setReservationStatusAfterReturn();
     }
 
     private Rental getRental(final ReturnRentalRequest returnRentalRequest) {
         final List<RentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(returnRentalRequest.getReservationId());
         final Reservation reservation = reservationService.getReservationWithReservationSpecsById(returnRentalRequest.getReservationId());
         return Rental.of(rentalSpecList, reservation);
+    }
+
+    private void setPenaltyAndItemAvailable(final RentalSpec rentalSpec) {
+        if (rentalSpec.isUnavailableAfterReturn()) {
+            itemService.setAvailable(rentalSpec.getPropertyNumber(), false);
+        }
+        if (rentalSpec.isOverdueReturned()) {
+            itemService.setAvailable(rentalSpec.getPropertyNumber(), true);
+        }
     }
 }

@@ -1,16 +1,22 @@
 package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
@@ -126,5 +132,109 @@ class RentalServiceTest {
 
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(ReservationWithRentalSpecsResponse.of(reservation, List.of(rentalSpec1, rentalSpec2)));
+    }
+
+    @Test
+    @DisplayName("연체중과 불량 반납을 포함하여 대여를 반납한다.")
+    void returnRental() {
+        // given
+        final long reservationId = 1L;
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(1)).id(1L).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(2)).id(2L).build();
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(1)).id(3L).build();
+        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2, reservationSpec3)).id(reservationId).build();
+        given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+
+        final ReturnRentalSpecRequest rentalSpecRequest1 = ReturnRentalSpecRequest.builder().id(2L).status(RentalSpecStatus.RETURNED).build();
+        final ReturnRentalSpecRequest rentalSpecRequest2 = ReturnRentalSpecRequest.builder().id(3L).status(RentalSpecStatus.LOST).build();
+        final ReturnRentalSpecRequest rentalSpecRequest3 = ReturnRentalSpecRequest.builder().id(4L).status(RentalSpecStatus.OVERDUE_RENTED).build();
+        final ReturnRentalSpecRequest rentalSpecRequest4 = ReturnRentalSpecRequest.builder().id(5L).status(RentalSpecStatus.BROKEN).build();
+        final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+                .reservationId(reservationId)
+                .rentalSpecs(List.of(rentalSpecRequest1, rentalSpecRequest2, rentalSpecRequest3, rentalSpecRequest4)).build();
+
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec1.getId())
+                .id(rentalSpecRequest1.getId()).propertyNumber("11111111").build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec2.getId())
+                .id(rentalSpecRequest2.getId()).propertyNumber("22222222").build();
+        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec2.getId())
+                .id(rentalSpecRequest3.getId()).propertyNumber("33333333").build();
+        final RentalSpec rentalSpec4 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec3.getId())
+                .id(rentalSpecRequest4.getId()).propertyNumber("44444444").build();
+
+        given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
+
+
+        doNothing().when(itemService).setAvailable(rentalSpec2.getPropertyNumber(), false);
+        doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), false);
+        doNothing().when(itemService).setAvailable(rentalSpec4.getPropertyNumber(), false);
+
+        // when
+        assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
+                .doesNotThrowAnyException();
+
+        // then
+        assertAll(
+                () -> assertThat(reservation.isTerminated()).isFalse(),
+                () -> assertThat(rentalSpec1.getStatus()).isEqualTo(RentalSpecStatus.RETURNED),
+                () -> assertThat(rentalSpec2.getStatus()).isEqualTo(RentalSpecStatus.LOST),
+                () -> assertThat(rentalSpec3.getStatus()).isEqualTo(RentalSpecStatus.OVERDUE_RENTED),
+                () -> assertThat(rentalSpec4.getStatus()).isEqualTo(RentalSpecStatus.BROKEN),
+                () -> assertThat(reservationSpec1.getStatus()).isEqualTo(ReservationSpecStatus.RETURNED),
+                () -> assertThat(reservationSpec2.getStatus()).isEqualTo(ReservationSpecStatus.OVERDUE_RENTED)
+        );
+    }
+
+    @Test
+    @DisplayName("연체 반납을 포함하여 반납한다.")
+    void returnRental_withOverdueReturned() {
+        // given
+        final long reservationId = 1L;
+        final RentalPeriod overduePeriod = new RentalPeriod(LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.RETURNED)
+                .period(overduePeriod).amount(new RentalAmount(1)).id(1L).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.OVERDUE_RENTED)
+                .period(overduePeriod).amount(new RentalAmount(2)).id(2L).build();
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.ABNORMAL_RETURNED)
+                .period(overduePeriod).amount(new RentalAmount(1)).id(3L).build();
+        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2, reservationSpec3)).id(reservationId).build();
+        given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+
+        final ReturnRentalSpecRequest rentalSpecRequest1 = ReturnRentalSpecRequest.builder().id(2L).status(RentalSpecStatus.RETURNED).build();
+        final ReturnRentalSpecRequest rentalSpecRequest2 = ReturnRentalSpecRequest.builder().id(3L).status(RentalSpecStatus.LOST).build();
+        final ReturnRentalSpecRequest rentalSpecRequest3 = ReturnRentalSpecRequest.builder().id(4L).status(RentalSpecStatus.RETURNED).build();
+        final ReturnRentalSpecRequest rentalSpecRequest4 = ReturnRentalSpecRequest.builder().id(5L).status(RentalSpecStatus.BROKEN).build();
+        final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+                .reservationId(reservationId)
+                .rentalSpecs(List.of(rentalSpecRequest3)).build();
+
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec1.getId()).status(RentalSpecStatus.RETURNED)
+                .id(rentalSpecRequest1.getId()).propertyNumber("11111111").build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec2.getId()).status(RentalSpecStatus.LOST)
+                .id(rentalSpecRequest2.getId()).propertyNumber("22222222").build();
+        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec2.getId()).status(RentalSpecStatus.OVERDUE_RENTED)
+                .id(rentalSpecRequest3.getId()).propertyNumber("33333333").build();
+        final RentalSpec rentalSpec4 = RentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec3.getId()).status(RentalSpecStatus.BROKEN)
+                .id(rentalSpecRequest4.getId()).propertyNumber("44444444").build();
+
+        given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
+
+
+        doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), true);
+
+        // when
+        assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
+                .doesNotThrowAnyException();
+
+        // then
+        assertAll(
+                () -> assertThat(reservation.isTerminated()).isTrue(),
+                () -> assertThat(rentalSpec1.getStatus()).isEqualTo(RentalSpecStatus.RETURNED),
+                () -> assertThat(rentalSpec2.getStatus()).isEqualTo(RentalSpecStatus.LOST),
+                () -> assertThat(rentalSpec3.getStatus()).isEqualTo(RentalSpecStatus.OVERDUE_RETURNED),
+                () -> assertThat(rentalSpec4.getStatus()).isEqualTo(RentalSpecStatus.BROKEN),
+                () -> assertThat(reservationSpec1.getStatus()).isEqualTo(ReservationSpecStatus.RETURNED),
+                () -> assertThat(reservationSpec2.getStatus()).isEqualTo(ReservationSpecStatus.ABNORMAL_RETURNED)
+        );
     }
 }
