@@ -147,9 +147,11 @@ class ItemAcceptanceTest extends AcceptanceTest {
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
         itemRepository.save(item);
+        final Item item2 = ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment.getId()).build();
+        itemRepository.save(item2);
 
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
-        UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "22222222");
+        UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "33333333");
         SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
 
         // when

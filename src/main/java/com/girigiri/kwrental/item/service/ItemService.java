@@ -83,6 +83,14 @@ public class ItemService {
         return ItemsResponse.of(equipmentItems.getItems());
     }
 
+    private void save(final Long equipmentId, final List<UpdateItemRequest> saveItemRequests) {
+        List<Item> itemsToSave = saveItemRequests
+                .stream()
+                .map(it -> mapToItem(equipmentId, it))
+                .toList();
+        itemRepository.saveAll(itemsToSave);
+    }
+
     private EquipmentItems getEquipmentItems(final Long equipmentId) {
         List<Item> items = itemRepository.findByEquipmentId(equipmentId);
         return EquipmentItems.from(items);
@@ -110,14 +118,6 @@ public class ItemService {
         return updateItemsRequest.items()
                 .stream()
                 .collect(Collectors.groupingBy(it -> it.id() == null));
-    }
-
-    private void save(final Long equipmentId, final List<UpdateItemRequest> saveItemRequests) {
-        List<Item> itemsToSave = saveItemRequests
-                .stream()
-                .map(it -> mapToItem(equipmentId, it))
-                .toList();
-        itemRepository.saveAll(itemsToSave);
     }
 
     private Item mapToItem(final Long equipmentId, final UpdateItemRequest updateItemRequest) {

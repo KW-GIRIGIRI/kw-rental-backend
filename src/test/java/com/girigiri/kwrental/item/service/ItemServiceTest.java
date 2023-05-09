@@ -130,7 +130,7 @@ class ItemServiceTest {
         Item itemForUpdate = ItemFixture.builder().id(1L).propertyNumber("11111111").build();
         Item savedItem = ItemFixture.builder().id(2L).propertyNumber("1234567").build();
         Item itemForDelete = ItemFixture.builder().id(3L).propertyNumber("33333333").build();
-        given(itemRepository.saveAll(any())).willReturn(List.of(savedItem));
+        given(itemRepository.saveAll(any())).willReturn(1);
         given(itemRepository.findByEquipmentId(any()))
                 .willReturn(List.of(itemForUpdate, savedItem, itemForDelete));
         given(itemRepository.deleteByPropertyNumbers(List.of(itemForDelete.getPropertyNumber()))).willReturn(1L);

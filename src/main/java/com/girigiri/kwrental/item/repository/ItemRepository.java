@@ -6,7 +6,7 @@ import org.springframework.data.repository.Repository;
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemRepository extends Repository<Item, Long>, ItemQueryDslRepositoryCustom {
+public interface ItemRepository extends Repository<Item, Long>, ItemQueryDslRepositoryCustom, ItemJdbcRepositoryCustom {
     void deleteByEquipmentId(Long equipmentId);
 
     List<Item> findByEquipmentId(Long equipmentId);
@@ -18,6 +18,4 @@ public interface ItemRepository extends Repository<Item, Long>, ItemQueryDslRepo
     void deleteById(Long id);
 
     Optional<Item> findByPropertyNumber(String propertyNumber);
-
-    <S extends Item> Iterable<S> saveAll(Iterable<S> entities);
 }
