@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -102,5 +104,21 @@ class ItemQueryDslRepositoryCustomImplTest {
 
         // then
         assertThat(expect).isOne();
+    }
+
+    @Test
+    @DisplayName("품목을 여러개 삭제한다.")
+    void deleteByIds() {
+        // given
+        Item item1 = ItemFixture.builder().propertyNumber("12345678").available(true).build();
+        Item item2 = ItemFixture.builder().propertyNumber("87654321").available(false).build();
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+
+        // when
+        final long actual = itemRepository.deleteByPropertyNumbers(List.of(item1.getPropertyNumber(), item2.getPropertyNumber()));
+
+        // then
+        assertThat(actual).isEqualTo(2L);
     }
 }

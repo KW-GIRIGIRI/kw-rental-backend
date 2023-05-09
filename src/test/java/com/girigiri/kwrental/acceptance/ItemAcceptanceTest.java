@@ -5,8 +5,8 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
+import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
@@ -147,10 +147,12 @@ class ItemAcceptanceTest extends AcceptanceTest {
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
         itemRepository.save(item);
+        final Item item2 = ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment.getId()).build();
+        itemRepository.save(item2);
 
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
-        UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "22222222");
-        UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
+        UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "33333333");
+        SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
 
         // when
         RestAssured.given(requestSpec)

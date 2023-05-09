@@ -54,4 +54,21 @@ public class EquipmentItems {
     public List<Item> getItems() {
         return new ArrayList<>(items.values());
     }
+
+    public void deleteByPropertyNumbers(final List<String> propertyNumbers) {
+        final List<Long> idsForDelete = this.items.values()
+                .stream()
+                .filter(item -> propertyNumbers.contains(item.getPropertyNumber()))
+                .map(Item::getId).toList();
+        for (Long id : idsForDelete) {
+            items.remove(id);
+        }
+    }
+
+    public List<String> getPropertyNumbers() {
+        return this.items.values()
+                .stream()
+                .map(Item::getPropertyNumber)
+                .toList();
+    }
 }

@@ -2,7 +2,7 @@ package com.girigiri.kwrental.item.controller;
 
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
+import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.service.ItemService;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +42,7 @@ public class AdminItemController {
     }
 
     @PutMapping
-    public ResponseEntity<?> saveOrUpdate(final Long equipmentId, @RequestBody @Validated UpdateItemsRequest updateItemsRequest) {
+    public ResponseEntity<?> saveOrUpdate(final Long equipmentId, @RequestBody @Validated SaveOrUpdateItemsRequest updateItemsRequest) {
         itemService.saveOrUpdate(equipmentId, updateItemsRequest);
         return ResponseEntity.noContent().location(URI.create("/api/items?equipmentId=" + equipmentId)).build();
     }
