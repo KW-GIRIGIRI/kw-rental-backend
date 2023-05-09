@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -29,14 +30,19 @@ public class OverdueReservationResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static OverdueReservationResponse of(final Reservation reservation, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
+        final Reservation reservation = reservationWithMemberNumber.getReservation();
+        final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, reservation);
+        return new OverdueReservationResponse(reservation.getId(), reservation.getName(),
+                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime(), overdueReservationSpecResponses);
+    }
+
+    private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
-        final List<OverdueReservationSpecResponse> reservationSpecByStartDateResponses = reservation.getReservationSpecs().stream()
+        return reservation.getReservationSpecs().stream()
                 .filter(it -> groupedRentalSpecsByReservationSpecId.get(it.getId()) != null)
                 .map(it -> OverdueReservationSpecResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
-        // TODO: 2023/05/03 학번이 가짜
-        return new OverdueReservationResponse(reservation.getId(), reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecByStartDateResponses);
     }
 }

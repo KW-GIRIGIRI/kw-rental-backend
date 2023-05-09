@@ -12,6 +12,7 @@ import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepositoryCustom;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +88,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public List<Reservation> getReservationsByStartDate(final LocalDate startDate) {
+    public Set<ReservationWithMemberNumber> getReservationsByStartDate(final LocalDate startDate) {
         return reservationRepository.findReservationsWithSpecsByStartDate(startDate);
     }
 
@@ -119,11 +120,11 @@ public class ReservationService {
                 .acceptAt(LocalDateTime.now());
     }
 
-    public List<Reservation> getOverdueReservations(final LocalDate localDate) {
+    public Set<ReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
         return reservationRepository.findOverdueReservationWithSpecs(localDate);
     }
 
-    public List<Reservation> getReservationsByEndDate(final LocalDate localDate) {
+    public Set<ReservationWithMemberNumber> getReservationsWithMemberNumberByEndDate(final LocalDate localDate) {
         return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
     }
 
