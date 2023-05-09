@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -30,13 +31,18 @@ public class ReservationWithRentalSpecsResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static ReservationWithRentalSpecsResponse of(final Reservation reservation, final List<RentalSpec> rentalSpecs) {
+    public static ReservationWithRentalSpecsResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
+        final Reservation reservation = reservationWithMemberNumber.getReservation();
+        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsRespons = mapToReservationSpecWithRentalSpecResponse(rentalSpecs, reservation);
+        return new ReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(),
+                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime(), reservationSpecWithRentalSpecsRespons);
+    }
+
+    private static List<ReservationSpecWithRentalSpecsResponse> mapToReservationSpecWithRentalSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
-        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsRespons = reservation.getReservationSpecs().stream()
+        return reservation.getReservationSpecs().stream()
                 .map(it -> ReservationSpecWithRentalSpecsResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
-        // TODO: 2023/05/03 학번이 가짜
-        return new ReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(), "11111111", reservation.getAcceptDateTime(), reservationSpecWithRentalSpecsRespons);
     }
 }

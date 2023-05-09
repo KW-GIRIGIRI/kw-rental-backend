@@ -3,7 +3,7 @@ package com.girigiri.kwrental.rental.controller;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +24,7 @@ public class AdminRentalController {
     }
 
     @GetMapping(params = "startDate")
-    public ReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(final LocalDate startDate) {
+    public ReservationsWithRentalSpecsAndMemberNumberResponse getReservationsWithRentalSpecsByStartDate(final LocalDate startDate) {
         return rentalService.getReservationsWithRentalSpecsByStartDate(startDate);
     }
 

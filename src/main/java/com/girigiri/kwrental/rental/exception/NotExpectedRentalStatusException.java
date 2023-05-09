@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.rental.domain;
+package com.girigiri.kwrental.rental.exception;
 
 import com.girigiri.kwrental.common.exception.BadRequestException;
 

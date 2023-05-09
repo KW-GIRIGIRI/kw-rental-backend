@@ -1,18 +1,19 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ReservationRepositoryCustom {
 
-    List<Reservation> findReservationsWithSpecsByStartDate(LocalDate startDate);
+    Set<ReservationWithMemberNumber> findReservationsWithSpecsByStartDate(LocalDate startDate);
 
     Optional<Reservation> findByIdWithSpecs(Long id);
 
-    List<Reservation> findOverdueReservationWithSpecs(LocalDate returnDate);
+    Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(LocalDate returnDate);
 
-    List<Reservation> findReservationsWithSpecsByEndDate(LocalDate localDate);
+    Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(LocalDate localDate);
 }

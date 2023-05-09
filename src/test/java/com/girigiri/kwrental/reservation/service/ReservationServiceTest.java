@@ -12,6 +12,7 @@ import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
@@ -102,20 +103,21 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("특정 날짜에 수령하는 대여 예약을 조회한다.")
-    void getReservationsByStartDate() {
+    void getReservationsWithMemberNumberByStartDate() {
         // given
         final Equipment equipment = EquipmentFixture.create();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
+        final ReservationWithMemberNumber reservationWithMemberNumber = new ReservationWithMemberNumber(reservation, "11111111");
         given(reservationRepository.findReservationsWithSpecsByStartDate(any()))
-                .willReturn(List.of(reservation));
+                .willReturn(Set.of(reservationWithMemberNumber));
 
         // when
-        final List<Reservation> reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
+        final Set<ReservationWithMemberNumber> reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
 
         // then
         assertThat(reservationsByStartDate).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(reservation);
+                .containsExactly(reservationWithMemberNumber);
     }
 
     @Test

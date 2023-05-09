@@ -1,12 +1,16 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.repository.dto.QReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static com.girigiri.kwrental.auth.domain.QMember.member;
 import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
 
@@ -19,12 +23,19 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public List<Reservation> findReservationsWithSpecsByStartDate(final LocalDate startDate) {
-        return jpaQueryFactory.selectFrom(reservation)
-                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.equipment).fetchJoin()
+    public Set<ReservationWithMemberNumber> findReservationsWithSpecsByStartDate(final LocalDate startDate) {
+        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservationSpec.period.rentalStartDate.eq(startDate))
-                .fetch();
+                .fetch());
+    }
+
+    private JPAQuery<ReservationWithMemberNumber> selectReservationWithMemberNumberAndEquipmentAndSpecs() {
+        return jpaQueryFactory
+                .select(new QReservationWithMemberNumber(reservation, member.memberNumber))
+                .from(reservation)
+                .leftJoin(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .leftJoin(reservationSpec.equipment).fetchJoin()
+                .leftJoin(member).on(member.id.eq(reservation.memberId));
     }
 
     @Override
@@ -37,21 +48,17 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public List<Reservation> findOverdueReservationWithSpecs(final LocalDate returnDate) {
-        return jpaQueryFactory.selectFrom(reservation)
-                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.equipment).fetchJoin()
+    public Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(final LocalDate returnDate) {
+        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservation.terminated.isFalse()
                         .and(reservationSpec.period.rentalEndDate.before(returnDate)))
-                .fetch();
+                .fetch());
     }
 
     @Override
-    public List<Reservation> findReservationsWithSpecsByEndDate(final LocalDate endDate) {
-        return jpaQueryFactory.selectFrom(reservation)
-                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.equipment).fetchJoin()
+    public Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(final LocalDate endDate) {
+        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservationSpec.period.rentalEndDate.eq(endDate))
-                .fetch();
+                .fetch());
     }
 }
