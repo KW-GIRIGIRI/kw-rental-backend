@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.dto;
+package com.girigiri.kwrental.reservation.repository.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 

@@ -7,7 +7,7 @@ import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
-import com.girigiri.kwrental.reservation.dto.ReservedAmount;
+import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;

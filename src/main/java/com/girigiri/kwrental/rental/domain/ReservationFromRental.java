@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.domain;
 
+import com.girigiri.kwrental.rental.exception.NotExpectedRentalStatusException;
 import com.girigiri.kwrental.rental.exception.RentedStatusWhenReturnException;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
