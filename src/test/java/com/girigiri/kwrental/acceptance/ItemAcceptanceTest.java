@@ -5,8 +5,8 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
+import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
@@ -150,7 +150,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
 
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
         UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "22222222");
-        UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
+        SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(List.of(updateItemRequest1, updateItemRequest2));
 
         // when
         RestAssured.given(requestSpec)

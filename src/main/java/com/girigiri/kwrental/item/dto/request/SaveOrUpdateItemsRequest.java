@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-public record UpdateItemsRequest(
+public record SaveOrUpdateItemsRequest(
         @Valid List<UpdateItemRequest> items
 ) {
 }

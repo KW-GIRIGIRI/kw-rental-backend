@@ -2,8 +2,8 @@ package com.girigiri.kwrental.item.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
+import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.testsupport.ControllerTest;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,7 @@ class AdminItemControllerTest extends ControllerTest {
     @DisplayName("기자재의 품목들 수정 요청 시 자산번호가 비어있을 때 예외 처리")
     void saveOrUpdate_emptyPropertyNumber() throws Exception {
         // given
-        UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(List.of(new UpdateItemRequest(1L, "")));
+        SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(List.of(new UpdateItemRequest(1L, "")));
         String body = objectMapper.writeValueAsString(updateItemsRequest);
 
         // when, then
@@ -58,7 +58,7 @@ class AdminItemControllerTest extends ControllerTest {
     @DisplayName("기자재의 품목들 수정 요청 시 자산번호가 중복되도록 수정할 경우 예외 처리")
     void saveOrUpdate_duplicatePropertyNumber() throws Exception {
         // given
-        UpdateItemsRequest updateItemsRequest = new UpdateItemsRequest(
+        SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(
                 List.of(new UpdateItemRequest(1L, "1234567")));
         String body = objectMapper.writeValueAsString(updateItemsRequest);
         given(itemService.updateRentalAvailable(any(), any())).willThrow(PersistenceException.class);

@@ -2,6 +2,7 @@ package com.girigiri.kwrental.item.service;
 
 import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class SaveItemServiceImplTest {
     void saveItems() {
         // given
         given(itemRepository.saveAll(any()))
-                .willReturn(1);
+                .willReturn(List.of(ItemFixture.create()));
         final AddItemRequest addItemRequest = new AddItemRequest("12345678");
 
         // when

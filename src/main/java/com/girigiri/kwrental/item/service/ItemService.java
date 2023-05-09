@@ -6,8 +6,8 @@ import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
+import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
@@ -72,26 +72,41 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemsResponse saveOrUpdate(final Long equipmentId, final UpdateItemsRequest updateItemsRequest) {
-        Map<Boolean, List<UpdateItemRequest>> updateItemRequestsGroup = groupByIdNull(updateItemsRequest);
-        List<UpdateItemRequest> saveItemRequests = updateItemRequestsGroup.get(true);
+    public ItemsResponse saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
+        Map<Boolean, List<UpdateItemRequest>> itemRequestsGroup = groupByIdNull(saveOrUpdateItemsRequest);
+        List<UpdateItemRequest> saveItemRequests = itemRequestsGroup.get(true);
         save(equipmentId, saveItemRequests);
-
-        List<UpdateItemRequest> updateItemRequests = updateItemRequestsGroup.get(false);
-        List<Item> updatedItems = update(equipmentId, updateItemRequests);
-        return ItemsResponse.of(updatedItems);
+        final EquipmentItems equipmentItems = getEquipmentItems(equipmentId);
+        List<UpdateItemRequest> updateItemRequests = itemRequestsGroup.get(false);
+        update(equipmentItems, updateItemRequests);
+        deleteNotRequested(equipmentItems, saveOrUpdateItemsRequest.items());
+        return ItemsResponse.of(equipmentItems.getItems());
     }
 
-    private List<Item> update(Long equipmentId, List<UpdateItemRequest> updateItemRequests) {
+    private EquipmentItems getEquipmentItems(final Long equipmentId) {
         List<Item> items = itemRepository.findByEquipmentId(equipmentId);
-        EquipmentItems equipmentItems = EquipmentItems.from(items);
+        return EquipmentItems.from(items);
+    }
+
+    private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
         for (UpdateItemRequest request : updateItemRequests) {
             equipmentItems.updatePropertyNumberById(request.id(), request.propertyNumber());
         }
-        return equipmentItems.getItems();
     }
 
-    private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(UpdateItemsRequest updateItemsRequest) {
+    private void deleteNotRequested(final EquipmentItems equipmentItems, final List<UpdateItemRequest> updateItemRequests) {
+        final List<String> propertyNumbers = equipmentItems.getPropertyNumbers();
+        final Set<String> requestedIds = updateItemRequests.stream()
+                .map(UpdateItemRequest::propertyNumber)
+                .collect(Collectors.toSet());
+        final List<String> notRequestedPropertyNumbers = propertyNumbers.stream()
+                .filter(id -> !requestedIds.contains(id))
+                .toList();
+        itemRepository.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+        equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+    }
+
+    private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(SaveOrUpdateItemsRequest updateItemsRequest) {
         return updateItemsRequest.items()
                 .stream()
                 .collect(Collectors.groupingBy(it -> it.id() == null));

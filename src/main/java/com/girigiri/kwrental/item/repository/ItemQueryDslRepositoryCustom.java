@@ -14,4 +14,6 @@ public interface ItemQueryDslRepositoryCustom {
     int countAvailable(Long equipmentId);
 
     List<Item> findByEquipmentIds(Set<Long> equipmentIds);
+
+    long deleteByPropertyNumbers(List<String> propertyNumbers);
 }

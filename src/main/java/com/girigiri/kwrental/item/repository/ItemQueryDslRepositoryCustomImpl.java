@@ -47,4 +47,11 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
                 .where(item.equipmentId.in(equipmentIds))
                 .fetch();
     }
+
+    @Override
+    public long deleteByPropertyNumbers(final List<String> propertyNumbers) {
+        return jpaQueryFactory.delete(item)
+                .where(item.propertyNumber.in(propertyNumbers))
+                .execute();
+    }
 }
