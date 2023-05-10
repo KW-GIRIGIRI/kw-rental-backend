@@ -1,8 +1,12 @@
 package com.girigiri.kwrental.config;
 
+import com.girigiri.kwrental.common.ApiLogFilter;
 import com.girigiri.kwrental.common.CustomHandlerMethodArgumentResolver;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -33,5 +37,13 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.addAll(argumentResolvers);
+    }
+
+    @Bean
+    public FilterRegistrationBean<OncePerRequestFilter> requestLoggingFilter() {
+        final FilterRegistrationBean<OncePerRequestFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new ApiLogFilter());
+        filterRegistrationBean.addUrlPatterns("/api/*");
+        return filterRegistrationBean;
     }
 }
