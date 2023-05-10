@@ -42,6 +42,25 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="ERROR-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/error/logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+            <cleanHistoryOnStart>${LOG_FILE_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+
     <!-- Spring Profiles -->
     <springProfile name="default">
         <root level="info">
@@ -52,6 +71,7 @@
         <root level="INFO">
             <appender-ref ref="INFO-FILE"/>
             <appender-ref ref="WARN-FILE"/>
+            <appender-ref ref="ERROR-FILE"/>
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
@@ -59,6 +79,7 @@
         <root level="INFO">
             <appender-ref ref="INFO-FILE"/>
             <appender-ref ref="WARN-FILE"/>
+            <appender-ref ref="ERROR-FILE"/>
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
