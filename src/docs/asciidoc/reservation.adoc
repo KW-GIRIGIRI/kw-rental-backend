@@ -8,6 +8,17 @@ operation::addReservations[snippets='http-request,http-response']
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']
 
-=== 아직 종결되지 않은 내 대여 조회 API
+=== 아직 종결되지 않은 내 대여 예약 조회 API
+
+==== 종결되지 않았다는 대여 신청한 모든 품목들이 아직 반납되지 않은 경우를 의미.
+
+각 대여 예약 상세의 상태에 대한 해석
+
+- `RESERVED` : 대여 신청
+- `RENTED` : 대여 중
+- `RETURNED` : 반납됨
+- `ABNORMAL_RETURNED` : 비정상 반납(파손, 분실, 연체 반납)
+- `OVERDUE_RENTED` : 연체 중
+- `CANCELED` : 대여 취소
 
 operation::getUnterminatedReservations[snippets='http-request,http-response']
