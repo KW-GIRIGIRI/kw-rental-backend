@@ -3,6 +3,8 @@ package com.girigiri.kwrental.inventory.domain;
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDate;
 
@@ -92,4 +94,20 @@ class RentalPeriodTest {
                 () -> assertThat(legalReturn2).isTrue()
         );
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {"0,2,1", "1,2,1", "1,3,0", "1,4,-1", "2,3,-1", "2,4,-1"})
+    void compareTo(int start, int end, int expect) {
+        // given
+        final LocalDate now = LocalDate.now();
+        final RentalPeriod period = new RentalPeriod(now.plusDays(1), now.plusDays(3));
+        final RentalPeriod other = new RentalPeriod(now.plusDays(start), now.plusDays(end));
+
+        // when
+        final int actual = period.compareTo(other);
+
+        // then
+        assertThat(actual).isEqualTo(expect);
+    }
+
 }

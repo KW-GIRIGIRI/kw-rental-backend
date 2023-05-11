@@ -16,4 +16,6 @@ public interface ReservationRepositoryCustom {
     Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(LocalDate returnDate);
 
     Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(LocalDate localDate);
+
+    Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
 }

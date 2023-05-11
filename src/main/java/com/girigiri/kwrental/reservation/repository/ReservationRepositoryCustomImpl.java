@@ -61,4 +61,16 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .where(reservationSpec.period.rentalEndDate.eq(endDate))
                 .fetch());
     }
+
+    @Override
+    public Set<Reservation> findNotTerminatedReservationsByMemberId(final Long memberId) {
+        return Set.copyOf(jpaQueryFactory
+                .selectFrom(reservation)
+                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .join(reservationSpec.equipment).fetchJoin()
+                .where(reservation.memberId.eq(memberId)
+                        .and(reservation.terminated.isFalse()))
+                .fetch()
+        );
+    }
 }

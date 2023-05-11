@@ -7,6 +7,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -20,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,22 +112,34 @@ public class ReservationService {
         throw new ReservationSpecException("입력된 대여 예약 상세가 맞지 않습니다.");
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void acceptReservation(final Long id) {
         reservationRepository.findById(id)
                 .orElseThrow(ReservationNotFoundException::new)
                 .acceptAt(LocalDateTime.now());
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Set<ReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
         return reservationRepository.findOverdueReservationWithSpecs(localDate);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Set<ReservationWithMemberNumber> getReservationsWithMemberNumberByEndDate(final LocalDate localDate) {
         return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Reservation getReservationWithReservationSpecsById(final Long id) {
         return reservationRepository.findByIdWithSpecs(id)
                 .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public UnterminatedReservationsResponse getUnterminatedReservations(final Long memberId) {
+        final Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
+        final List<Reservation> reservationList = new ArrayList<>(reservations);
+        reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
+        return UnterminatedReservationsResponse.from(reservationList);
     }
 }
