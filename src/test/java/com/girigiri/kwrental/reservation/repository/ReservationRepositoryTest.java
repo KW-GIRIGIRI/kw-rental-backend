@@ -8,6 +8,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
@@ -109,5 +110,35 @@ class ReservationRepositoryTest {
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()));
+    }
+
+    @Test
+    @DisplayName("특정 회원의 완료되지 않은 대여를 조회한다.")
+    void findNotTerminatedReservationsByMemberId() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+
+        final LocalDate now = LocalDate.now();
+        final LocalDate start = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(1L).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).terminated(true).memberId(1L).build());
+
+        final ReservationSpec reservationSpec5 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).memberId(2L).build());
+
+        // when
+        final Set<Reservation> actual = reservationRepository.findNotTerminatedReservationsByMemberId(1L);
+
+        // then
+        assertThat(actual).containsExactlyInAnyOrder(reservation1);
+
     }
 }

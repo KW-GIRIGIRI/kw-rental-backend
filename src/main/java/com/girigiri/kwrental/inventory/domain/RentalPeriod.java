@@ -12,7 +12,7 @@ import java.time.temporal.ChronoUnit;
 @Embeddable
 @Getter
 @EqualsAndHashCode
-public class RentalPeriod {
+public class RentalPeriod implements Comparable<RentalPeriod> {
 
     @Column(nullable = false)
     private LocalDate rentalStartDate;
@@ -45,5 +45,20 @@ public class RentalPeriod {
 
     public boolean isLegalReturnIn(final LocalDate date) {
         return this.contains(date) || rentalEndDate.isEqual(date);
+    }
+
+    @Override
+    public int compareTo(final RentalPeriod o) {
+        if (o == null) return 1;
+        if (this.rentalStartDate.isBefore(o.rentalStartDate)) {
+            return -1;
+        }
+        if (this.rentalStartDate.isEqual(o.rentalStartDate) && this.rentalEndDate.isBefore(o.rentalEndDate)) {
+            return -1;
+        }
+        if (this.rentalStartDate.isEqual(o.rentalStartDate) && this.rentalEndDate.isEqual(o.rentalEndDate)) {
+            return 0;
+        }
+        return 1;
     }
 }

@@ -18,6 +18,7 @@ public class ReservationFixture {
                 .name("대여자")
                 .phoneNumber("01012345678")
                 .memberId(0L)
-                .reservationSpecs(reservationSpecs);
+                .reservationSpecs(reservationSpecs)
+                .terminated(false);
     }
 }

@@ -13,6 +13,8 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -29,7 +31,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
@@ -98,9 +99,37 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 .extract().as(ReservationsByEquipmentPerYearMonthResponse.class);
 
         // then
-        assertAll(
-                () -> assertThat(response.getReservations().get(LocalDate.now().getDayOfMonth()))
-                        .usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1.getName())
-        );
+        assertThat(response.getReservations().get(LocalDate.now().getDayOfMonth()))
+                .usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1.getName());
+    }
+
+    @Test
+    @DisplayName("특정 유저의 완료되지 않은 대여 예약 건을 조회한다.")
+    void getUnterminatedReservations() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName2").build());
+        final Item item1 = itemRepository.save(ItemFixture.builder().equipmentId(equipment1.getId()).propertyNumber("11111111").build());
+        final Item item2 = itemRepository.save(ItemFixture.builder().equipmentId(equipment2.getId()).propertyNumber("22222222").build());
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+
+        // when
+        final UnterminatedReservationsResponse response = RestAssured.given(requestSpec)
+                .filter(document("getUnterminatedReservations"))
+                .sessionId(sessionId)
+                .when().log().all().get("/api/reservations?terminated=false")
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(UnterminatedReservationsResponse.class);
+
+        // then
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(UnterminatedReservationResponse.from(reservation1), UnterminatedReservationResponse.from(reservation2));
     }
 }

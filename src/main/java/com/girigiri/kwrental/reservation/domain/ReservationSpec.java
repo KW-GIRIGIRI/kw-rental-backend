@@ -76,4 +76,8 @@ public class ReservationSpec {
     public void setStatus(final ReservationSpecStatus status) {
         this.status = status;
     }
+
+    public LocalDate getEndDate() {
+        return this.period.getRentalEndDate();
+    }
 }

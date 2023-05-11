@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -86,5 +87,17 @@ public class Reservation {
                                 && it != ReservationSpecStatus.RENTED
                                 && it != ReservationSpecStatus.OVERDUE_RENTED
                 );
+    }
+
+    public RentalPeriod getRentalPeriod() {
+        return new RentalPeriod(getStartDate(), getEndDate());
+    }
+
+    public LocalDate getStartDate() {
+        return this.reservationSpecs.get(0).getStartDate();
+    }
+
+    public LocalDate getEndDate() {
+        return this.reservationSpecs.get(0).getEndDate();
     }
 }
