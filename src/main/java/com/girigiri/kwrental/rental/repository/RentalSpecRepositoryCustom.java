@@ -1,7 +1,9 @@
 package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -14,4 +16,6 @@ public interface RentalSpecRepositoryCustom {
     Set<RentalSpec> findRentedRentalSpecs(Long equipmentId, LocalDateTime date);
 
     List<RentalSpec> findByReservationId(Long reservationId);
+
+    List<RentalDto> findRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
 }

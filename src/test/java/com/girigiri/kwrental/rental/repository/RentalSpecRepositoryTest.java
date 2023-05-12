@@ -1,20 +1,26 @@
 package com.girigiri.kwrental.rental.repository;
 
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +38,10 @@ class RentalSpecRepositoryTest {
     private ReservationSpecRepository reservationSpecRepository;
     @Autowired
     private EquipmentRepository equipmentRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Test
     @DisplayName("대여 상세를 모두 저장한다.")
@@ -90,5 +100,31 @@ class RentalSpecRepositoryTest {
 
         // then
         assertThat(expect).containsExactlyInAnyOrder(rentalSpec1, rentalSpec2, rentalSpec3);
+    }
+
+    @Test
+    @DisplayName("특정 기간에 해당하는 대여를 조히한다.")
+    void findRentalDtosBetweenDate() {
+        // given
+        final Member member = memberRepository.save(MemberFixture.create());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+
+        final LocalDate now = LocalDate.now();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member.getId()).build());
+
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(reservationSpec1.getId()).reservationId(reservation.getId()).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).reservationId(reservation.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        // when
+        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member.getId(), now.minusDays(1), now.plusDays(1));
+
+        // then
+        assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(
+                        new RentalDto(reservation.getId(), reservationSpec1.getStartDate(), reservationSpec1.getEndDate(), Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()))));
     }
 }
