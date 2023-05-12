@@ -8,9 +8,7 @@ operation::addReservations[snippets='http-request,http-response']
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']
 
-=== 아직 종결되지 않은 내 대여 예약 조회 API
-
-==== 종결되지 않았다는 대여 신청한 모든 품목들이 아직 반납되지 않은 경우를 의미.
+=== 현재 내 대여 예약 조회 API
 
 각 대여 예약 상세의 상태에 대한 해석
 
