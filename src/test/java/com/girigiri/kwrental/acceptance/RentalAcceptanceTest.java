@@ -13,9 +13,12 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -31,7 +34,9 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
@@ -198,5 +203,42 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 .contentType(ContentType.JSON)
                 .when().log().all().patch("/api/admin/rentals/returns")
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("사용자의 대여 이력을 조회한다.")
+    void getRentals() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+
+        final LocalDateTime acceptDateTime = LocalDateTime.now();
+        final LocalDate now = LocalDate.now();
+        final LocalDate yesterday = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(yesterday, now)).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(yesterday, now)).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member.getId()).build());
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(reservationSpec1.getId()).reservationId(reservation.getId()).status(RentalSpecStatus.RETURNED).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).reservationId(reservation.getId()).status(RentalSpecStatus.RETURNED).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        // when
+        final RentalsDto response = RestAssured.given(requestSpec)
+                .filter(document("getRentals"))
+                .sessionId(sessionId)
+                .when().log().all().get("/api/rentals?from={from}&to={}", yesterday.toString(), now.toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(RentalsDto.class);
+
+        // then
+        assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new RentalDto(reservation.getStartDate(), reservation.getEndDate(),
+                        Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(equipment2.getModelName(), rentalSpec2.getStatus())))
+                );
     }
 }

@@ -1,14 +1,22 @@
 package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.rental.domain.QRentalSpec.rentalSpec;
+import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
+import static com.querydsl.core.group.GroupBy.groupBy;
 
 public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
 
@@ -48,5 +56,18 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
         return jpaQueryFactory.selectFrom(rentalSpec)
                 .where(rentalSpec.reservationId.eq(reservationId))
                 .fetch();
+    }
+
+    @Override
+    public List<RentalDto> findRentalDtosBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+        return jpaQueryFactory
+                .from(rentalSpec)
+                .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId))
+                .join(reservation).on(reservation.memberId.eq(memberId))
+                .join(equipment).on(equipment.id.eq(reservationSpec.equipment.id))
+                .where(reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to)))
+                .transform(groupBy(reservationSpec.period).
+                        list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
+                                GroupBy.set(Projections.constructor(RentalSpecDto.class, equipment.modelName, rentalSpec.status)))));
     }
 }
