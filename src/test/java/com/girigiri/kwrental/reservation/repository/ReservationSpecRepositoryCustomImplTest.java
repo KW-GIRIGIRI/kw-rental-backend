@@ -96,16 +96,17 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("특정 기간에 대여 수령하는 대여 상세를 조회한다.")
     void findByStartDateBetween() {
         // given
-        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
         final YearMonth now = YearMonth.now();
-        final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
-        final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
-        final ReservationSpec reservationSpec3 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
+        final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
+        final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
+        final ReservationSpec reservationSpec3 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2))).build());
 
         // when
-        final List<ReservationSpec> expect = reservationSpecRepository.findByStartDateBetween(equipment.getId(), now.atDay(1), now.atEndOfMonth());
+        final List<ReservationSpec> expect = reservationSpecRepository.findByStartDateBetween(equipment1.getId(), now.atDay(1), now.atEndOfMonth());
 
         // then
-        assertThat(expect).containsExactlyInAnyOrder(reservationSpec1, reservationSpec2);
+        assertThat(expect).containsExactlyInAnyOrder(reservationSpec1);
     }
 }
