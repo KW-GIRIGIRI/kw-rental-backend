@@ -60,7 +60,8 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 .selectFrom(reservationSpec)
                 .leftJoin(reservationSpec.reservation).fetchJoin()
                 .where(
-                        reservationSpec.period.rentalStartDate.goe(start)
+                        reservationSpec.equipment.id.eq(equipmentId)
+                                .and(reservationSpec.period.rentalStartDate.goe(start))
                                 .and(reservationSpec.period.rentalStartDate.loe(end)))
                 .fetch();
     }
