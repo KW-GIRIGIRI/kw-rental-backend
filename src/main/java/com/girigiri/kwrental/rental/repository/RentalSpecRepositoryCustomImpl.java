@@ -3,6 +3,7 @@ package com.girigiri.kwrental.rental.repository;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -16,7 +17,6 @@ import static com.girigiri.kwrental.rental.domain.QRentalSpec.rentalSpec;
 import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
 import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.types.Projections.list;
 
 public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
 
@@ -66,8 +66,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .join(reservation).on(reservation.memberId.eq(memberId))
                 .join(equipment).on(equipment.id.eq(reservationSpec.equipment.id))
                 .where(reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to)))
-                .transform(groupBy(reservation.id).
-                        list(Projections.constructor(RentalDto.class, reservation.id, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
-                                list(Projections.constructor(RentalSpecDto.class, equipment.modelName, rentalSpec.status)))));
+                .transform(groupBy(reservationSpec.period).
+                        list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
+                                GroupBy.set(Projections.constructor(RentalSpecDto.class, equipment.modelName, rentalSpec.status)))));
     }
 }

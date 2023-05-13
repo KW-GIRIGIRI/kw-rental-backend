@@ -120,11 +120,12 @@ class RentalSpecRepositoryTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
         // when
-        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member.getId(), now.minusDays(1), now.plusDays(1));
+        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member.getId(), now, now.plusDays(1));
 
         // then
         assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
-                        new RentalDto(reservation.getId(), reservationSpec1.getStartDate(), reservationSpec1.getEndDate(), Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()))));
+                        new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
+                                Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(equipment2.getModelName(), rentalSpec2.getStatus()))));
     }
 }
