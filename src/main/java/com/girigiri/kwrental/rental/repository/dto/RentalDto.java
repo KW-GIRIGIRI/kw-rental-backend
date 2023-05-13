@@ -10,13 +10,11 @@ import java.util.Set;
 @Getter
 public class RentalDto {
 
-    private final Long reservationId;
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final Set<RentalSpecDto> rentalSpecs;
 
-    public RentalDto(final Long reservationId, final LocalDate startDate, final LocalDate endDate, final Collection<RentalSpecDto> rentalSpecs) {
-        this.reservationId = reservationId;
+    public RentalDto(final LocalDate startDate, final LocalDate endDate, final Collection<RentalSpecDto> rentalSpecs) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.rentalSpecs = new HashSet<>(rentalSpecs);

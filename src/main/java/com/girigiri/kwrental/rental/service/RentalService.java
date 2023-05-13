@@ -8,6 +8,7 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
@@ -151,5 +152,10 @@ public class RentalService {
         if (rentalSpec.isOverdueReturned()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), true);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public RentalsDto getRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+        return new RentalsDto(rentalSpecRepository.findRentalDtosBetweenDate(memberId, from, to));
     }
 }
