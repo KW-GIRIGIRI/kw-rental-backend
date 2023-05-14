@@ -3,8 +3,10 @@ package com.girigiri.kwrental.rental.repository;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
@@ -65,9 +67,25 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId))
                 .join(reservation).on(reservation.memberId.eq(memberId))
                 .join(equipment).on(equipment.id.eq(reservationSpec.equipment.id))
-                .where(reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to)))
+                .where(reservationSpecBetweenDate(from, to))
                 .transform(groupBy(reservationSpec.period).
                         list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
                                 GroupBy.set(Projections.constructor(RentalSpecDto.class, equipment.modelName, rentalSpec.status)))));
+    }
+
+    private BooleanExpression reservationSpecBetweenDate(final LocalDate from, final LocalDate to) {
+        return reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to));
+    }
+
+    @Override
+    public List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(final Set<String> propertyNumbers, final LocalDate from, final LocalDate to) {
+        return jpaQueryFactory
+                .select(Projections.constructor(RentalSpecStatuesPerPropertyNumber.class,
+                        rentalSpec.propertyNumber,
+                        Projections.list(rentalSpec.status)))
+                .from(rentalSpec)
+                .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId).and(reservationSpecBetweenDate(from, to)))
+                .where(rentalSpec.propertyNumber.in(propertyNumbers))
+                .fetch();
     }
 }

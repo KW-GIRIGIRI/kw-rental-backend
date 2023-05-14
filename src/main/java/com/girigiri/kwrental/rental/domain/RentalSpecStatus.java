@@ -17,7 +17,11 @@ public enum RentalSpecStatus {
         return this == RETURNED || isAbnormalReturned();
     }
 
-    private boolean isAbnormalReturned() {
+    public boolean isAbnormalReturned() {
         return this == LOST || this == BROKEN || this == OVERDUE_RETURNED;
+    }
+
+    public boolean isNormalReturned() {
+        return this == RETURNED;
     }
 }

@@ -7,8 +7,10 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -127,5 +129,34 @@ class RentalSpecRepositoryTest {
                 .containsExactly(
                         new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
                                 Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(equipment2.getModelName(), rentalSpec2.getStatus()))));
+    }
+
+    @Test
+    @DisplayName("특정 자산번호의 특정 기간동안 대여 상태들을 조회한다.")
+    void findRentalCountsByPropertyNumbersBetweenDate() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+
+        final LocalDate now = LocalDate.now();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).build());
+
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(reservationSpec1.getId()).reservationId(reservation.getId())
+                .status(RentalSpecStatus.RETURNED).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).reservationId(reservation.getId())
+                .status(RentalSpecStatus.LOST).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        // when
+        final List<RentalSpecStatuesPerPropertyNumber> rentalCountsDtos = rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(
+                Set.of(rentalSpec1.getPropertyNumber(), rentalSpec2.getPropertyNumber()), now, now.plusDays(1));
+
+        // then
+        assertThat(rentalCountsDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(
+                        new RentalSpecStatuesPerPropertyNumber(rentalSpec1.getPropertyNumber(), List.of(RentalSpecStatus.RETURNED)),
+                        new RentalSpecStatuesPerPropertyNumber(rentalSpec2.getPropertyNumber(), List.of(RentalSpecStatus.LOST)));
     }
 }
