@@ -84,6 +84,7 @@ public class ItemService {
     }
 
     private void save(final Long equipmentId, final List<UpdateItemRequest> saveItemRequests) {
+        if (saveItemRequests == null) return;
         List<Item> itemsToSave = saveItemRequests
                 .stream()
                 .map(it -> mapToItem(equipmentId, it))
@@ -97,12 +98,14 @@ public class ItemService {
     }
 
     private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
+        if (updateItemRequests == null) return;
         for (UpdateItemRequest request : updateItemRequests) {
             equipmentItems.updatePropertyNumberById(request.id(), request.propertyNumber());
         }
     }
 
     private void deleteNotRequested(final EquipmentItems equipmentItems, final List<UpdateItemRequest> updateItemRequests) {
+        if (updateItemRequests == null) return;
         final List<String> propertyNumbers = equipmentItems.getPropertyNumbers();
         final Set<String> requestedIds = updateItemRequests.stream()
                 .map(UpdateItemRequest::propertyNumber)
