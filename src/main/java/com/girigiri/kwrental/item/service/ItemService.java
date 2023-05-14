@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.item.service;
 
+import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
@@ -8,15 +9,18 @@ import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.response.ItemResponse;
-import com.girigiri.kwrental.item.dto.response.ItemsResponse;
+import com.girigiri.kwrental.item.dto.response.*;
+import com.girigiri.kwrental.item.dto.response.ItemHistory.ItemHistoryBuilder;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -168,5 +172,33 @@ public class ItemService {
         Item item = itemRepository.findByPropertyNumber(propertyNumber)
                 .orElseThrow(ItemNotFoundException::new);
         item.setAvailable(available);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ItemHistory> getItemHistories(final Pageable pageable, final Category category, final LocalDate from, final LocalDate to) {
+        final Page<EquipmentItemDto> itemDtosPage = itemRepository.findEquipmentItem(pageable, category);
+        final Set<String> propertyNumbers = itemDtosPage.getContent().stream()
+                .map(EquipmentItemDto::getPropertyNumber)
+                .collect(Collectors.toSet());
+        final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers = rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(propertyNumbers, from, to);
+        return itemDtosPage.map(it -> mapToHistory(it, rentalCountsByPropertyNumbers.get(it.getPropertyNumber())));
+    }
+
+    private static ItemHistory mapToHistory(final EquipmentItemDto equipmentItemDto, final RentalCountsDto rentalCountsDto) {
+        final ItemHistoryBuilder builder = ItemHistory.builder()
+                .modelName(equipmentItemDto.getModelName())
+                .category(equipmentItemDto.getCategory())
+                .propertyNumber(equipmentItemDto.getPropertyNumber());
+
+        if (rentalCountsDto == null) {
+            return builder
+                    .normalRentalCount(0)
+                    .abnormalRentalCount(0)
+                    .build();
+        }
+        return builder
+                .normalRentalCount(rentalCountsDto.getNormalRentalCount())
+                .abnormalRentalCount(rentalCountsDto.getAbnormalRentalCount())
+                .build();
     }
 }
