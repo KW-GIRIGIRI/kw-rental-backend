@@ -3,7 +3,6 @@ package com.girigiri.kwrental.inventory.repository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import org.springframework.data.repository.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface InventoryRepository extends Repository<Inventory, Long>, InventoryRepositoryCustom {
@@ -13,6 +12,4 @@ public interface InventoryRepository extends Repository<Inventory, Long>, Invent
     Optional<Inventory> findById(Long id);
 
     void deleteById(Long id);
-
-    List<Inventory> findAll();
 }
