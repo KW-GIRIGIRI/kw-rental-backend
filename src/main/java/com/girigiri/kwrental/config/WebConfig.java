@@ -18,6 +18,9 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    private static final String FRONT_SERVER = "http://kw-girigiri-web.s3-website.ap-northeast-2.amazonaws.com/";
+    private static final String LOCAL = "http://localhost:3000";
+
     private final List<CustomHandlerMethodArgumentResolver> argumentResolvers;
 
     public WebConfig(final List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
@@ -31,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                         PUT.name(), HEAD.name(), PATCH.name(), TRACE.name())
                 .allowCredentials(true)
                 .exposedHeaders(HttpHeaders.LOCATION, HttpHeaders.AUTHORIZATION, HttpHeaders.SET_COOKIE)
-                .allowedOrigins("http://localhost:3000");
+                .allowedOrigins(LOCAL, FRONT_SERVER);
     }
 
     @Override
