@@ -3,6 +3,8 @@ package com.girigiri.kwrental.inventory.service;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
@@ -47,6 +50,8 @@ class InventoryServiceTest {
     @DisplayName("담은 기자재를 저장한다")
     void saveInventory() {
         // given
+        given(inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(any(), any(), any()))
+                .willReturn(Optional.empty());
         doNothing().when(amountValidator).validateAmount(any(), any(), any());
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
         given(equipmentService.validateRentalDays(any(), any())).willReturn(equipment);
@@ -56,6 +61,34 @@ class InventoryServiceTest {
                 .amount(1)
                 .rentalStartDate(LocalDate.now().plusDays(1))
                 .rentalEndDate(LocalDate.now().plusDays(2))
+                .build();
+
+        // when
+        Long id = inventoryService.save(1L, addInventoryRequest);
+
+        // then
+        assertThat(id).isNotNull();
+    }
+
+    @Test
+    @DisplayName("담은 기자재를 저장하려고 할 때 기간과 기자재 ID가 동일한 담은 기자재가 존재하면 갯수를 추가해서 저장")
+    void saveInventory_update() {
+        // given
+        final Equipment equipment = EquipmentFixture.builder().id(1L).build();
+        final LocalDate now = LocalDate.now();
+        final Inventory inventory = InventoryFixture.builder(equipment).id(1L).memberId(1L)
+                .rentalPeriod(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+        given(inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(any(), any(), any()))
+                .willReturn(Optional.of(inventory));
+        final int updateAmount = inventory.getRentalAmount().getAmount() + 1;
+        doNothing().when(amountValidator).validateAmount(
+                eq(1L), eq(updateAmount), eq(inventory.getRentalPeriod()));
+        doNothing().when(inventoryRepository).updateAmount(inventory.getId(), new RentalAmount(updateAmount));
+        final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()
+                .equipmentId(1L)
+                .amount(1)
+                .rentalStartDate(now.plusDays(1))
+                .rentalEndDate(now.plusDays(2))
                 .build();
 
         // when

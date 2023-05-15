@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.inventory.repository;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -49,5 +50,13 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
                         .where(inventory.memberId.eq(memberId), inventory.equipment.id.eq(equipmentId), inventory.rentalPeriod.eq(rentalPeriod))
                         .fetchOne()
         );
+    }
+
+    @Override
+    public void updateAmount(final Long id, final RentalAmount amount) {
+        jpaQueryFactory.update(inventory)
+                .set(inventory.rentalAmount, amount)
+                .where(inventory.id.eq(id))
+                .execute();
     }
 }

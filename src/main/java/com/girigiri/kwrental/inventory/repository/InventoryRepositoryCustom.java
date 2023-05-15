@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.inventory.repository;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface InventoryRepositoryCustom {
     Optional<Inventory> findWithEquipmentById(Long id);
 
     Optional<Inventory> findByPeriodAndEquipmentIdAndMemberId(RentalPeriod rentalPeriod, Long equipmentId, Long memberId);
+
+    void updateAmount(Long id, RentalAmount amount);
 }

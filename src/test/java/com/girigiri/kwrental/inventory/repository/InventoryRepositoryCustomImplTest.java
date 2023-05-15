@@ -4,6 +4,7 @@ import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -57,5 +59,17 @@ class InventoryRepositoryCustomImplTest {
 
         // then
         assertThat(result.get()).isEqualTo(inventory);
+    }
+
+    @Test
+    @DisplayName("담은 기자재의 대여 갯수를 수정한다.")
+    void updateAmount() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Inventory inventory = inventoryRepository.save(InventoryFixture.create(equipment, 0L));
+
+        // when, then
+        assertThatCode(() -> inventoryRepository.updateAmount(inventory.getId(), new RentalAmount(10)))
+                .doesNotThrowAnyException();
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -36,9 +37,17 @@ public class InventoryService {
     public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
         final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         final Long equipmentId = addInventoryRequest.getEquipmentId();
-        final Equipment equipment = equipmentService.validateRentalDays(equipmentId, rentalPeriod.getRentalDays());
-        amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
-        final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
+        final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(rentalPeriod, equipmentId, memberId);
+        if (foundInventory.isEmpty()) {
+            final Equipment equipment = equipmentService.validateRentalDays(equipmentId, rentalPeriod.getRentalDays());
+            amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
+            final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
+            return inventory.getId();
+        }
+        final Inventory inventory = foundInventory.get();
+        final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.getAmount();
+        amountValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
+        inventoryRepository.updateAmount(inventory.getId(), new RentalAmount(updatedAmount));
         return inventory.getId();
     }
 
