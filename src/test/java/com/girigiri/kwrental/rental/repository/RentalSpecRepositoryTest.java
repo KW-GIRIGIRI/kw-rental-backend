@@ -8,6 +8,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
@@ -168,5 +169,23 @@ class RentalSpecRepositoryTest {
                 .containsExactlyInAnyOrder(
                         new RentalSpecStatuesPerPropertyNumber(rentalSpec1.getPropertyNumber(), List.of(RentalSpecStatus.RETURNED, RentalSpecStatus.BROKEN)),
                         new RentalSpecStatuesPerPropertyNumber(rentalSpec2.getPropertyNumber(), List.of(RentalSpecStatus.LOST, RentalSpecStatus.LOST)));
+    }
+
+    @Test
+    @DisplayName("자산번호에 해당하는 대여 상세를 대여자의 이름과 함께 조회한다.")
+    void findRentalSpecsWithNameByPropertyNumber() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
+        final RentalSpec rentalSpec = RentalSpecFixture.builder().reservationId(reservation.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+
+        // when
+        final List<RentalSpecWithName> result = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(rentalSpec.getPropertyNumber());
+
+        // then
+        assertThat(result).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new RentalSpecWithName(reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()));
     }
 }
