@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -61,6 +62,21 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
         return overlappedReservationSpecs.stream()
                 .filter(rentalSpec -> rentalSpec.containsDate(date))
                 .mapToInt(rentalSpec -> rentalSpec.getAmount().getAmount())
+                .sum();
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Map<LocalDate, Integer> getReservedAmountBetween(final Long equipmentId, final LocalDate from, final LocalDate to) {
+        final RentalPeriod rentalPeriod = new RentalPeriod(from, to);
+        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
+        return rentalPeriod.getRentalAvailableDates().stream()
+                .collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedByPeriod, date)));
+    }
+
+    private int getReservedAmountsByDate(final List<ReservationSpec> reservationSpecs, final LocalDate date) {
+        return reservationSpecs.stream()
+                .filter(it -> it.containsDate(date))
+                .mapToInt(it -> it.getAmount().getAmount())
                 .sum();
     }
 }
