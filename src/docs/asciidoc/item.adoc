@@ -29,3 +29,9 @@ operation::admin_deleteItem[snippets='http-request,http-response']
 === 현 시점 수령 가능한 품목 조회 API
 
 operation::admin_getAcceptableItems[snippets='http-request,http-response']
+
+=== 관리자 품목 히스토리 페이지 조회 API (기자재 히스토리)
+
+`size` 는 한 페이지에 담길 데이터 갯수
+
+operation::admin_getItemHistories[snippets='http-request,http-response']

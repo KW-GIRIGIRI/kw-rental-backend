@@ -1,15 +1,21 @@
 package com.girigiri.kwrental.acceptance;
 
+import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
+import com.girigiri.kwrental.item.dto.response.ItemHistoriesResponse;
+import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -25,11 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class ItemAcceptanceTest extends AcceptanceTest {
@@ -186,5 +194,40 @@ class ItemAcceptanceTest extends AcceptanceTest {
         assertThat(response.items()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .containsOnly(ItemResponse.from(item2));
 
+    }
+
+    @Test
+    @DisplayName("품목의 히스토리를 조회한다.")
+    void getHistories() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item.ItemBuilder itemBuilder = ItemFixture.builder().equipmentId(equipment.getId());
+        final Item item1 = itemRepository.save(itemBuilder.propertyNumber("111111111").build());
+        final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
+        final LocalDate now = LocalDate.now();
+        final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(1), now)).build());
+        final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(2), now.minusDays(2))).build());
+        final ReservationSpec reservationSpec3 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(2), now.minusDays(2))).build());
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.RETURNED).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).propertyNumber(item2.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
+        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().reservationSpecId(reservationSpec3.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3));
+
+        // when
+        final ItemHistoriesResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getItemHistories"))
+                .when().log().all().get("/api/admin/items/histories?size=2&from={from}&to={to}", now.minusDays(2).toString(), now.toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(ItemHistoriesResponse.class);
+
+        // then
+        assertAll(
+                () -> assertThat(response.getHistories()).usingRecursiveFieldByFieldElementComparator()
+                        .containsExactly(new ItemHistory(Category.CAMERA, equipment.getModelName(), item2.getPropertyNumber(), 0, 1),
+                                new ItemHistory(Category.CAMERA, equipment.getModelName(), item1.getPropertyNumber(), 1, 1)),
+                () -> assertThat(response.getPage()).isEqualTo(0),
+                () -> assertThat(response.getEndpoints()).hasSize(1)
+                        .containsExactly("/api/admin/items/histories?from=2023-05-13&to=2023-05-15&size=2&page=0&sort=id,DESC")
+        );
     }
 }
