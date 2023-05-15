@@ -23,7 +23,11 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
     protected RentalPeriod() {
     }
 
-    public RentalPeriod(LocalDate rentalStartDate, LocalDate rentalEndDate) {
+    public RentalPeriod(final RentalDateTime start, final RentalDateTime end) {
+        this(start.toLocalDate(), end.toLocalDate());
+    }
+
+    public RentalPeriod(final LocalDate rentalStartDate, final LocalDate rentalEndDate) {
         if (rentalStartDate == null || rentalEndDate == null) {
             throw new RentalDateException("일자에 빈 값이 올 수 없습니다.");
         }
@@ -33,6 +37,7 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;
     }
+
 
     public Integer getRentalDays() {
         return (int) rentalStartDate.until(rentalEndDate, ChronoUnit.DAYS);

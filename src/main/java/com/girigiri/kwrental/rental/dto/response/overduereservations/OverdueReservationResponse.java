@@ -5,7 +5,7 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -16,13 +16,13 @@ public class OverdueReservationResponse {
     private Long reservationId;
     private String name;
     private String memberNumber;
-    private LocalDateTime returnDate;
+    private Instant returnDate;
     private List<OverdueReservationSpecResponse> reservationSpecs;
 
     private OverdueReservationResponse() {
     }
 
-    private OverdueReservationResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
+    private OverdueReservationResponse(final Long reservationId, final String name, final String memberNumber, final Instant returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
         this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
@@ -34,7 +34,7 @@ public class OverdueReservationResponse {
         final Reservation reservation = reservationWithMemberNumber.getReservation();
         final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, reservation);
         return new OverdueReservationResponse(reservation.getId(), reservation.getName(),
-                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime(), overdueReservationSpecResponses);
+                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime().getInstant(), overdueReservationSpecResponses);
     }
 
     private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {

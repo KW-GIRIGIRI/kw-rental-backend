@@ -29,8 +29,8 @@ public class RentalSpecByItemResponse {
     public static RentalSpecByItemResponse from(final RentalSpecWithName rentalSpecWithName) {
         return RentalSpecByItemResponse.builder()
                 .status(rentalSpecWithName.getStatus().isAbnormalReturned() ? "불량 반납" : "정상 반납")
-                .acceptDate(rentalSpecWithName.getAcceptDateTime().toLocalDate())
-                .returnDate(rentalSpecWithName.getReturnDateTime().toLocalDate())
+                .acceptDate(LocalDate.from(rentalSpecWithName.getAcceptDateTime()))
+                .returnDate(LocalDate.from(rentalSpecWithName.getReturnDateTime()))
                 .name(rentalSpecWithName.getName())
                 .reason(rentalSpecWithName.getStatus().name())
                 .build();

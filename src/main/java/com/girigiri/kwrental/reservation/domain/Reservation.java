@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.reservation.domain;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 import jakarta.persistence.*;
@@ -36,7 +37,9 @@ public class Reservation {
     @Column(nullable = false, name = "is_terminated")
     private boolean terminated = false;
 
-    private LocalDateTime acceptDateTime;
+    @Embedded
+    @AttributeOverride(name = "instant", column = @Column(name = "accept_date_time"))
+    private RentalDateTime acceptDateTime;
 
     @Column(nullable = false)
     private Long memberId;
@@ -47,7 +50,7 @@ public class Reservation {
     }
 
     @Builder
-    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final boolean terminated, final LocalDateTime acceptDateTime, final Long memberId) {
+    private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name, final String email, final String phoneNumber, final String purpose, final boolean terminated, final RentalDateTime acceptDateTime, final Long memberId) {
         this.id = id;
         this.terminated = terminated;
         this.acceptDateTime = acceptDateTime;
@@ -72,7 +75,7 @@ public class Reservation {
     }
 
     public void acceptAt(final LocalDateTime acceptDateTime) {
-        this.acceptDateTime = acceptDateTime;
+        this.acceptDateTime = RentalDateTime.from(acceptDateTime);
     }
 
     public boolean isAccepted() {

@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.repository;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
@@ -52,8 +53,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 jpaQueryFactory.selectFrom(rentalSpec)
                         .leftJoin(reservationSpec).on(rentalSpec.reservationSpecId.eq(reservationSpec.id))
                         .where(reservationSpec.equipment.id.eq(equipmentId)
-                                .and(rentalSpec.acceptDateTime.loe(dateTime))
-                                .and(rentalSpec.returnDateTime.isNull()))
+                                .and(rentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
+                                        .and(rentalSpec.returnDateTime.isNull())))
                         .fetch());
     }
 

@@ -5,6 +5,7 @@ import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
@@ -69,8 +70,8 @@ class RentalSpecRepositoryTest {
     @DisplayName("특정 기자재의 특정 날짜에 대여 중인 대여 상세를 조회한다.")
     void findRentedRentalSpecs() {
         // given
-        final LocalDateTime acceptTime = LocalDateTime.now();
-        final LocalDateTime returnTime = LocalDateTime.now();
+        final RentalDateTime acceptTime = RentalDateTime.now();
+        final RentalDateTime returnTime = RentalDateTime.now();
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName1").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName2").build());
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).build());
