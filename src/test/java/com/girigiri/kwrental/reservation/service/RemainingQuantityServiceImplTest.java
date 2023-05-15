@@ -89,7 +89,7 @@ class RemainingQuantityServiceImplTest {
                 .period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3))).build();
         final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
                 .period(new RentalPeriod(monday.plusDays(3), monday.plusDays(4))).build();
-        given(reservationSpecRepository.findOverlappedByPeriod(any(), any()))
+        given(reservationSpecRepository.findOverlappedBetween(any(), any(), any()))
                 .willReturn(List.of(reservationSpec1, reservationSpec2, reservationSpec3, reservationSpec4));
 
         // when

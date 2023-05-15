@@ -6,6 +6,7 @@ import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
+import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -90,5 +92,10 @@ public class AdminEquipmentController {
         return ResponseEntity.noContent()
                 .location(URI.create("/api/equipments/" + updatedResponse.id()))
                 .build();
+    }
+
+    @GetMapping("/{id}/remainQuantities")
+    public RemainQuantitiesPerDateResponse getRemainQuantitiesBetween(@PathVariable final Long id, final LocalDate from, final LocalDate to) {
+        return equipmentService.getRemainQuantitiesPerDate(id, from, to);
     }
 }

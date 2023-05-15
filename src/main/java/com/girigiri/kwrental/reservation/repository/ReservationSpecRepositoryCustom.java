@@ -10,6 +10,8 @@ import java.util.List;
 public interface ReservationSpecRepositoryCustom {
     List<ReservationSpec> findOverlappedByPeriod(Long equipmentId, RentalPeriod rentalPeriod);
 
+    List<ReservationSpec> findOverlappedBetween(Long equipmentId, LocalDate start, LocalDate end);
+
     List<ReservedAmount> findRentalAmountsByEquipmentIds(List<Long> equipmentIds, LocalDate date);
 
     List<ReservationSpec> findByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);

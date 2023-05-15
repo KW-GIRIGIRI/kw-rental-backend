@@ -6,11 +6,8 @@ import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Set;
 
 @Embeddable
 @Getter
@@ -53,20 +50,6 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
 
     public boolean isLegalReturnIn(final LocalDate date) {
         return this.contains(date) || rentalEndDate.isEqual(date);
-    }
-
-    public Set<LocalDate> getRentalAvailableDates() {
-        final Set<LocalDate> availableDates = new HashSet<>();
-        for (LocalDate i = rentalStartDate; i.isBefore(rentalEndDate) || i.equals(rentalEndDate); i = i.plusDays(1)) {
-            if (isRentalAvailable(i)) availableDates.add(i);
-        }
-        return availableDates;
-    }
-
-    private boolean isRentalAvailable(final LocalDate date) {
-        final DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return dayOfWeek.equals(DayOfWeek.MONDAY) || dayOfWeek.equals(DayOfWeek.TUESDAY)
-                || dayOfWeek.equals(DayOfWeek.WEDNESDAY) || dayOfWeek.equals(DayOfWeek.THURSDAY);
     }
 
     @Override

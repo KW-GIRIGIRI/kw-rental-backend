@@ -6,6 +6,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.equipment.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
+import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -68,9 +69,9 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
     @Override
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Map<LocalDate, Integer> getReservedAmountBetween(final Long equipmentId, final LocalDate from, final LocalDate to) {
-        final RentalPeriod rentalPeriod = new RentalPeriod(from, to);
-        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
-        return rentalPeriod.getRentalAvailableDates().stream()
+        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedBetween(equipmentId, from, to);
+        final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
+        return operatingPeriod.getRentalAvailableDates().stream()
                 .collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedByPeriod, date)));
     }
 
