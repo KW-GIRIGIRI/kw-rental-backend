@@ -65,6 +65,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
                 .sum();
     }
 
+    @Override
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Map<LocalDate, Integer> getReservedAmountBetween(final Long equipmentId, final LocalDate from, final LocalDate to) {
         final RentalPeriod rentalPeriod = new RentalPeriod(from, to);

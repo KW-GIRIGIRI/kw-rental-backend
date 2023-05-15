@@ -6,9 +6,7 @@ import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
@@ -21,8 +19,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class EquipmentService {
@@ -133,5 +133,17 @@ public class EquipmentService {
             throw new EquipmentException("최대 대여일 보다 더 길게 대여할 수 없습니다.");
         }
         return equipment;
+    }
+
+    @Transactional(readOnly = true)
+    public RemainQuantitiesPerDateResponse getRemainQuantitiesPerDate(final Long equipmentId, final LocalDate from, final LocalDate to) {
+        final Equipment equipment = equipmentRepository.findById(equipmentId)
+                .orElseThrow(EquipmentNotFoundException::new);
+        final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountBetween(equipmentId, from, to);
+        final List<RemainQuantityPerDateResponse> remainQuantityPerDateResponses = reservedAmounts.keySet().stream()
+                .map(date -> new RemainQuantityPerDateResponse(date, equipment.getTotalQuantity() - reservedAmounts.get(date)))
+                .sorted(Comparator.comparing(RemainQuantityPerDateResponse::getDate))
+                .collect(Collectors.toList());
+        return new RemainQuantitiesPerDateResponse(remainQuantityPerDateResponses);
     }
 }
