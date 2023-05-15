@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Embeddable
@@ -18,7 +19,7 @@ public class RentalDateTime {
     }
 
     private RentalDateTime(final Instant instant) {
-        this.instant = instant;
+        this.instant = instant.truncatedTo(ChronoUnit.MILLIS);
     }
 
     public static RentalDateTime now() {
@@ -26,7 +27,7 @@ public class RentalDateTime {
     }
 
     public LocalDateTime toLocalDateTime() {
-        return LocalDateTime.ofInstant(this.instant, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(this.instant, ZoneId.systemDefault()).truncatedTo(ChronoUnit.MILLIS);
     }
 
     public RentalDateTime calculateDay(final int days) {
