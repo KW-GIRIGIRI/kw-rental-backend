@@ -184,7 +184,7 @@ public class ItemService {
         return itemDtosPage.map(it -> mapToHistory(it, rentalCountsByPropertyNumbers.get(it.getPropertyNumber())));
     }
 
-    private static ItemHistory mapToHistory(final EquipmentItemDto equipmentItemDto, final RentalCountsDto rentalCountsDto) {
+    private ItemHistory mapToHistory(final EquipmentItemDto equipmentItemDto, final RentalCountsDto rentalCountsDto) {
         final ItemHistoryBuilder builder = ItemHistory.builder()
                 .modelName(equipmentItemDto.getModelName())
                 .category(equipmentItemDto.getCategory())
