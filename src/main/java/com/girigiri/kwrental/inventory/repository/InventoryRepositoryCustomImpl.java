@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.inventory.repository;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.List;
@@ -37,6 +38,15 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
                 jpaQueryFactory.selectFrom(inventory)
                         .leftJoin(inventory.equipment).fetchJoin()
                         .where(inventory.id.eq(id))
+                        .fetchOne()
+        );
+    }
+
+    @Override
+    public Optional<Inventory> findByPeriodAndEquipmentIdAndMemberId(final RentalPeriod rentalPeriod, final Long equipmentId, final Long memberId) {
+        return Optional.ofNullable(
+                jpaQueryFactory.selectFrom(inventory)
+                        .where(inventory.memberId.eq(memberId), inventory.equipment.id.eq(equipmentId), inventory.rentalPeriod.eq(rentalPeriod))
                         .fetchOne()
         );
     }
