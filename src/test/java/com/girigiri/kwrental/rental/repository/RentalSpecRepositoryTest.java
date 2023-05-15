@@ -185,7 +185,11 @@ class RentalSpecRepositoryTest {
         final List<RentalSpecWithName> result = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(rentalSpec.getPropertyNumber());
 
         // then
-        assertThat(result).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(new RentalSpecWithName(reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()));
+        assertAll(
+                () -> assertThat(result).hasSize(1),
+                () -> assertThat(result.get(0)).usingRecursiveComparison()
+                        .isEqualTo(new RentalSpecWithName(
+                                reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()))
+        );
     }
 }
