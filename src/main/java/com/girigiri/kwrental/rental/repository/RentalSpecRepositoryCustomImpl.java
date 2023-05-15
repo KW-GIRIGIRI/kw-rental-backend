@@ -1,7 +1,9 @@
 package com.girigiri.kwrental.rental.repository;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
@@ -51,8 +53,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 jpaQueryFactory.selectFrom(rentalSpec)
                         .leftJoin(reservationSpec).on(rentalSpec.reservationSpecId.eq(reservationSpec.id))
                         .where(reservationSpec.equipment.id.eq(equipmentId)
-                                .and(rentalSpec.acceptDateTime.loe(dateTime))
-                                .and(rentalSpec.returnDateTime.isNull()))
+                                .and(rentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
+                                        .and(rentalSpec.returnDateTime.isNull())))
                         .fetch());
     }
 
@@ -91,5 +93,15 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
         return statusPerPropertyNumber.entrySet().stream()
                 .map(entry -> new RentalSpecStatuesPerPropertyNumber(entry.getKey(), entry.getValue()))
                 .toList();
+    }
+
+    @Override
+    public List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(final String propertyNumber) {
+        return jpaQueryFactory
+                .select(Projections.constructor(RentalSpecWithName.class, reservation.name, rentalSpec.acceptDateTime, rentalSpec.returnDateTime, rentalSpec.status))
+                .from(rentalSpec)
+                .join(reservation).on(reservation.id.eq(rentalSpec.reservationId), reservation.terminated.isTrue())
+                .where(rentalSpec.propertyNumber.eq(propertyNumber))
+                .fetch();
     }
 }

@@ -5,7 +5,7 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +17,13 @@ public class ReservationWithRentalSpecsResponse {
     private Long reservationId;
     private String name;
     private String memberNumber;
-    private LocalDateTime acceptDateTime;
+    private Instant acceptDateTime;
     private List<ReservationSpecWithRentalSpecsResponse> reservationSpecs;
 
     private ReservationWithRentalSpecsResponse() {
     }
 
-    private ReservationWithRentalSpecsResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
+    private ReservationWithRentalSpecsResponse(final Long reservationId, final String name, final String memberNumber, final Instant acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
         this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
@@ -33,9 +33,10 @@ public class ReservationWithRentalSpecsResponse {
 
     public static ReservationWithRentalSpecsResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
         final Reservation reservation = reservationWithMemberNumber.getReservation();
-        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsRespons = mapToReservationSpecWithRentalSpecResponse(rentalSpecs, reservation);
+        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsResponse = mapToReservationSpecWithRentalSpecResponse(rentalSpecs, reservation);
+        final Instant rentalAcceptDateTime = reservation.getAcceptDateTime() == null ? null : reservation.getAcceptDateTime().getInstant();
         return new ReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(),
-                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime(), reservationSpecWithRentalSpecsRespons);
+                reservationWithMemberNumber.getMemberNumber(), rentalAcceptDateTime, reservationSpecWithRentalSpecsResponse);
     }
 
     private static List<ReservationSpecWithRentalSpecsResponse> mapToReservationSpecWithRentalSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {

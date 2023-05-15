@@ -8,6 +8,8 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
@@ -22,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -157,5 +156,12 @@ public class RentalService {
     @Transactional(readOnly = true)
     public RentalsDto getRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
         return new RentalsDto(rentalSpecRepository.findRentalDtosBetweenDate(memberId, from, to));
+    }
+
+    @Transactional(readOnly = true)
+    public RentalSpecsByItemResponse getReturnedRentalSpecs(final String propertyNumber) {
+        final List<RentalSpecWithName> rentalSpecsWithName = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(propertyNumber);
+        Collections.reverse(rentalSpecsWithName);
+        return RentalSpecsByItemResponse.from(rentalSpecsWithName);
     }
 }

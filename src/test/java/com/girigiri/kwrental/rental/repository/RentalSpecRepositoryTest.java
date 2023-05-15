@@ -5,9 +5,11 @@ import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
@@ -68,8 +70,8 @@ class RentalSpecRepositoryTest {
     @DisplayName("특정 기자재의 특정 날짜에 대여 중인 대여 상세를 조회한다.")
     void findRentedRentalSpecs() {
         // given
-        final LocalDateTime acceptTime = LocalDateTime.now();
-        final LocalDateTime returnTime = LocalDateTime.now();
+        final RentalDateTime acceptTime = RentalDateTime.now();
+        final RentalDateTime returnTime = RentalDateTime.now();
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName1").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName2").build());
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).build());
@@ -168,5 +170,27 @@ class RentalSpecRepositoryTest {
                 .containsExactlyInAnyOrder(
                         new RentalSpecStatuesPerPropertyNumber(rentalSpec1.getPropertyNumber(), List.of(RentalSpecStatus.RETURNED, RentalSpecStatus.BROKEN)),
                         new RentalSpecStatuesPerPropertyNumber(rentalSpec2.getPropertyNumber(), List.of(RentalSpecStatus.LOST, RentalSpecStatus.LOST)));
+    }
+
+    @Test
+    @DisplayName("자산번호에 해당하는 대여 상세를 대여자의 이름과 함께 조회한다.")
+    void findRentalSpecsWithNameByPropertyNumber() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
+        final RentalSpec rentalSpec = RentalSpecFixture.builder().reservationId(reservation.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+
+        // when
+        final List<RentalSpecWithName> result = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(rentalSpec.getPropertyNumber());
+
+        // then
+        assertAll(
+                () -> assertThat(result).hasSize(1),
+                () -> assertThat(result.get(0)).usingRecursiveComparison()
+                        .isEqualTo(new RentalSpecWithName(
+                                reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()))
+        );
     }
 }

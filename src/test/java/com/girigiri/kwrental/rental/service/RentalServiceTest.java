@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
@@ -32,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +122,7 @@ class RentalServiceTest {
         final Equipment equipment2 = EquipmentFixture.create();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).id(1L).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).id(2L).build();
-        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(1L).acceptDateTime(LocalDateTime.now()).build();
+        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(1L).acceptDateTime(RentalDateTime.now()).build();
         final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).build();
         final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).build();
         final ReservationWithMemberNumber reservationWithMemberNumber = new ReservationWithMemberNumber(reservation, "11111111");

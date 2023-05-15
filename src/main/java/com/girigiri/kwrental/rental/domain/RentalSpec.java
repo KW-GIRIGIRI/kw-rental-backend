@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.domain;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,14 +34,18 @@ public class RentalSpec {
     private RentalSpecStatus status = RentalSpecStatus.RENTED;
 
     @CreatedDate
-    private LocalDateTime acceptDateTime;
+    @Embedded
+    @AttributeOverride(name = "instant", column = @Column(name = "accept_date_time"))
+    private RentalDateTime acceptDateTime;
 
-    private LocalDateTime returnDateTime;
+    @Embedded
+    @AttributeOverride(name = "instant", column = @Column(name = "return_date_time"))
+    private RentalDateTime returnDateTime;
 
     protected RentalSpec() {
     }
 
-    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalSpecStatus status, final LocalDateTime acceptDateTime, final LocalDateTime returnDateTime) {
+    private RentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalSpecStatus status, final RentalDateTime acceptDateTime, final RentalDateTime returnDateTime) {
         this.id = id;
         this.reservationSpecId = reservationSpecId;
         this.reservationId = reservationId;
@@ -60,7 +65,7 @@ public class RentalSpec {
 
     public void setReturnDateTimeIfAnyReturned(final LocalDateTime returnDateTime) {
         if (this.status.isReturnedOrAbnormalReturned()) {
-            this.returnDateTime = returnDateTime;
+            this.returnDateTime = RentalDateTime.from(returnDateTime);
         }
     }
 

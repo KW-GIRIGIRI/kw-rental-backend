@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.domain;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +18,9 @@ class RentalSpecTest {
     @DisplayName("대여 상세가 대여중인지 확인한다.")
     void isNowRental() {
         // given
-        final LocalDateTime now = LocalDateTime.now();
+        final RentalDateTime now = RentalDateTime.now();
         final RentalSpec rentalSpec1 = RentalSpecFixture.builder().acceptDateTime(now).returnDateTime(null).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().acceptDateTime(now).returnDateTime(now.plusSeconds(1)).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().acceptDateTime(now).returnDateTime(now.calculateDay(1)).build();
 
         // when
         final boolean nowRental = rentalSpec1.isNowRental();

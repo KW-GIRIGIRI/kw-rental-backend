@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
@@ -21,4 +22,6 @@ public interface RentalSpecRepositoryCustom {
     List<RentalDto> findRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
 
     List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(Set<String> propertyNumbers, LocalDate from, LocalDate to);
+
+    List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(String propertyNumber);
 }

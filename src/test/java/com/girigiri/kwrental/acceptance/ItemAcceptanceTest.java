@@ -32,7 +32,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -182,7 +181,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
         final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
         final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).build());
         rentalSpecRepository.saveAll(List.of(
-                RentalSpecFixture.builder().reservationSpecId(reservationSpec.getId()).propertyNumber(item1.getPropertyNumber()).acceptDateTime(LocalDateTime.now()).build()));
+                RentalSpecFixture.builder().reservationSpecId(reservationSpec.getId()).propertyNumber(item1.getPropertyNumber()).build()));
 
         // when
         final ItemsResponse response = RestAssured.given(requestSpec)
@@ -214,9 +213,10 @@ class ItemAcceptanceTest extends AcceptanceTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3));
 
         // when
+        final LocalDate from = now.minusDays(2);
         final ItemHistoriesResponse response = RestAssured.given(requestSpec)
                 .filter(document("admin_getItemHistories"))
-                .when().log().all().get("/api/admin/items/histories?size=2&from={from}&to={to}", now.minusDays(2).toString(), now.toString())
+                .when().log().all().get("/api/admin/items/histories?size=2&from={from}&to={to}", from.toString(), now.toString())
                 .then().log().all().statusCode(HttpStatus.OK.value())
                 .extract().as(ItemHistoriesResponse.class);
 
@@ -227,7 +227,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
                                 new ItemHistory(Category.CAMERA, equipment.getModelName(), item1.getPropertyNumber(), 1, 1)),
                 () -> assertThat(response.getPage()).isEqualTo(0),
                 () -> assertThat(response.getEndpoints()).hasSize(1)
-                        .containsExactly("/api/admin/items/histories?from=2023-05-13&to=2023-05-15&size=2&page=0&sort=id,DESC")
+                        .containsExactly(String.format("/api/admin/items/histories?from=%s&to=%s&size=2&page=0&sort=id,DESC", from, now))
         );
     }
 }
