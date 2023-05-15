@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.controller;
 
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
@@ -45,5 +46,10 @@ public class AdminRentalController {
     public ResponseEntity<?> returnRental(@RequestBody final ReturnRentalRequest returnRentalRequest) {
         rentalService.returnRental(returnRentalRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/returns", params = "propertyNumber")
+    public RentalSpecsByItemResponse getReturnsByPropertyNumber(final String propertyNumber) {
+        return rentalService.getReturnedRentalSpecs(propertyNumber);
     }
 }

@@ -37,3 +37,7 @@ operation::admin_returnRentals[snippets='http-request,http-response']
 === 내 대여 이력 조회
 
 operation::getRentals[snippets='http-request,http-response']
+
+=== 품목 사용 이력 조회
+
+operation::admin_getReturnedRentalSpecsByPropertyNumber[snippets='http-request,http-response']
