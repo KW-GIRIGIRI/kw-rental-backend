@@ -307,4 +307,31 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/equipments/" + equipment.getId()));
     }
+
+    @Test
+    @DisplayName("특정 기자재의 날짜별 남은 갯수를 조회한다.")
+    void getRemainQuantitiesBetween() {
+        // given
+        final Equipment equipment1 = EquipmentFixture.builder().modelName("equipment1").totalQuantity(10).build();
+        equipmentRepository.save(equipment1);
+        LocalDate monday = LocalDate.of(2023, 5, 15);
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(monday, monday.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(4)).period(new RentalPeriod(monday.plusDays(1), monday.plusDays(2))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(3)).period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3))).build());
+
+        // when
+        final RemainQuantitiesPerDateResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getEquipmentRemainQuantities"))
+                .when().log().all().get("/api/admin/equipments/{id}/remainQuantities?from={from}&to={to}", equipment1.getId(), monday.toString(), monday.plusDays(2).toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(RemainQuantitiesPerDateResponse.class);
+
+        // then
+        assertThat(response.getRemainQuantities()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(
+                        new RemainQuantityPerDateResponse(monday, 5),
+                        new RemainQuantityPerDateResponse(monday.plusDays(1), 6),
+                        new RemainQuantityPerDateResponse(monday.plusDays(2), 7)
+                );
+    }
 }

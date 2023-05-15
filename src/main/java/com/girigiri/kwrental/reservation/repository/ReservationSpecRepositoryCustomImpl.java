@@ -40,6 +40,11 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
     }
 
     @Override
+    public List<ReservationSpec> findOverlappedBetween(final Long equipmentId, final LocalDate start, final LocalDate end) {
+        return findOverlappedByPeriod(equipmentId, new RentalPeriod(start, end.plusDays(1)));
+    }
+
+    @Override
     public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
         return queryFactory
                 .select(

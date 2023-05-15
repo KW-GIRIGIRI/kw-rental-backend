@@ -37,3 +37,7 @@ operation::admin_uploadImage[snippets='http-request,http-response']
 ==== Location 헤더에 수정된 기자재 정보로 접근할 수 있다.
 
 operation::admin_updateEquipment[snippets='http-request,http-response']
+
+=== 기자재 날짜 별 대여 가능 갯수 조회 API
+
+operation::admin_getEquipmentRemainQuantities[snippets='http-request,http-response']

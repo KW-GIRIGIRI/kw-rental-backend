@@ -6,6 +6,7 @@ import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.equipment.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
+import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -61,6 +63,22 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
         return overlappedReservationSpecs.stream()
                 .filter(rentalSpec -> rentalSpec.containsDate(date))
                 .mapToInt(rentalSpec -> rentalSpec.getAmount().getAmount())
+                .sum();
+    }
+
+    @Override
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Map<LocalDate, Integer> getReservedAmountBetween(final Long equipmentId, final LocalDate from, final LocalDate to) {
+        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedBetween(equipmentId, from, to);
+        final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
+        return operatingPeriod.getRentalAvailableDates().stream()
+                .collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedByPeriod, date)));
+    }
+
+    private int getReservedAmountsByDate(final List<ReservationSpec> reservationSpecs, final LocalDate date) {
+        return reservationSpecs.stream()
+                .filter(it -> it.containsDate(date))
+                .mapToInt(it -> it.getAmount().getAmount())
                 .sum();
     }
 }

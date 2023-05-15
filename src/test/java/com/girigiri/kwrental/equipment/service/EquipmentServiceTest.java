@@ -2,9 +2,7 @@ package com.girigiri.kwrental.equipment.service;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.*;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.dto.response.*;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
@@ -22,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -256,5 +255,23 @@ class EquipmentServiceTest {
         // when, then
         assertThatCode(() -> equipmentService.validateRentalDays(1L, 1))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("특정 기자재의 날짜별 대여 가능 갯수 조회")
+    void getRemainQuantitiesPerDate() {
+        // given
+        final Equipment equipment = EquipmentFixture.builder().totalQuantity(10).build();
+        final LocalDate now = LocalDate.now();
+        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+        given(remainingQuantityService.getReservedAmountBetween(any(), any(), any()))
+                .willReturn(Map.of(now, 10, now.plusDays(1), 5));
+
+        // when
+        final RemainQuantitiesPerDateResponse remainQuantitiesPerDate = equipmentService.getRemainQuantitiesPerDate(1L, now, now.plusDays(1));
+
+        // then
+        assertThat(remainQuantitiesPerDate.getRemainQuantities()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new RemainQuantityPerDateResponse(now, 0), new RemainQuantityPerDateResponse(now.plusDays(1), 5));
     }
 }
