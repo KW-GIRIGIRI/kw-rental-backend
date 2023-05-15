@@ -1,13 +1,23 @@
 package com.girigiri.kwrental.item.repository;
 
+import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.item.domain.QItem.item;
+import static com.girigiri.kwrental.util.QueryDSLUtils.isEqualTo;
+import static com.girigiri.kwrental.util.QueryDSLUtils.setPageable;
 
 public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryCustom {
 
@@ -53,5 +63,24 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
         return jpaQueryFactory.delete(item)
                 .where(item.propertyNumber.in(propertyNumbers))
                 .execute();
+    }
+
+    @Override
+    public Page<EquipmentItemDto> findEquipmentItem(final Pageable pageable, final Category category) {
+        final JPAQuery<EquipmentItemDto> query = jpaQueryFactory.select(Projections.constructor(EquipmentItemDto.class, equipment.modelName, equipment.category, item.propertyNumber))
+                .from(item)
+                .join(equipment).on(equipment.id.eq(item.equipmentId))
+                .where(isEqualTo(category, equipment.category));
+        setPageable(query, item, pageable);
+        return new PageImpl<>(query.fetch(), pageable, countBy(query));
+    }
+
+    private long countBy(final JPAQuery<?> query) {
+        final Long count = jpaQueryFactory.select(item.count())
+                .from(item)
+                .join(equipment).on(equipment.id.eq(item.equipmentId))
+                .where(query.getMetadata().getWhere())
+                .fetchOne();
+        return count == null ? 0 : count;
     }
 }

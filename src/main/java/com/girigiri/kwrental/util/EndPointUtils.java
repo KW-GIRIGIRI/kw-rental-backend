@@ -1,9 +1,5 @@
 package com.girigiri.kwrental.util;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,6 +8,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 public class EndPointUtils {
@@ -49,6 +50,7 @@ public class EndPointUtils {
     }
 
     private static String sortToString(final Sort sort) {
+        if (sort.isEmpty()) return "";
         StringBuilder builder = new StringBuilder();
 
         for (Order order : sort) {

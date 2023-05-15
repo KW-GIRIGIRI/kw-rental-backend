@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,4 +19,6 @@ public interface RentalSpecRepositoryCustom {
     List<RentalSpec> findByReservationId(Long reservationId);
 
     List<RentalDto> findRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
+
+    List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(Set<String> propertyNumbers, LocalDate from, LocalDate to);
 }

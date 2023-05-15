@@ -1,15 +1,19 @@
 package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
@@ -17,6 +21,7 @@ import static com.girigiri.kwrental.rental.domain.QRentalSpec.rentalSpec;
 import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
 import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCustom {
 
@@ -65,9 +70,26 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId))
                 .join(reservation).on(reservation.memberId.eq(memberId))
                 .join(equipment).on(equipment.id.eq(reservationSpec.equipment.id))
-                .where(reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to)))
-                .transform(groupBy(reservationSpec.period).
-                        list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
+                .where(reservationSpecBetweenDate(from, to))
+                .transform(groupBy(reservationSpec.period)
+                        .list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
                                 GroupBy.set(Projections.constructor(RentalSpecDto.class, equipment.modelName, rentalSpec.status)))));
+    }
+
+    private BooleanExpression reservationSpecBetweenDate(final LocalDate from, final LocalDate to) {
+        return reservationSpec.period.rentalStartDate.goe(from).and(reservationSpec.period.rentalEndDate.loe(to));
+    }
+
+    @Override
+    public List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(final Set<String> propertyNumbers, final LocalDate from, final LocalDate to) {
+        final Map<String, List<RentalSpecStatus>> statusPerPropertyNumber = jpaQueryFactory
+                .from(rentalSpec)
+                .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId).and(reservationSpecBetweenDate(from, to)))
+                .where(rentalSpec.propertyNumber.in(propertyNumbers))
+                .transform(groupBy(rentalSpec.propertyNumber)
+                        .as(list(rentalSpec.status)));
+        return statusPerPropertyNumber.entrySet().stream()
+                .map(entry -> new RentalSpecStatuesPerPropertyNumber(entry.getKey(), entry.getValue()))
+                .toList();
     }
 }

@@ -7,8 +7,10 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -127,5 +129,44 @@ class RentalSpecRepositoryTest {
                 .containsExactly(
                         new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
                                 Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(equipment2.getModelName(), rentalSpec2.getStatus()))));
+    }
+
+    @Test
+    @DisplayName("특정 자산번호의 특정 기간동안 대여 상태들을 조회한다.")
+    void findRentalCountsByPropertyNumbersBetweenDate() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+
+        final LocalDate now = LocalDate.now();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).build());
+
+        final String propertyNumber1 = "11111111";
+        final String propertyNumber2 = "22222222";
+        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().propertyNumber(propertyNumber1).reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId())
+                .status(RentalSpecStatus.RETURNED).build();
+        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber(propertyNumber2).reservationSpecId(reservationSpec2.getId()).reservationId(reservation1.getId())
+                .status(RentalSpecStatus.LOST).build();
+        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().propertyNumber(propertyNumber1).reservationSpecId(reservationSpec3.getId()).reservationId(reservation2.getId())
+                .status(RentalSpecStatus.BROKEN).build();
+        final RentalSpec rentalSpec4 = RentalSpecFixture.builder().propertyNumber(propertyNumber2).reservationSpecId(reservationSpec4.getId()).reservationId(reservation2.getId())
+                .status(RentalSpecStatus.LOST).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
+
+        // when
+        final List<RentalSpecStatuesPerPropertyNumber> rentalCountsDtos = rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(
+                Set.of(rentalSpec1.getPropertyNumber(), rentalSpec2.getPropertyNumber()), now, now.plusDays(2));
+
+        // then
+        assertThat(rentalCountsDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(
+                        new RentalSpecStatuesPerPropertyNumber(rentalSpec1.getPropertyNumber(), List.of(RentalSpecStatus.RETURNED, RentalSpecStatus.BROKEN)),
+                        new RentalSpecStatuesPerPropertyNumber(rentalSpec2.getPropertyNumber(), List.of(RentalSpecStatus.LOST, RentalSpecStatus.LOST)));
     }
 }

@@ -1,7 +1,12 @@
 package com.girigiri.kwrental.item.repository;
 
 import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.equipment.domain.Category;
+import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
@@ -11,11 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -26,6 +34,8 @@ class ItemQueryDslRepositoryCustomImplTest {
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private EquipmentRepository equipmentRepository;
 
 
     @Test
@@ -120,5 +130,28 @@ class ItemQueryDslRepositoryCustomImplTest {
 
         // then
         assertThat(actual).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("품목을 기자재 카테고리와 모델 이름, 품목 자산번호를 페이지로 조회한다.")
+    void findEquipmentItem() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Item item1 = ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment.getId()).build();
+        itemRepository.saveAll(List.of(item1, item2));
+
+        // when
+        final Category category = equipment.getCategory();
+        final Page<EquipmentItemDto> equipmentItem = itemRepository.findEquipmentItem(PageRequest.of(0, 2), category);
+
+        // then
+        final String modelName = equipment.getModelName();
+        assertAll(
+                () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
+                () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()
+                        .containsExactly(new EquipmentItemDto(modelName, category, item1.getPropertyNumber()),
+                                new EquipmentItemDto(modelName, category, item2.getPropertyNumber()))
+        );
     }
 }
