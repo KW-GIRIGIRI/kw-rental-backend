@@ -91,4 +91,10 @@ public class ReservationSpec {
             this.status = ReservationSpecStatus.CANCELED;
         }
     }
+
+    public boolean isTerminated() {
+        return status != ReservationSpecStatus.RESERVED
+                && status != ReservationSpecStatus.RENTED
+                && status != ReservationSpecStatus.OVERDUE_RENTED;
+    }
 }

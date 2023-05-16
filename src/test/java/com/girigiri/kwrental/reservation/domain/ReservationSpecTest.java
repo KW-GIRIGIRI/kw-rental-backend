@@ -5,6 +5,8 @@ import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -59,5 +61,19 @@ class ReservationSpecTest {
         // when, then
         assertThatThrownBy(() -> reservationSpec.cancelAmount(1))
                 .isExactlyInstanceOf(ReservationSpecException.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"RESERVED,false", "RENTED,false", "RETURNED,true", "ABNORMAL_RETURNED,true", "OVERDUE_RENTED,false", "CANCELED,true"})
+    @DisplayName("대여 예약 상세가 종결됐는 지 판단한다.")
+    void isTerminated(final ReservationSpecStatus status, final boolean expect) {
+        // given
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).status(status).build();
+
+        // when
+        final boolean actual = reservationSpec.isTerminated();
+
+        // then
+        assertThat(actual).isEqualTo(expect);
     }
 }
