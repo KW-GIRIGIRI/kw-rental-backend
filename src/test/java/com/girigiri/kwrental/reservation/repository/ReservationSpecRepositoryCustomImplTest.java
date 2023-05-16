@@ -70,9 +70,9 @@ class ReservationSpecRepositoryCustomImplTest {
         final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름3").totalQuantity(4).build());
 
         final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
-        final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(new RentalAmount(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
-        final ReservationSpec reservationSpec2 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
-        final ReservationSpec reservationSpec3 = rentalSpec1Builder.amount(new RentalAmount(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
+        final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(RentalAmount.ofPositive(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
+        final ReservationSpec reservationSpec2 = rentalSpec1Builder.amount(RentalAmount.ofPositive(1)).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
+        final ReservationSpec reservationSpec3 = rentalSpec1Builder.amount(RentalAmount.ofPositive(1)).period(new RentalPeriod(NOW.plusDays(1), NOW.plusDays(2))).build();
         reservationSpecRepository.save(reservationSpec1);
         reservationSpecRepository.save(reservationSpec2);
         reservationSpecRepository.save(reservationSpec3);

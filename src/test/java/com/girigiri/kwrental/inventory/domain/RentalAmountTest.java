@@ -4,6 +4,7 @@ import com.girigiri.kwrental.inventory.exception.RentalAmountException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class RentalAmountTest {
@@ -15,7 +16,31 @@ class RentalAmountTest {
         Integer zero = 0;
 
         // when, then
-        assertThatThrownBy(() -> new RentalAmount(zero))
+        assertThatThrownBy(() -> RentalAmount.ofPositive(zero))
+                .isExactlyInstanceOf(RentalAmountException.class);
+    }
+
+    @Test
+    @DisplayName("대여 갯수를 뺀다.")
+    void subtract() {
+        // given
+        final RentalAmount rentalAmount = RentalAmount.ofPositive(10);
+
+        // when
+        final RentalAmount actual = rentalAmount.subtract(RentalAmount.ofPositive(5));
+
+        // then
+        assertThat(actual).isEqualTo(RentalAmount.ofPositive(5));
+    }
+
+    @Test
+    @DisplayName("대여 갯수를 밸 때 결과가 음수면 예외 발생")
+    void subtract_exceptionNegativeResult() {
+        // given
+        final RentalAmount rentalAmount = RentalAmount.ofPositive(10);
+
+        // when, then
+        assertThatThrownBy(() -> rentalAmount.subtract(RentalAmount.ofPositive(11)))
                 .isExactlyInstanceOf(RentalAmountException.class);
     }
 }

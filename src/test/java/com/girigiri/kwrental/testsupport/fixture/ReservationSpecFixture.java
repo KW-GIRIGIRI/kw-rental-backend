@@ -17,7 +17,7 @@ public class ReservationSpecFixture {
 
     public static ReservationSpecBuilder builder(final Equipment equipment) {
         return ReservationSpec.builder()
-                .amount(new RentalAmount(1))
+                .amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2)))
                 .equipment(equipment);
     }

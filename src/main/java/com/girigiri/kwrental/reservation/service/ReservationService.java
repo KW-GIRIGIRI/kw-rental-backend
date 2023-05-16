@@ -31,14 +31,17 @@ public class ReservationService {
     private final InventoryService inventoryService;
     private final RemainingQuantityServiceImpl remainingQuantityService;
     private final ReservationSpecRepositoryCustom rentalSpecRepository;
+    private final ReservationSpecRepositoryCustom reservationSpecRepository;
 
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
                               final RemainingQuantityServiceImpl remainingQuantityService,
-                              final ReservationSpecRepository rentalSpecRepository) {
+                              final ReservationSpecRepository rentalSpecRepository,
+                              final ReservationSpecRepositoryCustom reservationSpecRepository) {
         this.reservationRepository = reservationRepository;
         this.inventoryService = inventoryService;
         this.remainingQuantityService = remainingQuantityService;
         this.rentalSpecRepository = rentalSpecRepository;
+        this.reservationSpecRepository = reservationSpecRepository;
     }
 
     @Transactional
@@ -142,4 +145,12 @@ public class ReservationService {
         reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
         return UnterminatedReservationsResponse.from(reservationList);
     }
+
+//    @Transactional
+//    public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
+//        final ReservationSpec reservationSpec = reservationSpecRepository.findById(reservationSpecId)
+//                .orElseThrow(ReservationSpecNotFoundException::new);
+//        reservationSpec.cancelAmount(amount);
+//        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
+//    }
 }

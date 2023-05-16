@@ -44,9 +44,9 @@ class RemainingQuantityServiceImplTest {
     void validateAmount() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).totalQuantity(2).build();
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
 
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
@@ -62,9 +62,9 @@ class RemainingQuantityServiceImplTest {
     void validateAmount_notEnoughRemainingAmount() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).totalQuantity(2).build();
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
 
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
@@ -81,13 +81,13 @@ class RemainingQuantityServiceImplTest {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).totalQuantity(2).build();
         final LocalDate monday = LocalDate.of(2023, 5, 15);
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(monday, monday.plusDays(1))).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(monday.plusDays(1), monday.plusDays(2))).build();
-        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3))).build();
-        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment).amount(new RentalAmount(1))
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(monday.plusDays(3), monday.plusDays(4))).build();
         given(reservationSpecRepository.findOverlappedBetween(any(), any(), any()))
                 .willReturn(List.of(reservationSpec1, reservationSpec2, reservationSpec3, reservationSpec4));

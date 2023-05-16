@@ -125,7 +125,7 @@ class ReservationServiceTest {
     void validatePropertyNumbersCountAndGroupByEquipmentId() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
-        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(new RentalAmount(2)).build();
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(RentalAmount.ofPositive(2)).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(3L).build();
         given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
@@ -143,7 +143,7 @@ class ReservationServiceTest {
     void validatePropertyNumbersCountAndGroupByEquipmentId_notSameAmount() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
-        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(new RentalAmount(1)).build();
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(RentalAmount.ofPositive(1)).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(3L).build();
         given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
@@ -158,7 +158,7 @@ class ReservationServiceTest {
     void validatePropertyNumbersCountAndGroupByEquipmentId_notFoundReservationSpec() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
-        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(new RentalAmount(1)).build();
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).id(2L).amount(RentalAmount.ofPositive(1)).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(3L).build();
         given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
