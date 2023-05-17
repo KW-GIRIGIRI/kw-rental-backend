@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -56,7 +57,7 @@ public class Reservation {
         this.acceptDateTime = acceptDateTime;
         this.memberId = memberId;
         validateReservationSpec(reservationSpecs);
-        this.reservationSpecs = reservationSpecs;
+        this.reservationSpecs = new ArrayList<>(reservationSpecs);
         reservationSpecs.forEach(it -> it.setReservation(this));
         this.name = name;
         this.email = email;
