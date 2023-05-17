@@ -20,7 +20,7 @@ public class InventoryFixture {
         final LocalDate rentalEndDate = rentalStartDate.plusDays(1);
 
         return Inventory.builder()
-                .rentalAmount(new RentalAmount(1))
+                .rentalAmount(RentalAmount.ofPositive(1))
                 .rentalPeriod(new RentalPeriod(rentalStartDate, rentalEndDate))
                 .equipment(equipment)
                 .memberId(0L);

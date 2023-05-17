@@ -10,9 +10,9 @@ import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPer
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.reservation.repository.ReservationSpecRepositoryCustom;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,15 +30,15 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final InventoryService inventoryService;
     private final RemainingQuantityServiceImpl remainingQuantityService;
-    private final ReservationSpecRepositoryCustom rentalSpecRepository;
+    private final ReservationSpecRepository reservationSpecRepository;
 
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
                               final RemainingQuantityServiceImpl remainingQuantityService,
-                              final ReservationSpecRepository rentalSpecRepository) {
+                              final ReservationSpecRepository reservationSpecRepository) {
         this.reservationRepository = reservationRepository;
         this.inventoryService = inventoryService;
         this.remainingQuantityService = remainingQuantityService;
-        this.rentalSpecRepository = rentalSpecRepository;
+        this.reservationSpecRepository = reservationSpecRepository;
     }
 
     @Transactional
@@ -79,7 +79,7 @@ public class ReservationService {
     public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentsPerYearMonth(final Long equipmentId, final YearMonth yearMonth) {
         LocalDate startOfMonth = yearMonth.atDay(1);
         LocalDate endOfMonth = yearMonth.atEndOfMonth();
-        final List<ReservationSpec> reservationSpecs = rentalSpecRepository.findByStartDateBetween(equipmentId, startOfMonth, endOfMonth);
+        final List<ReservationSpec> reservationSpecs = reservationSpecRepository.findByStartDateBetween(equipmentId, startOfMonth, endOfMonth);
         final ReservationCalendar calendar = ReservationCalendar.from(startOfMonth, endOfMonth);
         calendar.addAll(reservationSpecs);
         return ReservationsByEquipmentPerYearMonthResponse.from(calendar);
@@ -141,5 +141,27 @@ public class ReservationService {
         final List<Reservation> reservationList = new ArrayList<>(reservations);
         reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
         return UnterminatedReservationsResponse.from(reservationList);
+    }
+
+    @Transactional
+    public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
+        final ReservationSpec reservationSpec = getReservationSpec(reservationSpecId);
+        reservationSpec.cancelAmount(amount);
+        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
+        final Long reservationId = reservationSpec.getReservation().getId();
+        updateAndAdjustTerminated(reservationId);
+        return reservationSpec.getId();
+    }
+
+    private ReservationSpec getReservationSpec(final Long reservationSpecId) {
+        return reservationSpecRepository.findById(reservationSpecId)
+                .orElseThrow(ReservationSpecNotFoundException::new);
+    }
+
+    private void updateAndAdjustTerminated(final Long reservationId) {
+        final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+        reservation.updateIfTerminated();
+        if (reservation.isTerminated()) reservationRepository.adjustTerminated(reservation);
     }
 }

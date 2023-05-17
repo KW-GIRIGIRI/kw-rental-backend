@@ -141,9 +141,9 @@ class RentalServiceTest {
     void returnRental() {
         // given
         final long reservationId = 1L;
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(1)).id(1L).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(2)).id(2L).build();
-        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(new RentalAmount(1)).id(3L).build();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(RentalAmount.ofPositive(1)).id(1L).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(RentalAmount.ofPositive(2)).id(2L).build();
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(null).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).amount(RentalAmount.ofPositive(1)).id(3L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2, reservationSpec3)).id(reservationId).build();
         given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
 
@@ -194,11 +194,11 @@ class RentalServiceTest {
         final long reservationId = 1L;
         final RentalPeriod overduePeriod = new RentalPeriod(LocalDate.now().minusDays(2), LocalDate.now().minusDays(1));
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.RETURNED)
-                .period(overduePeriod).amount(new RentalAmount(1)).id(1L).build();
+                .period(overduePeriod).amount(RentalAmount.ofPositive(1)).id(1L).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.OVERDUE_RENTED)
-                .period(overduePeriod).amount(new RentalAmount(2)).id(2L).build();
+                .period(overduePeriod).amount(RentalAmount.ofPositive(2)).id(2L).build();
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.ABNORMAL_RETURNED)
-                .period(overduePeriod).amount(new RentalAmount(1)).id(3L).build();
+                .period(overduePeriod).amount(RentalAmount.ofPositive(1)).id(3L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2, reservationSpec3)).id(reservationId).build();
         given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
 

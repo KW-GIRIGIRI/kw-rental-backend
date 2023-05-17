@@ -15,4 +15,6 @@ public interface ReservationSpecRepositoryCustom {
     List<ReservedAmount> findRentalAmountsByEquipmentIds(List<Long> equipmentIds, LocalDate date);
 
     List<ReservationSpec> findByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);
+
+    void adjustAmountAndStatus(ReservationSpec reservationSpec);
 }

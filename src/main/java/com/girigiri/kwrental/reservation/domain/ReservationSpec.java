@@ -66,7 +66,8 @@ public class ReservationSpec {
     }
 
     public void validateAmount(final int amount) {
-        if (this.amount.getAmount() != amount) throw new ReservationSpecException("대여 신청 갯수가 맞지 않습니다.");
+        if (!this.amount.equals(RentalAmount.ofPositive(amount)))
+            throw new ReservationSpecException("대여 신청 갯수가 맞지 않습니다.");
     }
 
     public boolean isLegalReturnIn(final LocalDate date) {
@@ -79,5 +80,21 @@ public class ReservationSpec {
 
     public LocalDate getEndDate() {
         return this.period.getRentalEndDate();
+    }
+
+    public void cancelAmount(final Integer amount) {
+        if (this.status != ReservationSpecStatus.RESERVED) {
+            throw new ReservationSpecException("대여 예약 상세 취소는 예약 상태에서만 가능합니다.");
+        }
+        this.amount = this.amount.subtract(RentalAmount.ofPositive(amount));
+        if (this.amount.isZero()) {
+            this.status = ReservationSpecStatus.CANCELED;
+        }
+    }
+
+    public boolean isTerminated() {
+        return status != ReservationSpecStatus.RESERVED
+                && status != ReservationSpecStatus.RENTED
+                && status != ReservationSpecStatus.OVERDUE_RENTED;
     }
 }

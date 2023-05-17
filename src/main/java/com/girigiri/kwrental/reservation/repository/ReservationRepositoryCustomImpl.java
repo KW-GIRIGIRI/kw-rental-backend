@@ -5,6 +5,7 @@ import com.girigiri.kwrental.reservation.repository.dto.QReservationWithMemberNu
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,9 +18,11 @@ import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservat
 public class ReservationRepositoryCustomImpl implements ReservationRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final EntityManager entityManager;
 
-    public ReservationRepositoryCustomImpl(final JPAQueryFactory jpaQueryFactory) {
+    public ReservationRepositoryCustomImpl(final JPAQueryFactory jpaQueryFactory, final EntityManager entityManager) {
         this.jpaQueryFactory = jpaQueryFactory;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -72,5 +75,15 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                         .and(reservation.terminated.isFalse()))
                 .fetch()
         );
+    }
+
+    @Override
+    public void adjustTerminated(final Reservation reservationForUpdate) {
+        entityManager.detach(reservationForUpdate);
+        jpaQueryFactory.update(reservation)
+                .set(reservation.terminated, reservationForUpdate.isTerminated())
+                .where(reservation.id.eq(reservationForUpdate.getId()))
+                .execute();
+        entityManager.merge(reservationForUpdate);
     }
 }

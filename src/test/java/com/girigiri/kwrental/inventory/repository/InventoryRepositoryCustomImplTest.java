@@ -69,7 +69,7 @@ class InventoryRepositoryCustomImplTest {
         final Inventory inventory = inventoryRepository.save(InventoryFixture.create(equipment, 0L));
 
         // when, then
-        assertThatCode(() -> inventoryRepository.updateAmount(inventory.getId(), new RentalAmount(10)))
+        assertThatCode(() -> inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(10)))
                 .doesNotThrowAnyException();
     }
 }

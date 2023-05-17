@@ -83,7 +83,7 @@ class InventoryServiceTest {
         final int updateAmount = inventory.getRentalAmount().getAmount() + 1;
         doNothing().when(amountValidator).validateAmount(
                 eq(1L), eq(updateAmount), eq(inventory.getRentalPeriod()));
-        doNothing().when(inventoryRepository).updateAmount(inventory.getId(), new RentalAmount(updateAmount));
+        doNothing().when(inventoryRepository).updateAmount(inventory.getId(), RentalAmount.ofPositive(updateAmount));
         final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()
                 .equipmentId(1L)
                 .amount(1)

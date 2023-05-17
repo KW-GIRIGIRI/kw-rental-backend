@@ -174,9 +174,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         final Equipment equipment2 = EquipmentFixture.builder().modelName("equipment2").totalQuantity(10).build();
         equipmentRepository.save(equipment2);
         LocalDate date = LocalDate.of(2023, 1, 1);
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).amount(new RentalAmount(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(2)).period(new RentalPeriod(date, date.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
 
         // when
         final EquipmentsWithRentalQuantityPageResponse response = RestAssured.given(this.requestSpec)
@@ -315,9 +315,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         final Equipment equipment1 = EquipmentFixture.builder().modelName("equipment1").totalQuantity(10).build();
         equipmentRepository.save(equipment1);
         LocalDate monday = LocalDate.of(2023, 5, 15);
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(5)).period(new RentalPeriod(monday, monday.plusDays(1))).build());
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(4)).period(new RentalPeriod(monday.plusDays(1), monday.plusDays(2))).build());
-        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(new RentalAmount(3)).period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(monday, monday.plusDays(1))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(4)).period(new RentalPeriod(monday.plusDays(1), monday.plusDays(2))).build());
+        reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(3)).period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3))).build());
 
         // when
         final RemainQuantitiesPerDateResponse response = RestAssured.given(requestSpec)

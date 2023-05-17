@@ -14,6 +14,8 @@ import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,8 @@ class ReservationRepositoryTest {
     private EquipmentRepository equipmentRepository;
     @Autowired
     private MemberRepository memberRepository;
-
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("대여 수령일로 대여 예약을 조회")
@@ -139,6 +142,24 @@ class ReservationRepositoryTest {
 
         // then
         assertThat(actual).containsExactlyInAnyOrder(reservation1);
+    }
 
+    @Test
+    @DisplayName("대여 예약의 종결 여부를 업데이트 한다.")
+    void adjustTerminated() {
+        // given
+        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).status(ReservationSpecStatus.CANCELED).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).terminated(false).build());
+        reservation.updateIfTerminated();
+
+        // when
+        reservationRepository.adjustTerminated(reservation);
+        entityManager.detach(reservation);
+        final Reservation actual = reservationRepository.findById(reservation.getId()).orElseThrow();
+
+        // then
+        assertThat(actual).usingRecursiveComparison()
+                .isEqualTo(reservation);
     }
 }

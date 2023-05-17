@@ -47,7 +47,7 @@ public class InventoryService {
         final Inventory inventory = foundInventory.get();
         final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.getAmount();
         amountValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
-        inventoryRepository.updateAmount(inventory.getId(), new RentalAmount(updatedAmount));
+        inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
         return inventory.getId();
     }
 
@@ -56,7 +56,7 @@ public class InventoryService {
         return Inventory.builder()
                 .equipment(equipment)
                 .rentalPeriod(rentalPeriod)
-                .rentalAmount(new RentalAmount(addInventoryRequest.getAmount()))
+                .rentalAmount(RentalAmount.ofPositive(addInventoryRequest.getAmount()))
                 .memberId(memberId)
                 .build();
     }
@@ -93,7 +93,7 @@ public class InventoryService {
         validateInventoryMemberId(memberId, inventory);
         amountValidator.validateAmount(inventory.getEquipment().getId(), request.getAmount(),
                 new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
-        inventory.setRentalAmount(new RentalAmount(request.getAmount()));
+        inventory.setRentalAmount(RentalAmount.ofPositive(request.getAmount()));
         inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         return InventoryResponse.from(inventory);
     }

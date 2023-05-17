@@ -18,4 +18,6 @@ public interface ReservationRepositoryCustom {
     Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(LocalDate localDate);
 
     Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
+
+    void adjustTerminated(Reservation reservation);
 }
