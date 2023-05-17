@@ -5,6 +5,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,9 +17,11 @@ import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservat
 public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
-    public ReservationSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
+    public ReservationSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory, final EntityManager entityManager) {
         this.queryFactory = queryFactory;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -69,5 +72,16 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                                 .and(reservationSpec.period.rentalStartDate.goe(start))
                                 .and(reservationSpec.period.rentalStartDate.loe(end)))
                 .fetch();
+    }
+
+    @Override
+    public void adjustAmountAndStatus(final ReservationSpec reservationSpecForUpdate) {
+        entityManager.detach(reservationSpecForUpdate);
+        queryFactory.update(reservationSpec)
+                .set(reservationSpec.amount, reservationSpecForUpdate.getAmount())
+                .set(reservationSpec.status, reservationSpecForUpdate.getStatus())
+                .where(reservationSpec.id.eq(reservationSpecForUpdate.getId()))
+                .execute();
+        entityManager.merge(reservationSpecForUpdate);
     }
 }

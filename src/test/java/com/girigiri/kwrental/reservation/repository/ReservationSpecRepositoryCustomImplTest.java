@@ -7,9 +7,12 @@ import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,9 @@ class ReservationSpecRepositoryCustomImplTest {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("특정 기간과 겹치는 대여 사항을 조회한다.")
@@ -108,5 +114,25 @@ class ReservationSpecRepositoryCustomImplTest {
 
         // then
         assertThat(expect).containsExactlyInAnyOrder(reservationSpec1);
+    }
+
+    @Test
+    @DisplayName("대여 예약 상세의 갯수와 상태를 변경한다.")
+    void adjustAmountAndStatus() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1)
+                .amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build());
+
+        // when
+        reservationSpec.cancelAmount(1);
+        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
+        entityManager.detach(reservationSpec);
+        final ReservationSpec actual = reservationSpecRepository.findById(reservationSpec.getId())
+                .orElseThrow();
+
+        // then
+        assertThat(actual).usingRecursiveComparison()
+                .isEqualTo(reservationSpec);
     }
 }
