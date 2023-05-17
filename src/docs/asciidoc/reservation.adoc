@@ -20,3 +20,7 @@ operation::admin_getReservationByEquipment[snippets='http-request,http-response'
 - `CANCELED` : 대여 취소
 
 operation::getUnterminatedReservations[snippets='http-request,http-response']
+
+=== 대여 취소하기
+
+operation::admin_cancelReservationSpec[snippets='http-request,http-response']

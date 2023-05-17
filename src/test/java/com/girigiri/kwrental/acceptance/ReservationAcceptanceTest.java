@@ -5,6 +5,7 @@ import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
@@ -12,6 +13,7 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
+import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
@@ -131,5 +133,25 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(UnterminatedReservationResponse.from(reservation1), UnterminatedReservationResponse.from(reservation2));
+    }
+
+    @Test
+    @DisplayName("대여 예약 상세를 취소한다.")
+    void cancelReservationSpec() {
+        // given
+        final Long memberId = 1L;
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName1").build());
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(2)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(memberId).build());
+
+        final CancelReservationSpecRequest requestBody = new CancelReservationSpecRequest(2);
+
+        // when, then
+        RestAssured.given(requestSpec)
+                .filter(document("admin_cancelReservationSpec"))
+                .contentType(ContentType.JSON).body(requestBody)
+                .when().log().all().patch("/api/admin/reservations/specs/{id}", reservationSpec1.getId())
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
+                .header(HttpHeaders.LOCATION, containsString("/api/reservations/specs/" + reservationSpec1.getId()));
     }
 }
