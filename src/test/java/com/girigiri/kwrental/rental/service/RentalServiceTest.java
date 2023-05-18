@@ -11,14 +11,15 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationSpecWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
@@ -120,8 +121,8 @@ class RentalServiceTest {
         // given
         final Equipment equipment1 = EquipmentFixture.create();
         final Equipment equipment2 = EquipmentFixture.create();
-        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).id(1L).build();
-        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).id(2L).build();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).id(1L).status(ReservationSpecStatus.RESERVED).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).id(2L).status(ReservationSpecStatus.CANCELED).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(1L).acceptDateTime(RentalDateTime.now()).build();
         final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).build();
         final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).build();
@@ -130,10 +131,11 @@ class RentalServiceTest {
         given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec2.getId()))).willReturn(List.of(rentalSpec1, rentalSpec2));
 
         // when
-        final ReservationsWithRentalSpecsAndMemberNumberResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
+        final ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
 
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservationWithRentalSpecsResponse.of(reservationWithMemberNumber, List.of(rentalSpec1, rentalSpec2)));
+                .containsExactly(ReservedOrRentedReservationWithRentalSpecsResponse.of(reservationWithMemberNumber, List.of(rentalSpec1, rentalSpec2)));
+        assertThat(response.getReservations().get(0).getReservationSpecs()).usingRecursiveFieldByFieldElementComparator().containsExactly(ReservationSpecWithRentalSpecsResponse.of(reservationSpec1, List.of(rentalSpec1)));
     }
 
     @Test

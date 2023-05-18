@@ -13,13 +13,13 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservations;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,11 +87,11 @@ public class RentalService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationsWithRentalSpecsAndMemberNumberResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
+    public ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
         final Set<ReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
-        return ReservationsWithRentalSpecsAndMemberNumberResponse.of(reservations, rentalSpecs);
+        return ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.of(reservations, rentalSpecs);
     }
 
     private Set<Long> getAcceptedReservationSpecIds(final Collection<ReservationWithMemberNumber> reservationsWithMemberNumber) {
@@ -105,7 +105,7 @@ public class RentalService {
     @Transactional(readOnly = true)
     public ReservationsWithRentalSpecsByEndDateResponse getReservationsWithRentalSpecsByEndDate(final LocalDate endDate) {
         final OverdueReservationsWithRentalSpecsResponse overdueReservationsWithRentalSpecs = getOverdueReservationsWithRentalSpecs(endDate);
-        final ReservationsWithRentalSpecsAndMemberNumberResponse reservationWithRentalSpecsByEndDate = getReservationWithRentalSpecsByEndDate(endDate);
+        final ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse reservationWithRentalSpecsByEndDate = getReservationWithRentalSpecsByEndDate(endDate);
         return new ReservationsWithRentalSpecsByEndDateResponse(overdueReservationsWithRentalSpecs, reservationWithRentalSpecsByEndDate);
     }
 
@@ -119,11 +119,11 @@ public class RentalService {
         return OverdueReservationsWithRentalSpecsResponse.of(overdueReservationsWithMemberNumber, overdueRentalSpecs);
     }
 
-    private ReservationsWithRentalSpecsAndMemberNumberResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
+    private ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
         Set<ReservationWithMemberNumber> reservationsWithMemberNumber = reservationService.getReservationsWithMemberNumberByEndDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservationsWithMemberNumber);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
-        return ReservationsWithRentalSpecsAndMemberNumberResponse.of(reservationsWithMemberNumber, rentalSpecs);
+        return ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.of(reservationsWithMemberNumber, rentalSpecs);
     }
 
     @Transactional

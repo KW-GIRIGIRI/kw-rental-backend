@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.repository.dto.QReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -32,13 +32,11 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .fetch());
     }
 
-    private JPAQuery<ReservationWithMemberNumber> selectReservationWithMemberNumberAndEquipmentAndSpecs() {
-        return jpaQueryFactory
-                .select(new QReservationWithMemberNumber(reservation, member.memberNumber))
-                .from(reservation)
-                .leftJoin(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .leftJoin(reservationSpec.equipment).fetchJoin()
-                .leftJoin(member).on(member.id.eq(reservation.memberId));
+    @Override
+    public Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(final LocalDate returnDate) {
+        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
+                .where(reservation.terminated.isFalse(), reservationSpec.period.rentalEndDate.before(returnDate))
+                .fetch());
     }
 
     @Override
@@ -50,12 +48,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .fetchOne());
     }
 
-    @Override
-    public Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(final LocalDate returnDate) {
-        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
-                .where(reservation.terminated.isFalse()
-                        .and(reservationSpec.period.rentalEndDate.before(returnDate)))
-                .fetch());
+    private JPAQuery<ReservationWithMemberNumber> selectReservationWithMemberNumberAndEquipmentAndSpecs() {
+        return jpaQueryFactory
+                .select(Projections.constructor(ReservationWithMemberNumber.class, reservation, member.memberNumber))
+                .from(reservation)
+                .leftJoin(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .leftJoin(reservationSpec.equipment).fetchJoin()
+                .leftJoin(member).on(member.id.eq(reservation.memberId));
     }
 
     @Override

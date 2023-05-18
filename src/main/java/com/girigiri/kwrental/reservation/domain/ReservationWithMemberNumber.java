@@ -1,24 +1,26 @@
-package com.girigiri.kwrental.reservation.repository.dto;
+package com.girigiri.kwrental.reservation.domain;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
 public class ReservationWithMemberNumber {
 
-    private Reservation reservation;
-    private String memberNumber;
+    private final Reservation reservation;
+    private final String memberNumber;
 
-    protected ReservationWithMemberNumber() {
-    }
 
-    @QueryProjection
     public ReservationWithMemberNumber(final Reservation reservation, final String memberNumber) {
         this.reservation = reservation;
         this.memberNumber = memberNumber;
+    }
+
+    public List<ReservationSpec> getReservedOrRentedSpecs() {
+        return reservation.getReservationSpecs().stream()
+                .filter(ReservationSpec::isReservedOrRented)
+                .toList();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import lombok.Getter;
 
 import java.util.Collection;

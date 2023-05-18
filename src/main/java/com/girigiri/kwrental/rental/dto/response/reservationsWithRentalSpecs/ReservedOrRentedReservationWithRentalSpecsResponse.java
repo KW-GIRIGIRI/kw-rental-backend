@@ -2,7 +2,7 @@ package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.groupingBy;
 
 @Getter
-public class ReservationWithRentalSpecsResponse {
+public class ReservedOrRentedReservationWithRentalSpecsResponse {
 
     private Long reservationId;
     private String name;
@@ -20,10 +20,10 @@ public class ReservationWithRentalSpecsResponse {
     private Instant acceptDateTime;
     private List<ReservationSpecWithRentalSpecsResponse> reservationSpecs;
 
-    private ReservationWithRentalSpecsResponse() {
+    private ReservedOrRentedReservationWithRentalSpecsResponse() {
     }
 
-    private ReservationWithRentalSpecsResponse(final Long reservationId, final String name, final String memberNumber, final Instant acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
+    private ReservedOrRentedReservationWithRentalSpecsResponse(final Long reservationId, final String name, final String memberNumber, final Instant acceptDateTime, final List<ReservationSpecWithRentalSpecsResponse> reservationSpecs) {
         this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
@@ -31,18 +31,18 @@ public class ReservationWithRentalSpecsResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static ReservationWithRentalSpecsResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
+    public static ReservedOrRentedReservationWithRentalSpecsResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
+        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsResponse = mapToReservationSpecWithRentalSpecResponse(rentalSpecs, reservationWithMemberNumber);
         final Reservation reservation = reservationWithMemberNumber.getReservation();
-        final List<ReservationSpecWithRentalSpecsResponse> reservationSpecWithRentalSpecsResponse = mapToReservationSpecWithRentalSpecResponse(rentalSpecs, reservation);
         final Instant rentalAcceptDateTime = reservation.getAcceptDateTime() == null ? null : reservation.getAcceptDateTime().getInstant();
-        return new ReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(),
+        return new ReservedOrRentedReservationWithRentalSpecsResponse(reservation.getId(), reservation.getName(),
                 reservationWithMemberNumber.getMemberNumber(), rentalAcceptDateTime, reservationSpecWithRentalSpecsResponse);
     }
 
-    private static List<ReservationSpecWithRentalSpecsResponse> mapToReservationSpecWithRentalSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
+    private static List<ReservationSpecWithRentalSpecsResponse> mapToReservationSpecWithRentalSpecResponse(final List<RentalSpec> rentalSpecs, final ReservationWithMemberNumber reservationWithMemberNumber) {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
-        return reservation.getReservationSpecs().stream()
+        return reservationWithMemberNumber.getReservedOrRentedSpecs().stream()
                 .map(it -> ReservationSpecWithRentalSpecsResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();
     }

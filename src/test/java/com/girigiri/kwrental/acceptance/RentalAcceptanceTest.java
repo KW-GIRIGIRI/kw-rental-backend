@@ -19,15 +19,15 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -118,16 +118,16 @@ class RentalAcceptanceTest extends AcceptanceTest {
 
 
         // when
-        final ReservationsWithRentalSpecsAndMemberNumberResponse response = RestAssured.given(requestSpec)
+        final ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse response = RestAssured.given(requestSpec)
                 .filter(document("admin_getReservationsWithRentalSpecsByStartDate"))
                 .when().log().all().get("/api/admin/rentals?startDate={startDate}", LocalDate.now().toString())
                 .then().log().all().statusCode(HttpStatus.OK.value())
-                .extract().as(ReservationsWithRentalSpecsAndMemberNumberResponse.class);
+                .extract().as(ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.class);
 
         // then
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyInAnyOrder(ReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)),
-                        ReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation2, member.getMemberNumber()), Collections.emptyList()));
+                .containsExactlyInAnyOrder(ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)),
+                        ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation2, member.getMemberNumber()), Collections.emptyList()));
     }
 
     @Test
@@ -168,7 +168,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
                         .containsExactlyInAnyOrder(OverdueReservationResponse.of(new ReservationWithMemberNumber(reservation2, member.getMemberNumber()), List.of(rentalSpec3))),
                 () -> assertThat(response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactlyInAnyOrder(ReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
+                        .containsExactlyInAnyOrder(ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
         );
     }
 

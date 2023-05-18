@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 
 import java.time.LocalDate;
 import java.util.Optional;

@@ -97,4 +97,8 @@ public class ReservationSpec {
                 && status != ReservationSpecStatus.RENTED
                 && status != ReservationSpecStatus.OVERDUE_RENTED;
     }
+
+    public boolean isReservedOrRented() {
+        return this.status == ReservationSpecStatus.RESERVED || this.status == ReservationSpecStatus.RENTED;
+    }
 }
