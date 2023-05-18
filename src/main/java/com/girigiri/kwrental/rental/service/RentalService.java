@@ -16,6 +16,7 @@ import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueRese
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.Reservations;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
@@ -155,7 +156,8 @@ public class RentalService {
 
     @Transactional(readOnly = true)
     public RentalsDto getRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
-        return new RentalsDto(rentalSpecRepository.findRentalDtosBetweenDate(memberId, from, to));
+        final List<RentalDto> rentalDtosBetweenDate = rentalSpecRepository.findRentalDtosBetweenDate(memberId, from, to);
+        return new RentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
     }
 
     @Transactional(readOnly = true)

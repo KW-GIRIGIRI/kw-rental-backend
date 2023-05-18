@@ -244,7 +244,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(new RentalDto(reservation.getStartDate(), reservation.getEndDate(),
-                        Set.of(new RentalSpecDto(equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(equipment2.getModelName(), rentalSpec2.getStatus())))
+                        Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getModelName(), rentalSpec2.getStatus())))
                 );
     }
 
