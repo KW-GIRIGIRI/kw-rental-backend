@@ -3,17 +3,17 @@ package com.girigiri.kwrental.rental.dto.response;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 public class RentalsDto {
 
-    private List<RentalDto> rentals;
+    private Set<RentalDto> rentals;
 
     private RentalsDto() {
     }
 
-    public RentalsDto(final List<RentalDto> rentals) {
+    public RentalsDto(final Set<RentalDto> rentals) {
         this.rentals = rentals;
     }
 }

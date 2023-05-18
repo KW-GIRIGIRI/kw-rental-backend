@@ -9,13 +9,15 @@ import java.util.Objects;
 
 public class RentalSpecDto {
 
+    private Long id;
     private String modelName;
     private RentalSpecStatus status;
 
     protected RentalSpecDto() {
     }
 
-    public RentalSpecDto(final String modelName, final RentalSpecStatus status) {
+    public RentalSpecDto(final Long id, final String modelName, final RentalSpecStatus status) {
+        this.id = id;
         this.modelName = modelName;
         this.status = status;
     }
@@ -25,11 +27,11 @@ public class RentalSpecDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final RentalSpecDto that = (RentalSpecDto) o;
-        return Objects.equals(modelName, that.modelName) && status == that.status;
+        return Objects.equals(id, that.id) && Objects.equals(modelName, that.modelName) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelName, status);
+        return Objects.hash(id, modelName, status);
     }
 }
