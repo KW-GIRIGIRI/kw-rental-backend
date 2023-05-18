@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Embeddable
 public class RentalDateTime {
 
+    private static final RentalDateTime NULL = new RentalDateTime();
     private Instant instant;
 
     protected RentalDateTime() {

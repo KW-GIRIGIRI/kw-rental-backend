@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.repository.dto.ReservationWithMemberNumber;
@@ -33,8 +34,9 @@ public class OverdueReservationResponse {
     public static OverdueReservationResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
         final Reservation reservation = reservationWithMemberNumber.getReservation();
         final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, reservation);
+        final RentalDateTime acceptDateTime = reservation.getAcceptDateTime();
         return new OverdueReservationResponse(reservation.getId(), reservation.getName(),
-                reservationWithMemberNumber.getMemberNumber(), reservation.getAcceptDateTime().getInstant(), overdueReservationSpecResponses);
+                reservationWithMemberNumber.getMemberNumber(), acceptDateTime == null ? null : acceptDateTime.getInstant(), overdueReservationSpecResponses);
     }
 
     private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
