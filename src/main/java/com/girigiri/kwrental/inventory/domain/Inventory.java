@@ -7,7 +7,6 @@ import lombok.Getter;
 
 import java.util.Objects;
 
-// TODO: 2023/04/05 회원 관련 코드가 필요하다
 @Entity
 @Getter
 @Builder
