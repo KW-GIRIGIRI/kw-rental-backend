@@ -6,8 +6,8 @@ import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Embeddable
 @Getter
@@ -38,9 +38,20 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         this.rentalEndDate = rentalEndDate;
     }
 
-
     public Integer getRentalDays() {
-        return (int) rentalStartDate.until(rentalEndDate, ChronoUnit.DAYS);
+        int rentalDays = 0;
+        for (LocalDate date = rentalStartDate; date.isBefore(rentalEndDate); date = date.plusDays(1)) {
+            if (isNotSupportedDayOfWeek(date)) {
+                continue;
+            }
+            rentalDays++;
+        }
+        return rentalDays;
+    }
+
+    public static boolean isNotSupportedDayOfWeek(final LocalDate date) {
+        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
+                || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
     }
 
     public boolean contains(final LocalDate date) {

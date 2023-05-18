@@ -31,15 +31,15 @@ class RentalPeriodTest {
     @DisplayName("대여 가능한 일 수를 계산한다")
     void getRentalDays() {
         // given
-        final LocalDate start = LocalDate.now().plusDays(1);
-        final LocalDate end = LocalDate.now().plusDays(1);
-        final RentalPeriod rentalPeriod = new RentalPeriod(start, end);
+        final LocalDate thursday = LocalDate.of(2023, 5, 18);
+        final LocalDate monday = LocalDate.of(2023, 5, 22);
+        final RentalPeriod rentalPeriod = new RentalPeriod(thursday, monday);
 
         // when
         final Integer expect = rentalPeriod.getRentalDays();
 
         // then
-        assertThat(expect).isZero();
+        assertThat(expect).isOne();
     }
 
     @Test
