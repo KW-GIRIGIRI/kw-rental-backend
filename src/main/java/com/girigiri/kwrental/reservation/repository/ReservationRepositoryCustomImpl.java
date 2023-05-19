@@ -26,14 +26,14 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public Set<ReservationWithMemberNumber> findReservationsWithSpecsByStartDate(final LocalDate startDate) {
+    public Set<ReservationWithMemberNumber> findUnterminatedReservationsWithSpecsByStartDate(final LocalDate startDate) {
         return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservation.terminated.isFalse(), reservationSpec.period.rentalStartDate.eq(startDate))
                 .fetch());
     }
 
     @Override
-    public Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(final LocalDate returnDate) {
+    public Set<ReservationWithMemberNumber> findUnterminatedOverdueReservationWithSpecs(final LocalDate returnDate) {
         return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservation.terminated.isFalse(), reservationSpec.period.rentalEndDate.before(returnDate))
                 .fetch());
@@ -58,9 +58,9 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(final LocalDate endDate) {
+    public Set<ReservationWithMemberNumber> findUnterminatedReservationsWithSpecsByEndDate(final LocalDate endDate) {
         return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
-                .where(reservationSpec.period.rentalEndDate.eq(endDate))
+                .where(reservation.terminated.isFalse(), reservationSpec.period.rentalEndDate.eq(endDate))
                 .fetch());
     }
 

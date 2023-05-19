@@ -64,7 +64,7 @@ class ReservationRepositoryTest {
         final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec5, reservationSpec6)).memberId(member.getId()).terminated(true).build());
 
         // when
-        final Set<ReservationWithMemberNumber> expect = reservationRepository.findReservationsWithSpecsByStartDate(LocalDate.now());
+        final Set<ReservationWithMemberNumber> expect = reservationRepository.findUnterminatedReservationsWithSpecsByStartDate(LocalDate.now());
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()));
@@ -88,7 +88,7 @@ class ReservationRepositoryTest {
         final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).terminated(true).build());
 
         // when
-        final Set<ReservationWithMemberNumber> expect = reservationRepository.findOverdueReservationWithSpecs(now);
+        final Set<ReservationWithMemberNumber> expect = reservationRepository.findUnterminatedOverdueReservationWithSpecs(now);
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()));
@@ -113,8 +113,12 @@ class ReservationRepositoryTest {
         final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now.plusDays(2))).build();
         final Reservation reservation2 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec3, reservationSpec4)));
 
+        final ReservationSpec reservationSpec5 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.CANCELED).build();
+        final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.CANCELED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec5, reservationSpec6)).memberId(member.getId()).terminated(true).build());
+
         // when
-        final Set<ReservationWithMemberNumber> expect = reservationRepository.findReservationsWithSpecsByEndDate(now);
+        final Set<ReservationWithMemberNumber> expect = reservationRepository.findUnterminatedReservationsWithSpecsByEndDate(now);
 
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()));

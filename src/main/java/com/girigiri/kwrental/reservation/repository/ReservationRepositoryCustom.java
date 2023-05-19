@@ -9,13 +9,13 @@ import java.util.Set;
 
 public interface ReservationRepositoryCustom {
 
-    Set<ReservationWithMemberNumber> findReservationsWithSpecsByStartDate(LocalDate startDate);
+    Set<ReservationWithMemberNumber> findUnterminatedReservationsWithSpecsByStartDate(LocalDate startDate);
 
     Optional<Reservation> findByIdWithSpecs(Long id);
 
-    Set<ReservationWithMemberNumber> findOverdueReservationWithSpecs(LocalDate returnDate);
+    Set<ReservationWithMemberNumber> findUnterminatedOverdueReservationWithSpecs(LocalDate returnDate);
 
-    Set<ReservationWithMemberNumber> findReservationsWithSpecsByEndDate(LocalDate localDate);
+    Set<ReservationWithMemberNumber> findUnterminatedReservationsWithSpecsByEndDate(LocalDate localDate);
 
     Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
 

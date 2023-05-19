@@ -111,7 +111,7 @@ class ReservationServiceTest {
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
         final ReservationWithMemberNumber reservationWithMemberNumber = new ReservationWithMemberNumber(reservation, "11111111");
-        given(reservationRepository.findReservationsWithSpecsByStartDate(any()))
+        given(reservationRepository.findUnterminatedReservationsWithSpecsByStartDate(any()))
                 .willReturn(Set.of(reservationWithMemberNumber));
 
         // when

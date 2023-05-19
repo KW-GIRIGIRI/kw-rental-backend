@@ -87,7 +87,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Set<ReservationWithMemberNumber> getReservationsByStartDate(final LocalDate startDate) {
-        return reservationRepository.findReservationsWithSpecsByStartDate(startDate);
+        return reservationRepository.findUnterminatedReservationsWithSpecsByStartDate(startDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -121,12 +121,12 @@ public class ReservationService {
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Set<ReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
-        return reservationRepository.findOverdueReservationWithSpecs(localDate);
+        return reservationRepository.findUnterminatedOverdueReservationWithSpecs(localDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Set<ReservationWithMemberNumber> getReservationsWithMemberNumberByEndDate(final LocalDate localDate) {
-        return reservationRepository.findReservationsWithSpecsByEndDate(localDate);
+        return reservationRepository.findUnterminatedReservationsWithSpecsByEndDate(localDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
