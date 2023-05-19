@@ -28,7 +28,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     @Override
     public Set<ReservationWithMemberNumber> findReservationsWithSpecsByStartDate(final LocalDate startDate) {
         return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
-                .where(reservationSpec.period.rentalStartDate.eq(startDate))
+                .where(reservation.terminated.isFalse(), reservationSpec.period.rentalStartDate.eq(startDate))
                 .fetch());
     }
 
