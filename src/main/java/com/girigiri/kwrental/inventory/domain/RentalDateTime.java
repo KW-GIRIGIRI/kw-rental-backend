@@ -30,7 +30,7 @@ public class RentalDateTime {
     }
 
     public static RentalDateTime from(final LocalDateTime localDateTime) {
-        return new RentalDateTime(localDateTime.atZone(SEOUL_ZONE_ID).toInstant());
+        return new RentalDateTime(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public RentalDateTime calculateDay(final int days) {
@@ -48,6 +48,6 @@ public class RentalDateTime {
     }
 
     public LocalDate toLocalDate() {
-        return LocalDate.ofInstant(this.instant, ZoneId.systemDefault());
+        return LocalDate.ofInstant(this.instant, SEOUL_ZONE_ID);
     }
 }
