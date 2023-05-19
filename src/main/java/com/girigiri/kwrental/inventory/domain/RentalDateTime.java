@@ -44,10 +44,10 @@ public class RentalDateTime {
     }
 
     public LocalDateTime toLocalDateTime() {
-        return LocalDateTime.ofInstant(this.instant, SEOUL_ZONE_ID).truncatedTo(ChronoUnit.MILLIS);
+        return this.instant.atZone(SEOUL_ZONE_ID).toLocalDateTime().truncatedTo(ChronoUnit.MILLIS);
     }
 
     public LocalDate toLocalDate() {
-        return LocalDate.ofInstant(this.instant, SEOUL_ZONE_ID);
+        return this.instant.atZone(SEOUL_ZONE_ID).toLocalDate();
     }
 }
