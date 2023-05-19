@@ -14,6 +14,8 @@ import java.time.temporal.ChronoUnit;
 public class RentalDateTime {
 
     private static final RentalDateTime NULL = new RentalDateTime();
+    private static final ZoneId SEOUL_ZONE_ID = ZoneId.of("Asia/Seoul");
+
     private Instant instant;
 
     protected RentalDateTime() {
@@ -27,8 +29,8 @@ public class RentalDateTime {
         return new RentalDateTime(Instant.now());
     }
 
-    public LocalDateTime toLocalDateTime() {
-        return LocalDateTime.ofInstant(this.instant, ZoneId.systemDefault()).truncatedTo(ChronoUnit.MILLIS);
+    public static RentalDateTime from(final LocalDateTime localDateTime) {
+        return new RentalDateTime(localDateTime.atZone(SEOUL_ZONE_ID).toInstant());
     }
 
     public RentalDateTime calculateDay(final int days) {
@@ -41,8 +43,8 @@ public class RentalDateTime {
         return RentalDateTime.from(localDateTime);
     }
 
-    public static RentalDateTime from(final LocalDateTime localDateTime) {
-        return new RentalDateTime(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    public LocalDateTime toLocalDateTime() {
+        return LocalDateTime.ofInstant(this.instant, SEOUL_ZONE_ID).truncatedTo(ChronoUnit.MILLIS);
     }
 
     public LocalDate toLocalDate() {
