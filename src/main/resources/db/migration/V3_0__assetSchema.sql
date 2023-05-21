@@ -1,4 +1,4 @@
-create table asset
+create table if not exists asset
 (
     id              bigint auto_increment,
     dtype           varchar(20) not null,
@@ -43,24 +43,3 @@ alter table reservation_spec
     drop constraint FK_RESERVATION_SPEC_EQUIPMENT;
 
 
-INSERT INTO asset (dtype, id, max_rental_days, name, total_quantity, category, components, description, img_url, maker,
-                   purpose, rental_place, is_available)
-SELECT 'equipment',
-       id,
-       max_rental_days,
-       model_name,
-       total_quantity,
-       category,
-       components,
-       description,
-       img_url,
-       maker,
-       purpose,
-       rental_place,
-       NULL
-FROM equipment;
-
-SELECT @max_id := MAX(id) + 1
-FROM equipment;
-ALTER TABLE asset
-    AUTO_INCREMENT = @max_id;
