@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.equipment.service;
 
+import com.girigiri.kwrental.asset.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;

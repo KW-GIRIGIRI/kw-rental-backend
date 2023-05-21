@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment.service;
+package com.girigiri.kwrental.asset;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,7 +1,10 @@
 package com.girigiri.kwrental.equipment.domain;
 
 import com.girigiri.kwrental.asset.RentableAsset;
-import jakarta.persistence.*;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +28,6 @@ public class Equipment extends RentableAsset {
 
     private String purpose;
 
-    @Column(nullable = false)
     private String rentalPlace;
 
     protected Equipment() {

@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.reservation.service;
 
+import com.girigiri.kwrental.asset.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.equipment.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
 import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
