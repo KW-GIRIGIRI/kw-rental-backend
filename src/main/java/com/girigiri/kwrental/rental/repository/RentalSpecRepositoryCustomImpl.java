@@ -52,7 +52,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
         return Set.copyOf(
                 jpaQueryFactory.selectFrom(rentalSpec)
                         .leftJoin(reservationSpec).on(rentalSpec.reservationSpecId.eq(reservationSpec.id))
-                        .where(reservationSpec.equipment.id.eq(equipmentId)
+                        .where(reservationSpec.rentable.id.eq(equipmentId)
                                 .and(rentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
                                         .and(rentalSpec.returnDateTime.isNull())))
                         .fetch());
@@ -71,7 +71,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .from(rentalSpec)
                 .join(reservationSpec).on(reservationSpec.id.eq(rentalSpec.reservationSpecId))
                 .join(reservation).on(reservation.memberId.eq(memberId))
-                .join(equipment).on(equipment.id.eq(reservationSpec.equipment.id))
+                .join(equipment).on(equipment.id.eq(reservationSpec.rentable.id))
                 .where(reservationSpecBetweenDate(from, to))
                 .transform(groupBy(reservationSpec.period)
                         .list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,

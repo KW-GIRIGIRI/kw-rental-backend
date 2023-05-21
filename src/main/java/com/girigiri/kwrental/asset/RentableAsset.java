@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "asset")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class RentableAsset {
+public abstract class RentableAsset implements Rentable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +36,7 @@ public abstract class RentableAsset {
         this.maxRentalDays = maxRentalDays;
     }
 
+    @Override
     public boolean canRentFor(final Integer rentalDays) {
         return this.maxRentalDays.compareTo(rentalDays) >= 0;
     }

@@ -29,12 +29,12 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
         final LocalDate start = rentalPeriod.getRentalStartDate();
         final LocalDate end = rentalPeriod.getRentalEndDate();
         final List<ReservationSpec> overlappedLeft = queryFactory.selectFrom(reservationSpec)
-                .where(reservationSpec.equipment.id.eq(equipmentId)
+                .where(reservationSpec.rentable.id.eq(equipmentId)
                         .and(reservationSpec.period.rentalStartDate.loe(start))
                         .and(reservationSpec.period.rentalEndDate.after(start)))
                 .fetch();
         final List<ReservationSpec> overLappedRight = queryFactory.selectFrom(reservationSpec)
-                .where(reservationSpec.equipment.id.eq(equipmentId)
+                .where(reservationSpec.rentable.id.eq(equipmentId)
                         .and(reservationSpec.period.rentalStartDate.after(start))
                         .and(reservationSpec.period.rentalStartDate.before(end)))
                 .fetch();
@@ -54,7 +54,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                         new QReservedAmount(equipment.id, equipment.totalQuantity, reservationSpec.amount.amount.sum().coalesce(0))
                 )
                 .from(reservationSpec)
-                .rightJoin(equipment).on(reservationSpec.equipment.id.eq(equipment.id).
+                .rightJoin(equipment).on(reservationSpec.rentable.id.eq(equipment.id).
                         and(reservationSpec.period.rentalStartDate.loe(date))
                         .and(reservationSpec.period.rentalEndDate.after(date)))
                 .where(equipment.id.in(equipmentIds))
@@ -68,7 +68,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 .selectFrom(reservationSpec)
                 .leftJoin(reservationSpec.reservation).fetchJoin()
                 .where(
-                        reservationSpec.equipment.id.eq(equipmentId)
+                        reservationSpec.rentable.id.eq(equipmentId)
                                 .and(reservationSpec.period.rentalStartDate.goe(start))
                                 .and(reservationSpec.period.rentalStartDate.loe(end)))
                 .fetch();

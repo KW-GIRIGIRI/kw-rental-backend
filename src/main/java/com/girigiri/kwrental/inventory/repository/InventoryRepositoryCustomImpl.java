@@ -21,7 +21,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public List<Inventory> findAllWithEquipment(final Long memberId) {
         return jpaQueryFactory.selectFrom(inventory)
-                .join(inventory.equipment).fetchJoin()
+                .join(inventory.rentable).fetchJoin()
                 .where(inventory.memberId.eq(memberId))
                 .fetch();
     }
@@ -37,7 +37,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     public Optional<Inventory> findWithEquipmentById(final Long id) {
         return Optional.ofNullable(
                 jpaQueryFactory.selectFrom(inventory)
-                        .leftJoin(inventory.equipment).fetchJoin()
+                        .leftJoin(inventory.rentable).fetchJoin()
                         .where(inventory.id.eq(id))
                         .fetchOne()
         );
@@ -47,7 +47,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     public Optional<Inventory> findByPeriodAndEquipmentIdAndMemberId(final RentalPeriod rentalPeriod, final Long equipmentId, final Long memberId) {
         return Optional.ofNullable(
                 jpaQueryFactory.selectFrom(inventory)
-                        .where(inventory.memberId.eq(memberId), inventory.equipment.id.eq(equipmentId), inventory.rentalPeriod.eq(rentalPeriod))
+                        .where(inventory.memberId.eq(memberId), inventory.rentable.id.eq(equipmentId), inventory.rentalPeriod.eq(rentalPeriod))
                         .fetchOne()
         );
     }

@@ -1,6 +1,8 @@
 package com.girigiri.kwrental.equipment.domain;
 
+import com.girigiri.kwrental.asset.Rentable;
 import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,5 +51,13 @@ public class Equipment extends RentableAsset {
         this.components = components;
         this.purpose = purpose;
         this.rentalPlace = rentalPlace;
+    }
+
+    @Override
+    public <T extends Rentable> T as(final Class<T> clazz) {
+        if (Equipment.class != clazz) {
+            throw new EquipmentException("해당 엔티티가 기자재가 아닙니다.");
+        }
+        return (T) this;
     }
 }

@@ -54,7 +54,7 @@ public class InventoryService {
     private Inventory mapToInventory(final Long memberId, final Equipment equipment, final AddInventoryRequest addInventoryRequest) {
         final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
         return Inventory.builder()
-                .equipment(equipment)
+                .rentable(equipment)
                 .rentalPeriod(rentalPeriod)
                 .rentalAmount(RentalAmount.ofPositive(addInventoryRequest.getAmount()))
                 .memberId(memberId)
@@ -91,7 +91,7 @@ public class InventoryService {
         final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
                 .orElseThrow(InventoryNotFoundException::new);
         validateInventoryMemberId(memberId, inventory);
-        amountValidator.validateAmount(inventory.getEquipment().getId(), request.getAmount(),
+        amountValidator.validateAmount(inventory.getRentable().getId(), request.getAmount(),
                 new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         inventory.setRentalAmount(RentalAmount.ofPositive(request.getAmount()));
         inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));

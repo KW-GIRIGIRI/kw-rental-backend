@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.reservation.domain;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.RentableAsset;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
@@ -30,8 +31,8 @@ public class ReservationSpec {
     @Builder.Default
     private ReservationSpecStatus status = ReservationSpecStatus.RESERVED;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Equipment equipment;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = RentableAsset.class)
+    private Rentable rentable;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
@@ -40,12 +41,12 @@ public class ReservationSpec {
     }
 
     private ReservationSpec(final Long id, final RentalAmount amount, final RentalPeriod period,
-                            final ReservationSpecStatus status, final Equipment equipment, final Reservation reservation) {
+                            final ReservationSpecStatus status, final Rentable rentable, final Reservation reservation) {
         this.id = id;
         this.amount = amount;
         this.period = period;
         this.status = status;
-        this.equipment = equipment;
+        this.rentable = rentable;
         this.reservation = reservation;
     }
 

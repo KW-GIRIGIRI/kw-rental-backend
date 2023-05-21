@@ -37,7 +37,7 @@ public class InventoryResponse {
     }
 
     public static InventoryResponse from(final Inventory inventory) {
-        final Equipment equipment = inventory.getEquipment();
+        final Equipment equipment = inventory.getRentable().as(Equipment.class);
         return InventoryResponse.builder()
                 .id(inventory.getId())
                 .rentalPlace(equipment.getRentalPlace())
