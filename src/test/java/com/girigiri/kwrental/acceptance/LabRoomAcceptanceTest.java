@@ -32,7 +32,7 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 기자재의 날짜별 남은 갯수를 조회한다.")
     void getRemainQuantitiesBetween() {
         // given
-        final LabRoom labRoom = LabRoomFixture.builder().name("hanool").totalQuantity(10).build();
+        final LabRoom labRoom = LabRoomFixture.builder().name("hanul").totalQuantity(16).build();
         labRoomRepository.save(labRoom);
         LocalDate monday = LocalDate.of(2023, 5, 15);
         reservationSpecRepository.save(ReservationSpecFixture.builder(labRoom).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(monday, monday.plusDays(1))).build());
@@ -49,9 +49,9 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.getRemainQuantities()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
-                        new RemainQuantityPerDateResponse(monday, 5),
-                        new RemainQuantityPerDateResponse(monday.plusDays(1), 6),
-                        new RemainQuantityPerDateResponse(monday.plusDays(2), 7)
+                        new RemainQuantityPerDateResponse(monday, 11),
+                        new RemainQuantityPerDateResponse(monday.plusDays(1), 12),
+                        new RemainQuantityPerDateResponse(monday.plusDays(2), 13)
                 );
     }
 }

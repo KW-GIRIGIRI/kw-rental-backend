@@ -1,0 +1,7 @@
+== 랩실 관련 API
+
+=== 랩실의 날짜별 남은 자리 조회 API
+
+==== url 중간에 `hanul` 과 `hwado` 로 각 랩실을 구분
+
+operation::admin_getLabRoomRemainQuantities[snippets='http-request,http-response']
