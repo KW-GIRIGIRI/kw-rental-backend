@@ -10,6 +10,6 @@ public record ItemResponse(
 ) {
     public static ItemResponse from(final Item item) {
         return new ItemResponse(item.getId(), item.getPropertyNumber(), item.isAvailable(),
-                item.getEquipmentId());
+                item.getAssetId());
     }
 }

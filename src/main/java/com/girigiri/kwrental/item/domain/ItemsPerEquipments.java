@@ -21,7 +21,7 @@ public class ItemsPerEquipments {
     public static ItemsPerEquipments from(final List<Item> items) {
         if (items.isEmpty()) throw new ItemNotFoundException();
         final Map<Long, Set<Item>> itemGroup = items.stream()
-                .collect(groupingBy(Item::getEquipmentId, toSet()));
+                .collect(groupingBy(Item::getAssetId, toSet()));
         return new ItemsPerEquipments(itemGroup);
     }
 

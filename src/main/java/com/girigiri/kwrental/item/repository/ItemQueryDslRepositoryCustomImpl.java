@@ -47,14 +47,14 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     public int countAvailable(final Long equipmentId) {
         return Objects.requireNonNull(jpaQueryFactory.select(item.count())
                 .from(item)
-                .where(item.equipmentId.eq(equipmentId).and(item.available.isTrue()))
+                .where(item.assetId.eq(equipmentId).and(item.available.isTrue()))
                 .fetchOne()).intValue();
     }
 
     @Override
     public List<Item> findByEquipmentIds(final Set<Long> equipmentIds) {
         return jpaQueryFactory.selectFrom(item)
-                .where(item.equipmentId.in(equipmentIds))
+                .where(item.assetId.in(equipmentIds))
                 .fetch();
     }
 
@@ -69,7 +69,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     public Page<EquipmentItemDto> findEquipmentItem(final Pageable pageable, final Category category) {
         final JPAQuery<EquipmentItemDto> query = jpaQueryFactory.select(Projections.constructor(EquipmentItemDto.class, equipment.name, equipment.category, item.propertyNumber))
                 .from(item)
-                .join(equipment).on(equipment.id.eq(item.equipmentId))
+                .join(equipment).on(equipment.id.eq(item.assetId))
                 .where(isEqualTo(category, equipment.category));
         setPageable(query, item, pageable);
         return new PageImpl<>(query.fetch(), pageable, countBy(query));
@@ -78,7 +78,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
     private long countBy(final JPAQuery<?> query) {
         final Long count = jpaQueryFactory.select(item.count())
                 .from(item)
-                .join(equipment).on(equipment.id.eq(item.equipmentId))
+                .join(equipment).on(equipment.id.eq(item.assetId))
                 .where(query.getMetadata().getWhere())
                 .fetchOne();
         return count == null ? 0 : count;

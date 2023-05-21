@@ -110,7 +110,7 @@ class ItemQueryDslRepositoryCustomImplTest {
         itemRepository.save(item2);
 
         // when
-        final int expect = itemRepository.countAvailable(item1.getEquipmentId());
+        final int expect = itemRepository.countAvailable(item1.getAssetId());
 
         // then
         assertThat(expect).isOne();
@@ -137,8 +137,8 @@ class ItemQueryDslRepositoryCustomImplTest {
     void findEquipmentItem() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item1 = ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment.getId()).build();
-        final Item item2 = ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment.getId()).build();
+        final Item item1 = ItemFixture.builder().propertyNumber("11111111").assetId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().propertyNumber("22222222").assetId(equipment.getId()).build();
         itemRepository.saveAll(List.of(item1, item2));
 
         // when

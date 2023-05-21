@@ -69,7 +69,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
     void createRental() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
+        final Item item = itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
         final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
 

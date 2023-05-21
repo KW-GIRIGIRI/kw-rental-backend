@@ -38,7 +38,7 @@ class ItemEventListenerTest {
         publisher.publishEvent(equipmentDeleteEvent);
 
         // then
-        verify(itemRepository).deleteByEquipmentId(1L);
+        verify(itemRepository).deleteByAssetId(1L);
     }
 
     @Test

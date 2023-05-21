@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.testsupport;
 
+import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.auth.interceptor.UserMemberArgumentResolver;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.auth.service.AuthService;
@@ -7,6 +8,7 @@ import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.labroom.service.LabRoomService;
 import com.girigiri.kwrental.rental.service.RentalService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,4 +47,10 @@ public abstract class ControllerTest {
 
     @MockBean
     protected MemberRepository memberRepository;
+
+    @MockBean
+    protected LabRoomService labRoomService;
+
+    @MockBean
+    protected AssetService assetService;
 }

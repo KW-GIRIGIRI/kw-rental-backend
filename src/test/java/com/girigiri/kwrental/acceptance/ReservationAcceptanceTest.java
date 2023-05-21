@@ -62,7 +62,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final String sessionId = getSessionId(member.getMemberNumber(), password);
 
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
+        final Item item = itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
         final Inventory inventory = inventoryRepository.save(InventoryFixture.create(equipment, member.getId()));
 
         final AddReservationRequest request = AddReservationRequest.builder()
@@ -87,7 +87,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void getReservationsByEquipment() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item = itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
+        final Item item = itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
         final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
@@ -115,8 +115,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("name1").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("name2").build());
-        final Item item1 = itemRepository.save(ItemFixture.builder().equipmentId(equipment1.getId()).propertyNumber("11111111").build());
-        final Item item2 = itemRepository.save(ItemFixture.builder().equipmentId(equipment2.getId()).propertyNumber("22222222").build());
+        final Item item1 = itemRepository.save(ItemFixture.builder().assetId(equipment1.getId()).propertyNumber("11111111").build());
+        final Item item2 = itemRepository.save(ItemFixture.builder().assetId(equipment2.getId()).propertyNumber("22222222").build());
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
         final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());

@@ -55,9 +55,9 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void getItemsByEquipment() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
-        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId()).propertyNumber("13579").build();
-        final Item item3 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber("24680").build();
+        final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().assetId(equipment.getId()).propertyNumber("13579").build();
+        final Item item3 = ItemFixture.builder().assetId(equipment.getId() + 1).propertyNumber("24680").build();
         itemRepository.saveAll(List.of(item1, item2, item3));
 
         // when
@@ -77,8 +77,8 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void getItem() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
-        final Item item2 = ItemFixture.builder().equipmentId(equipment.getId() + 1).propertyNumber("1346778").build();
+        final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().assetId(equipment.getId() + 1).propertyNumber("1346778").build();
         itemRepository.save(item1);
         itemRepository.save(item2);
 
@@ -100,7 +100,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void updateRentalAvailable() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
         itemRepository.save(item1);
         final ItemRentalAvailableRequest requestBody = new ItemRentalAvailableRequest(false);
 
@@ -118,7 +118,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void updatePropertyNumber() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item1 = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
         itemRepository.save(item1);
         final ItemPropertyNumberRequest requestBody = new ItemPropertyNumberRequest("updatedNumber");
 
@@ -136,7 +136,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void deleteItem() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
         itemRepository.save(item);
 
         // when
@@ -152,9 +152,9 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void updateByEquipment() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item item = ItemFixture.builder().equipmentId(equipment.getId()).build();
+        final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
         itemRepository.save(item);
-        final Item item2 = ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment.getId()).build();
+        final Item item2 = ItemFixture.builder().propertyNumber("22222222").assetId(equipment.getId()).build();
         itemRepository.save(item2);
 
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
@@ -176,7 +176,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void getAcceptableItems() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item.ItemBuilder itemBuilder = ItemFixture.builder().equipmentId(equipment.getId());
+        final Item.ItemBuilder itemBuilder = ItemFixture.builder().assetId(equipment.getId());
         final Item item1 = itemRepository.save(itemBuilder.propertyNumber("111111111").build());
         final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
         final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).build());
@@ -200,7 +200,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
     void getHistories() {
         // given
         final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        final Item.ItemBuilder itemBuilder = ItemFixture.builder().equipmentId(equipment.getId());
+        final Item.ItemBuilder itemBuilder = ItemFixture.builder().assetId(equipment.getId());
         final Item item1 = itemRepository.save(itemBuilder.propertyNumber("111111111").build());
         final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
         final LocalDate now = LocalDate.now();

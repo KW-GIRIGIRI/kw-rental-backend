@@ -43,7 +43,7 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ItemsResponse getItems(final Long equipmentId) {
         equipmentService.validateExistsById(equipmentId);
-        final List<Item> items = itemRepository.findByEquipmentId(equipmentId);
+        final List<Item> items = itemRepository.findByAssetId(equipmentId);
         return ItemsResponse.of(items);
     }
 
@@ -97,7 +97,7 @@ public class ItemService {
     }
 
     private EquipmentItems getEquipmentItems(final Long equipmentId) {
-        List<Item> items = itemRepository.findByEquipmentId(equipmentId);
+        List<Item> items = itemRepository.findByAssetId(equipmentId);
         return EquipmentItems.from(items);
     }
 
@@ -130,7 +130,7 @@ public class ItemService {
     private Item mapToItem(final Long equipmentId, final UpdateItemRequest updateItemRequest) {
         return Item.builder()
                 .propertyNumber(updateItemRequest.propertyNumber())
-                .equipmentId(equipmentId)
+                .assetId(equipmentId)
                 .build();
     }
 
@@ -156,7 +156,7 @@ public class ItemService {
     public ItemsResponse getRentalAvailableItems(final Long equipmentId) {
         equipmentService.validateExistsById(equipmentId);
         final Set<String> rentedPropertyNumbers = rentedItemService.getRentedPropertyNumbers(equipmentId, LocalDateTime.now());
-        final List<Item> items = itemRepository.findByEquipmentId(equipmentId);
+        final List<Item> items = itemRepository.findByAssetId(equipmentId);
         final List<Item> rentalAvailableItems = items.stream()
                 .filter(it -> canRentalAvailable(rentedPropertyNumbers, it))
                 .toList();

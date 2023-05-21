@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.equipment.service;
 
-import com.girigiri.kwrental.asset.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.*;
 import com.girigiri.kwrental.equipment.dto.response.*;
@@ -46,6 +47,9 @@ class EquipmentServiceTest {
 
     @Mock
     private RemainingQuantityService remainingQuantityService;
+
+    @Mock
+    private AssetService assetService;
 
     @InjectMocks
     private EquipmentService equipmentService;
@@ -265,8 +269,11 @@ class EquipmentServiceTest {
         final Equipment equipment = EquipmentFixture.builder().totalQuantity(10).build();
         final LocalDate now = LocalDate.now();
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+        final Map<LocalDate, Integer> reservedAmounts = Map.of(now, 10, now.plusDays(1), 5);
         given(remainingQuantityService.getReservedAmountBetween(any(), any(), any()))
-                .willReturn(Map.of(now, 10, now.plusDays(1), 5));
+                .willReturn(reservedAmounts);
+        given(assetService.getReservableCountPerDate(reservedAmounts, equipment))
+                .willReturn(new RemainQuantitiesPerDateResponse(List.of(new RemainQuantityPerDateResponse(now, 0), new RemainQuantityPerDateResponse(now.plusDays(1), 5))));
 
         // when
         final RemainQuantitiesPerDateResponse remainQuantitiesPerDate = equipmentService.getRemainQuantitiesPerDate(1L, now, now.plusDays(1));

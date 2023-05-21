@@ -52,7 +52,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         final String sessionId = getSessionId(member.getMemberNumber(), password);
 
         Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-        itemRepository.save(ItemFixture.builder().equipmentId(equipment.getId()).build());
+        itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
 
         AddInventoryRequest request = AddInventoryRequest.builder()
                 .equipmentId(equipment.getId())
@@ -83,8 +83,8 @@ class InventoryAcceptanceTest extends AcceptanceTest {
 
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("aaaaaaaa").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("bbbbbbbb").build());
-        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        final Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
+        final Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").assetId(equipment1.getId()).build());
+        final Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").assetId(equipment2.getId()).build());
         final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
         final Inventory inventory2 = inventoryRepository.save(InventoryFixture.create(equipment2, member.getId()));
         // when
@@ -112,8 +112,8 @@ class InventoryAcceptanceTest extends AcceptanceTest {
 
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("aaaaaaaa").build());
         final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("bbbbbbbb").build());
-        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
-        itemRepository.save(ItemFixture.builder().propertyNumber("22222222").equipmentId(equipment2.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").assetId(equipment1.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("22222222").assetId(equipment2.getId()).build());
         inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
         inventoryRepository.save(InventoryFixture.create(equipment2, member.getId()));
 
@@ -135,7 +135,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         final String sessionId = getSessionId(member.getMemberNumber(), password);
 
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("aaaaaaaa").build());
-        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").assetId(equipment1.getId()).build());
         final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
 
         // when, then
@@ -156,7 +156,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         final String sessionId = getSessionId(member.getMemberNumber(), password);
 
         final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("aaaaaaaa").build());
-        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").equipmentId(equipment1.getId()).build());
+        itemRepository.save(ItemFixture.builder().propertyNumber("11111111").assetId(equipment1.getId()).build());
         final Inventory inventory1 = inventoryRepository.save(InventoryFixture.create(equipment1, member.getId()));
         final UpdateInventoryRequest request = UpdateInventoryRequest.builder()
                 .rentalStartDate(LocalDate.now().plusDays(2))

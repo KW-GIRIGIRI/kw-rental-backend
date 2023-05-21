@@ -10,7 +10,7 @@ public class ItemFixture {
 
     public static ItemBuilder builder() {
         return Item.builder()
-                .equipmentId(EQUIPMENT_ID)
+                .assetId(EQUIPMENT_ID)
                 .propertyNumber(PROPERTY_NUMBER)
                 .available(true);
     }

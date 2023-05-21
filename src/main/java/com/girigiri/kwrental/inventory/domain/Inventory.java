@@ -24,6 +24,7 @@ public class Inventory {
     private RentalAmount rentalAmount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = RentableAsset.class)
+    @JoinColumn(name = "asset_id")
     private Rentable rentable;
 
     @Column(nullable = false)
