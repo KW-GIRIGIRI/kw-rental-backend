@@ -67,7 +67,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 
     @Override
     public Page<EquipmentItemDto> findEquipmentItem(final Pageable pageable, final Category category) {
-        final JPAQuery<EquipmentItemDto> query = jpaQueryFactory.select(Projections.constructor(EquipmentItemDto.class, equipment.modelName, equipment.category, item.propertyNumber))
+        final JPAQuery<EquipmentItemDto> query = jpaQueryFactory.select(Projections.constructor(EquipmentItemDto.class, equipment.name, equipment.category, item.propertyNumber))
                 .from(item)
                 .join(equipment).on(equipment.id.eq(item.equipmentId))
                 .where(isEqualTo(category, equipment.category));

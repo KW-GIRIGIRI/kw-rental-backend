@@ -71,9 +71,9 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("기자재들의 특정 날짜에 대여 예약된 갯수를 구한다.")
     void findRentalAmountsByEquipmentIds() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름1").totalQuantity(4).build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름2").totalQuantity(4).build());
-        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().modelName("모델이름3").totalQuantity(4).build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름1").totalQuantity(4).build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름2").totalQuantity(4).build());
+        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름3").totalQuantity(4).build());
 
         final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
         final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(RentalAmount.ofPositive(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
@@ -102,8 +102,8 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("특정 기간에 대여 수령하는 대여 상세를 조회한다.")
     void findByStartDateBetween() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
         final YearMonth now = YearMonth.now();
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
         final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
@@ -120,7 +120,7 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("대여 예약 상세의 갯수와 상태를 변경한다.")
     void adjustAmountAndStatus() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
         final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1)
                 .amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build());
 

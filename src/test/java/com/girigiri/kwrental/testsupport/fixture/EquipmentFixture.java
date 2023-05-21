@@ -18,7 +18,7 @@ public class EquipmentFixture {
         return Equipment.builder()
                 .category(Category.CAMERA)
                 .maker(maker)
-                .modelName(modelName)
+                .name(modelName)
                 .totalQuantity(totalQuantity)
                 .imgUrl(imgUrl)
                 .description(description)

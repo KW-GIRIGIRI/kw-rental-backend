@@ -75,7 +75,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .where(reservationSpecBetweenDate(from, to))
                 .transform(groupBy(reservationSpec.period)
                         .list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
-                                GroupBy.set(Projections.constructor(RentalSpecDto.class, rentalSpec.id, equipment.modelName, rentalSpec.status)))));
+                                GroupBy.set(Projections.constructor(RentalSpecDto.class, rentalSpec.id, equipment.name, rentalSpec.status)))));
     }
 
     private BooleanExpression reservationSpecBetweenDate(final LocalDate from, final LocalDate to) {

@@ -23,7 +23,7 @@ public class EquipmentRepositoryCustomImpl implements EquipmentRepositoryCustom 
     public Page<Equipment> findEquipmentBy(final Pageable pageable, final String keyword, final Category category) {
         final JPAQuery<Equipment> query = jpaQueryFactory.selectFrom(equipment)
                 .where(
-                        isContains(keyword, equipment.modelName),
+                        isContains(keyword, equipment.name),
                         isEqualTo(category, equipment.category)
                 );
         setPageable(query, equipment, pageable);

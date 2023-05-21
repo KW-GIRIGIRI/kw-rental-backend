@@ -32,6 +32,6 @@ public class UnterminatedReservationSpecResponse {
     public static UnterminatedReservationSpecResponse from(final ReservationSpec reservationSpec) {
         final Equipment equipment = reservationSpec.getEquipment();
         return new UnterminatedReservationSpecResponse(
-                reservationSpec.getId(), equipment.getCategory(), equipment.getModelName(), equipment.getImgUrl(), reservationSpec.getAmount().getAmount(), reservationSpec.getStatus());
+                reservationSpec.getId(), equipment.getCategory(), equipment.getName(), equipment.getImgUrl(), reservationSpec.getAmount().getAmount(), reservationSpec.getStatus());
     }
 }

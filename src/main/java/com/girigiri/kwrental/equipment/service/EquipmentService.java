@@ -86,7 +86,7 @@ public class EquipmentService {
 
     private Equipment mapToEquipment(final AddEquipmentRequest addEquipmentRequest) {
         return Equipment.builder()
-                .modelName(addEquipmentRequest.getModelName())
+                .name(addEquipmentRequest.getModelName())
                 .maker(addEquipmentRequest.getMaker())
                 .imgUrl(addEquipmentRequest.getImgUrl())
                 .purpose(addEquipmentRequest.getPurpose())
@@ -112,7 +112,7 @@ public class EquipmentService {
         Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(EquipmentNotFoundException::new);
 
-        equipment.setModelName(updateEquipmentRequest.modelName());
+        equipment.setName(updateEquipmentRequest.modelName());
         equipment.setComponents(updateEquipmentRequest.component());
         equipment.setCategory(Category.from(updateEquipmentRequest.category()));
         equipment.setMaker(updateEquipmentRequest.maker());

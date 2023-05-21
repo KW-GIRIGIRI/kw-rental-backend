@@ -42,7 +42,7 @@ public class ReservationSpecWithRentalSpecsResponse {
                 .imgUrl(equipment.getImgUrl())
                 .equipmentId(equipment.getId())
                 .category(equipment.getCategory().name())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .amount(reservationSpec.getAmount().getAmount())
                 .rentalSpecs(rentalSpecByStartDateResponses)
                 .build();

@@ -41,7 +41,7 @@ public class InventoryResponse {
         return InventoryResponse.builder()
                 .id(inventory.getId())
                 .rentalPlace(equipment.getRentalPlace())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())
                 .equipmentId(equipment.getId())

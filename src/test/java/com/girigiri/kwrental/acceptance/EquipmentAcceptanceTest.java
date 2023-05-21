@@ -67,13 +67,13 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("기자재 목록 조회 API")
     void getEquipmentsPage() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("name1").build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("name1").build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("name2").build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("name2").build();
         equipmentRepository.save(equipment2);
-        final Equipment equipment3 = EquipmentFixture.builder().modelName("name3").build();
+        final Equipment equipment3 = EquipmentFixture.builder().name("name3").build();
         equipmentRepository.save(equipment3);
-        final Equipment equipment4 = EquipmentFixture.builder().modelName("name4").build();
+        final Equipment equipment4 = EquipmentFixture.builder().name("name4").build();
         equipmentRepository.save(equipment4);
 
         // when
@@ -99,16 +99,16 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("기자재 목록 조회 API_모델명으로 검색")
     void getEquipmentsPage_search() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("key").build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("key").build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("akey").build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("akey").build();
         equipmentRepository.save(equipment2);
-        final Equipment equipment3 = EquipmentFixture.builder().modelName("akeyb").build();
+        final Equipment equipment3 = EquipmentFixture.builder().name("akeyb").build();
         equipmentRepository.save(equipment3);
-        final Equipment equipment4 = EquipmentFixture.builder().modelName("keyb").build();
+        final Equipment equipment4 = EquipmentFixture.builder().name("keyb").build();
         equipmentRepository.save(equipment4);
 
-        final Equipment equipment5 = EquipmentFixture.builder().modelName("notForSearch").build();
+        final Equipment equipment5 = EquipmentFixture.builder().name("notForSearch").build();
         equipmentRepository.save(equipment5);
 
         // when
@@ -134,16 +134,16 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("기자재 목록 조회 API_카테고리로 필터링하여 검색")
     void getEquipmentsPage_searchWithCategory() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("key").category(CAMERA).build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("key").category(CAMERA).build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("akey").category(CAMERA).build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("akey").category(CAMERA).build();
         equipmentRepository.save(equipment2);
-        final Equipment equipment3 = EquipmentFixture.builder().modelName("akeyb").category(CAMERA).build();
+        final Equipment equipment3 = EquipmentFixture.builder().name("akeyb").category(CAMERA).build();
         equipmentRepository.save(equipment3);
-        final Equipment equipment4 = EquipmentFixture.builder().modelName("keyb").category(ETC).build();
+        final Equipment equipment4 = EquipmentFixture.builder().name("keyb").category(ETC).build();
         equipmentRepository.save(equipment4);
 
-        final Equipment equipment5 = EquipmentFixture.builder().modelName("notForSearch").build();
+        final Equipment equipment5 = EquipmentFixture.builder().name("notForSearch").build();
         equipmentRepository.save(equipment5);
 
         // when
@@ -169,9 +169,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("기자재 목록 조회 API_날짜에 따라 대여 가능한 갯수 다르게 보여짐.")
     void getEquipmentsPage_withDate() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("equipment1").totalQuantity(10).build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("equipment1").totalQuantity(10).build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("equipment2").totalQuantity(10).build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("equipment2").totalQuantity(10).build();
         equipmentRepository.save(equipment2);
         LocalDate date = LocalDate.of(2023, 1, 1);
         reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(date, date.plusDays(1))).build());
@@ -199,16 +199,16 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("관리자가 기자재 페이지 조회 API")
     void getEquipmentsPageAdmin() {
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("key").category(CAMERA).build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("key").category(CAMERA).build();
         equipmentRepository.save(equipment1);
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("akey").category(CAMERA).build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("akey").category(CAMERA).build();
         equipmentRepository.save(equipment2);
-        final Equipment equipment3 = EquipmentFixture.builder().modelName("akeyb").category(CAMERA).build();
+        final Equipment equipment3 = EquipmentFixture.builder().name("akeyb").category(CAMERA).build();
         equipmentRepository.save(equipment3);
-        final Equipment equipment4 = EquipmentFixture.builder().modelName("keyb").category(ETC).build();
+        final Equipment equipment4 = EquipmentFixture.builder().name("keyb").category(ETC).build();
         equipmentRepository.save(equipment4);
 
-        final Equipment equipment5 = EquipmentFixture.builder().modelName("notForSearch").build();
+        final Equipment equipment5 = EquipmentFixture.builder().name("notForSearch").build();
         equipmentRepository.save(equipment5);
 
         // when
@@ -235,7 +235,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     void addEquipment() {
         // given
         final AddEquipmentRequest equipment = new AddEquipmentRequest(
-                "rentalPlace", "modelName",
+                "rentalPlace", "name()",
                 "CAMERA", "maker", "imgUrl",
                 "component", "purpose", "description", 1, 2);
         final List<AddItemRequest> items = List.of(new AddItemRequest("12345678"), new AddItemRequest("8765421"));
@@ -293,7 +293,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
         Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
 
         UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
-                "rentalPlace", "modelName",
+                "rentalPlace", "name()",
                 "CAMERA", "maker", "imgUrl",
                 "component", "purpose", "description", 1, 1);
 
@@ -312,7 +312,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 기자재의 날짜별 남은 갯수를 조회한다.")
     void getRemainQuantitiesBetween() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("equipment1").totalQuantity(10).build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("equipment1").totalQuantity(10).build();
         equipmentRepository.save(equipment1);
         LocalDate monday = LocalDate.of(2023, 5, 15);
         reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).amount(RentalAmount.ofPositive(5)).period(new RentalPeriod(monday, monday.plusDays(1))).build());

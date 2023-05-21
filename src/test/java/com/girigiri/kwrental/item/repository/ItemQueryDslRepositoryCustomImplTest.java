@@ -146,7 +146,7 @@ class ItemQueryDslRepositoryCustomImplTest {
         final Page<EquipmentItemDto> equipmentItem = itemRepository.findEquipmentItem(PageRequest.of(0, 2), category);
 
         // then
-        final String modelName = equipment.getModelName();
+        final String modelName = equipment.getName();
         assertAll(
                 () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
                 () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()

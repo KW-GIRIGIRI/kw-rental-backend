@@ -41,7 +41,7 @@ public class OverdueReservationSpecResponse {
                 .equipmentId(equipment.getId())
                 .imgUrl(equipment.getImgUrl())
                 .category(equipment.getCategory().name())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .amount(rentalSpecByStartDateResponses.size())
                 .rentalSpecs(rentalSpecByStartDateResponses)
                 .build();

@@ -46,8 +46,8 @@ class ReservationRepositoryTest {
     @DisplayName("대여 수령일로 대여 예약을 조회")
     void findReservationsWithSpecsByStartDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
         final Member member = memberRepository.save(MemberFixture.create());
 
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
@@ -74,8 +74,8 @@ class ReservationRepositoryTest {
     @DisplayName("반납이 지연된 대여 예약을 회웑 정보와 함께 조회")
     void findOverdueReservationWithSpecs() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate start = now.minusDays(1);
@@ -98,8 +98,8 @@ class ReservationRepositoryTest {
     @DisplayName("반납일로 대여 예약을 조회")
     void findReservationsWithSpecsByEndDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate start = now.minusDays(1);
@@ -128,8 +128,8 @@ class ReservationRepositoryTest {
     @DisplayName("특정 회원의 완료되지 않은 대여를 조회한다.")
     void findNotTerminatedReservationsByMemberId() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate start = now.minusDays(1);

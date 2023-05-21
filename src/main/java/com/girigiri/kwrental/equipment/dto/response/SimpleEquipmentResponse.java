@@ -17,7 +17,7 @@ public record SimpleEquipmentResponse(
                 .id(equipment.getId())
                 .category(equipment.getCategory().name())
                 .imgUrl(equipment.getImgUrl())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .maker(equipment.getMaker())
                 .totalQuantity(equipment.getTotalQuantity())
                 .build();

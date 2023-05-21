@@ -72,8 +72,8 @@ class RentalSpecRepositoryTest {
         // given
         final RentalDateTime acceptTime = RentalDateTime.now();
         final RentalDateTime returnTime = RentalDateTime.now();
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("modelName2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("modelName1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("modelName2").build());
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).build());
         final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).build());
 
@@ -111,8 +111,8 @@ class RentalSpecRepositoryTest {
     void findRentalDtosBetweenDate() {
         // given
         final Member member = memberRepository.save(MemberFixture.create());
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
 
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
@@ -136,9 +136,9 @@ class RentalSpecRepositoryTest {
         assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
                         new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
-                                Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getModelName(), rentalSpec2.getStatus()))),
+                                Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus()))),
                         new RentalDto(reservationSpec3.getStartDate(), reservationSpec3.getEndDate(),
-                                Set.of(new RentalSpecDto(rentalSpec3.getId(), equipment1.getModelName(), rentalSpec3.getStatus()), new RentalSpecDto(rentalSpec4.getId(), equipment2.getModelName(), rentalSpec4.getStatus())))
+                                Set.of(new RentalSpecDto(rentalSpec3.getId(), equipment1.getName(), rentalSpec3.getStatus()), new RentalSpecDto(rentalSpec4.getId(), equipment2.getName(), rentalSpec4.getStatus())))
                 );
     }
 
@@ -146,8 +146,8 @@ class RentalSpecRepositoryTest {
     @DisplayName("특정 자산번호의 특정 기간동안 대여 상태들을 조회한다.")
     void findRentalCountsByPropertyNumbersBetweenDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("model2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
 
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();

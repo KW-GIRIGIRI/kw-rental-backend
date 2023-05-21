@@ -17,7 +17,7 @@ public record SimpleEquipmentWithRentalQuantityResponse(
                 .id(equipment.getId())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .rentalQuantity(new RentalQuantityResponse(equipment.getTotalQuantity(), remainingQuantity))
                 .imgUrl(equipment.getImgUrl())
                 .build();

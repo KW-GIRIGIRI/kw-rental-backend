@@ -14,7 +14,7 @@ public record EquipmentDetailResponse(Long id, String rentalPlace, String modelN
                 .id(equipment.getId())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .imgUrl(equipment.getImgUrl())
                 .description(equipment.getDescription())
                 .components(equipment.getComponents())

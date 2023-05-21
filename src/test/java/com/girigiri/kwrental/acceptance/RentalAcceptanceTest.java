@@ -96,8 +96,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
     @DisplayName("특절 날짜에 수령일인 대여 예약을 조회한다.")
     void getReservationsByStartDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
         final Member member = memberRepository.save(MemberFixture.create());
 
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
@@ -134,8 +134,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 날짜에 반납일인 대여 예약과 연체된 대여 예약을 조회한다.")
     void getReservationWithRentalSpecsByEndDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
         final Member member = memberRepository.save(MemberFixture.create());
 
         final RentalDateTime acceptDateTime = RentalDateTime.now();
@@ -176,8 +176,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
     @DisplayName("반납한다.")
     void returnRentals() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final RentalDateTime acceptDateTime = RentalDateTime.now();
         final LocalDate now = LocalDate.now();
@@ -220,8 +220,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final Member member = memberRepository.save(MemberFixture.create(password));
         final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().modelName("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().modelName("test2").build());
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate yesterday = now.minusDays(1);
@@ -244,7 +244,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(new RentalDto(reservation.getStartDate(), reservation.getEndDate(),
-                        Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getModelName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getModelName(), rentalSpec2.getStatus())))
+                        Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
                 );
     }
 
