@@ -35,14 +35,14 @@ public class ReservationSpecWithRentalSpecsResponse {
     }
 
     public static ReservationSpecWithRentalSpecsResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
-        final Equipment equipment = reservationSpec.getEquipment();
+        final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
         final List<RentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
         return ReservationSpecWithRentalSpecsResponse.builder()
                 .reservationSpecId(reservationSpec.getId())
                 .imgUrl(equipment.getImgUrl())
                 .equipmentId(equipment.getId())
                 .category(equipment.getCategory().name())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .amount(reservationSpec.getAmount().getAmount())
                 .rentalSpecs(rentalSpecByStartDateResponses)
                 .build();

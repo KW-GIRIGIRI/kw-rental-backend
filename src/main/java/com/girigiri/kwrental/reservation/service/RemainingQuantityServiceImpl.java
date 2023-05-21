@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.reservation.service;
 
+import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.equipment.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
 import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
@@ -35,8 +35,8 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> equipmentIds, final LocalDate date) {
-        return reservationSpecRepository.findRentalAmountsByEquipmentIds(equipmentIds, date)
+    public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> rentableIds, final LocalDate date) {
+        return reservationSpecRepository.findRentalAmountsByEquipmentIds(rentableIds, date)
                 .stream()
                 .collect(toMap(ReservedAmount::getEquipmentId, ReservedAmount::getRemainingAmount));
     }
@@ -68,8 +68,8 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Map<LocalDate, Integer> getReservedAmountBetween(final Long equipmentId, final LocalDate from, final LocalDate to) {
-        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedBetween(equipmentId, from, to);
+    public Map<LocalDate, Integer> getReservedAmountBetween(final Long rentableId, final LocalDate from, final LocalDate to) {
+        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedBetween(rentableId, from, to);
         final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
         return operatingPeriod.getRentalAvailableDates().stream()
                 .collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedByPeriod, date)));

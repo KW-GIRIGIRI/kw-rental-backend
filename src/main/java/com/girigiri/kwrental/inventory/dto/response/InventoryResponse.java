@@ -37,11 +37,11 @@ public class InventoryResponse {
     }
 
     public static InventoryResponse from(final Inventory inventory) {
-        final Equipment equipment = inventory.getEquipment();
+        final Equipment equipment = inventory.getRentable().as(Equipment.class);
         return InventoryResponse.builder()
                 .id(inventory.getId())
                 .rentalPlace(equipment.getRentalPlace())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .category(equipment.getCategory().name())
                 .maker(equipment.getMaker())
                 .equipmentId(equipment.getId())

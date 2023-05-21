@@ -17,7 +17,7 @@ class ItemsPerEquipmentsTest {
     @DisplayName("존재하지 않는 기자재 아이디의 품목 자산번호를 검증하려 하면 예외 발생")
     void validatePropertyNumbersAvailable_notExistsEquipmentItem() {
         // given
-        final Item item = ItemFixture.builder().equipmentId(1L).build();
+        final Item item = ItemFixture.builder().assetId(1L).build();
         final ItemsPerEquipments items = ItemsPerEquipments.from(List.of(item));
 
         // when, then
@@ -29,7 +29,7 @@ class ItemsPerEquipmentsTest {
     @DisplayName("존재하지 않는 품목 자산번호를 검증하려 하면 예외 발생")
     void validatePropertyNumbersAvailable_notExistsPropertyNumber() {
         // given
-        final Item item = ItemFixture.builder().equipmentId(1L).propertyNumber("11111111").build();
+        final Item item = ItemFixture.builder().assetId(1L).propertyNumber("11111111").build();
         final ItemsPerEquipments items = ItemsPerEquipments.from(List.of(item));
 
         // when, then
@@ -41,11 +41,11 @@ class ItemsPerEquipmentsTest {
     @DisplayName("품목이 대여 불가능한 상황일 경우 예외 발생")
     void validatePropertyNumbersAvailable_notAvailableItem() {
         // given
-        final Item item = ItemFixture.builder().equipmentId(1L).available(false).build();
+        final Item item = ItemFixture.builder().assetId(1L).available(false).build();
         final ItemsPerEquipments items = ItemsPerEquipments.from(List.of(item));
 
         // when, then
-        assertThatThrownBy(() -> items.validatePropertyNumbersAvailable(item.getEquipmentId(), Set.of(item.getPropertyNumber())))
+        assertThatThrownBy(() -> items.validatePropertyNumbersAvailable(item.getAssetId(), Set.of(item.getPropertyNumber())))
                 .isExactlyInstanceOf(ItemNotAvailableException.class);
     }
 }

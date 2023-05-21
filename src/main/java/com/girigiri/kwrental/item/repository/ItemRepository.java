@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemRepository extends Repository<Item, Long>, ItemQueryDslRepositoryCustom, ItemJdbcRepositoryCustom {
-    void deleteByEquipmentId(Long equipmentId);
+    void deleteByAssetId(Long assetId);
 
-    List<Item> findByEquipmentId(Long equipmentId);
+    List<Item> findByAssetId(Long assetId);
 
     Optional<Item> findById(Long id);
 

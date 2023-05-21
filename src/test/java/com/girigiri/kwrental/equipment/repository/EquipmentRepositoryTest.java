@@ -1,11 +1,5 @@
 package com.girigiri.kwrental.equipment.repository;
 
-import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
-import static com.girigiri.kwrental.equipment.domain.Category.ETC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -19,6 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
+import static com.girigiri.kwrental.equipment.domain.Category.ETC;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DataJpaTest
 @Import(JpaConfig.class)
 class EquipmentRepositoryTest {
@@ -30,11 +30,11 @@ class EquipmentRepositoryTest {
     @DisplayName("기자재를 모델 이름과 카테고리로 검색해서 목록 조회한다.")
     void findEquipmentBy() {
         // given
-        final Equipment equipment1 = EquipmentFixture.builder().modelName("key").category(CAMERA).build();
-        final Equipment equipment2 = EquipmentFixture.builder().modelName("akey").category(CAMERA).build();
-        final Equipment equipment3 = EquipmentFixture.builder().modelName("keyb").category(CAMERA).build();
-        final Equipment equipment4 = EquipmentFixture.builder().modelName("akeyb").category(ETC).build();
-        final Equipment equipment5 = EquipmentFixture.builder().modelName("notForSearch").category(CAMERA).build();
+        final Equipment equipment1 = EquipmentFixture.builder().name("key").category(CAMERA).build();
+        final Equipment equipment2 = EquipmentFixture.builder().name("akey").category(CAMERA).build();
+        final Equipment equipment3 = EquipmentFixture.builder().name("keyb").category(CAMERA).build();
+        final Equipment equipment4 = EquipmentFixture.builder().name("akeyb").category(ETC).build();
+        final Equipment equipment5 = EquipmentFixture.builder().name("notForSearch").category(CAMERA).build();
         equipmentRepository.save(equipment1);
         equipmentRepository.save(equipment2);
         equipmentRepository.save(equipment3);
@@ -53,7 +53,7 @@ class EquipmentRepositoryTest {
 
     @Test
     @DisplayName("중복된 모델이름으로 기자재를 등록하려면 예외가 발생한다.")
-    void save_duplicatedModelName() {
+    void save_duplicatedname() {
         // given
         final Equipment equipment = EquipmentFixture.create();
         equipmentRepository.save(equipment);

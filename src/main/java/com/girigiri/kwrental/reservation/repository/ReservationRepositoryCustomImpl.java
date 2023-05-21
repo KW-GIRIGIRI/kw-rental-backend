@@ -53,7 +53,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .select(Projections.constructor(ReservationWithMemberNumber.class, reservation, member.memberNumber))
                 .from(reservation)
                 .leftJoin(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .leftJoin(reservationSpec.equipment).fetchJoin()
+                .leftJoin(reservationSpec.rentable).fetchJoin()
                 .leftJoin(member).on(member.id.eq(reservation.memberId));
     }
 
@@ -69,7 +69,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
         return Set.copyOf(jpaQueryFactory
                 .selectFrom(reservation)
                 .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.equipment).fetchJoin()
+                .join(reservationSpec.rentable).fetchJoin()
                 .where(reservation.memberId.eq(memberId)
                         .and(reservation.terminated.isFalse()))
                 .fetch()

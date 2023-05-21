@@ -34,14 +34,14 @@ public class OverdueReservationSpecResponse {
     }
 
     public static OverdueReservationSpecResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
-        final Equipment equipment = reservationSpec.getEquipment();
+        final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
         final List<OverdueRentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
         return OverdueReservationSpecResponse.builder()
                 .reservationSpecId(reservationSpec.getId())
                 .equipmentId(equipment.getId())
                 .imgUrl(equipment.getImgUrl())
                 .category(equipment.getCategory().name())
-                .modelName(equipment.getModelName())
+                .modelName(equipment.getName())
                 .amount(rentalSpecByStartDateResponses.size())
                 .rentalSpecs(rentalSpecByStartDateResponses)
                 .build();

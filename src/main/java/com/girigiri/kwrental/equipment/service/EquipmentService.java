@@ -1,12 +1,17 @@
 package com.girigiri.kwrental.equipment.service;
 
+import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Category;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.response.*;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
@@ -19,10 +24,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class EquipmentService {
@@ -31,13 +34,15 @@ public class EquipmentService {
     private final SaveItemService saveitemService;
     private final ApplicationEventPublisher eventPublisher;
     private final RemainingQuantityService remainingQuantityService;
+    private final AssetService assetService;
 
     public EquipmentService(final EquipmentRepository equipmentRepository, final SaveItemService SaveitemService,
-                            final ApplicationEventPublisher eventPublisher, final RemainingQuantityService remainingQuantityService) {
+                            final ApplicationEventPublisher eventPublisher, final RemainingQuantityService remainingQuantityService, final AssetService assetService) {
         this.equipmentRepository = equipmentRepository;
         this.saveitemService = SaveitemService;
         this.eventPublisher = eventPublisher;
         this.remainingQuantityService = remainingQuantityService;
+        this.assetService = assetService;
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +91,7 @@ public class EquipmentService {
 
     private Equipment mapToEquipment(final AddEquipmentRequest addEquipmentRequest) {
         return Equipment.builder()
-                .modelName(addEquipmentRequest.getModelName())
+                .name(addEquipmentRequest.getModelName())
                 .maker(addEquipmentRequest.getMaker())
                 .imgUrl(addEquipmentRequest.getImgUrl())
                 .purpose(addEquipmentRequest.getPurpose())
@@ -112,7 +117,7 @@ public class EquipmentService {
         Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(EquipmentNotFoundException::new);
 
-        equipment.setModelName(updateEquipmentRequest.modelName());
+        equipment.setName(updateEquipmentRequest.modelName());
         equipment.setComponents(updateEquipmentRequest.component());
         equipment.setCategory(Category.from(updateEquipmentRequest.category()));
         equipment.setMaker(updateEquipmentRequest.maker());
@@ -140,10 +145,6 @@ public class EquipmentService {
         final Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(EquipmentNotFoundException::new);
         final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountBetween(equipmentId, from, to);
-        final List<RemainQuantityPerDateResponse> remainQuantityPerDateResponses = reservedAmounts.keySet().stream()
-                .map(date -> new RemainQuantityPerDateResponse(date, equipment.getTotalQuantity() - reservedAmounts.get(date)))
-                .sorted(Comparator.comparing(RemainQuantityPerDateResponse::getDate))
-                .collect(Collectors.toList());
-        return new RemainQuantitiesPerDateResponse(remainQuantityPerDateResponses);
+        return assetService.getReservableCountPerDate(reservedAmounts, equipment);
     }
 }

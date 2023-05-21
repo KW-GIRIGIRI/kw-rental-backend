@@ -15,11 +15,11 @@ public class ItemJdbcRepositoryCustomImpl implements ItemJdbcRepositoryCustom {
 
     @Override
     public int saveAll(final List<Item> items) {
-        final String query = "INSERT INTO item (property_number, available, equipment_id) values (?, ?, ?)";
+        final String query = "INSERT INTO item (property_number, available, asset_id) values (?, ?, ?)";
         final int[][] affectedRows = jdbcTemplate.batchUpdate(query, items, items.size(), (ps, arg) -> {
             ps.setString(1, arg.getPropertyNumber());
             ps.setBoolean(2, arg.isAvailable());
-            ps.setLong(3, arg.getEquipmentId());
+            ps.setLong(3, arg.getAssetId());
         });
         return sum(affectedRows);
     }

@@ -21,16 +21,16 @@ public class Item {
     private boolean available = true;
 
     @Column(nullable = false)
-    private Long equipmentId;
+    private Long assetId;
 
     protected Item() {
     }
 
-    public Item(final Long id, final String propertyNumber, final boolean available, final Long equipmentId) {
+    public Item(final Long id, final String propertyNumber, final boolean available, final Long assetId) {
         this.id = id;
         this.propertyNumber = propertyNumber;
         this.available = available;
-        this.equipmentId = equipmentId;
+        this.assetId = assetId;
     }
 
     public void updatePropertyNumber(String propertyNumber) {

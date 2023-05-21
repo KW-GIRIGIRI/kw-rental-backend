@@ -53,14 +53,14 @@ public class ReservationService {
     }
 
     private boolean isAvailableCountValid(final Inventory inventory) {
-        remainingQuantityService.validateAmount(inventory.getEquipment().getId(), inventory.getRentalAmount().getAmount(), inventory.getRentalPeriod());
+        remainingQuantityService.validateAmount(inventory.getRentable().getId(), inventory.getRentalAmount().getAmount(), inventory.getRentalPeriod());
         return true;
     }
 
     private ReservationSpec mapToRentalSpec(final Inventory inventory) {
         return ReservationSpec.builder().period(inventory.getRentalPeriod())
                 .amount(inventory.getRentalAmount())
-                .equipment(inventory.getEquipment())
+                .rentable(inventory.getRentable())
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class ReservationService {
         Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
         for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
             reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
-            collectedByEquipmentId.put(reservationSpec.getEquipment().getId(), propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
+            collectedByEquipmentId.put(reservationSpec.getRentable().getId(), propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
         }
         return collectedByEquipmentId;
     }

@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.inventory.domain;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.RentableAsset;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +23,9 @@ public class Inventory {
     @Embedded
     private RentalAmount rentalAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Equipment equipment;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = RentableAsset.class)
+    @JoinColumn(name = "asset_id")
+    private Rentable rentable;
 
     @Column(nullable = false)
     private Long memberId;
@@ -31,11 +33,11 @@ public class Inventory {
     protected Inventory() {
     }
 
-    public Inventory(final Long id, final RentalPeriod rentalPeriod, final RentalAmount rentalAmount, final Equipment equipment, final Long memberId) {
+    public Inventory(final Long id, final RentalPeriod rentalPeriod, final RentalAmount rentalAmount, final Rentable rentable, final Long memberId) {
         this.id = id;
         this.rentalPeriod = rentalPeriod;
         this.rentalAmount = rentalAmount;
-        this.equipment = equipment;
+        this.rentable = rentable;
         this.memberId = memberId;
     }
 

@@ -30,7 +30,7 @@ public class SaveItemServiceImpl implements SaveItemService {
 
     private Item mapToItem(final Long equipmentId, final AddItemRequest addItemRequest) {
         return Item.builder()
-                .equipmentId(equipmentId)
+                .assetId(equipmentId)
                 .propertyNumber(addItemRequest.propertyNumber())
                 .available(true)
                 .build();

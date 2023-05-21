@@ -113,7 +113,7 @@ class ItemServiceTest {
         // given
         Item itemForUpdate = ItemFixture.builder().id(1L).propertyNumber("11111111").build();
         Item savedItem = ItemFixture.builder().id(2L).propertyNumber("1234567").build();
-        given(itemRepository.findByEquipmentId(any()))
+        given(itemRepository.findByAssetId(any()))
                 .willReturn(List.of(itemForUpdate, savedItem));
 
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(null, "1234567");
@@ -136,7 +136,7 @@ class ItemServiceTest {
         Item savedItem = ItemFixture.builder().id(2L).propertyNumber("1234567").build();
         Item itemForDelete = ItemFixture.builder().id(3L).propertyNumber("33333333").build();
         given(itemRepository.saveAll(any())).willReturn(1);
-        given(itemRepository.findByEquipmentId(any()))
+        given(itemRepository.findByAssetId(any()))
                 .willReturn(List.of(itemForUpdate, savedItem, itemForDelete));
         given(itemRepository.deleteByPropertyNumbers(List.of(itemForDelete.getPropertyNumber()))).willReturn(1L);
 
@@ -167,12 +167,12 @@ class ItemServiceTest {
     @DisplayName("기자재 ID들과 그에 해당하는 자산번호를 검증한다.")
     void validatePropertyNumbers() {
         // given
-        final Item item = ItemFixture.builder().equipmentId(1L).propertyNumber("11111111").build();
+        final Item item = ItemFixture.builder().assetId(1L).propertyNumber("11111111").build();
         given(itemRepository.findByEquipmentIds(any()))
                 .willReturn(List.of(item));
 
         // when, then
-        assertThatCode(() -> itemService.validatePropertyNumbers(Map.of(item.getEquipmentId(), Set.of(item.getPropertyNumber()))))
+        assertThatCode(() -> itemService.validatePropertyNumbers(Map.of(item.getAssetId(), Set.of(item.getPropertyNumber()))))
                 .doesNotThrowAnyException();
     }
 
@@ -185,7 +185,7 @@ class ItemServiceTest {
         final Item item1 = ItemFixture.builder().id(1L).propertyNumber("11111111").available(true).build();
         final Item item2 = ItemFixture.builder().id(2L).propertyNumber("22222222").available(true).build();
         final Item item3 = ItemFixture.builder().id(3L).propertyNumber("33333333").available(false).build();
-        given(itemRepository.findByEquipmentId(any())).willReturn(List.of(item1, item2, item3));
+        given(itemRepository.findByAssetId(any())).willReturn(List.of(item1, item2, item3));
 
         // when
         final ItemsResponse itemsResponse = itemService.getRentalAvailableItems(1L);

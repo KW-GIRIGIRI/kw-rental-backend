@@ -19,6 +19,6 @@ public class ItemEventListener {
     @EventListener
     @Transactional(propagation = Propagation.MANDATORY)
     public void handleEquipmentDelete(final EquipmentDeleteEvent event) {
-        itemRepository.deleteByEquipmentId(event.getEquipmentId());
+        itemRepository.deleteByAssetId(event.getEquipmentId());
     }
 }
