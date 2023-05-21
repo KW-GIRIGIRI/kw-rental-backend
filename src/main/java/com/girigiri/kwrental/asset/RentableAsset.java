@@ -1,8 +1,13 @@
 package com.girigiri.kwrental.asset;
 
+import com.girigiri.kwrental.asset.exception.RentableCastException;
+import com.girigiri.kwrental.common.exception.NotNullException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -39,5 +44,21 @@ public abstract class RentableAsset implements Rentable {
     @Override
     public boolean canRentFor(final Integer rentalDays) {
         return this.maxRentalDays.compareTo(rentalDays) >= 0;
+    }
+
+    @Override
+    public <T extends Rentable> T as(final Class<T> clazz) {
+        if (this.getClass() != clazz) {
+            throw new RentableCastException(this.getClass(), clazz);
+        }
+        return (T) this;
+    }
+
+    protected void validateNotNull(final Object... params) {
+        final boolean anyIsNull = Arrays.stream(params)
+                .anyMatch(Objects::isNull);
+        if (anyIsNull) {
+            throw new NotNullException(params);
+        }
     }
 }
