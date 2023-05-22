@@ -13,7 +13,7 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
@@ -88,11 +88,11 @@ public class RentalService {
     }
 
     @Transactional(readOnly = true)
-    public ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
+    public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
         final Set<EquipmentReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
-        return ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.of(reservations, rentalSpecs);
+        return EquipmentReservationsWithRentalSpecsResponse.of(reservations, rentalSpecs);
     }
 
     private Set<Long> getAcceptedReservationSpecIds(final Set<EquipmentReservationWithMemberNumber> reservationsWithMemberNumber) {
@@ -113,23 +113,23 @@ public class RentalService {
 
     @Transactional(readOnly = true)
     public ReservationsWithRentalSpecsByEndDateResponse getReservationsWithRentalSpecsByEndDate(final LocalDate endDate) {
-        final OverdueReservationsWithRentalSpecsResponse overdueReservationsWithRentalSpecs = getOverdueReservationsWithRentalSpecs(endDate);
-        final ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse reservationWithRentalSpecsByEndDate = getReservationWithRentalSpecsByEndDate(endDate);
-        return new ReservationsWithRentalSpecsByEndDateResponse(overdueReservationsWithRentalSpecs, reservationWithRentalSpecsByEndDate);
+        final OverdueReservationsWithRentalSpecsResponse overdueReservations = getOverdueReservationsWithRentalSpecs(endDate);
+        final EquipmentReservationsWithRentalSpecsResponse equipmentReservations = getReservationWithRentalSpecsByEndDate(endDate);
+        return new ReservationsWithRentalSpecsByEndDateResponse(overdueReservations, equipmentReservations);
     }
 
     private OverdueReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(final LocalDate localDate) {
-        Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservation = reservationService.getOverdueReservationsWithMemberNumber(localDate);
-        final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservation);
+        Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservations = reservationService.getOverdueReservationsWithMemberNumber(localDate);
+        final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservations);
         final List<RentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds);
-        return OverdueReservationsWithRentalSpecsResponse.of(overdueEquipmentReservation, overdueRentalSpecs);
+        return OverdueReservationsWithRentalSpecsResponse.of(overdueEquipmentReservations, overdueRentalSpecs);
     }
 
-    private ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
-        Set<ReservationWithMemberNumber> reservationsWithMemberNumber = reservationService.getReservationsWithMemberNumberByEndDate(localDate);
-        final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservationsWithMemberNumber);
+    private EquipmentReservationsWithRentalSpecsResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
+        Set<EquipmentReservationWithMemberNumber> equipmentReservations = reservationService.getReservationsWithMemberNumberByEndDate(localDate);
+        final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(equipmentReservations);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
-        return ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.of(reservationsWithMemberNumber, rentalSpecs);
+        return EquipmentReservationsWithRentalSpecsResponse.of(equipmentReservations, rentalSpecs);
     }
 
     @Transactional

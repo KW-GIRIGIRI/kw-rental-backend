@@ -10,28 +10,28 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public class ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse {
+public class EquipmentReservationsWithRentalSpecsResponse {
 
     private List<ReservedOrRentedReservationWithRentalSpecsResponse> reservations;
 
-    private ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse() {
+    private EquipmentReservationsWithRentalSpecsResponse() {
     }
 
-    private ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse(final List<ReservedOrRentedReservationWithRentalSpecsResponse> reservations) {
+    private EquipmentReservationsWithRentalSpecsResponse(final List<ReservedOrRentedReservationWithRentalSpecsResponse> reservations) {
         this.reservations = reservations;
     }
 
-    public static ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse of(Collection<ReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
+    public static EquipmentReservationsWithRentalSpecsResponse of(Collection<ReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
         final List<ReservedOrRentedReservationWithRentalSpecsResponse> reservedOrRentedReservationWithRentalSpecsResponse = reservations.stream()
                 .map(it -> ReservedOrRentedReservationWithRentalSpecsResponse.of(it, rentalSpecs))
                 .toList();
-        return new ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse(reservedOrRentedReservationWithRentalSpecsResponse);
+        return new EquipmentReservationsWithRentalSpecsResponse(reservedOrRentedReservationWithRentalSpecsResponse);
     }
 
-    public static ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse of(final Set<EquipmentReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
+    public static EquipmentReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
         final List<ReservedOrRentedReservationWithRentalSpecsResponse> reservedOrRentedReservationWithRentalSpecsResponses = reservations.stream()
                 .map(it -> ReservedOrRentedReservationWithRentalSpecsResponse.of(it, rentalSpecs))
                 .toList();
-        return new ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse(reservedOrRentedReservationWithRentalSpecsResponses);
+        return new EquipmentReservationsWithRentalSpecsResponse(reservedOrRentedReservationWithRentalSpecsResponses);
     }
 }
