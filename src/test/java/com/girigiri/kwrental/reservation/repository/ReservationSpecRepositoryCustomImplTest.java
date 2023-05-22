@@ -264,4 +264,28 @@ class ReservationSpecRepositoryCustomImplTest {
                 );
     }
 
+    @Test
+    @DisplayName("대여 예약 상세 id로 대여 예약을 조회한다.")
+    void findByReservationSpecIds() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+        final Rentable labRoom3 = assetRepository.save(LabRoomFixture.builder().name("test3").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(labRoom1);
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.create(labRoom2);
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member.getId()).build());
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.create(labRoom3);
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member.getId()).build());
+
+        // when
+        entityManager.flush();
+        entityManager.clear();
+        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec3.getId()));
+
+        // then
+        assertThat(reservations).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(reservation1, reservation2);
+    }
 }
