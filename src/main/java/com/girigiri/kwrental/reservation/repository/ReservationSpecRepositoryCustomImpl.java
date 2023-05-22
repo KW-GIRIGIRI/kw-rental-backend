@@ -106,7 +106,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                         reservationSpec.period.rentalStartDate.eq(date))
                 .transform(groupBy(reservation.id)
                         .list(Projections.constructor(EquipmentReservationWithMemberNumber.class,
-                                reservation.name, member.memberNumber, reservation.acceptDateTime, list(reservationSpec)))
+                                reservation.id, reservation.name, member.memberNumber, reservation.acceptDateTime, list(reservationSpec)))
                 )
         );
     }

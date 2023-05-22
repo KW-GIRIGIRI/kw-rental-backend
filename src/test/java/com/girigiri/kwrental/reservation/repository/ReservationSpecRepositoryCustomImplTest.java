@@ -176,7 +176,7 @@ class ReservationSpecRepositoryCustomImplTest {
 
         // then
         assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
-                .containsExactlyInAnyOrder(new EquipmentReservationWithMemberNumber(reservation1.getName(), member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec1, reservationSpec2))
-                        , new EquipmentReservationWithMemberNumber(reservation3.getName(), member.getMemberNumber(), reservation3.getAcceptDateTime(), List.of(reservationSpec6, reservationSpec7)));
+                .containsExactlyInAnyOrder(new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(), member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec1, reservationSpec2))
+                        , new EquipmentReservationWithMemberNumber(reservation3.getId(), reservation3.getName(), member.getMemberNumber(), reservation3.getAcceptDateTime(), List.of(reservationSpec6, reservationSpec7)));
     }
 }

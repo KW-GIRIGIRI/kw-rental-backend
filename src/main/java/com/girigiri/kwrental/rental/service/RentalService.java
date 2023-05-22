@@ -17,6 +17,7 @@ import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.Res
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservations;
@@ -88,10 +89,18 @@ public class RentalService {
 
     @Transactional(readOnly = true)
     public ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
-        final Set<ReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(localDate);
+        final Set<EquipmentReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
         final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
         return ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse.of(reservations, rentalSpecs);
+    }
+
+    private Set<Long> getAcceptedReservationSpecIds(final Set<EquipmentReservationWithMemberNumber> reservationsWithMemberNumber) {
+        return reservationsWithMemberNumber.stream()
+                .filter(EquipmentReservationWithMemberNumber::isAccepted)
+                .map(EquipmentReservationWithMemberNumber::getReservationSpecIds)
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
     }
 
     private Set<Long> getAcceptedReservationSpecIds(final Collection<ReservationWithMemberNumber> reservationsWithMemberNumber) {

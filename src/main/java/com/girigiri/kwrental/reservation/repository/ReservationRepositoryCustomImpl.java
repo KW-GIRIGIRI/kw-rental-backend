@@ -26,13 +26,6 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public Set<ReservationWithMemberNumber> findUnterminatedReservationsWithSpecsByStartDate(final LocalDate startDate) {
-        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
-                .where(reservation.terminated.isFalse(), reservationSpec.period.rentalStartDate.eq(startDate))
-                .fetch());
-    }
-
-    @Override
     public Set<ReservationWithMemberNumber> findUnterminatedOverdueReservationWithSpecs(final LocalDate returnDate) {
         return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
                 .where(reservation.terminated.isFalse(), reservationSpec.period.rentalEndDate.before(returnDate))

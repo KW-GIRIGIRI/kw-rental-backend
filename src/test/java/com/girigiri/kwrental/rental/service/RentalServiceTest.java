@@ -16,10 +16,10 @@ import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.Res
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
@@ -125,16 +125,15 @@ class RentalServiceTest {
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).id(2L).status(ReservationSpecStatus.CANCELED).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(1L).acceptDateTime(RentalDateTime.now()).build();
         final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).build();
-        final ReservationWithMemberNumber reservationWithMemberNumber = new ReservationWithMemberNumber(reservation, "11111111");
-        given(reservationService.getReservationsByStartDate(any())).willReturn(Set.of(reservationWithMemberNumber));
-        given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec2.getId()))).willReturn(List.of(rentalSpec1, rentalSpec2));
+        final EquipmentReservationWithMemberNumber equipmentReservation = EquipmentReservationWithMemberNumber.of(reservation, List.of(reservationSpec1), "11111111");
+        given(reservationService.getReservationsByStartDate(any())).willReturn(Set.of(equipmentReservation));
+        given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId()))).willReturn(List.of(rentalSpec1));
 
         // when
         final ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
 
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservedOrRentedReservationWithRentalSpecsResponse.of(reservationWithMemberNumber, List.of(rentalSpec1, rentalSpec2)));
+                .containsExactly(ReservedOrRentedReservationWithRentalSpecsResponse.of(equipmentReservation, List.of(rentalSpec1)));
         assertThat(response.getReservations().get(0).getReservationSpecs()).usingRecursiveFieldByFieldElementComparator().containsExactly(ReservationSpecWithRentalSpecsResponse.of(reservationSpec1, List.of(rentalSpec1)));
     }
 
