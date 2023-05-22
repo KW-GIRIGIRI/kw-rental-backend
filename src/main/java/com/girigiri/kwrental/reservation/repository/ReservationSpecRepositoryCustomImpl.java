@@ -126,4 +126,13 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 reservationSpec.period.rentalEndDate.before(date)
         );
     }
+
+    @Override
+    public Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenReturn(final LocalDate date) {
+        return findEquipmentReservationWhere(
+                reservationSpec.rentable.instanceOf(Equipment.class),
+                reservationSpec.status.eq(ReservationSpecStatus.RENTED),
+                reservationSpec.period.rentalEndDate.eq(date)
+        );
+    }
 }

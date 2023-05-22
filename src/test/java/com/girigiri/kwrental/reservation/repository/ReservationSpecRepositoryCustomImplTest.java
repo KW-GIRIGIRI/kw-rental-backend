@@ -204,4 +204,33 @@ class ReservationSpecRepositoryCustomImplTest {
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2), member.getMemberNumber()));
     }
 
+    @Test
+    @DisplayName("반납이 예정된 예약 상세를 회웑 정보와 함께 조회")
+    void findEquipmentReservationWhenReturn() {
+        // given
+        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
+
+        final LocalDate now = LocalDate.now();
+        final LocalDate start = now.minusDays(1);
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.RENTED).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.CANCELED).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member.getId()).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now.plusDays(2))).build();
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now.plusDays(2))).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec3, reservationSpec4)));
+
+        final ReservationSpec reservationSpec5 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.CANCELED).build();
+        final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(start, now)).status(ReservationSpecStatus.CANCELED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec5, reservationSpec6)).memberId(member.getId()).terminated(true).build());
+
+        // when
+        final Set<EquipmentReservationWithMemberNumber> expect = reservationSpecRepository.findEquipmentReservationWhenReturn(now);
+
+        // then
+        assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1), member.getMemberNumber()));
+    }
 }
