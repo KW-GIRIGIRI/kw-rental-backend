@@ -7,6 +7,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -96,18 +97,33 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 
     @Override
     public Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenAccept(final LocalDate date) {
+        return findEquipmentReservationWhere(
+                reservationSpec.rentable.instanceOf(Equipment.class),
+                reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
+                reservationSpec.period.rentalStartDate.eq(date)
+        );
+    }
+
+    private Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhere(final Predicate... predicates) {
         return Set.copyOf(queryFactory
                 .from(reservationSpec)
                 .leftJoin(reservation).on(reservationSpec.reservation.id.eq(reservation.id))
                 .leftJoin(reservationSpec.rentable).fetchJoin()
                 .leftJoin(member).on(member.id.eq(reservation.memberId))
-                .where(reservationSpec.rentable.instanceOf(Equipment.class),
-                        reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
-                        reservationSpec.period.rentalStartDate.eq(date))
+                .where(predicates)
                 .transform(groupBy(reservation.id)
                         .list(Projections.constructor(EquipmentReservationWithMemberNumber.class,
                                 reservation.id, reservation.name, member.memberNumber, reservation.acceptDateTime, list(reservationSpec)))
                 )
+        );
+    }
+
+    @Override
+    public Set<EquipmentReservationWithMemberNumber> findOverdueEquipmentReservationWhenReturn(final LocalDate date) {
+        return findEquipmentReservationWhere(
+                reservationSpec.rentable.instanceOf(Equipment.class),
+                reservationSpec.status.eq(ReservationSpecStatus.OVERDUE_RENTED),
+                reservationSpec.period.rentalEndDate.before(date)
         );
     }
 }

@@ -21,4 +21,6 @@ public interface ReservationSpecRepositoryCustom {
     void adjustAmountAndStatus(ReservationSpec reservationSpec);
 
     Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenAccept(LocalDate date);
+
+    Set<EquipmentReservationWithMemberNumber> findOverdueEquipmentReservationWhenReturn(LocalDate date);
 }
