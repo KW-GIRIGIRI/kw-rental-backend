@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.reservation.service;
 
+import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -34,7 +33,7 @@ class RemainingQuantityServiceImplTest {
     private ReservationSpecRepository reservationSpecRepository;
 
     @Mock
-    private EquipmentRepository equipmentRepository;
+    private AssetService assetService;
 
     @InjectMocks
     private RemainingQuantityServiceImpl remainingQuantityService;
@@ -49,7 +48,7 @@ class RemainingQuantityServiceImplTest {
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
 
-        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+        given(assetService.getRentableById(any())).willReturn(equipment);
         given(reservationSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
 
         // when, then
@@ -67,7 +66,7 @@ class RemainingQuantityServiceImplTest {
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment).amount(RentalAmount.ofPositive(1))
                 .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
 
-        given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
+        given(assetService.getRentableById(any())).willReturn(equipment);
         given(reservationSpecRepository.findOverlappedByPeriod(any(), any())).willReturn(List.of(reservationSpec1, reservationSpec2));
 
         // when, then
