@@ -1,9 +1,8 @@
 package com.girigiri.kwrental.reservation.service;
 
+import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
 import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
@@ -26,11 +25,11 @@ import static java.util.stream.Collectors.toMap;
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
 
     private final ReservationSpecRepository reservationSpecRepository;
-    private final EquipmentRepository equipmentRepository;
+    private final AssetService assetService;
 
-    public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository, final EquipmentRepository equipmentRepository) {
+    public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository, final AssetService assetService) {
         this.reservationSpecRepository = reservationSpecRepository;
-        this.equipmentRepository = equipmentRepository;
+        this.assetService = assetService;
     }
 
     @Override
@@ -44,17 +43,16 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
     @Override   // TODO: 2023/04/23 반복문을 두번 도는 로직을 최적화 할 수 있다.
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public void validateAmount(final Long equipmentId, final Integer amount, final RentalPeriod rentalPeriod) {
-        final Equipment equipment = equipmentRepository.findById(equipmentId)
-                .orElseThrow(EquipmentNotFoundException::new);
+        final Rentable rentable = assetService.getRentableById(equipmentId);
         final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
         for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
             final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
-            validateTotalAmount(amount + rentedAmountByDate, equipment);
+            validateTotalAmount(amount + rentedAmountByDate, rentable);
         }
     }
 
-    private void validateTotalAmount(final Integer amount, final Equipment equipment) {
-        if (amount > equipment.getTotalQuantity()) {
+    private void validateTotalAmount(final Integer amount, final Rentable rentable) {
+        if (amount > rentable.getTotalQuantity()) {
             throw new NotEnoughAmountException();
         }
     }

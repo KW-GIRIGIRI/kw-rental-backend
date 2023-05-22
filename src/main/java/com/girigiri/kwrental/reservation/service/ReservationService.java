@@ -1,11 +1,16 @@
 package com.girigiri.kwrental.reservation.service;
 
+import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
@@ -32,13 +37,16 @@ public class ReservationService {
     private final RemainingQuantityServiceImpl remainingQuantityService;
     private final ReservationSpecRepository reservationSpecRepository;
 
+    private final AssetService assetService;
+
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
                               final RemainingQuantityServiceImpl remainingQuantityService,
-                              final ReservationSpecRepository reservationSpecRepository) {
+                              final ReservationSpecRepository reservationSpecRepository, final AssetService assetService) {
         this.reservationRepository = reservationRepository;
         this.inventoryService = inventoryService;
         this.remainingQuantityService = remainingQuantityService;
         this.reservationSpecRepository = reservationSpecRepository;
+        this.assetService = assetService;
     }
 
     @Transactional
@@ -46,7 +54,7 @@ public class ReservationService {
         final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
         final List<ReservationSpec> reservationSpecs = inventories.stream()
                 .filter(this::isAvailableCountValid)
-                .map(this::mapToRentalSpec)
+                .map(this::mapToReservationSpec)
                 .toList();
         final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
         return reservationRepository.save(reservation).getId();
@@ -57,7 +65,7 @@ public class ReservationService {
         return true;
     }
 
-    private ReservationSpec mapToRentalSpec(final Inventory inventory) {
+    private ReservationSpec mapToReservationSpec(final Inventory inventory) {
         return ReservationSpec.builder().period(inventory.getRentalPeriod())
                 .amount(inventory.getRentalAmount())
                 .rentable(inventory.getRentable())
@@ -72,6 +80,37 @@ public class ReservationService {
                 .purpose(addReservationRequest.getRentalPurpose())
                 .phoneNumber(addReservationRequest.getRenterPhoneNumber())
                 .memberId(memberId)
+                .build();
+    }
+
+    @Transactional
+    public Long reserve(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
+        final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.getLabRoomName());
+        final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.getStartDate(), addLabRoomReservationRequest.getEndDate());
+        final RentalAmount amount = RentalAmount.ofPositive(addLabRoomReservationRequest.getRenterCount());
+        remainingQuantityService.validateAmount(rentable.getId(), amount.getAmount(), period);
+        final ReservationSpec spec = mapToReservationSpec(rentable, period, amount);
+        final Reservation reservation = mapToReservation(memberId, addLabRoomReservationRequest, spec);
+        reservationRepository.save(reservation);
+        return reservation.getId();
+    }
+
+    private ReservationSpec mapToReservationSpec(final Rentable rentable, final RentalPeriod period, final RentalAmount amount) {
+        return ReservationSpec.builder()
+                .period(period)
+                .amount(amount)
+                .rentable(rentable)
+                .build();
+    }
+
+    private Reservation mapToReservation(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest, final ReservationSpec spec) {
+        return Reservation.builder()
+                .reservationSpecs(List.of(spec))
+                .memberId(memberId)
+                .email(addLabRoomReservationRequest.getRenterEmail())
+                .name(addLabRoomReservationRequest.getRenterName())
+                .purpose(addLabRoomReservationRequest.getRentalPurpose())
+                .phoneNumber(addLabRoomReservationRequest.getRenterPhoneNumber())
                 .build();
     }
 
