@@ -1,15 +1,15 @@
 package com.girigiri.kwrental.reservation.service;
 
-import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
@@ -125,8 +125,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Set<ReservationWithMemberNumber> getReservationsByStartDate(final LocalDate startDate) {
-        return reservationRepository.findUnterminatedReservationsWithSpecsByStartDate(startDate);
+    public Set<EquipmentReservationWithMemberNumber> getReservationsByStartDate(final LocalDate startDate) {
+        return reservationSpecRepository.findEquipmentReservationWhenAccept(startDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -159,13 +159,13 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Set<ReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
-        return reservationRepository.findUnterminatedOverdueReservationWithSpecs(localDate);
+    public Set<EquipmentReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
+        return reservationSpecRepository.findOverdueEquipmentReservationWhenReturn(localDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Set<ReservationWithMemberNumber> getReservationsWithMemberNumberByEndDate(final LocalDate localDate) {
-        return reservationRepository.findUnterminatedReservationsWithSpecsByEndDate(localDate);
+    public Set<EquipmentReservationWithMemberNumber> getReservationsWithMemberNumberByEndDate(final LocalDate localDate) {
+        return reservationSpecRepository.findEquipmentReservationWhenReturn(localDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)

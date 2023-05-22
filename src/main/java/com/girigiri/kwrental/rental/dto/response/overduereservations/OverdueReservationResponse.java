@@ -2,8 +2,7 @@ package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -31,18 +30,17 @@ public class OverdueReservationResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static OverdueReservationResponse of(final ReservationWithMemberNumber reservationWithMemberNumber, final List<RentalSpec> rentalSpecs) {
-        final Reservation reservation = reservationWithMemberNumber.getReservation();
-        final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, reservation);
-        final RentalDateTime acceptDateTime = reservation.getAcceptDateTime();
-        return new OverdueReservationResponse(reservation.getId(), reservation.getName(),
-                reservationWithMemberNumber.getMemberNumber(), acceptDateTime == null ? null : acceptDateTime.toLocalDateTime(), overdueReservationSpecResponses);
+    public static OverdueReservationResponse of(final EquipmentReservationWithMemberNumber equipmentReservation, final List<RentalSpec> rentalSpecs) {
+        final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, equipmentReservation);
+        final RentalDateTime acceptDateTime = equipmentReservation.getAcceptDateTime();
+        return new OverdueReservationResponse(equipmentReservation.getId(), equipmentReservation.getRenterName(),
+                equipmentReservation.getMemberNumber(), acceptDateTime == null ? null : acceptDateTime.toLocalDateTime(), overdueReservationSpecResponses);
     }
 
-    private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
+    private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final EquipmentReservationWithMemberNumber equipmentReservation) {
         final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
                 .collect(groupingBy(RentalSpec::getReservationSpecId));
-        return reservation.getReservationSpecs().stream()
+        return equipmentReservation.getReservationSpecs().stream()
                 .filter(it -> groupedRentalSpecsByReservationSpecId.get(it.getId()) != null)
                 .map(it -> OverdueReservationSpecResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))
                 .toList();

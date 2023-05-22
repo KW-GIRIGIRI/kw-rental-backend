@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.reservation.service;
 
-import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;

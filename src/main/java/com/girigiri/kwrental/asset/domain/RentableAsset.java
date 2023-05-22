@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.asset;
+package com.girigiri.kwrental.asset.domain;
 
 import com.girigiri.kwrental.asset.exception.RentableCastException;
 import com.girigiri.kwrental.common.exception.NotNullException;

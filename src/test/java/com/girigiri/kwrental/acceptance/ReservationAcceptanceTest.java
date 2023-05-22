@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
-import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;

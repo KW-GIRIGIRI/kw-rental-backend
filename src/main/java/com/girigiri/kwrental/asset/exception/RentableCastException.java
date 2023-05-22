@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.asset.exception;
 
-import com.girigiri.kwrental.asset.Rentable;
-import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.common.exception.DomainException;
 
 public class RentableCastException extends DomainException {

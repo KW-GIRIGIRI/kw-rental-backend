@@ -4,9 +4,9 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.service.InventoryService;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
@@ -110,16 +110,16 @@ class ReservationServiceTest {
         final Equipment equipment = EquipmentFixture.create();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-        final ReservationWithMemberNumber reservationWithMemberNumber = new ReservationWithMemberNumber(reservation, "11111111");
-        given(reservationRepository.findUnterminatedReservationsWithSpecsByStartDate(any()))
-                .willReturn(Set.of(reservationWithMemberNumber));
+        final EquipmentReservationWithMemberNumber equipmentReservation = EquipmentReservationWithMemberNumber.of(reservation, List.of(reservationSpec), "11111111");
+        given(reservationSpecRepository.findEquipmentReservationWhenAccept(any()))
+                .willReturn(Set.of(equipmentReservation));
 
         // when
-        final Set<ReservationWithMemberNumber> reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
+        final Set<EquipmentReservationWithMemberNumber> reservationsByStartDate = reservationService.getReservationsByStartDate(LocalDate.now());
 
         // then
         assertThat(reservationsByStartDate).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(reservationWithMemberNumber);
+                .containsExactly(equipmentReservation);
     }
 
     @Test
