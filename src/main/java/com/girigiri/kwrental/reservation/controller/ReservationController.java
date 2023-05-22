@@ -3,6 +3,7 @@ package com.girigiri.kwrental.reservation.controller;
 import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.common.exception.BadRequestException;
+import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
 import com.girigiri.kwrental.reservation.service.ReservationService;
@@ -24,6 +25,13 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<?> reserve(@UserMember final SessionMember sessionMember, @RequestBody final AddReservationRequest addReservationRequest) {
         final Long id = reservationService.reserve(sessionMember.getId(), addReservationRequest);
+        return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
+    }
+
+    @PostMapping("/labRooms")
+    public ResponseEntity<?> reserveLabRoom(@UserMember final SessionMember sessionMember,
+                                            @RequestBody final AddLabRoomReservationRequest addLabRoomReservationRequest) {
+        final Long id = reservationService.reserve(sessionMember.getId(), addLabRoomReservationRequest);
         return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
     }
 
