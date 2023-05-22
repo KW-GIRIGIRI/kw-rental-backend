@@ -2,9 +2,12 @@ package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.querydsl.core.types.Predicate;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.girigiri.kwrental.asset.domain.QRentableAsset.rentableAsset;
 import static com.girigiri.kwrental.auth.domain.QMember.member;
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
@@ -133,6 +137,32 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 reservationSpec.rentable.instanceOf(Equipment.class),
                 reservationSpec.status.eq(ReservationSpecStatus.RENTED),
                 reservationSpec.period.rentalEndDate.eq(date)
+        );
+    }
+
+    @Override
+    public Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhenAccept(final LocalDate date) {
+        return findLabRoomReservationsWhere(
+                reservationSpec.rentable.instanceOf(LabRoom.class),
+                reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
+                reservationSpec.period.rentalStartDate.eq(date));
+    }
+
+    private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(final Predicate... predicates) {
+        return Set.copyOf(
+                queryFactory
+                        .from(reservationSpec)
+                        .leftJoin(reservation).on(reservationSpec.reservation.id.eq(reservation.id))
+                        .leftJoin(rentableAsset).on(reservationSpec.rentable.id.eq(rentableAsset.id))
+                        .leftJoin(member).on(member.id.eq(reservation.memberId))
+                        .where(predicates)
+                        .transform(groupBy(rentableAsset.id)
+                                .as(Projections.constructor(LabRoomReservationWithMemberNumberResponse.class,
+                                        rentableAsset.name, reservation.acceptDateTime,
+                                        list(Projections.constructor(LabRoomReservationSpecWithMemberNumberResponse.class,
+                                                reservationSpec.id, reservation.name, member.memberNumber, reservationSpec.amount.amount, reservation.phoneNumber)))
+                                )
+                        ).values()
         );
     }
 }

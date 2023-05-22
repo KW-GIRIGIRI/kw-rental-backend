@@ -12,6 +12,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
@@ -202,5 +203,10 @@ public class ReservationService {
                 .orElseThrow(ReservationNotFoundException::new);
         reservation.updateIfTerminated();
         if (reservation.isTerminated()) reservationRepository.adjustTerminated(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<LabRoomReservationWithMemberNumberResponse> getLabRoomReservationForAccept(final LocalDate date) {
+        return reservationSpecRepository.findLabRoomReservationsWhenAccept(date);
     }
 }

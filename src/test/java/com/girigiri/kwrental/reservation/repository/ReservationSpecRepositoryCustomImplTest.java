@@ -1,10 +1,10 @@
 package com.girigiri.kwrental.reservation.repository;
 
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
@@ -12,11 +12,10 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +45,7 @@ class ReservationSpecRepositoryCustomImplTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private EquipmentRepository equipmentRepository;
+    private AssetRepository assetRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -58,7 +57,7 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("특정 기간과 겹치는 대여 사항을 조회한다.")
     void findOverlappedByPeriod() {
         // given
-        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
         final RentalPeriod notOverlappedLeft = new RentalPeriod(NOW, NOW.plusDays(1));
         final RentalPeriod overlappedLeft = new RentalPeriod(NOW, NOW.plusDays(5));
         final RentalPeriod overlappedMid = new RentalPeriod(NOW.plusDays(2), NOW.plusDays(3));
@@ -84,9 +83,9 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("기자재들의 특정 날짜에 대여 예약된 갯수를 구한다.")
     void findRentalAmountsByEquipmentIds() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름1").totalQuantity(4).build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름2").totalQuantity(4).build());
-        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().name("모델이름3").totalQuantity(4).build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("모델이름1").totalQuantity(4).build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("모델이름2").totalQuantity(4).build());
+        final Rentable equipment3 = assetRepository.save(EquipmentFixture.builder().name("모델이름3").totalQuantity(4).build());
 
         final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
         final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(RentalAmount.ofPositive(2)).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
@@ -115,8 +114,8 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("특정 기간에 대여 수령하는 대여 상세를 조회한다.")
     void findByStartDateBetween() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
         final YearMonth now = YearMonth.now();
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.atDay(1), now.atEndOfMonth())).build());
         final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now.atEndOfMonth(), now.atEndOfMonth().plusDays(1))).build());
@@ -133,7 +132,7 @@ class ReservationSpecRepositoryCustomImplTest {
     @DisplayName("대여 예약 상세의 갯수와 상태를 변경한다.")
     void adjustAmountAndStatus() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
         final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1)
                 .amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build());
 
@@ -150,12 +149,12 @@ class ReservationSpecRepositoryCustomImplTest {
     }
 
     @Test
-    @DisplayName("특정 날짜가 수령일인 대여 예약 상세를 회원 번호화 함께 조회한다.")
+    @DisplayName("특정 날짜가 수령일인 기자재 대여 예약 상세를 회원 번호화 함께 조회한다.")
     void findEquipmentReservationForAccept() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
-        final Equipment equipment3 = equipmentRepository.save(EquipmentFixture.builder().name("test3").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+        final Rentable equipment3 = assetRepository.save(EquipmentFixture.builder().name("test3").build());
         final Member member = memberRepository.save(MemberFixture.create());
 
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(NOW, NOW.plusDays(1))).status(ReservationSpecStatus.RESERVED).build();
@@ -181,11 +180,11 @@ class ReservationSpecRepositoryCustomImplTest {
     }
 
     @Test
-    @DisplayName("반납이 지연된 대여 예약 상세를 회웑 정보와 함께 조회")
+    @DisplayName("기자재 반납이 지연된 대여 예약 상세를 회웑 정보와 함께 조회")
     void findOverdueEquipmentReservationWhenReturn() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate start = now.minusDays(1);
@@ -205,11 +204,11 @@ class ReservationSpecRepositoryCustomImplTest {
     }
 
     @Test
-    @DisplayName("반납이 예정된 예약 상세를 회웑 정보와 함께 조회")
+    @DisplayName("기자재 반납이 예정된 예약 상세를 회웑 정보와 함께 조회")
     void findEquipmentReservationWhenReturn() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("test1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("test2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 
         final LocalDate now = LocalDate.now();
         final LocalDate start = now.minusDays(1);
@@ -233,4 +232,36 @@ class ReservationSpecRepositoryCustomImplTest {
         // then
         assertThat(expect).usingRecursiveFieldByFieldElementComparator().containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1), member.getMemberNumber()));
     }
+
+    @Test
+    @DisplayName("특정 날짜가 수령일인 랩실 대여 예약 상세를 회원 번호화 함께 조회한다.")
+    void findLabRoomReservationsWhenAccept() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(NOW, NOW.plusDays(2))).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(NOW, NOW.plusDays(1))).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member.getId()).build());
+
+        // when
+        final Set<LabRoomReservationWithMemberNumberResponse> actual = reservationSpecRepository.findLabRoomReservationsWhenAccept(NOW);
+
+        // then
+        assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
+                .containsExactlyInAnyOrder(
+                        new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
+                                List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(), reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(), reservation1.getPhoneNumber()),
+                                        new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(), reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(), reservation3.getPhoneNumber()))),
+                        new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
+                                List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(), reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(), reservation2.getPhoneNumber())))
+                );
+    }
+
 }
