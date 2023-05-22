@@ -24,9 +24,7 @@ import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.Res
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.*;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -149,8 +147,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final RentalSpec rentalSpec2 = RentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).build();
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
-        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(yesterday.minusDays(1), yesterday)).build();
-        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(yesterday.minusDays(1), yesterday)).build();
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(yesterday.minusDays(1), yesterday)).status(ReservationSpecStatus.OVERDUE_RENTED).build();
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(yesterday.minusDays(1), yesterday)).status(ReservationSpecStatus.ABNORMAL_RETURNED).build();
         final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
         final RentalSpec rentalSpec3 = RentalSpecFixture.builder().propertyNumber("33333333").reservationSpecId(reservationSpec3.getId()).build();
         final RentalSpec rentalSpec4 = RentalSpecFixture.builder().propertyNumber("44444444").reservationSpecId(reservationSpec4.getId()).returnDateTime(RentalDateTime.now()).build();
@@ -166,7 +164,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactlyInAnyOrder(OverdueReservationResponse.of(new ReservationWithMemberNumber(reservation2, member.getMemberNumber()), List.of(rentalSpec3))),
+                        .containsExactlyInAnyOrder(OverdueReservationResponse.of(EquipmentReservationWithMemberNumber.of(reservation2, List.of(reservationSpec3), member.getMemberNumber()), List.of(rentalSpec3))),
                 () -> assertThat(response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
                         .containsExactlyInAnyOrder(ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
         );

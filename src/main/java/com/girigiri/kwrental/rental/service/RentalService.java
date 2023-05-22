@@ -119,13 +119,10 @@ public class RentalService {
     }
 
     private OverdueReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(final LocalDate localDate) {
-        Set<ReservationWithMemberNumber> overdueReservationsWithMemberNumber = reservationService.getOverdueReservationsWithMemberNumber(localDate);
-        final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueReservationsWithMemberNumber);
-        final List<RentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds)
-                .stream()
-                .filter(RentalSpec::isNowRental)
-                .toList();
-        return OverdueReservationsWithRentalSpecsResponse.of(overdueReservationsWithMemberNumber, overdueRentalSpecs);
+        Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservation = reservationService.getOverdueReservationsWithMemberNumber(localDate);
+        final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservation);
+        final List<RentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds);
+        return OverdueReservationsWithRentalSpecsResponse.of(overdueEquipmentReservation, overdueRentalSpecs);
     }
 
     private ReservedOrRentedReservationsWithRentalSpecsAndMemberNumberResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {

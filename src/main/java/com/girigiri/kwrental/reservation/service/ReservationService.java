@@ -156,8 +156,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Set<ReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
-        return reservationRepository.findUnterminatedOverdueReservationWithSpecs(localDate);
+    public Set<EquipmentReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
+        return reservationSpecRepository.findOverdueEquipmentReservationWhenReturn(localDate);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)

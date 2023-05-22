@@ -1,11 +1,11 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import lombok.Getter;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class OverdueReservationsWithRentalSpecsResponse {
@@ -19,8 +19,8 @@ public class OverdueReservationsWithRentalSpecsResponse {
         this.reservations = reservations;
     }
 
-    public static OverdueReservationsWithRentalSpecsResponse of(final Collection<ReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
-        final List<OverdueReservationResponse> reservationResponses = reservations.stream()
+    public static OverdueReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> equipmentReservations, final List<RentalSpec> rentalSpecs) {
+        final List<OverdueReservationResponse> reservationResponses = equipmentReservations.stream()
                 .map(it -> OverdueReservationResponse.of(it, rentalSpecs))
                 .toList();
         return new OverdueReservationsWithRentalSpecsResponse(reservationResponses);

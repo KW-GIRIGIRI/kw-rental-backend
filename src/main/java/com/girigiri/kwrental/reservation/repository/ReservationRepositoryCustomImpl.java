@@ -26,13 +26,6 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public Set<ReservationWithMemberNumber> findUnterminatedOverdueReservationWithSpecs(final LocalDate returnDate) {
-        return Set.copyOf(selectReservationWithMemberNumberAndEquipmentAndSpecs()
-                .where(reservation.terminated.isFalse(), reservationSpec.period.rentalEndDate.before(returnDate))
-                .fetch());
-    }
-
-    @Override
     public Optional<Reservation> findByIdWithSpecs(final Long id) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(reservation)
