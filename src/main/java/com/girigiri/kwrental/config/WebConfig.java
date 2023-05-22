@@ -18,7 +18,7 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private static final String FRONT_SERVER = "http://web.kw-girigiri.com";
+    private static final String FRONT_SERVER = "https://web.kw-girigiri.com";
     private static final String LOCAL = "http://localhost:3000";
 
     private final List<CustomHandlerMethodArgumentResolver> argumentResolvers;
