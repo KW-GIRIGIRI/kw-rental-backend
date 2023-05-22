@@ -6,18 +6,18 @@ import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationResponse;
-import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
+import com.girigiri.kwrental.reservation.dto.response.*;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -186,4 +186,43 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/reservations/specs/" + reservationSpec1.getId()));
     }
+
+    @Test
+    @DisplayName("특절 날짜에 수령일인 랩실 대여 예약을 조회한다.")
+    void getReservationsByStartDate() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).status(ReservationSpecStatus.RENTED).build();
+        final RentalDateTime acceptDateTime = RentalDateTime.now();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
+
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member.getId()).build());
+
+        // when
+        final LabRoomReservationsWithMemberNumberResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getLabRoomReservationsWhenAccept"))
+                .when().log().all().get("/api/admin/reservations/labRooms?startDate={startDate}", LocalDate.now().toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(LabRoomReservationsWithMemberNumberResponse.class);
+
+        // then
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(
+                        new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(), List.of(
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(), reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(), reservation1.getPhoneNumber()),
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(), reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(), reservation2.getPhoneNumber())
+                        )),
+                        new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(), List.of(
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(), reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(), reservation3.getPhoneNumber())
+                        ))
+                );
+    }
+
 }

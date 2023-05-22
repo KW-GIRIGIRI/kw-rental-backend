@@ -144,7 +144,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
     public Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhenAccept(final LocalDate date) {
         return findLabRoomReservationsWhere(
                 reservationSpec.rentable.instanceOf(LabRoom.class),
-                reservationSpec.status.eq(ReservationSpecStatus.RESERVED),
+                reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
                 reservationSpec.period.rentalStartDate.eq(date));
     }
 
@@ -160,7 +160,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                                 .as(Projections.constructor(LabRoomReservationWithMemberNumberResponse.class,
                                         rentableAsset.name, reservation.acceptDateTime,
                                         list(Projections.constructor(LabRoomReservationSpecWithMemberNumberResponse.class,
-                                                reservation.name, member.memberNumber, reservationSpec.amount.amount, reservation.phoneNumber)))
+                                                reservationSpec.id, reservation.name, member.memberNumber, reservationSpec.amount.amount, reservation.phoneNumber)))
                                 )
                         ).values()
         );

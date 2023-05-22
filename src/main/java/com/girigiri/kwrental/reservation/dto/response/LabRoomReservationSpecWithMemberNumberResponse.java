@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public class LabRoomReservationSpecWithMemberNumberResponse {
 
+    private Long id;
     private String renterName;
     private String memberNumber;
     private Integer rentalAmount;
@@ -13,7 +14,8 @@ public class LabRoomReservationSpecWithMemberNumberResponse {
     private LabRoomReservationSpecWithMemberNumberResponse() {
     }
 
-    public LabRoomReservationSpecWithMemberNumberResponse(final String renterName, final String memberNumber, final Integer rentalAmount, final String phoneNumber) {
+    public LabRoomReservationSpecWithMemberNumberResponse(final Long id, final String renterName, final String memberNumber, final Integer rentalAmount, final String phoneNumber) {
+        this.id = id;
         this.renterName = renterName;
         this.memberNumber = memberNumber;
         this.rentalAmount = rentalAmount;

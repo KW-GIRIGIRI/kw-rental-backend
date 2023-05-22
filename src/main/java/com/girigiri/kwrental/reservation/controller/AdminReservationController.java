@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.reservation.controller;
 
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @RestController
@@ -31,5 +33,10 @@ public class AdminReservationController {
         final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId, body.getAmount());
         return ResponseEntity.noContent()
                 .location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();
+    }
+
+    @GetMapping("/labRooms")
+    public LabRoomReservationsWithMemberNumberResponse getLabRoomReservations(final LocalDate startDate) {
+        return new LabRoomReservationsWithMemberNumberResponse(reservationService.getLabRoomReservationForAccept(startDate));
     }
 }
