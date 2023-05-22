@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.asset;
+package com.girigiri.kwrental.asset.domain;
 
 public interface Rentable {
     boolean canRentFor(Integer rentalDays);

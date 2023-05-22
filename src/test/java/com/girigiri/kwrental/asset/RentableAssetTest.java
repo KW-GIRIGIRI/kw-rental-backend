@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.asset;
 
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.exception.RentableCastException;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;

@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;

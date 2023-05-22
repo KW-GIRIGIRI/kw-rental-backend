@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.equipment.domain;
 
-import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

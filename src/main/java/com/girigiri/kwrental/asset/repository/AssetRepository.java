@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.asset.repository;
 
-import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;

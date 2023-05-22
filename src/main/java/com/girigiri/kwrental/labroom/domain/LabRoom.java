@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.labroom.domain;
 
-import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Builder;

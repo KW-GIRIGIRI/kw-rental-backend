@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.inventory.domain;
 
-import com.girigiri.kwrental.asset.Rentable;
-import com.girigiri.kwrental.asset.RentableAsset;
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

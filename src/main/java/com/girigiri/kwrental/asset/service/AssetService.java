@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.asset.service;
 
-import com.girigiri.kwrental.asset.Rentable;
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.exception.AssetNotFoundException;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;

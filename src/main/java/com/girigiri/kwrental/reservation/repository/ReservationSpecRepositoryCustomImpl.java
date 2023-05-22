@@ -1,18 +1,27 @@
 package com.girigiri.kwrental.reservation.repository;
 
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.girigiri.kwrental.auth.domain.QMember.member;
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
+import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.reservationSpec;
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepositoryCustom {
 
@@ -25,26 +34,26 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
     }
 
     @Override
-    public List<ReservationSpec> findOverlappedByPeriod(final Long equipmentId, final RentalPeriod rentalPeriod) {
+    public List<ReservationSpec> findOverlappedBetween(final Long rentableId, final LocalDate start, final LocalDate end) {
+        return findOverlappedByPeriod(rentableId, new RentalPeriod(start, end.plusDays(1)));
+    }
+
+    @Override
+    public List<ReservationSpec> findOverlappedByPeriod(final Long rentableId, final RentalPeriod rentalPeriod) {
         final LocalDate start = rentalPeriod.getRentalStartDate();
         final LocalDate end = rentalPeriod.getRentalEndDate();
         final List<ReservationSpec> overlappedLeft = queryFactory.selectFrom(reservationSpec)
-                .where(reservationSpec.rentable.id.eq(equipmentId)
+                .where(reservationSpec.rentable.id.eq(rentableId)
                         .and(reservationSpec.period.rentalStartDate.loe(start))
                         .and(reservationSpec.period.rentalEndDate.after(start)))
                 .fetch();
         final List<ReservationSpec> overLappedRight = queryFactory.selectFrom(reservationSpec)
-                .where(reservationSpec.rentable.id.eq(equipmentId)
+                .where(reservationSpec.rentable.id.eq(rentableId)
                         .and(reservationSpec.period.rentalStartDate.after(start))
                         .and(reservationSpec.period.rentalStartDate.before(end)))
                 .fetch();
         return Stream.concat(overlappedLeft.stream(), overLappedRight.stream())
                 .distinct().toList();
-    }
-
-    @Override
-    public List<ReservationSpec> findOverlappedBetween(final Long equipmentId, final LocalDate start, final LocalDate end) {
-        return findOverlappedByPeriod(equipmentId, new RentalPeriod(start, end.plusDays(1)));
     }
 
     @Override
@@ -83,5 +92,22 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 .where(reservationSpec.id.eq(reservationSpecForUpdate.getId()))
                 .execute();
         entityManager.merge(reservationSpecForUpdate);
+    }
+
+    @Override
+    public Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenAccept(final LocalDate date) {
+        return Set.copyOf(queryFactory
+                .from(reservationSpec)
+                .leftJoin(reservation).on(reservationSpec.reservation.id.eq(reservation.id))
+                .leftJoin(reservationSpec.rentable).fetchJoin()
+                .leftJoin(member).on(member.id.eq(reservation.memberId))
+                .where(reservationSpec.rentable.instanceOf(Equipment.class),
+                        reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
+                        reservationSpec.period.rentalStartDate.eq(date))
+                .transform(groupBy(reservation.id)
+                        .list(Projections.constructor(EquipmentReservationWithMemberNumber.class,
+                                reservation.name, member.memberNumber, reservation.acceptDateTime, list(reservationSpec)))
+                )
+        );
     }
 }
