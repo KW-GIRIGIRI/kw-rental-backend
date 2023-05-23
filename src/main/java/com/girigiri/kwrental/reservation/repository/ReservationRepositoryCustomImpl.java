@@ -54,7 +54,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public List<Reservation> findByReservationSpecIds(Set<Long> reservationSpecIds) {
+    public List<Reservation> findByReservationSpecIds(List<Long> reservationSpecIds) {
         final List<Long> reservationIds = jpaQueryFactory.select(reservationSpec.reservation.id)
                 .from(reservationSpec)
                 .where(reservationSpec.id.in(reservationSpecIds))

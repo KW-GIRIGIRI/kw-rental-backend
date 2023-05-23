@@ -6,18 +6,14 @@ import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.*;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
+import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
-import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
+import com.girigiri.kwrental.reservation.exception.*;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import org.springframework.stereotype.Service;
@@ -208,5 +204,28 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public Set<LabRoomReservationWithMemberNumberResponse> getLabRoomReservationForAccept(final LocalDate date) {
         return reservationSpecRepository.findLabRoomReservationsWhenAccept(date);
+    }
+
+    @Transactional
+    public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
+        final LocalDateTime acceptedTime = LocalDateTime.now();
+        validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
+        for (Reservation reservation : reservations) {
+            final List<ReservationSpec> specs = reservation.getReservationSpecs();
+            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
+            if (!specs.stream().allMatch(ReservationSpec::isReserved))
+                throw new LabRoomReservationSpecNotReservedException();
+            if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
+                throw new IllegalRentDateException();
+            specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RENTED));
+            reservation.acceptAt(acceptedTime);
+        }
+    }
+
+    private void validateSameLabRoom(final String labRoomName, final List<Reservation> reservations) {
+        final boolean isSameRentable = reservations.stream()
+                .allMatch(reservation -> reservation.isOnlyRentFor(labRoomName));
+        if (!isSameRentable) throw new NotSameRentableRentException();
     }
 }

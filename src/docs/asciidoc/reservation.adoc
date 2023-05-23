@@ -12,6 +12,10 @@ operation::addLabRoomReservations[snippets='http-request,http-response']
 
 operation::admin_getLabRoomReservationsWhenAccept[snippets='http-request,http-response']
 
+=== 랩실 대여 수령 API
+
+operation::admin_rentLabRoom[snippets='http-request,http-response']
+
 === 관리자 특정 기자재 품목 대여 현황 API
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']

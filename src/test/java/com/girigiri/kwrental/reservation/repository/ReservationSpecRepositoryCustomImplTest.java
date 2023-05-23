@@ -282,7 +282,7 @@ class ReservationSpecRepositoryCustomImplTest {
         // when
         entityManager.flush();
         entityManager.clear();
-        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId(), reservationSpec3.getId()));
+        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(List.of(reservationSpec1.getId(), reservationSpec3.getId()));
 
         // then
         assertThat(reservations).usingRecursiveFieldByFieldElementComparator()
