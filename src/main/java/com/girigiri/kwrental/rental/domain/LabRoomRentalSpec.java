@@ -1,10 +1,12 @@
 package com.girigiri.kwrental.rental.domain;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Builder;
 
 @Entity
+@DiscriminatorValue("lab_room")
 public class LabRoomRentalSpec extends AbstractRentalSpec implements RentalSpec {
 
     protected LabRoomRentalSpec() {

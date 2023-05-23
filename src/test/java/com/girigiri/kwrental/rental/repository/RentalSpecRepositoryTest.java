@@ -11,12 +11,14 @@ import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
@@ -228,5 +230,24 @@ class RentalSpecRepositoryTest {
         AbstractRentalSpec actual = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
         assertThat(actual.getStatus()).isEqualTo(RentalSpecStatus.RETURNED);
         assertThat(actual.getReturnDateTime()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("특정 랩실 이름과 특정 날짜로 랩실 대여 예약을 대여 상세와 함께 조회한다.")
+    void getLabRoomReservationWithRentalSpec() {
+        // given
+        final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(labRoom).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).build());
+        final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder().reservationId(reservation.getId()).reservationSpecId(reservationSpec.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+
+        // when
+        final List<LabRoomReservationResponse> actual = rentalSpecRepository.getLabRoomReservationWithRentalSpec(labRoom.getName(), reservationSpec.getPeriod().getRentalStartDate());
+
+        // then
+        assertThat(actual).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(new LabRoomReservationResponse(reservation.getId(), reservationSpec.getId(),
+                        reservationSpec.getPeriod().getRentalStartDate(), reservationSpec.getPeriod().getRentalEndDate(), reservation.getName(), rentalSpec.getStatus()));
     }
 }

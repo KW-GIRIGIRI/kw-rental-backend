@@ -1,12 +1,15 @@
 package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.girigiri.kwrental.asset.domain.QRentableAsset.rentableAsset;
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
 import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.abstractRentalSpec;
 import static com.girigiri.kwrental.rental.domain.QEquipmentRentalSpec.equipmentRentalSpec;
@@ -113,5 +117,22 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .set(abstractRentalSpec.returnDateTime, returnDateTime)
                 .where(abstractRentalSpec.reservationId.in(reservationIds))
                 .execute();
+    }
+
+    @Override
+    public List<LabRoomReservationResponse> getLabRoomReservationWithRentalSpec(final String labRoomName, final LocalDate startDate) {
+        return jpaQueryFactory
+                .from(abstractRentalSpec)
+                .join(reservation).on(reservation.id.eq(abstractRentalSpec.reservationId))
+                .join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+                .join(rentableAsset).on(rentableAsset.eq(reservationSpec.rentable))
+                .where(
+                        rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
+                        reservationSpec.period.rentalStartDate.eq(startDate), reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED)
+                )
+                .select(Projections.constructor(LabRoomReservationResponse.class,
+                        reservation.id, reservationSpec.id, reservationSpec.period.rentalStartDate,
+                        reservationSpec.period.rentalEndDate, reservation.name, abstractRentalSpec.status))
+                .fetch();
     }
 }

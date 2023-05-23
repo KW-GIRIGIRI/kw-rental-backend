@@ -16,10 +16,7 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecByItemResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalsDto;
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
+import com.girigiri.kwrental.rental.dto.response.*;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
@@ -352,5 +349,30 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(actualRentalSpec.getStatus()).isEqualTo(RentalSpecStatus.RETURNED),
                 () -> assertThat(actualRentalSpec.getReturnDateTime()).isNotNull()
         );
+    }
+
+    @Test
+    @DisplayName("특정 날짜에 완료된 특정 랩실 대여 예약을 조회한다..")
+    void getLabRoomReservations() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).status(RentalSpecStatus.RETURNED).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+
+
+        // when
+        final LabRoomReservationsResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getLabRoomReservations"))
+                .when().log().all().get("/api/admin/rentals/labRooms/{labRoomName}?date={date}", labRoom1.getName(), LocalDate.now().minusDays(1).toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(LabRoomReservationsResponse.class);
+
+        // then
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(new LabRoomReservationResponse(reservation1.getId(), reservationSpec1.getId(), reservationSpec1.getStartDate(), reservationSpec1.getEndDate(), reservation1.getName(), rentalSpec.getStatus()));
     }
 }

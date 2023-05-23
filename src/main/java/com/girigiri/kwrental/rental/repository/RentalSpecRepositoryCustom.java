@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.repository;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
@@ -27,4 +28,6 @@ public interface RentalSpecRepositoryCustom {
     List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(String propertyNumber);
 
     void updateNormalReturnedByReservationIds(List<Long> reservationIds, RentalDateTime returnDateTime);
+
+    List<LabRoomReservationResponse> getLabRoomReservationWithRentalSpec(String labRoomName, LocalDate date);
 }

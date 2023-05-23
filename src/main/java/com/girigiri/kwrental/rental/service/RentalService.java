@@ -10,10 +10,7 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalsDto;
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
+import com.girigiri.kwrental.rental.dto.response.*;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
@@ -190,5 +187,11 @@ public class RentalService {
                 .map(Reservation::getId)
                 .toList();
         rentalSpecRepository.updateNormalReturnedByReservationIds(reservationIds, RentalDateTime.now());
+    }
+
+    @Transactional(readOnly = true)
+    public LabRoomReservationsResponse getReturnedLabRoomReservation(final String labRoomName, final LocalDate date) {
+        final List<LabRoomReservationResponse> labRoomReservationWithRentalSpecs = rentalSpecRepository.getLabRoomReservationWithRentalSpec(labRoomName, date);
+        return new LabRoomReservationsResponse(labRoomReservationWithRentalSpecs);
     }
 }
