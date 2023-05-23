@@ -11,9 +11,9 @@ import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationSpecWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
@@ -133,7 +133,7 @@ class RentalServiceTest {
         final EquipmentReservationsWithRentalSpecsResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(LocalDate.now());
 
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(ReservedOrRentedReservationWithRentalSpecsResponse.of(equipmentReservation, List.of(rentalSpec1)));
+                .containsExactly(EquipmentReservationWithRentalSpecsResponse.of(equipmentReservation, List.of(rentalSpec1)));
         assertThat(response.getReservations().get(0).getReservationSpecs()).usingRecursiveFieldByFieldElementComparator().containsExactly(ReservationSpecWithRentalSpecsResponse.of(reservationSpec1, List.of(rentalSpec1)));
     }
 

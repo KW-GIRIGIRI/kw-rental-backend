@@ -99,4 +99,9 @@ public class Reservation {
     public LocalDate getEndDate() {
         return this.reservationSpecs.get(0).getEndDate();
     }
+
+    public boolean isOnlyRentFor(final String rentableName) {
+        return this.reservationSpecs.stream()
+                .allMatch(spec -> spec.isRentFor(rentableName));
+    }
 }

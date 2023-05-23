@@ -19,8 +19,6 @@ import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.Reservations;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,14 +99,6 @@ public class RentalService {
                 .map(EquipmentReservationWithMemberNumber::getReservationSpecIds)
                 .flatMap(List::stream)
                 .collect(Collectors.toSet());
-    }
-
-    private Set<Long> getAcceptedReservationSpecIds(final Collection<ReservationWithMemberNumber> reservationsWithMemberNumber) {
-        final List<Reservation> reservations = reservationsWithMemberNumber.stream()
-                .map(ReservationWithMemberNumber::getReservation)
-                .toList();
-        return Set.copyOf(new Reservations(reservations)
-                .getAcceptedReservationSpecIds());
     }
 
     @Transactional(readOnly = true)

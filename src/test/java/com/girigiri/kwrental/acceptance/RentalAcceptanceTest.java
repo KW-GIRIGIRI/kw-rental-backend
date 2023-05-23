@@ -19,12 +19,15 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalsDto;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservedOrRentedReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.reservation.domain.*;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -124,8 +127,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyInAnyOrder(ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation1, member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)),
-                        ReservedOrRentedReservationWithRentalSpecsResponse.of(new ReservationWithMemberNumber(reservation2, member.getMemberNumber()), Collections.emptyList()));
+                .containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1, reservationSpec2), member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)),
+                        EquipmentReservationWithRentalSpecsResponse.of(EquipmentReservationWithMemberNumber.of(reservation2, List.of(reservationSpec3, reservationSpec4), member.getMemberNumber()), Collections.emptyList()));
     }
 
     @Test
@@ -166,7 +169,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
                         .containsExactlyInAnyOrder(OverdueReservationResponse.of(EquipmentReservationWithMemberNumber.of(reservation2, List.of(reservationSpec3), member.getMemberNumber()), List.of(rentalSpec3))),
                 () -> assertThat(response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactlyInAnyOrder(ReservedOrRentedReservationWithRentalSpecsResponse.of(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2), member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
+                        .containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2), member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
         );
     }
 

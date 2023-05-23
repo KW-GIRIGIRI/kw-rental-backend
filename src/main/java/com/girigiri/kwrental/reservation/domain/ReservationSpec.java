@@ -103,4 +103,12 @@ public class ReservationSpec {
     public boolean isReservedOrRented() {
         return this.status == ReservationSpecStatus.RESERVED || this.status == ReservationSpecStatus.RENTED;
     }
+
+    public boolean isRentFor(final String rentableName) {
+        return this.rentable.getName().equals(rentableName);
+    }
+
+    public boolean isReserved() {
+        return status == ReservationSpecStatus.RESERVED;
+    }
 }
