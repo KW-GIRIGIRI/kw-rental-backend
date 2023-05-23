@@ -206,6 +206,11 @@ public class ReservationService {
         return reservationSpecRepository.findLabRoomReservationsWhenAccept(date);
     }
 
+    @Transactional(readOnly = true)
+    public Set<LabRoomReservationWithMemberNumberResponse> getLabRoomReservationForReturn(final LocalDate date) {
+        return reservationSpecRepository.findLabRoomReservationWhenReturn(date);
+    }
+
     @Transactional
     public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());

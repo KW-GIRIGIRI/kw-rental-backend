@@ -265,6 +265,38 @@ class ReservationSpecRepositoryCustomImplTest {
     }
 
     @Test
+    @DisplayName("특정 날짜가 반납일인 랩실 대여 예약 상세를 회원 번호화 함께 조회한다.")
+    void findLabRoomReservationWhenReturn() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final RentalPeriod period = new RentalPeriod(NOW.minusDays(1), NOW);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(period).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(period).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(NOW, NOW.plusDays(2))).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member.getId()).build());
+
+        // when
+        final Set<LabRoomReservationWithMemberNumberResponse> actual = reservationSpecRepository.findLabRoomReservationWhenReturn(NOW);
+
+        // then
+        assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
+                .containsExactlyInAnyOrder(
+                        new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
+                                List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(), reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(), reservation1.getPhoneNumber()))),
+                        new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
+                                List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(), reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(), reservation2.getPhoneNumber())))
+                );
+    }
+
+    @Test
     @DisplayName("대여 예약 상세 id로 대여 예약을 조회한다.")
     void findByReservationSpecIds() {
         // given

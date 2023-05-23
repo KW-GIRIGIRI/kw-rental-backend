@@ -28,4 +28,6 @@ public interface ReservationSpecRepositoryCustom {
     Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenReturn(LocalDate date);
 
     Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhenAccept(LocalDate date);
+
+    Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationWhenReturn(LocalDate date);
 }

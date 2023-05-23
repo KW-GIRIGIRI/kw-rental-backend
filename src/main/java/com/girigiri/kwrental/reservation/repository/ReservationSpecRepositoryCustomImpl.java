@@ -148,6 +148,14 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 reservationSpec.period.rentalStartDate.eq(date));
     }
 
+    @Override
+    public Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationWhenReturn(final LocalDate date) {
+        return findLabRoomReservationsWhere(
+                reservationSpec.rentable.instanceOf(LabRoom.class),
+                reservationSpec.status.in(ReservationSpecStatus.RENTED),
+                reservationSpec.period.rentalEndDate.eq(date));
+    }
+
     private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(final Predicate... predicates) {
         return Set.copyOf(
                 queryFactory

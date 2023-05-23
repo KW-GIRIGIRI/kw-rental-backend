@@ -190,8 +190,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("특절 날짜에 수령일인 랩실 대여 예약을 조회한다.")
-    void getReservationsByStartDate() {
+    @DisplayName("특절 날짜에 사용일인 랩실 대여 예약을 조회한다.")
+    void getLabRoomReservationsForAccept() {
         // given
         final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
         final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
@@ -228,7 +228,46 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("랩실 대여 예약을 수령 처리한다.")
+    @DisplayName("특절 날짜에 사용일인 랩실 대여 예약을 조회한다.")
+    void getLabRoomReservationsForReturn() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+        final RentalPeriod period = new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(period).status(ReservationSpecStatus.RENTED).build();
+        final RentalDateTime acceptDateTime = RentalDateTime.now();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
+
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom1).period(period).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom2).period(period).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member.getId()).acceptDateTime(acceptDateTime).build());
+
+        // when
+        final LabRoomReservationsWithMemberNumberResponse response = RestAssured.given(requestSpec)
+                .filter(document("admin_getLabRoomReservationsWhenReturn"))
+                .when().log().all().get("/api/admin/reservations/labRooms?endDate={endDate}", LocalDate.now().toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(LabRoomReservationsWithMemberNumberResponse.class);
+
+        // then
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(
+                        new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(), List.of(
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(), reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(), reservation1.getPhoneNumber()),
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(), reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(), reservation2.getPhoneNumber())
+                        )),
+                        new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(), List.of(
+                                new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(), reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(), reservation3.getPhoneNumber())
+                        ))
+                );
+    }
+
+    @Test
+    @DisplayName("랩실 대여 예약을 사용 처리한다.")
     void rentLabRoom() {
         // given
         final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());

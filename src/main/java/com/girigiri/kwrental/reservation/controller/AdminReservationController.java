@@ -36,9 +36,14 @@ public class AdminReservationController {
                 .location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();
     }
 
-    @GetMapping("/labRooms")
-    public LabRoomReservationsWithMemberNumberResponse getLabRoomReservations(final LocalDate startDate) {
+    @GetMapping(value = "/labRooms", params = "startDate")
+    public LabRoomReservationsWithMemberNumberResponse getLabRoomReservationsForAccept(final LocalDate startDate) {
         return new LabRoomReservationsWithMemberNumberResponse(reservationService.getLabRoomReservationForAccept(startDate));
+    }
+
+    @GetMapping(value = "/labRooms", params = "endDate")
+    public LabRoomReservationsWithMemberNumberResponse getLabRoomReservationsForReturn(final LocalDate endDate) {
+        return new LabRoomReservationsWithMemberNumberResponse(reservationService.getLabRoomReservationForReturn(endDate));
     }
 
     @PatchMapping("/labRooms")
