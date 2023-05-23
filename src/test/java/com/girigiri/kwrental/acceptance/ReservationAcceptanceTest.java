@@ -14,10 +14,7 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.*;
 import com.girigiri.kwrental.reservation.dto.response.*;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
@@ -295,6 +292,38 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getReservationSpecs().get(0).getStatus()).isEqualTo(ReservationSpecStatus.RENTED),
                 () -> assertThat(actual.getAcceptDateTime()).isNotNull()
+        );
+    }
+
+    @Test
+    @DisplayName("랩실 대여 예약을 퇴실 처리한다.")
+    void returnLabRoom() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+
+        final ReturnLabRoomRequest requestBody = ReturnLabRoomRequest.builder()
+                .reservationSpecIds(List.of(reservationSpec1.getId()))
+                .name(labRoom1.getName())
+                .build();
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_returnLabRoom"))
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when().log().all().patch("/api/admin/reservations/labRooms/return")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final Reservation actual = reservationRepository.findByIdWithSpecs(reservation1.getId())
+                .orElseThrow();
+        assertAll(
+                () -> assertThat(actual.getReservationSpecs().get(0).getStatus()).isEqualTo(ReservationSpecStatus.RETURNED),
+                () -> assertThat(actual.isTerminated()).isTrue()
         );
     }
 }

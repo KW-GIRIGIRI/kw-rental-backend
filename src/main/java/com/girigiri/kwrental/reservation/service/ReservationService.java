@@ -10,6 +10,7 @@ import com.girigiri.kwrental.reservation.domain.*;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
@@ -220,7 +221,7 @@ public class ReservationService {
             final List<ReservationSpec> specs = reservation.getReservationSpecs();
             if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
             if (!specs.stream().allMatch(ReservationSpec::isReserved))
-                throw new LabRoomReservationSpecNotReservedException();
+                throw new LabRoomReservationNotReservedWhenAcceptException();
             if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
                 throw new IllegalRentDateException();
             specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RENTED));
@@ -232,5 +233,19 @@ public class ReservationService {
         final boolean isSameRentable = reservations.stream()
                 .allMatch(reservation -> reservation.isOnlyRentFor(labRoomName));
         if (!isSameRentable) throw new NotSameRentableRentException();
+    }
+
+    @Transactional
+    public void returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
+        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(returnLabRoomRequest.getReservationSpecIds());
+        validateSameLabRoom(returnLabRoomRequest.getName(), reservations);
+        for (Reservation reservation : reservations) {
+            final List<ReservationSpec> specs = reservation.getReservationSpecs();
+            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
+            if (!specs.stream().allMatch(ReservationSpec::isRented))
+                throw new LabRoomReservationNotRentedWhenReturnException();
+            specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
+            reservation.updateIfTerminated();
+        }
     }
 }

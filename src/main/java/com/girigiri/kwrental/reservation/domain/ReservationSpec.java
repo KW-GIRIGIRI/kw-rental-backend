@@ -111,4 +111,8 @@ public class ReservationSpec {
     public boolean isReserved() {
         return status == ReservationSpecStatus.RESERVED;
     }
+
+    public boolean isRented() {
+        return status == ReservationSpecStatus.RENTED;
+    }
 }
