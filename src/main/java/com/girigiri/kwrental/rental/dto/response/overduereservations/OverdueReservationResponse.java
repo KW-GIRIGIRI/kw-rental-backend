@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import lombok.Getter;
 
@@ -30,16 +30,16 @@ public class OverdueReservationResponse {
         this.reservationSpecs = reservationSpecs;
     }
 
-    public static OverdueReservationResponse of(final EquipmentReservationWithMemberNumber equipmentReservation, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationResponse of(final EquipmentReservationWithMemberNumber equipmentReservation, final List<EquipmentRentalSpec> rentalSpecs) {
         final List<OverdueReservationSpecResponse> overdueReservationSpecResponses = mapToReservationSpecResponse(rentalSpecs, equipmentReservation);
         final RentalDateTime acceptDateTime = equipmentReservation.getAcceptDateTime();
         return new OverdueReservationResponse(equipmentReservation.getId(), equipmentReservation.getRenterName(),
                 equipmentReservation.getMemberNumber(), acceptDateTime == null ? null : acceptDateTime.toLocalDateTime(), overdueReservationSpecResponses);
     }
 
-    private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<RentalSpec> rentalSpecs, final EquipmentReservationWithMemberNumber equipmentReservation) {
-        final Map<Long, List<RentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
-                .collect(groupingBy(RentalSpec::getReservationSpecId));
+    private static List<OverdueReservationSpecResponse> mapToReservationSpecResponse(final List<EquipmentRentalSpec> rentalSpecs, final EquipmentReservationWithMemberNumber equipmentReservation) {
+        final Map<Long, List<EquipmentRentalSpec>> groupedRentalSpecsByReservationSpecId = rentalSpecs.stream()
+                .collect(groupingBy(EquipmentRentalSpec::getReservationSpecId));
         return equipmentReservation.getReservationSpecs().stream()
                 .filter(it -> groupedRentalSpecsByReservationSpecId.get(it.getId()) != null)
                 .map(it -> OverdueReservationSpecResponse.of(it, groupedRentalSpecsByReservationSpecId.get(it.getId())))

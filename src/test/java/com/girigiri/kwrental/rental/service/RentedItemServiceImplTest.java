@@ -4,7 +4,7 @@ import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +38,7 @@ class RentedItemServiceImplTest {
     void getRentedPropertyNumbers() {
         // given
         given(rentalSpecRepository.findRentedRentalSpecs(any(), any()))
-                .willReturn(Set.of(RentalSpecFixture.builder().propertyNumber("12345678").build()));
+                .willReturn(Set.of(EquipmentRentalSpecFixture.builder().propertyNumber("12345678").build()));
 
         // when
         final Set<String> rentedPropertyNumbers = rentedItemService.getRentedPropertyNumbers(1L, LocalDateTime.now());

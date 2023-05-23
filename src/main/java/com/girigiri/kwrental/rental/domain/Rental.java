@@ -21,7 +21,7 @@ public class Rental {
         this.reservationFromRental = reservationFromRental;
     }
 
-    public static Rental of(final List<RentalSpec> rentalSpecs, final Reservation reservation) {
+    public static Rental of(final List<? extends RentalSpec> rentalSpecs, final Reservation reservation) {
         final Map<Long, RentalSpec> rentalSpecMap = rentalSpecs.stream()
                 .collect(toMap(RentalSpec::getId, Function.identity()));
         final ReservationFromRental reservationFromRental = ReservationFromRental.from(reservation);
@@ -45,7 +45,12 @@ public class Rental {
         rentalSpec.setStatus(status);
     }
 
-    public RentalSpec getRentalSpec(final Long id) {
+    public <T extends RentalSpec> T getRentalSpecAs(final Long id, final Class<T> clazz) {
+        final RentalSpec rentalSpec = getRentalSpec(id);
+        return rentalSpec.as(clazz);
+    }
+
+    private RentalSpec getRentalSpec(final Long id) {
         final RentalSpec rentalSpec = rentalSpecMap.get(id);
         if (rentalSpec == null) throw new RentalSpecNotFoundException();
         return rentalSpec;

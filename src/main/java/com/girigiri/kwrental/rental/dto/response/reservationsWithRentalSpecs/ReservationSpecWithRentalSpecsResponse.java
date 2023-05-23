@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class ReservationSpecWithRentalSpecsResponse {
         this.rentalSpecs = rentalSpecs;
     }
 
-    public static ReservationSpecWithRentalSpecsResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
+    public static ReservationSpecWithRentalSpecsResponse of(final ReservationSpec reservationSpec, final List<EquipmentRentalSpec> rentalSpecs) {
         final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
         final List<RentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
         return ReservationSpecWithRentalSpecsResponse.builder()
@@ -48,7 +48,7 @@ public class ReservationSpecWithRentalSpecsResponse {
                 .build();
     }
 
-    private static List<RentalSpecResponse> mapToRentalSpecDto(final List<RentalSpec> rentalSpecs) {
+    private static List<RentalSpecResponse> mapToRentalSpecDto(final List<EquipmentRentalSpec> rentalSpecs) {
         if (rentalSpecs == null) return null;
         return rentalSpecs.stream()
                 .map(RentalSpecResponse::from)

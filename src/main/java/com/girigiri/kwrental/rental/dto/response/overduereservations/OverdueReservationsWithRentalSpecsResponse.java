@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import lombok.Getter;
 
@@ -19,7 +19,7 @@ public class OverdueReservationsWithRentalSpecsResponse {
         this.reservations = reservations;
     }
 
-    public static OverdueReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> equipmentReservations, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> equipmentReservations, final List<EquipmentRentalSpec> rentalSpecs) {
         final List<OverdueReservationResponse> reservationResponses = equipmentReservations.stream()
                 .map(it -> OverdueReservationResponse.of(it, rentalSpecs))
                 .toList();

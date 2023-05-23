@@ -2,7 +2,7 @@ package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.service.RentedItemService;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class RentedItemServiceImpl implements RentedItemService {
     public Set<String> getRentedPropertyNumbers(final Long equipmentId, final LocalDateTime dateTime) {
         return rentalSpecRepository.findRentedRentalSpecs(equipmentId, dateTime)
                 .stream()
-                .map(RentalSpec::getPropertyNumber)
+                .map(EquipmentRentalSpec::getPropertyNumber)
                 .collect(Collectors.toSet());
     }
 

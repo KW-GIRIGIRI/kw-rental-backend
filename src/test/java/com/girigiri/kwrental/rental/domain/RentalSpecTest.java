@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.domain;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +19,8 @@ class RentalSpecTest {
     void isNowRental() {
         // given
         final RentalDateTime now = RentalDateTime.now();
-        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().acceptDateTime(now).returnDateTime(null).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().acceptDateTime(now).returnDateTime(now.calculateDay(1)).build();
+        final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder().acceptDateTime(now).returnDateTime(null).build();
+        final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder().acceptDateTime(now).returnDateTime(now.calculateDay(1)).build();
 
         // when
         final boolean nowRental = rentalSpec1.isNowRental();
@@ -38,7 +38,7 @@ class RentalSpecTest {
     @DisplayName("대여 상세가 반납이 된 상태인 경우 반납 시간을 기록한다")
     void setReturnDateTime(final RentalSpecStatus status, final boolean isNotNull) {
         // given
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().status(status).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().status(status).build();
 
         // when
         rentalSpec.setReturnDateTimeIfAnyReturned(LocalDateTime.now());
@@ -52,7 +52,7 @@ class RentalSpecTest {
     @DisplayName("대여 상세가 반납이 된 상태인 경우 반납 시간을 기록한다")
     void isOverdueReturned(final RentalSpecStatus status, final boolean expect) {
         // given
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().status(status).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().status(status).build();
 
         // when
         final boolean actual = rentalSpec.isOverdueReturned();
@@ -66,7 +66,7 @@ class RentalSpecTest {
     @DisplayName("대여 상세가 반납이 된 상태인 경우 반납 시간을 기록한다")
     void isUnavailableAfterReturn(final RentalSpecStatus status, final boolean expect) {
         // given
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().status(status).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().status(status).build();
 
         // when
         final boolean actual = rentalSpec.isUnavailableAfterReturn();

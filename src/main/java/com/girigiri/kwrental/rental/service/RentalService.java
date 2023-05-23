@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.Rental;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
@@ -49,7 +49,7 @@ public class RentalService {
         Map<Long, Set<String>> collectedByEquipmentId = reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(createRentalRequest.getReservationId(), propertyNumbersByReservationSpecId);
         itemService.validatePropertyNumbers(collectedByEquipmentId);
         validateNowRental(collectedByEquipmentId);
-        final List<RentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
+        final List<EquipmentRentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
         rentalSpecRepository.saveAll(rentalSpecs);
         reservationService.acceptReservation(createRentalRequest.getReservationId());
     }
@@ -59,26 +59,26 @@ public class RentalService {
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
         final boolean nowRental = rentalSpecRepository.findByPropertyNumbers(propertyNumbers).stream()
-                .anyMatch(RentalSpec::isNowRental);
+                .anyMatch(EquipmentRentalSpec::isNowRental);
         if (nowRental) throw new DuplicateRentalException();
     }
 
-    private List<RentalSpec> mapToRentalSpecs(final CreateRentalRequest createRentalRequest) {
+    private List<EquipmentRentalSpec> mapToRentalSpecs(final CreateRentalRequest createRentalRequest) {
         return createRentalRequest.getRentalSpecsRequests().stream()
                 .map(it -> mapToRentalSpecPerReservationSpec(createRentalRequest.getReservationId(), it))
                 .flatMap(List::stream)
                 .toList();
     }
 
-    private List<RentalSpec> mapToRentalSpecPerReservationSpec(final Long reservationId, final RentalSpecsRequest rentalSpecsRequest) {
+    private List<EquipmentRentalSpec> mapToRentalSpecPerReservationSpec(final Long reservationId, final RentalSpecsRequest rentalSpecsRequest) {
         final Long reservationSpecId = rentalSpecsRequest.getReservationSpecId();
         return rentalSpecsRequest.getPropertyNumbers().stream()
                 .map(propertyNumber -> mapToRentalSpec(reservationId, reservationSpecId, propertyNumber))
                 .toList();
     }
 
-    private RentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId, final String propertyNumber) {
-        return RentalSpec.builder()
+    private EquipmentRentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId, final String propertyNumber) {
+        return EquipmentRentalSpec.builder()
                 .reservationId(reservationId)
                 .reservationSpecId(reservationSpecId)
                 .propertyNumber(propertyNumber)
@@ -89,7 +89,7 @@ public class RentalService {
     public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(final LocalDate localDate) {
         final Set<EquipmentReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
-        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
+        final List<EquipmentRentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
         return EquipmentReservationsWithRentalSpecsResponse.of(reservations, rentalSpecs);
     }
 
@@ -111,14 +111,14 @@ public class RentalService {
     private OverdueReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(final LocalDate localDate) {
         Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservations = reservationService.getOverdueReservationsWithMemberNumber(localDate);
         final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservations);
-        final List<RentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds);
+        final List<EquipmentRentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(overdueReservationSpecsIds);
         return OverdueReservationsWithRentalSpecsResponse.of(overdueEquipmentReservations, overdueRentalSpecs);
     }
 
     private EquipmentReservationsWithRentalSpecsResponse getReservationWithRentalSpecsByEndDate(final LocalDate localDate) {
         Set<EquipmentReservationWithMemberNumber> equipmentReservations = reservationService.getReservationsWithMemberNumberByEndDate(localDate);
         final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(equipmentReservations);
-        final List<RentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
+        final List<EquipmentRentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecIds(reservationSpecIds);
         return EquipmentReservationsWithRentalSpecsResponse.of(equipmentReservations, rentalSpecs);
     }
 
@@ -130,18 +130,18 @@ public class RentalService {
         for (Long rentalSpecId : returnRequest.keySet()) {
             final RentalSpecStatus status = returnRequest.get(rentalSpecId);
             rental.returnByRentalSpecId(rentalSpecId, status);
-            setPenaltyAndItemAvailable(rental.getRentalSpec(rentalSpecId));
+            setPenaltyAndItemAvailable(rental.getRentalSpecAs(rentalSpecId, EquipmentRentalSpec.class));
         }
         rental.setReservationStatusAfterReturn();
     }
 
     private Rental getRental(final ReturnRentalRequest returnRentalRequest) {
-        final List<RentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(returnRentalRequest.getReservationId());
+        final List<EquipmentRentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(returnRentalRequest.getReservationId());
         final Reservation reservation = reservationService.getReservationWithReservationSpecsById(returnRentalRequest.getReservationId());
         return Rental.of(rentalSpecList, reservation);
     }
 
-    private void setPenaltyAndItemAvailable(final RentalSpec rentalSpec) {
+    private void setPenaltyAndItemAvailable(final EquipmentRentalSpec rentalSpec) {
         if (rentalSpec.isUnavailableAfterReturn()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), false);
         }

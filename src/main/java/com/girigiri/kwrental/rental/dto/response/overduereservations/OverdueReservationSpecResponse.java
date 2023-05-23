@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class OverdueReservationSpecResponse {
         this.rentalSpecs = rentalSpecs;
     }
 
-    public static OverdueReservationSpecResponse of(final ReservationSpec reservationSpec, final List<RentalSpec> rentalSpecs) {
+    public static OverdueReservationSpecResponse of(final ReservationSpec reservationSpec, final List<EquipmentRentalSpec> rentalSpecs) {
         final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
         final List<OverdueRentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(rentalSpecs);
         return OverdueReservationSpecResponse.builder()
@@ -47,7 +47,7 @@ public class OverdueReservationSpecResponse {
                 .build();
     }
 
-    private static List<OverdueRentalSpecResponse> mapToRentalSpecDto(final List<RentalSpec> rentalSpecs) {
+    private static List<OverdueRentalSpecResponse> mapToRentalSpecDto(final List<EquipmentRentalSpec> rentalSpecs) {
         return rentalSpecs.stream()
                 .map(OverdueRentalSpecResponse::from)
                 .toList();

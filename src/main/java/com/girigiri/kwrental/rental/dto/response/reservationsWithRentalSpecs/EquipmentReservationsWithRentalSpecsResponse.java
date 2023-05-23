@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import lombok.Getter;
 
@@ -19,7 +19,7 @@ public class EquipmentReservationsWithRentalSpecsResponse {
         this.reservations = reservations;
     }
 
-    public static EquipmentReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> reservations, final List<RentalSpec> rentalSpecs) {
+    public static EquipmentReservationsWithRentalSpecsResponse of(final Set<EquipmentReservationWithMemberNumber> reservations, final List<EquipmentRentalSpec> rentalSpecs) {
         final List<EquipmentReservationWithRentalSpecsResponse> equipmentReservationWithRentalSpecsRespons = reservations.stream()
                 .map(it -> EquipmentReservationWithRentalSpecsResponse.of(it, rentalSpecs))
                 .toList();
