@@ -8,11 +8,15 @@ operation::addReservations[snippets='http-request,http-response']
 
 operation::addLabRoomReservations[snippets='http-request,http-response']
 
-=== 랩실 대여 수령 조회 API
+=== 특정 일이 사용일인 랩실 대여 조회 API
 
 operation::admin_getLabRoomReservationsWhenAccept[snippets='http-request,http-response']
 
-=== 랩실 대여 수령 API
+=== 특정 일이 퇴실일인 랩실 대여 조회 API
+
+operation::admin_getLabRoomReservationsWhenReturn[snippets='http-request,http-response']
+
+=== 랩실 대여 사용 처리 API
 
 operation::admin_rentLabRoom[snippets='http-request,http-response']
 
