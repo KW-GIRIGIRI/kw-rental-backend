@@ -105,4 +105,13 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .where(equipmentRentalSpec.propertyNumber.eq(propertyNumber))
                 .fetch();
     }
+
+    @Override
+    public void updateNormalReturnedByReservationIds(final List<Long> reservationIds, final RentalDateTime returnDateTime) {
+        jpaQueryFactory.update(abstractRentalSpec)
+                .set(abstractRentalSpec.status, RentalSpecStatus.RETURNED)
+                .set(abstractRentalSpec.returnDateTime, returnDateTime)
+                .where(abstractRentalSpec.reservationId.in(reservationIds))
+                .execute();
+    }
 }

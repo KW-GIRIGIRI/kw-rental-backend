@@ -7,6 +7,7 @@ import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEn
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +58,12 @@ public class AdminRentalController {
     @PostMapping("/labRooms")
     public ResponseEntity<?> rentLabRoom(@Validated @RequestBody RentLabRoomRequest rentLabRoomRequest) {
         rentalService.rentLabRoom(rentLabRoomRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/labRooms/returns")
+    public ResponseEntity<?> returnLabRoom(@Validated @RequestBody ReturnLabRoomRequest returnLabRoomRequest) {
+        rentalService.returnLabRoom(returnLabRoomRequest);
         return ResponseEntity.noContent().build();
     }
 }

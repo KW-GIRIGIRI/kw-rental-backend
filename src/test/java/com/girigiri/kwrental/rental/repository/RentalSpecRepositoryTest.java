@@ -1,13 +1,15 @@
 package com.girigiri.kwrental.rental.repository;
 
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
@@ -18,6 +20,8 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +38,21 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(JpaConfig.class)
-class EquipmentRentalSpecRepositoryTest {
+class RentalSpecRepositoryTest {
 
     @Autowired
     private RentalSpecRepository rentalSpecRepository;
     @Autowired
     private ReservationSpecRepository reservationSpecRepository;
     @Autowired
-    private EquipmentRepository equipmentRepository;
+    private AssetRepository assetRepository;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("대여 상세를 모두 저장한다.")
@@ -72,8 +79,8 @@ class EquipmentRentalSpecRepositoryTest {
         // given
         final RentalDateTime acceptTime = RentalDateTime.now();
         final RentalDateTime returnTime = RentalDateTime.now();
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("modelName1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("modelName2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("modelName1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("modelName2").build());
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1).build());
         final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment2).build());
 
@@ -111,8 +118,8 @@ class EquipmentRentalSpecRepositoryTest {
     void findRentalDtosBetweenDate() {
         // given
         final Member member = memberRepository.save(MemberFixture.create());
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
 
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
@@ -146,8 +153,8 @@ class EquipmentRentalSpecRepositoryTest {
     @DisplayName("특정 자산번호의 특정 기간동안 대여 상태들을 조회한다.")
     void findRentalCountsByPropertyNumbersBetweenDate() {
         // given
-        final Equipment equipment1 = equipmentRepository.save(EquipmentFixture.builder().name("model1").build());
-        final Equipment equipment2 = equipmentRepository.save(EquipmentFixture.builder().name("model2").build());
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
+        final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
 
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
@@ -185,7 +192,7 @@ class EquipmentRentalSpecRepositoryTest {
     @DisplayName("자산번호에 해당하는 대여 상세를 대여자의 이름과 함께 조회한다.")
     void findRentalSpecsWithNameByPropertyNumber() {
         // given
-        final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
         final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
         final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
         final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().reservationId(reservation.getId()).build();
@@ -201,5 +208,25 @@ class EquipmentRentalSpecRepositoryTest {
                         .isEqualTo(new RentalSpecWithName(
                                 reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()))
         );
+    }
+
+    @Test
+    @DisplayName("대여 예약에 해당하는 대여 상세를 정상 반납으로 업데이트한다.")
+    void updateNormalReturnedByReservationIds() {
+        // given
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
+        final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
+        final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder().reservationId(reservation.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+        entityManager.clear();
+
+        // when
+        rentalSpecRepository.updateNormalReturnedByReservationIds(List.of(reservation.getId()), RentalDateTime.now());
+
+        //then
+        AbstractRentalSpec actual = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
+        assertThat(actual.getStatus()).isEqualTo(RentalSpecStatus.RETURNED);
+        assertThat(actual.getReturnDateTime()).isNotNull();
     }
 }

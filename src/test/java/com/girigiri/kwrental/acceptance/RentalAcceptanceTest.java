@@ -8,7 +8,9 @@ import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
@@ -29,6 +31,7 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
@@ -311,6 +314,43 @@ class RentalAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getReservationSpecs().get(0).getStatus()).isEqualTo(ReservationSpecStatus.RENTED),
                 () -> assertThat(actual.getAcceptDateTime()).isNotNull()
+        );
+    }
+
+    @Test
+    @DisplayName("랩실 대여 예약을 퇴실 처리한다.")
+    void returnLabRoom() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Member member = memberRepository.save(MemberFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now())).status(ReservationSpecStatus.RENTED).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec));
+
+        final ReturnLabRoomRequest requestBody = ReturnLabRoomRequest.builder()
+                .reservationSpecIds(List.of(reservationSpec1.getId()))
+                .name(labRoom1.getName())
+                .build();
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("admin_returnLabRoom"))
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when().log().all().patch("/api/admin/rentals/labRooms/returns")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final Reservation actualReservation = reservationRepository.findByIdWithSpecs(reservation1.getId())
+                .orElseThrow();
+        final AbstractRentalSpec actualRentalSpec = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
+        assertAll(
+                () -> assertThat(actualReservation.getReservationSpecs().get(0).getStatus()).isEqualTo(ReservationSpecStatus.RETURNED),
+                () -> assertThat(actualReservation.isTerminated()).isTrue(),
+                () -> assertThat(actualRentalSpec.getStatus()).isEqualTo(RentalSpecStatus.RETURNED),
+                () -> assertThat(actualRentalSpec.getReturnDateTime()).isNotNull()
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.service;
 
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
@@ -21,6 +22,7 @@ import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,5 +181,14 @@ public class RentalService {
                 .reservationId(reservationId)
                 .reservationSpecId(reservationSpecId)
                 .build();
+    }
+
+    @Transactional
+    public void returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
+        final List<Reservation> returnedReservations = reservationService.returnLabRoom(returnLabRoomRequest);
+        final List<Long> reservationIds = returnedReservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        rentalSpecRepository.updateNormalReturnedByReservationIds(reservationIds, RentalDateTime.now());
     }
 }

@@ -236,8 +236,8 @@ public class ReservationService {
         if (!isSameRentable) throw new NotSameRentableRentException();
     }
 
-    @Transactional
-    public void returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
+    @Transactional(propagation = Propagation.MANDATORY)
+    public List<Reservation> returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(returnLabRoomRequest.getReservationSpecIds());
         validateSameLabRoom(returnLabRoomRequest.getName(), reservations);
         for (Reservation reservation : reservations) {
@@ -248,5 +248,6 @@ public class ReservationService {
             specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
             reservation.updateIfTerminated();
         }
+        return reservations;
     }
 }
