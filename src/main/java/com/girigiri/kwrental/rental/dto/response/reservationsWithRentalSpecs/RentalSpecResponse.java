@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -19,10 +19,10 @@ public class RentalSpecResponse {
         this.propertyNumber = propertyNumber;
     }
 
-    public static RentalSpecResponse from(final RentalSpec rentalSpec) {
+    public static RentalSpecResponse from(final EquipmentRentalSpec equipmentRentalSpec) {
         return RentalSpecResponse.builder()
-                .rentalSpecId(rentalSpec.getId())
-                .propertyNumber(rentalSpec.getPropertyNumber())
+                .rentalSpecId(equipmentRentalSpec.getId())
+                .propertyNumber(equipmentRentalSpec.getPropertyNumber())
                 .build();
     }
 }

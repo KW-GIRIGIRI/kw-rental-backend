@@ -14,14 +14,14 @@ import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import io.restassured.RestAssured;
 import org.apache.http.entity.ContentType;
@@ -181,7 +181,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
         final Item item2 = itemRepository.save(itemBuilder.propertyNumber("222222222").build());
         final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).build());
         rentalSpecRepository.saveAll(List.of(
-                RentalSpecFixture.builder().reservationSpecId(reservationSpec.getId()).propertyNumber(item1.getPropertyNumber()).build()));
+                EquipmentRentalSpecFixture.builder().reservationSpecId(reservationSpec.getId()).propertyNumber(item1.getPropertyNumber()).build()));
 
         // when
         final ItemsResponse response = RestAssured.given(requestSpec)
@@ -207,9 +207,9 @@ class ItemAcceptanceTest extends AcceptanceTest {
         final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(1), now)).build());
         final ReservationSpec reservationSpec2 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(2), now.minusDays(2))).build());
         final ReservationSpec reservationSpec3 = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(new RentalPeriod(now.minusDays(2), now.minusDays(2))).build());
-        final RentalSpec rentalSpec1 = RentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.RETURNED).build();
-        final RentalSpec rentalSpec2 = RentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).propertyNumber(item2.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
-        final RentalSpec rentalSpec3 = RentalSpecFixture.builder().reservationSpecId(reservationSpec3.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
+        final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.RETURNED).build();
+        final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).propertyNumber(item2.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
+        final EquipmentRentalSpec rentalSpec3 = EquipmentRentalSpecFixture.builder().reservationSpecId(reservationSpec3.getId()).propertyNumber(item1.getPropertyNumber()).status(RentalSpecStatus.LOST).build();
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3));
 
         // when

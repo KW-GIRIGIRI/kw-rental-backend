@@ -5,7 +5,7 @@ import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
 import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.testsupport.fixture.RentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ class RentalTest {
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).period(new RentalPeriod(now.minusDays(1), now)).id(1L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(2L).build();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
         final Rental rental = Rental.of(List.of(rentalSpec), reservation);
 
         // when
@@ -47,7 +47,7 @@ class RentalTest {
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).period(new RentalPeriod(now.minusDays(1), now)).id(1L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(2L).build();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
         final Rental rental = Rental.of(List.of(rentalSpec), reservation);
 
         // when
@@ -67,7 +67,7 @@ class RentalTest {
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).period(new RentalPeriod(now.minusDays(2), now.minusDays(1))).id(1L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(2L).build();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().id(3L).reservationSpecId(reservationSpec.getId()).build();
         final Rental rental = Rental.of(List.of(rentalSpec), reservation);
 
         // when
@@ -86,7 +86,7 @@ class RentalTest {
         // given
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).id(1L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(2L).build();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().id(3L).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().id(3L).build();
         final Rental rental = Rental.of(List.of(rentalSpec), reservation);
 
         // when, then
@@ -100,7 +100,7 @@ class RentalTest {
         // given
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null).id(1L).build();
         final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(2L).build();
-        final RentalSpec rentalSpec = RentalSpecFixture.builder().id(3L).build();
+        final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().id(3L).build();
         final Rental rental = Rental.of(List.of(rentalSpec), reservation);
 
         // when, then

@@ -1,6 +1,8 @@
 package com.girigiri.kwrental.asset.domain;
 
-public interface Rentable {
+import com.girigiri.kwrental.common.SuperEntity;
+
+public interface Rentable extends SuperEntity {
     boolean canRentFor(Integer rentalDays);
 
     Long getId();
@@ -10,6 +12,4 @@ public interface Rentable {
     Integer getTotalQuantity();
 
     Integer getMaxRentalDays();
-
-    <T extends Rentable> T as(Class<T> clazz);
 }

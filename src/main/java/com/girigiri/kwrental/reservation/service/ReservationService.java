@@ -212,8 +212,8 @@ public class ReservationService {
         return reservationSpecRepository.findLabRoomReservationWhenReturn(date);
     }
 
-    @Transactional
-    public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+    @Transactional(propagation = Propagation.MANDATORY)
+    public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
         final LocalDateTime acceptedTime = LocalDateTime.now();
         validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
@@ -227,6 +227,7 @@ public class ReservationService {
             specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RENTED));
             reservation.acceptAt(acceptedTime);
         }
+        return reservations;
     }
 
     private void validateSameLabRoom(final String labRoomName, final List<Reservation> reservations) {
@@ -235,8 +236,8 @@ public class ReservationService {
         if (!isSameRentable) throw new NotSameRentableRentException();
     }
 
-    @Transactional
-    public void returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
+    @Transactional(propagation = Propagation.MANDATORY)
+    public List<Reservation> returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(returnLabRoomRequest.getReservationSpecIds());
         validateSameLabRoom(returnLabRoomRequest.getName(), reservations);
         for (Reservation reservation : reservations) {
@@ -247,5 +248,6 @@ public class ReservationService {
             specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
             reservation.updateIfTerminated();
         }
+        return reservations;
     }
 }
