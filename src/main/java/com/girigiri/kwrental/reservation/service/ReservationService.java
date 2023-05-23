@@ -212,8 +212,8 @@ public class ReservationService {
         return reservationSpecRepository.findLabRoomReservationWhenReturn(date);
     }
 
-    @Transactional
-    public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+    @Transactional(propagation = Propagation.MANDATORY)
+    public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
         final LocalDateTime acceptedTime = LocalDateTime.now();
         validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
@@ -227,6 +227,7 @@ public class ReservationService {
             specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RENTED));
             reservation.acceptAt(acceptedTime);
         }
+        return reservations;
     }
 
     private void validateSameLabRoom(final String labRoomName, final List<Reservation> reservations) {

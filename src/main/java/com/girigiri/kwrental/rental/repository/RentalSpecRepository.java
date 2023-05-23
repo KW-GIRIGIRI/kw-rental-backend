@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.rental.repository;
 
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import org.springframework.data.repository.Repository;
 
-public interface RentalSpecRepository extends Repository<EquipmentRentalSpec, Long>, RentalSpecRepositoryCustom {
-    <S extends EquipmentRentalSpec> Iterable<S> saveAll(Iterable<S> entities);
+public interface RentalSpecRepository extends Repository<AbstractRentalSpec, Long>, RentalSpecRepositoryCustom {
+    <S extends AbstractRentalSpec> Iterable<S> saveAll(Iterable<S> entities);
 }

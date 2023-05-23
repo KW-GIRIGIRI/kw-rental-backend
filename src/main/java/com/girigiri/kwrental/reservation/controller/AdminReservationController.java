@@ -1,7 +1,6 @@
 package com.girigiri.kwrental.reservation.controller;
 
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
@@ -45,12 +44,6 @@ public class AdminReservationController {
     @GetMapping(value = "/labRooms", params = "endDate")
     public LabRoomReservationsWithMemberNumberResponse getLabRoomReservationsForReturn(final LocalDate endDate) {
         return new LabRoomReservationsWithMemberNumberResponse(reservationService.getLabRoomReservationForReturn(endDate));
-    }
-
-    @PatchMapping("/labRooms")
-    public ResponseEntity<?> rentLabRoom(@Validated @RequestBody RentLabRoomRequest rentLabRoomRequest) {
-        reservationService.rentLabRoom(rentLabRoomRequest);
-        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/labRooms/return")

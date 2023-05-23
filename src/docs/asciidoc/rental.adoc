@@ -34,6 +34,14 @@ operation::admin_getReservationsWithRentalSpecsByEndDate[snippets='http-request,
 
 operation::admin_returnRentals[snippets='http-request,http-response']
 
+=== 랩실 대여 사용 처리 API
+
+operation::admin_rentLabRoom[snippets='http-request,http-response']
+
+=== 랩실 대여 퇴실 처리 API
+
+operation::admin_returnLabRoom[snippets='http-request,http-response']
+
 === 내 대여 이력 조회
 
 operation::getRentals[snippets='http-request,http-response']

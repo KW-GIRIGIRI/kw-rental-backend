@@ -16,14 +16,6 @@ operation::admin_getLabRoomReservationsWhenAccept[snippets='http-request,http-re
 
 operation::admin_getLabRoomReservationsWhenReturn[snippets='http-request,http-response']
 
-=== 랩실 대여 사용 처리 API
-
-operation::admin_rentLabRoom[snippets='http-request,http-response']
-
-=== 랩실 대여 퇴실 처리 API
-
-operation::admin_returnLabRoom[snippets='http-request,http-response']
-
 === 관리자 특정 기자재 품목 대여 현황 API
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']

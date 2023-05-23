@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.Rental;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
@@ -19,6 +20,7 @@ import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,5 +163,21 @@ public class RentalService {
         final List<RentalSpecWithName> rentalSpecsWithName = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(propertyNumber);
         Collections.reverse(rentalSpecsWithName);
         return RentalSpecsByItemResponse.from(rentalSpecsWithName);
+    }
+
+    @Transactional
+    public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+        final List<Reservation> rentedReservations = reservationService.rentLabRoom(rentLabRoomRequest);
+        final List<LabRoomRentalSpec> labRoomRentalSpecs = rentedReservations.stream()
+                .map(reservation -> mapToRentalSpec(reservation.getId(), reservation.getReservationSpecs().get(0).getId()))
+                .toList();
+        rentalSpecRepository.saveAll(labRoomRentalSpecs);
+    }
+
+    private LabRoomRentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId) {
+        return LabRoomRentalSpec.builder()
+                .reservationId(reservationId)
+                .reservationSpecId(reservationSpecId)
+                .build();
     }
 }
