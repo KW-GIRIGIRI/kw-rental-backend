@@ -2,10 +2,7 @@ package com.girigiri.kwrental.rental.service;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.item.service.ItemService;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
-import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
-import com.girigiri.kwrental.rental.domain.Rental;
-import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.domain.*;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
@@ -52,7 +49,10 @@ public class RentalService {
         validateNowRental(collectedByEquipmentId);
         final List<EquipmentRentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
         rentalSpecRepository.saveAll(rentalSpecs);
-        reservationService.acceptReservation(createRentalRequest.getReservationId());
+        final List<Long> rentedReservationSpecIds = rentalSpecs.stream()
+                .map(AbstractRentalSpec::getReservationSpecId)
+                .toList();
+        reservationService.acceptReservation(createRentalRequest.getReservationId(), rentedReservationSpecIds);
     }
 
     private void validateNowRental(final Map<Long, Set<String>> collectedByEquipmentId) {

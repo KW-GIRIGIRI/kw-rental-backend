@@ -156,6 +156,14 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
                 reservationSpec.period.rentalEndDate.eq(date));
     }
 
+    @Override
+    public void updateStatusByIds(final List<Long> ids, final ReservationSpecStatus status) {
+        queryFactory.update(reservationSpec)
+                .set(reservationSpec.status, status)
+                .where(reservationSpec.id.in(ids))
+                .execute();
+    }
+
     private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(final Predicate... predicates) {
         return Set.copyOf(
                 queryFactory
