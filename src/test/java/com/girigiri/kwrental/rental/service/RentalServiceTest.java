@@ -240,4 +240,37 @@ class RentalServiceTest {
                 () -> assertThat(reservationSpec2.getStatus()).isEqualTo(ReservationSpecStatus.ABNORMAL_RETURNED)
         );
     }
+
+    @Test
+    @DisplayName("정상 반납 처리한다.")
+    void return_normal() {
+        // given
+        final RentalPeriod period = new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1));
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.RETURNED)
+                .period(period).amount(RentalAmount.ofPositive(1)).id(1L).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null).status(ReservationSpecStatus.OVERDUE_RENTED)
+                .period(period).amount(RentalAmount.ofPositive(2)).id(2L).build();
+        final Long reservationId = 1L;
+        final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).id(reservationId).build();
+        given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+
+        final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec1.getId()).status(RentalSpecStatus.RETURNED)
+                .id(1L).propertyNumber("11111111").build();
+        final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec2.getId()).status(RentalSpecStatus.LOST)
+                .id(2L).propertyNumber("22222222").build();
+
+        given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2));
+
+        final ReturnRentalSpecRequest rentalSpecRequest1 = ReturnRentalSpecRequest.builder().id(rentalSpec1.getId()).status(RentalSpecStatus.RETURNED).build();
+        final ReturnRentalSpecRequest rentalSpecRequest2 = ReturnRentalSpecRequest.builder().id(rentalSpec2.getId()).status(RentalSpecStatus.RETURNED).build();
+
+        final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+                .reservationId(reservationId)
+                .rentalSpecs(List.of(rentalSpecRequest1, rentalSpecRequest2)).build();
+
+        // when
+        assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
+                .doesNotThrowAnyException();
+
+    }
 }

@@ -320,4 +320,19 @@ class ReservationSpecRepositoryCustomImplTest {
         assertThat(reservations).usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(reservation1, reservation2);
     }
+
+    @Test
+    @DisplayName("id에 해당하는 상세들을 특정 상태로 업데이트")
+    void updateStatusByIds() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+        final ReservationSpec reservationSpec1 = reservationSpecRepository.save(ReservationSpecFixture.create(labRoom1));
+
+        // when
+        reservationSpecRepository.updateStatusByIds(List.of(reservationSpec1.getId()), ReservationSpecStatus.CANCELED);
+        entityManager.refresh(reservationSpec1);
+
+        // then
+        assertThat(reservationSpec1.getStatus()).isEqualTo(ReservationSpecStatus.CANCELED);
+    }
 }

@@ -77,6 +77,7 @@ class RentalPeriodTest {
     void isLegalReturnIn() {
         // given
         final LocalDate start = LocalDate.now();
+        final LocalDate mid = start.plusDays(1);
         final LocalDate end = LocalDate.now().plusDays(2);
         final RentalPeriod rentalPeriod = new RentalPeriod(start, end);
 
@@ -86,12 +87,14 @@ class RentalPeriodTest {
         final boolean illegalReturn = rentalPeriod.isLegalReturnIn(illegal);
         final boolean legalReturn1 = rentalPeriod.isLegalReturnIn(end);
         final boolean legalReturn2 = rentalPeriod.isLegalReturnIn(start);
+        final boolean legalReturn3 = rentalPeriod.isLegalReturnIn(mid);
 
         // then
         assertAll(
                 () -> assertThat(illegalReturn).isFalse(),
                 () -> assertThat(legalReturn1).isTrue(),
-                () -> assertThat(legalReturn2).isTrue()
+                () -> assertThat(legalReturn2).isTrue(),
+                () -> assertThat(legalReturn3).isTrue()
         );
     }
 

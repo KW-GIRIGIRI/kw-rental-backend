@@ -92,6 +92,12 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .header(HttpHeaders.LOCATION, containsString("/api/rentals?reservationId="));
+
+        // then
+        final Reservation actualReservation = reservationRepository.findByIdWithSpecs(reservation1.getId()).orElseThrow();
+        final ReservationSpec actualSpec = actualReservation.getReservationSpecs().get(0);
+        assertThat(actualReservation.getAcceptDateTime()).isNotNull();
+        assertThat(actualSpec.getStatus()).isEqualTo(ReservationSpecStatus.RENTED);
     }
 
     @Test

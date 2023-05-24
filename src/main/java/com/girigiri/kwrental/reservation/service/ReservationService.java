@@ -150,10 +150,22 @@ public class ReservationService {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void acceptReservation(final Long id) {
-        reservationRepository.findById(id)
-                .orElseThrow(ReservationNotFoundException::new)
-                .acceptAt(LocalDateTime.now());
+    public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
+        validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
+        for (Reservation reservation : reservations) {
+            final List<ReservationSpec> specs = reservation.getReservationSpecs();
+            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
+            if (!specs.stream().allMatch(ReservationSpec::isReserved))
+                throw new LabRoomReservationNotReservedWhenAcceptException();
+            if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
+                throw new IllegalRentDateException();
+            final List<Long> specIds = reservation
+                    .getReservationSpecs()
+                    .stream().map(ReservationSpec::getId).toList();
+            acceptReservation(reservation.getId(), specIds);
+        }
+        return reservations;
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -213,21 +225,11 @@ public class ReservationService {
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
-        final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
-        final LocalDateTime acceptedTime = LocalDateTime.now();
-        validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
-        for (Reservation reservation : reservations) {
-            final List<ReservationSpec> specs = reservation.getReservationSpecs();
-            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
-            if (!specs.stream().allMatch(ReservationSpec::isReserved))
-                throw new LabRoomReservationNotReservedWhenAcceptException();
-            if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
-                throw new IllegalRentDateException();
-            specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RENTED));
-            reservation.acceptAt(acceptedTime);
-        }
-        return reservations;
+    public void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
+        final Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new);
+        reservation.acceptAt(LocalDateTime.now());
+        reservationSpecRepository.updateStatusByIds(rentedReservationSpecIds, ReservationSpecStatus.RENTED);
     }
 
     private void validateSameLabRoom(final String labRoomName, final List<Reservation> reservations) {
