@@ -55,6 +55,7 @@ public class ReservationService {
                 .map(this::mapToReservationSpec)
                 .toList();
         final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
+        inventoryService.deleteAll(memberId);
         return reservationRepository.save(reservation).getId();
     }
 
@@ -142,11 +143,12 @@ public class ReservationService {
 
     private void validateReservationSpecIdContainsAll(final Reservation reservation, final Set<Long> reservationSpecIdsFromInput) {
         final Set<Long> reservationSpecIdsFromReservation = reservation.getReservationSpecs().stream()
+                .filter(ReservationSpec::isReserved)
                 .map(ReservationSpec::getId)
                 .collect(Collectors.toSet());
         if (reservationSpecIdsFromInput.containsAll(reservationSpecIdsFromReservation) &&
                 reservationSpecIdsFromReservation.containsAll(reservationSpecIdsFromInput)) return;
-        throw new ReservationSpecException("입력된 대여 예약 상세가 맞지 않습니다.");
+        throw new ReservationSpecException("신청한 대여 상세와 입력된 대여 상세가 일치하지 않습니다.");
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

@@ -119,18 +119,19 @@ class RentalSpecRepositoryTest {
     @DisplayName("특정 기간에 해당하는 대여를 조히한다.")
     void findRentalDtosBetweenDate() {
         // given
-        final Member member = memberRepository.save(MemberFixture.create());
+        final Member member1 = memberRepository.save(MemberFixture.create());
+        final Member member2 = memberRepository.save(MemberFixture.create());
         final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
         final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
 
         final LocalDate now = LocalDate.now();
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now, now.plusDays(1))).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now, now.plusDays(1))).build();
-        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member.getId()).build());
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(member1.getId()).build());
 
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
         final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
-        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).memberId(member.getId()).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).memberId(member2.getId()).build());
 
         final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder().propertyNumber("11111111").reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).build();
         final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder().propertyNumber("22222222").reservationSpecId(reservationSpec2.getId()).reservationId(reservation1.getId()).build();
@@ -139,15 +140,13 @@ class RentalSpecRepositoryTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
 
         // when
-        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member.getId(), now, now.plusDays(2));
+        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member1.getId(), now, now.plusDays(2));
 
         // then
         assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
                         new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
-                                Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus()))),
-                        new RentalDto(reservationSpec3.getStartDate(), reservationSpec3.getEndDate(),
-                                Set.of(new RentalSpecDto(rentalSpec3.getId(), equipment1.getName(), rentalSpec3.getStatus()), new RentalSpecDto(rentalSpec4.getId(), equipment2.getName(), rentalSpec4.getStatus())))
+                                Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
                 );
     }
 

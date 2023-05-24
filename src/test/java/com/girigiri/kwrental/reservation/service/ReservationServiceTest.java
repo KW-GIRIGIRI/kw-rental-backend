@@ -63,6 +63,7 @@ class ReservationServiceTest {
         final Inventory inventory = InventoryFixture.create(equipment, 0L);
         given(inventoryService.getInventoriesWithEquipment(any())).willReturn(List.of(inventory));
         doNothing().when(remainingQuantityService).validateAmount(any(), any(), any());
+        doNothing().when(inventoryService).deleteAll(any());
 
         final AddReservationRequest addReservationRequest = AddReservationRequest.builder()
                 .renterEmail("email@email.com")
