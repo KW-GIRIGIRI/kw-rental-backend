@@ -75,7 +75,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
         return jpaQueryFactory
                 .from(abstractRentalSpec)
                 .join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-                .join(reservation).on(reservation.memberId.eq(memberId))
+                .join(reservation).on(abstractRentalSpec.reservationId.eq(reservation.id), reservation.memberId.eq(memberId))
                 .join(equipment).on(equipment.id.eq(reservationSpec.rentable.id))
                 .where(reservationSpecBetweenDate(from, to))
                 .transform(groupBy(reservationSpec.period)

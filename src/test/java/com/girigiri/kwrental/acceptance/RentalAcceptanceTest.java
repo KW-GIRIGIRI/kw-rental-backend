@@ -67,7 +67,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("대여를 생성한다.")
+    @DisplayName("대여를 수령한다.")
     void createRental() {
         // given
         final Rentable equipment = assetRepository.save(EquipmentFixture.create());
