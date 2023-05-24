@@ -55,6 +55,7 @@ public class ReservationService {
                 .map(this::mapToReservationSpec)
                 .toList();
         final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
+        inventoryService.deleteAll(memberId);
         return reservationRepository.save(reservation).getId();
     }
 
