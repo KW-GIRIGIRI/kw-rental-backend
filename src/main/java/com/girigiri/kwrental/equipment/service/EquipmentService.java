@@ -118,7 +118,7 @@ public class EquipmentService {
                 .orElseThrow(EquipmentNotFoundException::new);
 
         equipment.setName(updateEquipmentRequest.modelName());
-        equipment.setComponents(updateEquipmentRequest.component());
+        equipment.setComponents(updateEquipmentRequest.components());
         equipment.setCategory(Category.from(updateEquipmentRequest.category()));
         equipment.setMaker(updateEquipmentRequest.maker());
         equipment.setDescription(updateEquipmentRequest.description());
