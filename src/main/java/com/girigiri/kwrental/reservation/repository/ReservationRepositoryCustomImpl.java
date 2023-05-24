@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.reservation.repository;
 
+import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -32,13 +33,13 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
     }
 
     @Override
-    public Set<Reservation> findNotTerminatedReservationsByMemberId(final Long memberId) {
+    public Set<Reservation> findNotTerminatedEquipmentReservationsByMemberId(final Long memberId) {
         return Set.copyOf(jpaQueryFactory
                 .selectFrom(reservation)
                 .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.rentable).fetchJoin()
-                .where(reservation.memberId.eq(memberId)
-                        .and(reservation.terminated.isFalse()))
+                .join(reservationSpec.rentable, rentableAsset).fetchJoin()
+                .where(rentableAsset.instanceOf(Equipment.class), reservation.memberId.eq(memberId)
+                        , reservation.terminated.isFalse())
                 .fetch()
         );
     }
