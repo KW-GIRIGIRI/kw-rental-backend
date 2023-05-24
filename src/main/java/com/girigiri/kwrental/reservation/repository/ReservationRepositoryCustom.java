@@ -10,7 +10,7 @@ public interface ReservationRepositoryCustom {
 
     Optional<Reservation> findByIdWithSpecs(Long id);
 
-    Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
+    Set<Reservation> findNotTerminatedEquipmentReservationsByMemberId(Long memberId);
 
     void adjustTerminated(Reservation reservation);
 

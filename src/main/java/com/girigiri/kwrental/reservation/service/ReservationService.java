@@ -174,7 +174,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public UnterminatedReservationsResponse getUnterminatedReservations(final Long memberId) {
-        final Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
+        final Set<Reservation> reservations = reservationRepository.findNotTerminatedEquipmentReservationsByMemberId(memberId);
         final List<Reservation> reservationList = new ArrayList<>(reservations);
         reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
         return UnterminatedReservationsResponse.from(reservationList);
