@@ -21,7 +21,7 @@ import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueRese
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -181,7 +181,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("반납한다.")
+    @DisplayName("기자재를 반납한다.")
     void returnRentals() {
         // given
         final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
@@ -221,7 +221,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("사용자의 대여 이력을 조회한다.")
+    @DisplayName("사용자의 기자재 대여 이력을 조회한다.")
     void getRentals() {
         // given
         final String password = "12345678";
@@ -242,16 +242,16 @@ class RentalAcceptanceTest extends AcceptanceTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
         // when
-        final RentalsDto response = RestAssured.given(requestSpec)
+        final EquipmentRentalsDto response = RestAssured.given(requestSpec)
                 .filter(document("getRentals"))
                 .sessionId(sessionId)
                 .when().log().all().get("/api/rentals?from={from}&to={}", yesterday.toString(), now.toString())
                 .then().log().all().statusCode(HttpStatus.OK.value())
-                .extract().as(RentalsDto.class);
+                .extract().as(EquipmentRentalsDto.class);
 
         // then
         assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(new RentalDto(reservation.getStartDate(), reservation.getEndDate(),
+                .containsExactly(new EquipmentRentalDto(reservation.getStartDate(), reservation.getEndDate(),
                         Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
                 );
     }
@@ -380,5 +380,43 @@ class RentalAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(new LabRoomReservationResponse(reservation1.getId(), reservationSpec1.getId(), reservationSpec1.getStartDate(), reservationSpec1.getEndDate(), reservation1.getName(), rentalSpec.getStatus()));
+    }
+
+    @Test
+    @DisplayName("사용자의 랩실 대여 이력을 조회한다.")
+    void getLabRoomRentals() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
+
+        final LocalDate now = LocalDate.now();
+        final LocalDate yesterday = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(yesterday, now)).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(yesterday, now)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+        final LabRoomRentalSpec rentalSpec1 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).status(RentalSpecStatus.RETURNED).build();
+        final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).reservationId(reservation1.getId()).status(RentalSpecStatus.RETURNED).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        // when
+        final LabRoomRentalsDto response = RestAssured.given(requestSpec)
+                .filter(document("getLabRoomRentals"))
+                .sessionId(sessionId)
+                .when().log().all().get("/api/rentals/labRooms?from={from}&to={}", yesterday.toString(), now.toString())
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(LabRoomRentalsDto.class);
+
+        // then
+        assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrder(
+                        new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(), reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
+                        new LabRoomRentalDto(reservation2.getStartDate(), reservation2.getEndDate(), labRoom2.getName(), reservationSpec2.getAmount().getAmount(), rentalSpec2.getStatus())
+                );
     }
 }

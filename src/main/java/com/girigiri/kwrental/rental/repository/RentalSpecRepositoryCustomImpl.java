@@ -4,9 +4,10 @@ import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
@@ -23,6 +24,7 @@ import java.util.Set;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.rentableAsset;
 import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
+import static com.girigiri.kwrental.labroom.domain.QLabRoom.labRoom;
 import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.abstractRentalSpec;
 import static com.girigiri.kwrental.rental.domain.QEquipmentRentalSpec.equipmentRentalSpec;
 import static com.girigiri.kwrental.reservation.domain.QReservation.reservation;
@@ -71,7 +73,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
     }
 
     @Override
-    public List<RentalDto> findRentalDtosBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+    public List<EquipmentRentalDto> findEquipmentRentalDtosBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
         return jpaQueryFactory
                 .from(abstractRentalSpec)
                 .join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
@@ -79,8 +81,21 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
                 .join(equipment).on(equipment.id.eq(reservationSpec.rentable.id))
                 .where(reservationSpecBetweenDate(from, to))
                 .transform(groupBy(reservationSpec.period)
-                        .list(Projections.constructor(RentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
+                        .list(Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
                                 GroupBy.set(Projections.constructor(RentalSpecDto.class, abstractRentalSpec.id, equipment.name, abstractRentalSpec.status)))));
+    }
+
+    @Override
+    public List<LabRoomRentalDto> findLabRoomRentalDtosBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+        return jpaQueryFactory
+                .from(abstractRentalSpec)
+                .join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+                .join(reservation).on(abstractRentalSpec.reservationId.eq(reservation.id), reservation.memberId.eq(memberId))
+                .join(labRoom).on(labRoom.id.eq(reservationSpec.rentable.id))
+                .where(reservationSpecBetweenDate(from, to))
+                .select(Projections.constructor(LabRoomRentalDto.class,
+                        reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
+                        labRoom.name, reservationSpec.amount.amount, abstractRentalSpec.status)).fetch();
     }
 
     private BooleanExpression reservationSpecBetweenDate(final LocalDate from, final LocalDate to) {

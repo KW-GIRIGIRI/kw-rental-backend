@@ -11,9 +11,10 @@ import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -116,8 +117,8 @@ class RentalSpecRepositoryTest {
     }
 
     @Test
-    @DisplayName("특정 기간에 해당하는 대여를 조히한다.")
-    void findRentalDtosBetweenDate() {
+    @DisplayName("특정 기간에 해당하는 기자재 대여를 조히한다.")
+    void findEquipmentRentalDtosBetweenDate() {
         // given
         final Member member1 = memberRepository.save(MemberFixture.create());
         final Member member2 = memberRepository.save(MemberFixture.create());
@@ -140,12 +141,12 @@ class RentalSpecRepositoryTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
 
         // when
-        final List<RentalDto> rentalDtos = rentalSpecRepository.findRentalDtosBetweenDate(member1.getId(), now, now.plusDays(2));
+        final List<EquipmentRentalDto> rentalDtos = rentalSpecRepository.findEquipmentRentalDtosBetweenDate(member1.getId(), now, now.plusDays(2));
 
         // then
         assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
-                        new RentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
+                        new EquipmentRentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
                                 Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()), new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
                 );
     }
@@ -205,7 +206,8 @@ class RentalSpecRepositoryTest {
         // then
         assertAll(
                 () -> assertThat(result).hasSize(1),
-                () -> assertThat(result.get(0)).usingRecursiveComparison()
+                () -> assertThat(result.
+                        get(0)).usingRecursiveComparison()
                         .isEqualTo(new RentalSpecWithName(
                                 reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(), rentalSpec.getStatus()))
         );
@@ -248,5 +250,42 @@ class RentalSpecRepositoryTest {
         assertThat(actual).usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(new LabRoomReservationResponse(reservation.getId(), reservationSpec.getId(),
                         reservationSpec.getPeriod().getRentalStartDate(), reservationSpec.getPeriod().getRentalEndDate(), reservation.getName(), rentalSpec.getStatus()));
+    }
+
+    @Test
+    @DisplayName("특정 기간에 해당하는 랩실 대여를 조히한다.")
+    void findLabRoomRentalDtosBetweenDate() {
+        // given
+        final Member member1 = memberRepository.save(MemberFixture.create());
+        final Member member2 = memberRepository.save(MemberFixture.create());
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
+
+        final LocalDate now = LocalDate.now();
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(now, now.plusDays(1))).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member1.getId()).build());
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member1.getId()).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(now, now.plusDays(2))).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member2.getId()).build());
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+        final Reservation reservation4 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec4)).memberId(member2.getId()).build());
+
+        final LabRoomRentalSpec rentalSpec1 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).build();
+        final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).reservationId(reservation2.getId()).build();
+        final LabRoomRentalSpec rentalSpec3 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec3.getId()).reservationId(reservation3.getId()).build();
+        final LabRoomRentalSpec rentalSpec4 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec4.getId()).reservationId(reservation4.getId()).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
+
+        // when
+        final List<LabRoomRentalDto> rentalDtos = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(member1.getId(), now, now.plusDays(2));
+
+        // then
+        assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(
+                        new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(), reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
+                        new LabRoomRentalDto(reservation2.getStartDate(), reservation2.getEndDate(), labRoom2.getName(), reservationSpec2.getAmount().getAmount(), rentalSpec2.getStatus())
+                );
     }
 }

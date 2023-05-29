@@ -42,9 +42,13 @@ operation::admin_rentLabRoom[snippets='http-request,http-response']
 
 operation::admin_returnLabRoom[snippets='http-request,http-response']
 
-=== 내 대여 이력 조회
+=== 내 기자재 대여 이력 조회
 
 operation::getRentals[snippets='http-request,http-response']
+
+=== 내 랩실 대여 이력 조회
+
+operation::getLabRoomRentals[snippets='http-request,http-response']
 
 === 품목 사용 이력 조회
 

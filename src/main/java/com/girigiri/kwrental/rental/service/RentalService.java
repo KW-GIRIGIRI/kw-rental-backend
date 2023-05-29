@@ -12,7 +12,7 @@ import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueRese
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalDto;
+import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
@@ -152,9 +152,15 @@ public class RentalService {
     }
 
     @Transactional(readOnly = true)
-    public RentalsDto getRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
-        final List<RentalDto> rentalDtosBetweenDate = rentalSpecRepository.findRentalDtosBetweenDate(memberId, from, to);
-        return new RentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
+    public EquipmentRentalsDto getEquipmentRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+        final List<EquipmentRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findEquipmentRentalDtosBetweenDate(memberId, from, to);
+        return new EquipmentRentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
+    }
+
+    @Transactional(readOnly = true)
+    public LabRoomRentalsDto getLabRoomRentalsBetweenDate(final Long memberId, final LocalDate from, final LocalDate to) {
+        final List<LabRoomRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(memberId, from, to);
+        return new LabRoomRentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
     }
 
     @Transactional(readOnly = true)
