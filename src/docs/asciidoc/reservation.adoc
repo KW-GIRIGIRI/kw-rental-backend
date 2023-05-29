@@ -20,7 +20,7 @@ operation::admin_getLabRoomReservationsWhenReturn[snippets='http-request,http-re
 
 operation::admin_getReservationByEquipment[snippets='http-request,http-response']
 
-=== 현재 내 대여 예약 조회 API
+=== 현재 내 기자재 대여 예약 조회 API
 
 각 대여 예약 상세의 상태에 대한 해석
 
@@ -32,6 +32,10 @@ operation::admin_getReservationByEquipment[snippets='http-request,http-response'
 - `CANCELED` : 대여 취소
 
 operation::getUnterminatedReservations[snippets='http-request,http-response']
+
+=== 현재 내 랩실 대여 예약 조회 API
+
+operation::getUnterminatedLabRoomReservations[snippets='http-request,http-response']
 
 === 대여 취소하기
 

@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -38,8 +39,20 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 .selectFrom(reservation)
                 .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
                 .join(reservationSpec.rentable, rentableAsset).fetchJoin()
-                .where(rentableAsset.instanceOf(Equipment.class), reservation.memberId.eq(memberId)
-                        , reservation.terminated.isFalse())
+                .where(rentableAsset.instanceOf(Equipment.class), reservation.memberId.eq(memberId),
+                        reservation.terminated.isFalse())
+                .fetch()
+        );
+    }
+
+    @Override
+    public Set<Reservation> findNotTerminatedLabRoomReservationsByMemberId(final Long memberId) {
+        return Set.copyOf(jpaQueryFactory
+                .selectFrom(reservation)
+                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
+                .join(reservationSpec.rentable, rentableAsset).fetchJoin()
+                .where(rentableAsset.instanceOf(LabRoom.class), reservation.memberId.eq(memberId),
+                        reservation.terminated.isFalse())
                 .fetch()
         );
     }

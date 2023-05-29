@@ -48,26 +48,61 @@ class ReservationRepositoryTest {
         final LocalDate start = now.minusDays(1);
 
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(1L).build());
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now)).build();
-        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).memberId(1L).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(1L).build());
 
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).terminated(true).memberId(1L).build());
         final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
-        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).terminated(true).memberId(1L).build());
+        final Reservation reservation4 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec4)).terminated(true).memberId(1L).build());
 
         final ReservationSpec reservationSpec5 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation5 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec5)).memberId(2L).build());
         final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
-        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3, reservationSpec4)).memberId(2L).build());
+        final Reservation reservation6 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec6)).memberId(2L).build());
 
         // when
         entityManager.clear();
         final Set<Reservation> actual = reservationRepository.findNotTerminatedEquipmentReservationsByMemberId(1L);
 
         // then
-        assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservationSpecs").containsExactlyInAnyOrder(reservation1);
-        assertThat(actual.iterator().next().getReservationSpecs()).usingRecursiveFieldByFieldElementComparatorIgnoringFields("reservation")
-                .containsExactlyInAnyOrder(reservationSpec1);
+        assertThat(actual).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1);
     }
+
+    @Test
+    @DisplayName("특정 회원의 완료되지 않은 기자재 대여를 조회한다.")
+    void findNotTerminatedLabRoomReservationsByMemberId() {
+        // given
+        final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+        final Rentable labRoom = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+
+        final LocalDate now = LocalDate.now();
+        final LocalDate start = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(1L).build());
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now)).build();
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(1L).build());
+
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).terminated(true).memberId(1L).build());
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation4 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec4)).terminated(true).memberId(1L).build());
+
+        final ReservationSpec reservationSpec5 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation5 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec5)).memberId(2L).build());
+        final ReservationSpec reservationSpec6 = ReservationSpecFixture.builder(labRoom).period(new RentalPeriod(start, now.plusDays(2))).status(ReservationSpecStatus.RETURNED).build();
+        final Reservation reservation6 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec6)).memberId(2L).build());
+
+        // when
+        entityManager.clear();
+        final Set<Reservation> actual = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(1L);
+
+        // then
+        assertThat(actual).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation2);
+    }
+
 
     @Test
     @DisplayName("대여 예약의 종결 여부를 업데이트 한다.")

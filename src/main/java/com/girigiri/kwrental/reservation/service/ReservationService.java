@@ -13,7 +13,8 @@ import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.UnterminatedReservationsResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.exception.*;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -187,11 +188,19 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public UnterminatedReservationsResponse getUnterminatedReservations(final Long memberId) {
+    public UnterminatedEquipmentReservationsResponse getUnterminatedEquipmentReservations(final Long memberId) {
         final Set<Reservation> reservations = reservationRepository.findNotTerminatedEquipmentReservationsByMemberId(memberId);
         final List<Reservation> reservationList = new ArrayList<>(reservations);
         reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
-        return UnterminatedReservationsResponse.from(reservationList);
+        return UnterminatedEquipmentReservationsResponse.from(reservationList);
+    }
+
+    @Transactional(readOnly = true)
+    public UnterminatedLabRoomReservationsResponse getUnterminatedLabRoomReservations(final Long memberId) {
+        final Set<Reservation> reservations = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(memberId);
+        final List<Reservation> reservationList = new ArrayList<>(reservations);
+        reservationList.sort(Comparator.comparing(Reservation::getRentalPeriod));
+        return UnterminatedLabRoomReservationsResponse.from(reservationList);
     }
 
     @Transactional

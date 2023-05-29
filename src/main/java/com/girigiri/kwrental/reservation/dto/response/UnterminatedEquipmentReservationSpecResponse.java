@@ -7,7 +7,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import lombok.Getter;
 
 @Getter
-public class UnterminatedReservationSpecResponse {
+public class UnterminatedEquipmentReservationSpecResponse {
 
     private Long id;
 
@@ -17,10 +17,10 @@ public class UnterminatedReservationSpecResponse {
     private Integer rentalAmount;
     private ReservationSpecStatus status;
 
-    private UnterminatedReservationSpecResponse() {
+    private UnterminatedEquipmentReservationSpecResponse() {
     }
 
-    private UnterminatedReservationSpecResponse(final Long id, final Category category, final String modelName, final String imgUrl, final Integer rentalAmount, final ReservationSpecStatus status) {
+    private UnterminatedEquipmentReservationSpecResponse(final Long id, final Category category, final String modelName, final String imgUrl, final Integer rentalAmount, final ReservationSpecStatus status) {
         this.id = id;
         this.category = category;
         this.modelName = modelName;
@@ -29,9 +29,9 @@ public class UnterminatedReservationSpecResponse {
         this.status = status;
     }
 
-    public static UnterminatedReservationSpecResponse from(final ReservationSpec reservationSpec) {
+    public static UnterminatedEquipmentReservationSpecResponse from(final ReservationSpec reservationSpec) {
         final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
-        return new UnterminatedReservationSpecResponse(
+        return new UnterminatedEquipmentReservationSpecResponse(
                 reservationSpec.getId(), equipment.getCategory(), equipment.getName(), equipment.getImgUrl(), reservationSpec.getAmount().getAmount(), reservationSpec.getStatus());
     }
 }

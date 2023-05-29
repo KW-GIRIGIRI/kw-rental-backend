@@ -138,7 +138,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("특정 유저의 완료되지 않은 대여 예약 건을 조회한다.")
+    @DisplayName("특정 유저의 완료되지 않은 기자재 대여 예약 건을 조회한다.")
     void getUnterminatedReservations() {
         // given
         final String password = "12345678";
@@ -155,16 +155,16 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
 
         // when
-        final UnterminatedReservationsResponse response = RestAssured.given(requestSpec)
+        final UnterminatedEquipmentReservationsResponse response = RestAssured.given(requestSpec)
                 .filter(document("getUnterminatedReservations"))
                 .sessionId(sessionId)
                 .when().log().all().get("/api/reservations?terminated=false")
                 .then().log().all().statusCode(HttpStatus.OK.value())
-                .extract().as(UnterminatedReservationsResponse.class);
+                .extract().as(UnterminatedEquipmentReservationsResponse.class);
 
         // then
         assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(UnterminatedReservationResponse.from(reservation1), UnterminatedReservationResponse.from(reservation2));
+                .containsExactly(UnterminatedEquipmentReservationResponse.from(reservation1), UnterminatedEquipmentReservationResponse.from(reservation2));
     }
 
     @Test
@@ -262,5 +262,33 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                                 new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(), reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(), reservation3.getPhoneNumber())
                         ))
                 );
+    }
+
+    @Test
+    @DisplayName("특정 유저의 완료되지 않은 랩실 대여 예약 건을 조회한다.")
+    void getUnterminatedLabRoomReservations() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1))).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+
+        // when
+        final UnterminatedLabRoomReservationsResponse response = RestAssured.given(requestSpec)
+                .filter(document("getUnterminatedLabRoomReservations"))
+                .sessionId(sessionId)
+                .when().log().all().get("/api/reservations/labRooms?terminated=false")
+                .then().log().all().statusCode(HttpStatus.OK.value())
+                .extract().as(UnterminatedLabRoomReservationsResponse.class);
+
+        // then
+        assertThat(response).usingRecursiveComparison()
+                .isEqualTo(UnterminatedLabRoomReservationsResponse.from(List.of(reservation1, reservation2)));
     }
 }

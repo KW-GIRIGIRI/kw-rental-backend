@@ -12,6 +12,8 @@ public interface ReservationRepositoryCustom {
 
     Set<Reservation> findNotTerminatedEquipmentReservationsByMemberId(Long memberId);
 
+    Set<Reservation> findNotTerminatedLabRoomReservationsByMemberId(Long memberId);
+
     void adjustTerminated(Reservation reservation);
 
     List<Reservation> findByReservationSpecIds(List<Long> reservationSpecIds);
