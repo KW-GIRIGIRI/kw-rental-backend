@@ -35,7 +35,6 @@ public class ReservationService {
     private final InventoryService inventoryService;
     private final RemainingQuantityServiceImpl remainingQuantityService;
     private final ReservationSpecRepository reservationSpecRepository;
-
     private final AssetService assetService;
 
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
@@ -184,6 +183,12 @@ public class ReservationService {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Reservation getReservationWithReservationSpecsById(final Long id) {
         return reservationRepository.findByIdWithSpecs(id)
+                .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Reservation getReservationById(final Long id) {
+        return reservationRepository.findById(id)
                 .orElseThrow(ReservationNotFoundException::new);
     }
 

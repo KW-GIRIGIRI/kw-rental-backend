@@ -34,10 +34,13 @@ public class RentalService {
     private final ReservationService reservationService;
     private final RentalSpecRepository rentalSpecRepository;
 
-    public RentalService(final ItemService itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository) {
+    private final PenaltyCreator penaltyCreator;
+
+    public RentalService(final ItemService itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository, final PenaltyCreator penaltyCreator) {
         this.itemService = itemService;
         this.reservationService = reservationService;
         this.rentalSpecRepository = rentalSpecRepository;
+        this.penaltyCreator = penaltyCreator;
     }
 
     @Transactional
@@ -143,11 +146,14 @@ public class RentalService {
     }
 
     private void setPenaltyAndItemAvailable(final EquipmentRentalSpec rentalSpec) {
+        final Reservation reservation = reservationService.getReservationById(rentalSpec.getReservationId());
         if (rentalSpec.isUnavailableAfterReturn()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), false);
+            penaltyCreator.create(reservation.getMemberId(), rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
         if (rentalSpec.isOverdueReturned()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), true);
+            penaltyCreator.create(reservation.getMemberId(), rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
     }
 

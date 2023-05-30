@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.penalty.domain;
 
+import com.girigiri.kwrental.penalty.exception.NegativePenaltyCountException;
 import com.girigiri.kwrental.penalty.exception.PenaltyPeriodException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -33,4 +34,20 @@ public class PenaltyPeriod {
         this.endDate = endDate;
     }
 
+    public static PenaltyPeriod fromPenaltyCount(final int penaltyCountBefore) {
+        final LocalDate now = LocalDate.now();
+        if (penaltyCountBefore < 0) {
+            throw new NegativePenaltyCountException();
+        }
+        if (penaltyCountBefore == 0) {
+            return new PenaltyPeriod(now, now.plusWeeks(1));
+        }
+        if (penaltyCountBefore == 1) {
+            return new PenaltyPeriod(now, now.plusMonths(1));
+        }
+        if (penaltyCountBefore == 2) {
+            return new PenaltyPeriod(now, now.plusMonths(6));
+        }
+        return new PenaltyPeriod(now, now.plusYears(1));
+    }
 }
