@@ -7,8 +7,10 @@ import com.girigiri.kwrental.auth.dto.response.MemberResponse;
 import com.girigiri.kwrental.auth.exception.SessionNotFoundException;
 import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.auth.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,11 @@ import java.net.URI;
 public class AuthController {
 
     private final AuthService authService;
+    private final SessionCookieSupport sessionCookieSupport;
 
-    public AuthController(final AuthService authService) {
+    public AuthController(final AuthService authService, final SessionCookieSupport sessionCookieSupport) {
         this.authService = authService;
+        this.sessionCookieSupport = sessionCookieSupport;
     }
 
     @PostMapping
@@ -37,6 +41,19 @@ public class AuthController {
         final SessionMember sessionMember = authService.login(loginRequest);
         session.setAttribute("member", sessionMember);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            final HttpSession session,
+            @CookieValue(name = SessionCookieSupport.COOKIE_NAME, required = false) Cookie cookie) {
+        if (session == null || cookie == null) {
+            throw new SessionNotFoundException();
+        }
+        session.invalidate();
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, sessionCookieSupport.createLogoutCookie().toString())
+                .build();
     }
 
     @GetMapping

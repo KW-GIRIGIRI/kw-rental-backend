@@ -8,6 +8,10 @@ operation::registerMember[snippets='http-request,http-response']
 
 operation::login[snippets='http-request,http-response']
 
+=== 로그아웃 API
+
+operation::logout[snippets='http-request,http-response']
+
 === 회원정보 조회 API
 
 operation::getMember[snippets='http-request,http-response']

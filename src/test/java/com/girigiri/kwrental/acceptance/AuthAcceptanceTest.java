@@ -110,4 +110,22 @@ class AuthAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response).usingRecursiveComparison().isEqualTo(SessionMember.from(member));
     }
+
+    @Test
+    @DisplayName("로그아웃 한다.")
+    void logout() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.builder(password).build());
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("logout"))
+                .sessionId(sessionId)
+                .when().log().all().post("/api/members/logout")
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .header(HttpHeaders.SET_COOKIE, containsString("JSESSIONID="));
+    }
 }

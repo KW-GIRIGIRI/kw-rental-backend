@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.testsupport;
 
 import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.auth.controller.SessionCookieSupport;
 import com.girigiri.kwrental.auth.interceptor.UserMemberArgumentResolver;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.auth.service.AuthService;
@@ -53,4 +54,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected AssetService assetService;
+
+    @MockBean
+    protected SessionCookieSupport sessionCookieSupport;
 }
