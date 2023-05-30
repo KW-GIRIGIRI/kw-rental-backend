@@ -16,17 +16,17 @@ public class OverdueReservationResponse {
     private Long reservationId;
     private String name;
     private String memberNumber;
-    private LocalDateTime returnDate;
+    private LocalDateTime overdueAcceptDateTime;
     private List<OverdueReservationSpecResponse> reservationSpecs;
 
     private OverdueReservationResponse() {
     }
 
-    private OverdueReservationResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime returnDate, final List<OverdueReservationSpecResponse> reservationSpecs) {
+    private OverdueReservationResponse(final Long reservationId, final String name, final String memberNumber, final LocalDateTime overdueAcceptDateTime, final List<OverdueReservationSpecResponse> reservationSpecs) {
         this.reservationId = reservationId;
         this.name = name;
         this.memberNumber = memberNumber;
-        this.returnDate = returnDate;
+        this.overdueAcceptDateTime = overdueAcceptDateTime;
         this.reservationSpecs = reservationSpecs;
     }
 
