@@ -3,3 +3,7 @@
 === 특정 회원의 페널티 이력 조회
 
 operation::getPenaltyByMember[snippets='http-request,http-response']
+
+=== 특정 회원의 페널티 상태 조회
+
+operation::getUserPenaltyStatus[snippets='http-request,http-response']
