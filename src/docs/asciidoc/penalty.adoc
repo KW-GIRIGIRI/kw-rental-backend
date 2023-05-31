@@ -15,3 +15,7 @@ operation::getPenaltyHistoryPage[snippets='http-request,http-response']
 === 관리자 패널티 상태 변경
 
 operation::updatePenaltyPeriod[snippets='http-request,http-response']
+
+=== 관리자 패널티 삭제
+
+operation::deletePenalty[snippets='http-request,http-response']
