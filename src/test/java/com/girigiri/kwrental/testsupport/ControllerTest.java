@@ -10,6 +10,7 @@ import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.labroom.service.LabRoomService;
+import com.girigiri.kwrental.rental.service.PenaltyService;
 import com.girigiri.kwrental.rental.service.RentalService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,4 +58,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected SessionCookieSupport sessionCookieSupport;
+
+    @MockBean
+    protected PenaltyService penaltyService;
 }

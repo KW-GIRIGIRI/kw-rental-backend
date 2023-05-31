@@ -3,6 +3,7 @@ package com.girigiri.kwrental.reservation.repository;
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
@@ -35,24 +36,33 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 
     @Override
     public Set<Reservation> findNotTerminatedEquipmentReservationsByMemberId(final Long memberId) {
-        return Set.copyOf(jpaQueryFactory
-                .selectFrom(reservation)
-                .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.rentable, rentableAsset).fetchJoin()
+        return Set.copyOf(selectFromReservationFetchJoinedSpecAndAsset()
                 .where(rentableAsset.instanceOf(Equipment.class), reservation.memberId.eq(memberId),
                         reservation.terminated.isFalse())
                 .fetch()
         );
     }
 
-    @Override
-    public Set<Reservation> findNotTerminatedLabRoomReservationsByMemberId(final Long memberId) {
-        return Set.copyOf(jpaQueryFactory
+    private JPAQuery<Reservation> selectFromReservationFetchJoinedSpecAndAsset() {
+        return jpaQueryFactory
                 .selectFrom(reservation)
                 .join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-                .join(reservationSpec.rentable, rentableAsset).fetchJoin()
+                .join(reservationSpec.rentable, rentableAsset).fetchJoin();
+    }
+
+    @Override
+    public Set<Reservation> findNotTerminatedLabRoomReservationsByMemberId(final Long memberId) {
+        return Set.copyOf(selectFromReservationFetchJoinedSpecAndAsset()
                 .where(rentableAsset.instanceOf(LabRoom.class), reservation.memberId.eq(memberId),
                         reservation.terminated.isFalse())
+                .fetch()
+        );
+    }
+
+    @Override
+    public Set<Reservation> findNotTerminatedReservationsByMemberId(final Long memberId) {
+        return Set.copyOf(selectFromReservationFetchJoinedSpecAndAsset()
+                .where(reservation.memberId.eq(memberId), reservation.terminated.isFalse())
                 .fetch()
         );
     }

@@ -8,6 +8,10 @@ import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.penalty.domain.Penalty;
+import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
+import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
@@ -65,6 +69,9 @@ class RentalAcceptanceTest extends AcceptanceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PenaltyRepository penaltyRepository;
 
     @Test
     @DisplayName("대여를 수령한다.")
@@ -190,7 +197,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
         final RentalDateTime acceptDateTime = RentalDateTime.now();
         final LocalDate now = LocalDate.now();
         final LocalDate yesterday = now.minusDays(1);
-
+        itemRepository.save(ItemFixture.builder().propertyNumber("22222222").assetId(equipment2.getId()).available(true).build());
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1).period(new RentalPeriod(yesterday, now)).build();
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment2).period(new RentalPeriod(yesterday, now)).build();
         final Reservation reservation = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2)).acceptDateTime(acceptDateTime).build());
@@ -204,20 +211,31 @@ class RentalAcceptanceTest extends AcceptanceTest {
                 .build();
         final ReturnRentalSpecRequest returnRentalSpecRequest2 = ReturnRentalSpecRequest.builder()
                 .id(rentalSpec2.getId())
-                .status(RentalSpecStatus.RETURNED)
+                .status(RentalSpecStatus.LOST)
                 .build();
         final ReturnRentalRequest returnRentalRequest = ReturnRentalRequest.builder()
                 .reservationId(reservation.getId())
                 .rentalSpecs(List.of(returnRentalSpecRequest1, returnRentalSpecRequest2))
                 .build();
 
-        // when, then
+        // when
         RestAssured.given(requestSpec)
                 .filter(document("admin_returnRentals"))
                 .body(returnRentalRequest)
                 .contentType(ContentType.JSON)
                 .when().log().all().patch("/api/admin/rentals/returns")
                 .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final List<Penalty> actualPenalties = penaltyRepository.findByOngoingPenalties(reservation.getMemberId());
+        final Penalty expect = Penalty.builder().reservationId(reservation.getId())
+                .reservationSpecId(reservationSpec2.getId())
+                .rentalSpecId(rentalSpec2.getId())
+                .memberId(reservation.getMemberId())
+                .reason(PenaltyReason.LOST)
+                .period(PenaltyPeriod.fromPenaltyCount(0))
+                .build();
+        assertThat(actualPenalties).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id").containsExactly(expect);
     }
 
     @Test

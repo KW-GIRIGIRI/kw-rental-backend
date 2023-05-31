@@ -17,4 +17,6 @@ public interface ReservationRepositoryCustom {
     void adjustTerminated(Reservation reservation);
 
     List<Reservation> findByReservationSpecIds(List<Long> reservationSpecIds);
+
+    Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
 }

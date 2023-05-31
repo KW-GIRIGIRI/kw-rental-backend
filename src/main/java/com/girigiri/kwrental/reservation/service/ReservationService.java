@@ -35,7 +35,6 @@ public class ReservationService {
     private final InventoryService inventoryService;
     private final RemainingQuantityServiceImpl remainingQuantityService;
     private final ReservationSpecRepository reservationSpecRepository;
-
     private final AssetService assetService;
 
     public ReservationService(final ReservationRepository reservationRepository, final InventoryService inventoryService,
@@ -187,6 +186,12 @@ public class ReservationService {
                 .orElseThrow(ReservationNotFoundException::new);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Reservation getReservationById(final Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new);
+    }
+
     @Transactional(readOnly = true)
     public UnterminatedEquipmentReservationsResponse getUnterminatedEquipmentReservations(final Long memberId) {
         final Set<Reservation> reservations = reservationRepository.findNotTerminatedEquipmentReservationsByMemberId(memberId);
@@ -206,16 +211,20 @@ public class ReservationService {
     @Transactional
     public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
         final ReservationSpec reservationSpec = getReservationSpec(reservationSpecId);
-        reservationSpec.cancelAmount(amount);
-        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
-        final Long reservationId = reservationSpec.getReservation().getId();
-        updateAndAdjustTerminated(reservationId);
+        cancelAndAdjust(reservationSpec, amount);
         return reservationSpec.getId();
     }
 
     private ReservationSpec getReservationSpec(final Long reservationSpecId) {
         return reservationSpecRepository.findById(reservationSpecId)
                 .orElseThrow(ReservationSpecNotFoundException::new);
+    }
+
+    private void cancelAndAdjust(final ReservationSpec reservationSpec, final Integer amount) {
+        reservationSpec.cancelAmount(amount);
+        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
+        final Long reservationId = reservationSpec.getReservation().getId();
+        updateAndAdjustTerminated(reservationId);
     }
 
     private void updateAndAdjustTerminated(final Long reservationId) {
@@ -262,5 +271,17 @@ public class ReservationService {
             reservation.updateIfTerminated();
         }
         return reservations;
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void cancelAll(final Long memberId) {
+        Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
+        final List<ReservationSpec> specs = reservations.stream()
+                .filter(reservation -> !reservation.isAccepted())
+                .map(Reservation::getReservationSpecs)
+                .flatMap(Collection::stream)
+                .filter(ReservationSpec::isReserved)
+                .toList();
+        specs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
     }
 }
