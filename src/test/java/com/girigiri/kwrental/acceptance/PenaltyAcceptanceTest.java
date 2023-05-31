@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
@@ -184,5 +185,33 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
         // then
         final Penalty actual = penaltyRepository.findById(penalty1.getId()).orElseThrow();
         assertThat(actual.getPeriod().getStatus()).isEqualTo(PenaltyStatus.ONE_YEAR);
+    }
+
+    @Test
+    @DisplayName("패널티를 삭제한다..")
+    void deletePenalty() {
+        // given
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
+
+        final EquipmentRentalSpec equipmentRentalSpec = EquipmentRentalSpecFixture.builder().reservationId(reservation1.getId()).reservationSpecId(reservationSpec1.getId()).build();
+        rentalSpecRepository.saveAll(List.of(equipmentRentalSpec));
+
+        final Long memberId = 1L;
+        final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(memberId).reservationId(reservation1.getId()).rentalSpecId(reservationSpec1.getId())
+                .reservationSpecId(reservationSpec1.getId()).period(PenaltyPeriod.fromPenaltyCount(0)).build());
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("deletePenalty"))
+                .when().log().all().delete("/api/admin/penalties/{id}", penalty1.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final Optional<Penalty> actual = penaltyRepository.findById(penalty1.getId());
+        assertThat(actual).isEqualTo(Optional.empty());
     }
 }

@@ -37,4 +37,10 @@ public class AdminPenaltyController {
         penaltyService.updatePeriod(id, updatePeriodRequest.getStatus());
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}")
+    public final ResponseEntity<?> delete(@PathVariable final Long id) {
+        penaltyService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

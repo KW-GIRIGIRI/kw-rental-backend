@@ -12,4 +12,6 @@ public interface PenaltyRepository extends Repository<Penalty, Long>, PenaltyRep
     Penalty save(Penalty penalty);
 
     List<Penalty> findByMemberId(Long memberId);
+
+    void deleteById(Long id);
 }

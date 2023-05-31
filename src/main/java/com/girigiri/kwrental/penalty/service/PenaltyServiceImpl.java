@@ -85,4 +85,11 @@ public class PenaltyServiceImpl implements PenaltyService {
                 .orElseThrow(PenaltyNotFoundException::new);
         penalty.updatePeriodByStatus(status);
     }
+
+    @Transactional
+    public void delete(final Long id) {
+        final Penalty penalty = penaltyRepository.findById(id)
+                .orElseThrow(PenaltyNotFoundException::new);
+        penaltyRepository.deleteById(penalty.getId());
+    }
 }
