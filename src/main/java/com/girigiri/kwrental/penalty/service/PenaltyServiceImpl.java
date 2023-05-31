@@ -70,8 +70,8 @@ public class PenaltyServiceImpl implements PenaltyService {
         final Optional<PenaltyPeriod> maxFarPeriod = penalties.stream()
                 .map(Penalty::getPeriod)
                 .max(Comparator.comparing(PenaltyPeriod::getEndDate));
-        return maxFarPeriod.map(period -> new UserPenaltyStatusResponse(false, period.getEndDate()))
-                .orElseGet(() -> new UserPenaltyStatusResponse(true, null));
+        return maxFarPeriod.map(period -> new UserPenaltyStatusResponse(false, period.getStatus(), period.getEndDate()))
+                .orElseGet(() -> new UserPenaltyStatusResponse(true, null, null));
     }
 
     @Transactional(readOnly = true)

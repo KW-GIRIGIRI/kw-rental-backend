@@ -116,7 +116,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response).usingRecursiveComparison()
-                .isEqualTo(new UserPenaltyStatusResponse(false, penalty1.getPeriod().getEndDate()));
+                .isEqualTo(new UserPenaltyStatusResponse(false, penalty1.getPeriod().getStatus(), penalty1.getPeriod().getEndDate()));
     }
 
     @Test
