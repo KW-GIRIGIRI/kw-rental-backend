@@ -5,19 +5,24 @@ import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.service.PenaltyCreator;
+import com.girigiri.kwrental.rental.service.PenaltyService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
-public class PenaltyCreatorImpl implements PenaltyCreator {
+public class PenaltyServiceImpl implements PenaltyService {
 
     private final PenaltyRepository penaltyRepository;
 
-    public PenaltyCreatorImpl(final PenaltyRepository penaltyRepository) {
+    public PenaltyServiceImpl(final PenaltyRepository penaltyRepository) {
         this.penaltyRepository = penaltyRepository;
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void create(final Long memberId, final Long reservationId, final Long reservationSpecId, final Long rentalSpecId, final RentalSpecStatus status) {
         final int penaltyCountBefore = countPenaltyFromDifferentReservation(memberId, reservationId);
         final Penalty penalty = Penalty.builder()
@@ -36,5 +41,12 @@ public class PenaltyCreatorImpl implements PenaltyCreator {
                 .stream()
                 .filter(it -> !it.getReservationId().equals(reservationId))
                 .count();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public boolean hasOngoingPenalty(final Long memberId) {
+        final List<Penalty> ongoingPenalties = penaltyRepository.findByOngoingPenalties(memberId);
+        return ongoingPenalties.size() > 0;
     }
 }

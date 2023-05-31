@@ -34,13 +34,13 @@ public class RentalService {
     private final ReservationService reservationService;
     private final RentalSpecRepository rentalSpecRepository;
 
-    private final PenaltyCreator penaltyCreator;
+    private final PenaltyService penaltyService;
 
-    public RentalService(final ItemService itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository, final PenaltyCreator penaltyCreator) {
+    public RentalService(final ItemService itemService, final ReservationService reservationService, final RentalSpecRepository rentalSpecRepository, final PenaltyService penaltyService) {
         this.itemService = itemService;
         this.reservationService = reservationService;
         this.rentalSpecRepository = rentalSpecRepository;
-        this.penaltyCreator = penaltyCreator;
+        this.penaltyService = penaltyService;
     }
 
     @Transactional
@@ -128,32 +128,36 @@ public class RentalService {
 
     @Transactional
     public void returnRental(final ReturnRentalRequest returnRentalRequest) {
-        Rental rental = getRental(returnRentalRequest);
+        final Reservation reservation = reservationService.getReservationWithReservationSpecsById(returnRentalRequest.getReservationId());
+        Rental rental = getRental(reservation, returnRentalRequest);
         final Map<Long, RentalSpecStatus> returnRequest = returnRentalRequest.getRentalSpecs().stream()
                 .collect(toMap(ReturnRentalSpecRequest::getId, ReturnRentalSpecRequest::getStatus));
         for (Long rentalSpecId : returnRequest.keySet()) {
             final RentalSpecStatus status = returnRequest.get(rentalSpecId);
             rental.returnByRentalSpecId(rentalSpecId, status);
-            setPenaltyAndItemAvailable(rental.getRentalSpecAs(rentalSpecId, EquipmentRentalSpec.class));
+            final EquipmentRentalSpec rentalSpec = rental.getRentalSpecAs(rentalSpecId, EquipmentRentalSpec.class);
+            setPenaltyAndItemAvailable(rentalSpec, reservation.getMemberId());
+        }
+        final boolean hasPenalty = penaltyService.hasOngoingPenalty(reservation.getMemberId());
+        if (hasPenalty) {
+            reservationService.cancelAll(reservation.getMemberId());
         }
         rental.setReservationStatusAfterReturn();
     }
 
-    private Rental getRental(final ReturnRentalRequest returnRentalRequest) {
+    private Rental getRental(final Reservation reservation, final ReturnRentalRequest returnRentalRequest) {
         final List<EquipmentRentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(returnRentalRequest.getReservationId());
-        final Reservation reservation = reservationService.getReservationWithReservationSpecsById(returnRentalRequest.getReservationId());
         return Rental.of(rentalSpecList, reservation);
     }
 
-    private void setPenaltyAndItemAvailable(final EquipmentRentalSpec rentalSpec) {
-        final Reservation reservation = reservationService.getReservationById(rentalSpec.getReservationId());
+    private void setPenaltyAndItemAvailable(final EquipmentRentalSpec rentalSpec, final Long memberId) {
         if (rentalSpec.isUnavailableAfterReturn()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), false);
-            penaltyCreator.create(reservation.getMemberId(), rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
+            penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
         if (rentalSpec.isOverdueReturned()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), true);
-            penaltyCreator.create(reservation.getMemberId(), rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
+            penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
     }
 

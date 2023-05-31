@@ -44,7 +44,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
@@ -60,7 +59,7 @@ class RentalServiceTest {
     @Mock
     private RentalSpecRepository rentalSpecRepository;
     @Mock
-    private PenaltyCreator penaltyCreator;
+    private PenaltyService penaltyService;
 
     @InjectMocks
     private RentalService rentalService;
@@ -169,14 +168,13 @@ class RentalServiceTest {
                 .id(rentalSpecRequest4.getId()).propertyNumber("44444444").build();
 
         given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
-        given(reservationService.getReservationById(anyLong())).willReturn(reservation);
 
         doNothing().when(itemService).setAvailable(rentalSpec2.getPropertyNumber(), false);
-        doNothing().when(penaltyCreator).create(reservation.getMemberId(), reservationId, rentalSpec2.getReservationSpecId(), rentalSpec2.getId(), RentalSpecStatus.LOST);
+        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec2.getReservationSpecId(), rentalSpec2.getId(), RentalSpecStatus.LOST);
         doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), false);
-        doNothing().when(penaltyCreator).create(reservation.getMemberId(), reservationId, rentalSpec3.getReservationSpecId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RENTED);
+        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec3.getReservationSpecId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RENTED);
         doNothing().when(itemService).setAvailable(rentalSpec4.getPropertyNumber(), false);
-        doNothing().when(penaltyCreator).create(reservation.getMemberId(), reservationId, rentalSpec4.getReservationSpecId(), rentalSpec4.getId(), RentalSpecStatus.BROKEN);
+        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec4.getReservationSpecId(), rentalSpec4.getId(), RentalSpecStatus.BROKEN);
 
         // when
         assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
@@ -224,8 +222,7 @@ class RentalServiceTest {
                 .id(5L).propertyNumber("44444444").build();
 
         given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
-        given(reservationService.getReservationById(anyLong())).willReturn(reservation);
-        doNothing().when(penaltyCreator).create(reservation.getMemberId(), reservationId, reservationSpec2.getId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RETURNED);
+        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, reservationSpec2.getId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RETURNED);
         doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), true);
 
         // when
@@ -274,6 +271,5 @@ class RentalServiceTest {
         // when
         assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
                 .doesNotThrowAnyException();
-
     }
 }

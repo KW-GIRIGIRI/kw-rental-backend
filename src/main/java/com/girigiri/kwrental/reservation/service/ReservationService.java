@@ -211,16 +211,20 @@ public class ReservationService {
     @Transactional
     public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
         final ReservationSpec reservationSpec = getReservationSpec(reservationSpecId);
-        reservationSpec.cancelAmount(amount);
-        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
-        final Long reservationId = reservationSpec.getReservation().getId();
-        updateAndAdjustTerminated(reservationId);
+        cancelAndAdjust(reservationSpec, amount);
         return reservationSpec.getId();
     }
 
     private ReservationSpec getReservationSpec(final Long reservationSpecId) {
         return reservationSpecRepository.findById(reservationSpecId)
                 .orElseThrow(ReservationSpecNotFoundException::new);
+    }
+
+    private void cancelAndAdjust(final ReservationSpec reservationSpec, final Integer amount) {
+        reservationSpec.cancelAmount(amount);
+        reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
+        final Long reservationId = reservationSpec.getReservation().getId();
+        updateAndAdjustTerminated(reservationId);
     }
 
     private void updateAndAdjustTerminated(final Long reservationId) {
@@ -267,5 +271,17 @@ public class ReservationService {
             reservation.updateIfTerminated();
         }
         return reservations;
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void cancelAll(final Long memberId) {
+        Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
+        final List<ReservationSpec> specs = reservations.stream()
+                .filter(reservation -> !reservation.isAccepted())
+                .map(Reservation::getReservationSpecs)
+                .flatMap(Collection::stream)
+                .filter(ReservationSpec::isReserved)
+                .toList();
+        specs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
     }
 }
