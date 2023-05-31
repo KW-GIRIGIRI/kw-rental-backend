@@ -89,8 +89,9 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
     }
 
     @Override
+    // TODO: 2023/06/01 양방향 detach문제 해결해야 한다. 
     public void adjustAmountAndStatus(final ReservationSpec reservationSpecForUpdate) {
-        entityManager.detach(reservationSpecForUpdate);
+//        entityManager.detach(reservationSpecForUpdate);
         queryFactory.update(reservationSpec)
                 .set(reservationSpec.amount, reservationSpecForUpdate.getAmount())
                 .set(reservationSpec.status, reservationSpecForUpdate.getStatus())

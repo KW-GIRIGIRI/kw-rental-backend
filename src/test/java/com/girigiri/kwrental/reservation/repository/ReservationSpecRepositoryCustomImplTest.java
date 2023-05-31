@@ -133,8 +133,9 @@ class ReservationSpecRepositoryCustomImplTest {
     void adjustAmountAndStatus() {
         // given
         final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
-        final ReservationSpec reservationSpec = reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1)
-                .amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build());
+        final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment1)
+                .amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build();
+        final Reservation reservation = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec)));
 
         // when
         reservationSpec.cancelAmount(1);
