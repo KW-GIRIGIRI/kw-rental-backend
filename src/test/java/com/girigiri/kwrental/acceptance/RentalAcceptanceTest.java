@@ -16,10 +16,7 @@ import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.request.*;
 import com.girigiri.kwrental.rental.dto.response.*;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
@@ -46,6 +43,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -376,7 +374,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("특정 날짜에 완료된 특정 랩실 대여 예약을 조회한다..")
+    @DisplayName("특정 날짜에 완료된 특정 랩실 대여 예약을 조회한다.")
     void getLabRoomReservations() {
         // given
         final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
@@ -436,5 +434,49 @@ class RentalAcceptanceTest extends AcceptanceTest {
                         new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(), reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
                         new LabRoomRentalDto(reservation2.getStartDate(), reservation2.getEndDate(), labRoom2.getName(), reservationSpec2.getAmount().getAmount(), rentalSpec2.getStatus())
                 );
+    }
+
+    @Test
+    @DisplayName("랩실 대여 상세의 상태를 변경한다.")
+    void updateLabRoomRentalSpecStatuses() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
+
+        final LocalDate now = LocalDate.now();
+        final LocalDate yesterday = now.minusDays(1);
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(yesterday, now)).build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(yesterday, now)).build();
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec2)).memberId(member.getId()).build());
+        final LabRoomRentalSpec rentalSpec1 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).status(RentalSpecStatus.RETURNED).build();
+        final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).reservationId(reservation1.getId()).status(RentalSpecStatus.BROKEN).build();
+        rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+        final Penalty penalty = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).reservationId(reservation2.getId()).reservationSpecId(reservationSpec2.getId()).rentalSpecId(rentalSpec2.getId()).memberId(member.getId()).build());
+
+        final UpdateLabRoomRentalSpecStatusesRequest requestBody = new UpdateLabRoomRentalSpecStatusesRequest(List.of(
+                new UpdateLabRoomRentalSpecStatusRequest(reservation1.getId(), RentalSpecStatus.LOST),
+                new UpdateLabRoomRentalSpecStatusRequest(reservation2.getId(), RentalSpecStatus.RETURNED)
+        ));
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("updateLabRoomRentalSpecStatuses"))
+                .sessionId(sessionId)
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when().log().all().patch("/api/admin/rentals/labRooms/status")
+                .then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final Optional<Penalty> existsActual = penaltyRepository.findByRentalSpecId(rentalSpec1.getId());
+        final Optional<Penalty> notExistsActual = penaltyRepository.findById(penalty.getId());
+        assertThat(existsActual.isPresent()).isTrue();
+        assertThat(notExistsActual.isEmpty()).isTrue();
     }
 }

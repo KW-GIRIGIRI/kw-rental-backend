@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.rental.domain;
 
 import com.girigiri.kwrental.common.SuperEntity;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +24,7 @@ public interface RentalSpec extends SuperEntity {
 
     void setStatus(RentalSpecStatus status);
 
-    com.girigiri.kwrental.inventory.domain.RentalDateTime getAcceptDateTime();
+    RentalDateTime getAcceptDateTime();
 
-    com.girigiri.kwrental.inventory.domain.RentalDateTime getReturnDateTime();
+    RentalDateTime getReturnDateTime();
 }

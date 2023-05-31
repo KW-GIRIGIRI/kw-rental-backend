@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PenaltyRepository extends Repository<Penalty, Long>, PenaltyRepositoryCustom {
+    Optional<Penalty> findByRentalSpecId(Long rentalSpecId);
+
     Optional<Penalty> findById(Long id);
 
     Penalty save(Penalty penalty);

@@ -15,7 +15,10 @@ import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemb
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
-import com.girigiri.kwrental.reservation.exception.*;
+import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
+import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import org.springframework.stereotype.Service;
@@ -156,16 +159,9 @@ public class ReservationService {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(rentLabRoomRequest.getReservationSpecIds());
         validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
         for (Reservation reservation : reservations) {
-            final List<ReservationSpec> specs = reservation.getReservationSpecs();
-            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
-            if (!specs.stream().allMatch(ReservationSpec::isReserved))
-                throw new LabRoomReservationNotReservedWhenAcceptException();
-            if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
-                throw new IllegalRentDateException();
-            final List<Long> specIds = reservation
-                    .getReservationSpecs()
-                    .stream().map(ReservationSpec::getId).toList();
-            acceptReservation(reservation.getId(), specIds);
+            final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
+            labRoomReservation.validateWhenRent();
+            acceptReservation(labRoomReservation.getId(), List.of(labRoomReservation.getReservationSpecId()));
         }
         return reservations;
     }
@@ -183,12 +179,6 @@ public class ReservationService {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Reservation getReservationWithReservationSpecsById(final Long id) {
         return reservationRepository.findByIdWithSpecs(id)
-                .orElseThrow(ReservationNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Reservation getReservationById(final Long id) {
-        return reservationRepository.findById(id)
                 .orElseThrow(ReservationNotFoundException::new);
     }
 
@@ -263,12 +253,9 @@ public class ReservationService {
         final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(returnLabRoomRequest.getReservationSpecIds());
         validateSameLabRoom(returnLabRoomRequest.getName(), reservations);
         for (Reservation reservation : reservations) {
-            final List<ReservationSpec> specs = reservation.getReservationSpecs();
-            if (specs.size() != 1) throw new LabRoomReservationSpecNotOneException();
-            if (!specs.stream().allMatch(ReservationSpec::isRented))
-                throw new LabRoomReservationNotRentedWhenReturnException();
-            specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
-            reservation.updateIfTerminated();
+            final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
+            labRoomReservation.validateWhenReturn();
+            labRoomReservation.normalReturnAll();
         }
         return reservations;
     }
