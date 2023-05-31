@@ -59,6 +59,13 @@ public class PenaltyServiceImpl implements PenaltyService {
         return ongoingPenalties.size() > 0;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void deleteByRentalSpecIdIfExists(final Long rentalSpecId) {
+        penaltyRepository.findByRentalSpecId(rentalSpecId)
+                .ifPresent(penalty -> penaltyRepository.deleteById(penalty.getId()));
+    }
+
     @Transactional(readOnly = true)
     public UserPenaltiesResponse getPenalties(final Long memberId) {
         return penaltyRepository.findUserPenaltiesResponseByMemberId(memberId);

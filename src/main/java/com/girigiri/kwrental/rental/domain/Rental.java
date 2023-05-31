@@ -35,6 +35,11 @@ public class Rental {
         rentalSpec.setReturnDateTimeIfAnyReturned(returnDateTime);
     }
 
+    public void updateStatusByRentalSpecId(final Long rentalSpecId, final RentalSpecStatus status) {
+        final RentalSpec rentalSpec = getRentalSpec(rentalSpecId);
+        setStatus(rentalSpec, status);
+    }
+
     private void setStatus(final RentalSpec rentalSpec, final RentalSpecStatus status) {
         if (status == RentalSpecStatus.RENTED) throw new RentedStatusForReturnException();
         final boolean nowIsLegalForReturn = reservationFromRental.nowIsLegalForReturn(rentalSpec.getReservationSpecId());
@@ -56,7 +61,7 @@ public class Rental {
         return rentalSpec;
     }
 
-    public void setReservationStatusAfterReturn() {
+    public void setReservationStatusAfterModification() {
         final Map<Long, List<RentalSpecStatus>> rentalStatusPerReservationSpecId = groupRentalStatusByReservationSpecId();
         reservationFromRental.setStatusAfterReturn(rentalStatusPerReservationSpecId);
     }

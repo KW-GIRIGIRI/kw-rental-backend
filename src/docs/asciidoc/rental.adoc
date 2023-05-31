@@ -57,3 +57,9 @@ operation::admin_getReturnedRentalSpecsByPropertyNumber[snippets='http-request,h
 === 특정 날짜의 랩실 대여 기록 조회 API
 
 operation::admin_getLabRoomReservations[snippets='http-request,http-response']
+
+=== 관리자 랩실 대여 상세 상태 변경 (랩실 대여 패널티 사유 변경)
+
+==== `RETURNED` 는 정상 반납된 의미. 기존에 불량 반납인 대여를 정상 반납으로 바꾸고 관련 패널티도 삭제한다.
+
+operation::updateLabRoomRentalSpecStatuses[snippets='http-request,http-response']

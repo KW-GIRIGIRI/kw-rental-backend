@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.controller;
 
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
@@ -71,5 +72,12 @@ public class AdminRentalController {
     @GetMapping(value = "/labRooms/{labRoomName}", params = "date")
     public LabRoomReservationsResponse getLabRoomReservations(@PathVariable String labRoomName, final LocalDate date) {
         return rentalService.getReturnedLabRoomReservation(labRoomName, date);
+    }
+
+    @PatchMapping("/labRooms/status")
+    public ResponseEntity<?> updateLabRoomRentalSpecStatuses(
+            @RequestBody @Validated UpdateLabRoomRentalSpecStatusesRequest updateLabRoomRentalSpecStatusesRequest) {
+        rentalService.updateLabRoomRentalSpecStatuses(updateLabRoomRentalSpecStatusesRequest);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -3,17 +3,16 @@ package com.girigiri.kwrental.rental.service;
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.*;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
+import com.girigiri.kwrental.rental.dto.request.*;
 import com.girigiri.kwrental.rental.dto.response.*;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
+import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
@@ -136,13 +135,14 @@ public class RentalService {
             final RentalSpecStatus status = returnRequest.get(rentalSpecId);
             rental.returnByRentalSpecId(rentalSpecId, status);
             final EquipmentRentalSpec rentalSpec = rental.getRentalSpecAs(rentalSpecId, EquipmentRentalSpec.class);
-            setPenaltyAndItemAvailable(rentalSpec, reservation.getMemberId());
+            setPenalty(rentalSpec, reservation.getMemberId());
+            setItemAvailable(rentalSpec);
         }
         final boolean hasPenalty = penaltyService.hasOngoingPenalty(reservation.getMemberId());
         if (hasPenalty) {
             reservationService.cancelAll(reservation.getMemberId());
         }
-        rental.setReservationStatusAfterReturn();
+        rental.setReservationStatusAfterModification();
     }
 
     private Rental getRental(final Reservation reservation, final ReturnRentalRequest returnRentalRequest) {
@@ -150,14 +150,20 @@ public class RentalService {
         return Rental.of(rentalSpecList, reservation);
     }
 
-    private void setPenaltyAndItemAvailable(final EquipmentRentalSpec rentalSpec, final Long memberId) {
+    private void setPenalty(final RentalSpec rentalSpec, final Long memberId) {
+        if (rentalSpec.isOverdueReturned() || rentalSpec.isUnavailableAfterReturn()) {
+            penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
+        } else {
+            penaltyService.deleteByRentalSpecIdIfExists(rentalSpec.getId());
+        }
+    }
+
+    private void setItemAvailable(final EquipmentRentalSpec rentalSpec) {
         if (rentalSpec.isUnavailableAfterReturn()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), false);
-            penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
         if (rentalSpec.isOverdueReturned()) {
             itemService.setAvailable(rentalSpec.getPropertyNumber(), true);
-            penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(), rentalSpec.getId(), rentalSpec.getStatus());
         }
     }
 
@@ -209,5 +215,23 @@ public class RentalService {
     public LabRoomReservationsResponse getReturnedLabRoomReservation(final String labRoomName, final LocalDate date) {
         final List<LabRoomReservationResponse> labRoomReservationWithRentalSpecs = rentalSpecRepository.getLabRoomReservationWithRentalSpec(labRoomName, date);
         return new LabRoomReservationsResponse(labRoomReservationWithRentalSpecs);
+    }
+
+    @Transactional
+    public void updateLabRoomRentalSpecStatuses(final UpdateLabRoomRentalSpecStatusesRequest updateLabRoomRentalSpecStatusesRequest) {
+        final List<UpdateLabRoomRentalSpecStatusRequest> updateLabRoomRentalSpecStatusRequests = updateLabRoomRentalSpecStatusesRequest.getReservations();
+        for (UpdateLabRoomRentalSpecStatusRequest request : updateLabRoomRentalSpecStatusRequests) {
+            final Reservation reservation = reservationService.getReservationWithReservationSpecsById(request.getReservationId());
+            final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
+            final Long reservationSpecId = labRoomReservation.getReservationSpecId();
+            final List<AbstractRentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecId(reservationSpecId);
+            if (rentalSpecs.size() != 1) throw new LabRoomRentalSpecNotOneException();
+            final AbstractRentalSpec rentalSpec = rentalSpecs.iterator().next();
+            final Rental rental = Rental.of(rentalSpecs, labRoomReservation.getReservation());
+            rental.updateStatusByRentalSpecId(rentalSpec.getId(), request.getRentalSpecStatus());
+            final LabRoomRentalSpec labRoomRentalSpec = rental.getRentalSpecAs(rentalSpec.getId(), LabRoomRentalSpec.class);
+            setPenalty(labRoomRentalSpec, labRoomReservation.getReservation().getMemberId());
+            rental.setReservationStatusAfterModification();
+        }
     }
 }
