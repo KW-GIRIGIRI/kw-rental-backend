@@ -45,4 +45,8 @@ public class Penalty {
         this.period = period;
         this.reason = reason;
     }
+
+    public void updatePeriodByStatus(final PenaltyStatus penaltyStatus) {
+        this.period = period.resize(penaltyStatus);
+    }
 }

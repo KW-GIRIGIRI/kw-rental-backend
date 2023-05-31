@@ -4,8 +4,10 @@ import com.girigiri.kwrental.penalty.domain.Penalty;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PenaltyRepository extends Repository<Penalty, Long>, PenaltyRepositoryCustom {
+    Optional<Penalty> findById(Long id);
 
     Penalty save(Penalty penalty);
 

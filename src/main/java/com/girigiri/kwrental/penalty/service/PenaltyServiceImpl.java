@@ -3,9 +3,11 @@ package com.girigiri.kwrental.penalty.service;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
 import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
+import com.girigiri.kwrental.penalty.exception.PenaltyNotFoundException;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.PenaltyService;
@@ -75,5 +77,12 @@ public class PenaltyServiceImpl implements PenaltyService {
     @Transactional(readOnly = true)
     public Page<PenaltyHistoryResponse> getPenaltyHistoryPage(final Pageable pageable) {
         return penaltyRepository.findPenaltyHistoryPageResponse(pageable);
+    }
+
+    @Transactional
+    public void updatePeriod(final Long id, final PenaltyStatus status) {
+        final Penalty penalty = penaltyRepository.findById(id)
+                .orElseThrow(PenaltyNotFoundException::new);
+        penalty.updatePeriodByStatus(status);
     }
 }
