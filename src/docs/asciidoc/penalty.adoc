@@ -11,3 +11,7 @@ operation::getUserPenaltyStatus[snippets='http-request,http-response']
 === 관리자 페널티 히스토리 조회
 
 operation::getPenaltyHistoryPage[snippets='http-request,http-response']
+
+=== 관리자 패널티 상태 변경
+
+operation::updatePenaltyPeriod[snippets='http-request,http-response']

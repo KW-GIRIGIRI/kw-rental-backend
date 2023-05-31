@@ -7,6 +7,8 @@ import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
+import com.girigiri.kwrental.penalty.dto.request.UpdatePeriodRequest;
 import com.girigiri.kwrental.penalty.dto.response.*;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
@@ -17,6 +19,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,5 +152,37 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
         assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(new PenaltyHistoryResponse(penalty2.getId(), reservation2.getName(), penalty2.getPeriod(), labRoom.getName(), penalty2.getReason()));
         assertThat(response.getEndPoints()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("패널티의 기간을 수정한다.")
+    void updatePenaltyPeriod() {
+        // given
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
+
+        final EquipmentRentalSpec equipmentRentalSpec = EquipmentRentalSpecFixture.builder().reservationId(reservation1.getId()).reservationSpecId(reservationSpec1.getId()).build();
+        rentalSpecRepository.saveAll(List.of(equipmentRentalSpec));
+
+        final Long memberId = 1L;
+        final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(memberId).reservationId(reservation1.getId()).rentalSpecId(reservationSpec1.getId())
+                .reservationSpecId(reservationSpec1.getId()).period(PenaltyPeriod.fromPenaltyCount(0)).build());
+
+        final UpdatePeriodRequest requestBody = new UpdatePeriodRequest(PenaltyStatus.ONE_YEAR);
+
+        // when
+        RestAssured.given(requestSpec)
+                .filter(document("updatePenaltyPeriod"))
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when().log().all().patch("/api/admin/penalties/{id}", penalty1.getId())
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        // then
+        final Penalty actual = penaltyRepository.findById(penalty1.getId()).orElseThrow();
+        assertThat(actual.getPeriod().getStatus()).isEqualTo(PenaltyStatus.ONE_YEAR);
     }
 }
