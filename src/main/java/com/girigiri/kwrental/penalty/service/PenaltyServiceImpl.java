@@ -3,11 +3,14 @@ package com.girigiri.kwrental.penalty.service;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.PenaltyService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,5 +70,10 @@ public class PenaltyServiceImpl implements PenaltyService {
                 .max(Comparator.comparing(PenaltyPeriod::getEndDate));
         return maxFarPeriod.map(period -> new UserPenaltyStatusResponse(false, period.getEndDate()))
                 .orElseGet(() -> new UserPenaltyStatusResponse(true, null));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PenaltyHistoryResponse> getPenaltyHistoryPage(final Pageable pageable) {
+        return penaltyRepository.findPenaltyHistoryPageResponse(pageable);
     }
 }

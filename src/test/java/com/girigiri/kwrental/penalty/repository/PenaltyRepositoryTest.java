@@ -6,6 +6,7 @@ import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -89,5 +92,37 @@ class PenaltyRepositoryTest {
                 .containsExactly(
                         new UserPenaltyResponse(penalty1.getId(), penalty1.getPeriod(), equipment.getName(), penalty1.getReason())
                 );
+    }
+
+    @Test
+    @DisplayName("페널티 히스토리를 조회한다.")
+    void findPenaltyHistoryPageResponse() {
+        // given
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+        final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.create(labRoom);
+        final Reservation reservation2 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec2)));
+
+        final EquipmentRentalSpec equipmentRentalSpec = EquipmentRentalSpecFixture.builder().reservationId(reservation1.getId()).reservationSpecId(reservationSpec1.getId()).build();
+        final LabRoomRentalSpec labRoomRentalSpec = LabRoomRentalSpecFixture.builder().reservationId(reservation2.getId()).reservationSpecId(reservationSpec2.getId()).build();
+        rentalSpecRepository.saveAll(List.of(equipmentRentalSpec, labRoomRentalSpec));
+
+        final Long memberId = 1L;
+        final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(memberId).reservationId(reservation1.getId()).rentalSpecId(reservationSpec1.getId())
+                .reservationSpecId(reservationSpec1.getId()).period(PenaltyPeriod.fromPenaltyCount(0)).build());
+        final Penalty penalty2 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.LOST).memberId(0L).reservationId(reservation2.getId()).rentalSpecId(reservationSpec2.getId())
+                .reservationSpecId(reservationSpec2.getId()).period(PenaltyPeriod.fromPenaltyCount(1)).build());
+
+        // when
+        final Page<PenaltyHistoryResponse> actual = penaltyRepository.findPenaltyHistoryPageResponse(PageRequest.of(0, 1));
+
+        // then
+        assertThat(actual.getContent()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(
+                        new PenaltyHistoryResponse(penalty1.getId(), reservation1.getName(), penalty1.getPeriod(), equipment.getName(), penalty1.getReason()));
+        assertThat(actual.getTotalElements()).isEqualTo(2);
     }
 }

@@ -7,3 +7,7 @@ operation::getPenaltyByMember[snippets='http-request,http-response']
 === 특정 회원의 페널티 상태 조회
 
 operation::getUserPenaltyStatus[snippets='http-request,http-response']
+
+=== 관리자 페널티 히스토리 조회
+
+operation::getPenaltyHistoryPage[snippets='http-request,http-response']

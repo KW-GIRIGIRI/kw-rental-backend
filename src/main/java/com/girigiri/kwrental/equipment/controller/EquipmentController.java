@@ -6,7 +6,6 @@ import com.girigiri.kwrental.equipment.dto.response.EquipmentsWithRentalQuantity
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.util.EndPointUtils;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/equipments")
@@ -35,8 +36,7 @@ public class EquipmentController {
     @GetMapping
     public EquipmentsWithRentalQuantityPageResponse getEquipmentsPage(
             @Validated EquipmentSearchCondition searchCondition,
-            @PageableDefault(sort = {"id"}, direction = Direction.DESC)
-            Pageable pageable) {
+            @PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable) {
         final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentService.findEquipmentsWithRentalQuantityBy(
                 pageable,
                 searchCondition);
