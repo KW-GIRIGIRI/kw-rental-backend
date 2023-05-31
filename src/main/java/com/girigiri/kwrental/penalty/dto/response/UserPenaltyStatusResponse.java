@@ -16,7 +16,7 @@ public class UserPenaltyStatusResponse {
 
     public UserPenaltyStatusResponse(final boolean canUse, final PenaltyStatus status, final LocalDate endDate) {
         this.canUse = canUse;
-        this.status = status.getMessage();
+        this.status = status.getMessage() == null ? null : status.getMessage();
         this.endDate = endDate;
     }
 }
