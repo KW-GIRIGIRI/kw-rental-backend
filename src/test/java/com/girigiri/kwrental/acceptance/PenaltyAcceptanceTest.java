@@ -9,6 +9,7 @@ import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
@@ -81,6 +82,38 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
                         new UserPenaltyResponse(penalty1.getId(), penalty1.getPeriod(), equipment.getName(), penalty1.getReason()),
                         new UserPenaltyResponse(penalty2.getId(), penalty2.getPeriod(), labRoom.getName(), penalty2.getReason())
                 );
+    }
 
+    @Test
+    @DisplayName("회원의 페널티 상태를 조회한다.")
+    void getUserPenaltyStatus() {
+        // given
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+        final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
+        final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
+
+        final EquipmentRentalSpec equipmentRentalSpec = EquipmentRentalSpecFixture.builder().reservationId(reservation1.getId()).reservationSpecId(reservationSpec1.getId()).build();
+        rentalSpecRepository.saveAll(List.of(equipmentRentalSpec));
+
+        final Long memberId = member.getId();
+        final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(memberId).reservationId(reservation1.getId()).rentalSpecId(reservationSpec1.getId())
+                .reservationSpecId(reservationSpec1.getId()).period(PenaltyPeriod.fromPenaltyCount(0)).build());
+
+        // when
+        final UserPenaltyStatusResponse response = RestAssured.given(requestSpec)
+                .sessionId(sessionId)
+                .filter(document("getUserPenaltyStatus"))
+                .when().log().all().get("/api/penalties/status")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(UserPenaltyStatusResponse.class);
+
+        // then
+        assertThat(response).usingRecursiveComparison()
+                .isEqualTo(new UserPenaltyStatusResponse(false, penalty1.getPeriod().getEndDate()));
     }
 }

@@ -123,7 +123,7 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleInternalServerError(Exception e) {
-        log.error(e.getMessage());
+        log.error("{} : {}", e.getClass(), e.getMessage());
         log.error(Arrays.toString(e.getStackTrace()));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상하지 못한 예외가 발생했습니다.");
     }

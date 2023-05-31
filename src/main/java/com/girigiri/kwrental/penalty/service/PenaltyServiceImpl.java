@@ -4,6 +4,7 @@ import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.PenaltyService;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PenaltyServiceImpl implements PenaltyService {
@@ -51,9 +54,18 @@ public class PenaltyServiceImpl implements PenaltyService {
         return ongoingPenalties.size() > 0;
     }
 
-    @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserPenaltiesResponse getPenalties(final Long memberId) {
         return penaltyRepository.findUserPenaltiesResponseByMemberId(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public UserPenaltyStatusResponse getPenaltyStatus(final Long memberId) {
+        final List<Penalty> penalties = penaltyRepository.findByOngoingPenalties(memberId);
+        final Optional<PenaltyPeriod> maxFarPeriod = penalties.stream()
+                .map(Penalty::getPeriod)
+                .max(Comparator.comparing(PenaltyPeriod::getEndDate));
+        return maxFarPeriod.map(period -> new UserPenaltyStatusResponse(false, period.getEndDate()))
+                .orElseGet(() -> new UserPenaltyStatusResponse(true, null));
     }
 }
