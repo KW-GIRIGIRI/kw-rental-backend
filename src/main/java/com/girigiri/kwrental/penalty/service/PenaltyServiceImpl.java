@@ -3,6 +3,7 @@ package com.girigiri.kwrental.penalty.service;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.PenaltyService;
@@ -48,5 +49,11 @@ public class PenaltyServiceImpl implements PenaltyService {
     public boolean hasOngoingPenalty(final Long memberId) {
         final List<Penalty> ongoingPenalties = penaltyRepository.findByOngoingPenalties(memberId);
         return ongoingPenalties.size() > 0;
+    }
+
+    @Override
+    @Transactional
+    public UserPenaltiesResponse getPenalties(final Long memberId) {
+        return penaltyRepository.findUserPenaltiesResponseByMemberId(memberId);
     }
 }

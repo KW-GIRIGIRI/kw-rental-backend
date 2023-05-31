@@ -1,13 +1,15 @@
-package com.girigiri.kwrental.penalty.repository;
+package com.girigiri.kwrental.acceptance;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.auth.domain.Member;
+import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -15,57 +17,40 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.*;
+import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
-@DataJpaTest
-@Import(JpaConfig.class)
-class PenaltyRepositoryTest {
+class PenaltyAcceptanceTest extends AcceptanceTest {
 
     @Autowired
-    private PenaltyRepository penaltyRepository;
+    private MemberRepository memberRepository;
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private RentalSpecRepository rentalSpecRepository;
+    @Autowired
+    private PenaltyRepository penaltyRepository;
 
     @Test
-    @DisplayName("특정 회원의 현재 진행 중인 페널티를 조회한다.")
-    void findOngoingPenalty() {
+    @DisplayName("특정 사용자의 페널티 이력을 조회한다.")
+    void penaltiesByMember() {
         // given
-        final LocalDate now = LocalDate.now();
-        final PenaltyPeriod penaltyPeriod1 = new PenaltyPeriod(now, now.plusDays(3));
-        final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(1L).period(penaltyPeriod1).build());
-        final PenaltyPeriod penaltyPeriod2 = new PenaltyPeriod(now.minusDays(2), now.minusDays(1));
-        final Penalty penalty2 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(1L).period(penaltyPeriod2).build());
-        final PenaltyPeriod penaltyPeriod3 = new PenaltyPeriod(now.minusDays(2), now);
-        final Penalty penalty3 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(1L).period(penaltyPeriod3).build());
-        final Penalty penalty4 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(2L).period(penaltyPeriod1).build());
+        final String password = "12345678";
+        final Member member = memberRepository.save(MemberFixture.create(password));
+        final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-        // when
-        final List<Penalty> actual = penaltyRepository.findByOngoingPenalties(1L);
-
-        // then
-        assertThat(actual).containsExactlyInAnyOrder(penalty1, penalty3);
-    }
-
-    @Test
-    @DisplayName("특정 회원의 페널티 이력을 조회한다.")
-    void findUserPenaltiesResponseByMemberId() {
-        // given
         final Rentable equipment = assetRepository.save(EquipmentFixture.create());
         final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
-
         final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
         final Reservation reservation1 = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec1)));
         final ReservationSpec reservationSpec2 = ReservationSpecFixture.create(labRoom);
@@ -75,19 +60,27 @@ class PenaltyRepositoryTest {
         final LabRoomRentalSpec labRoomRentalSpec = LabRoomRentalSpecFixture.builder().reservationId(reservation2.getId()).reservationSpecId(reservationSpec2.getId()).build();
         rentalSpecRepository.saveAll(List.of(equipmentRentalSpec, labRoomRentalSpec));
 
-        final Long memberId = 1L;
+        final Long memberId = member.getId();
         final Penalty penalty1 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.BROKEN).memberId(memberId).reservationId(reservation1.getId()).rentalSpecId(reservationSpec1.getId())
                 .reservationSpecId(reservationSpec1.getId()).period(PenaltyPeriod.fromPenaltyCount(0)).build());
-        final Penalty penalty2 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.LOST).memberId(0L).reservationId(reservation2.getId()).rentalSpecId(reservationSpec2.getId())
+        final Penalty penalty2 = penaltyRepository.save(PenaltyFixture.builder(PenaltyReason.LOST).memberId(memberId).reservationId(reservation2.getId()).rentalSpecId(reservationSpec2.getId())
                 .reservationSpecId(reservationSpec2.getId()).period(PenaltyPeriod.fromPenaltyCount(1)).build());
 
         // when
-        final UserPenaltiesResponse actual = penaltyRepository.findUserPenaltiesResponseByMemberId(memberId);
+        final UserPenaltiesResponse response = RestAssured.given(requestSpec)
+                .sessionId(sessionId)
+                .filter(document("getPenaltyByMember"))
+                .when().log().all().get("/api/penalties")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(UserPenaltiesResponse.class);
 
         // then
-        assertThat(actual.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+        assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(
-                        new UserPenaltyResponse(penalty1.getId(), penalty1.getPeriod(), equipment.getName(), penalty1.getReason())
+                        new UserPenaltyResponse(penalty1.getId(), penalty1.getPeriod(), equipment.getName(), penalty1.getReason()),
+                        new UserPenaltyResponse(penalty2.getId(), penalty2.getPeriod(), labRoom.getName(), penalty2.getReason())
                 );
+
     }
 }

@@ -50,4 +50,8 @@ public class PenaltyPeriod {
         }
         return new PenaltyPeriod(now, now.plusYears(1));
     }
+
+    public PenaltyStatus getStatus() {
+        return PenaltyStatus.of(startDate, endDate);
+    }
 }

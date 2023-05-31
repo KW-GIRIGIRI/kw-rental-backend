@@ -1,0 +1,5 @@
+== 페널티 관련 API
+
+=== 특정 회원의 페널티 이력 조회
+
+operation::getPenaltyByMember[snippets='http-request,http-response']
