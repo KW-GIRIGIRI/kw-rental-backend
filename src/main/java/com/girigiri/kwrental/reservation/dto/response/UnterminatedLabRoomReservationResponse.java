@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Getter
 public class UnterminatedLabRoomReservationResponse {
 
+    private Long reservationId;
+    private Long reservationSpecId;
     private LocalDate startDate;
     private LocalDate endDate;
     private String name;
@@ -19,7 +21,9 @@ public class UnterminatedLabRoomReservationResponse {
     private UnterminatedLabRoomReservationResponse() {
     }
 
-    private UnterminatedLabRoomReservationResponse(final LocalDate startDate, final LocalDate endDate, final String name, final Integer amount, final ReservationSpecStatus status) {
+    private UnterminatedLabRoomReservationResponse(final Long reservationId, final Long reservationSpecId, final LocalDate startDate, final LocalDate endDate, final String name, final Integer amount, final ReservationSpecStatus status) {
+        this.reservationId = reservationId;
+        this.reservationSpecId = reservationSpecId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.name = name;
@@ -29,6 +33,6 @@ public class UnterminatedLabRoomReservationResponse {
 
     public static UnterminatedLabRoomReservationResponse from(final Reservation reservation) {
         final ReservationSpec spec = reservation.getReservationSpecs().iterator().next();
-        return new UnterminatedLabRoomReservationResponse(spec.getStartDate(), spec.getEndDate(), spec.getRentable().getName(), spec.getAmount().getAmount(), spec.getStatus());
+        return new UnterminatedLabRoomReservationResponse(reservation.getId(), spec.getId(), spec.getStartDate(), spec.getEndDate(), spec.getRentable().getName(), spec.getAmount().getAmount(), spec.getStatus());
     }
 }
