@@ -1,5 +1,16 @@
 package com.girigiri.kwrental.reservation.service;
 
+import static java.util.stream.Collectors.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
@@ -10,16 +21,6 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toMap;
 
 @Service
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
@@ -42,10 +43,12 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 
     @Override   // TODO: 2023/04/23 반복문을 두번 도는 로직을 최적화 할 수 있다.
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public void validateAmount(final Long equipmentId, final Integer amount, final RentalPeriod rentalPeriod) {
-        final Rentable rentable = assetService.getRentableById(equipmentId);
-        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedByPeriod(equipmentId, rentalPeriod);
-        for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
+    public void validateAmount(final Long assetId, final Integer amount, final RentalPeriod rentalPeriod) {
+        final Rentable rentable = assetService.getRentableById(assetId);
+        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedByPeriod(
+            assetId, rentalPeriod);
+        for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(
+            rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
             final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
             validateTotalAmount(amount + rentedAmountByDate, rentable);
         }
