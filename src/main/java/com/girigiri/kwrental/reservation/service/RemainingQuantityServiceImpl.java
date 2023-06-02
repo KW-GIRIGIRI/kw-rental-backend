@@ -45,7 +45,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public void validateAmount(final Long assetId, final Integer amount, final RentalPeriod rentalPeriod) {
         final Rentable rentable = assetService.getRentableById(assetId);
-        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedByPeriod(
+        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(
             assetId, rentalPeriod);
         for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(
             rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
@@ -62,8 +62,8 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 
     private int sumRentedAmountByDate(final List<ReservationSpec> overlappedReservationSpecs, final LocalDate date) {
         return overlappedReservationSpecs.stream()
-                .filter(rentalSpec -> rentalSpec.containsDate(date))
-                .mapToInt(rentalSpec -> rentalSpec.getAmount().getAmount())
+            .filter(spec -> spec.containsDate(date))
+            .mapToInt(spec -> spec.getAmount().getAmount())
                 .sum();
     }
 
