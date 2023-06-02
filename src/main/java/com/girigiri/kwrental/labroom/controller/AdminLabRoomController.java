@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.labroom.controller;
 
-import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;
-import com.girigiri.kwrental.labroom.service.LabRoomService;
+import java.time.LocalDate;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.labroom.service.LabRoomService;
 
 @RestController
 @RequestMapping("/api/admin/labRooms")
@@ -21,6 +22,6 @@ public class AdminLabRoomController {
 
     @GetMapping("/{name}/remainQuantities")
     public RemainQuantitiesPerDateResponse getRemainQuantities(@PathVariable final String name, final LocalDate from, final LocalDate to) {
-        return labRoomService.getRemainQuantityByName(name, from, to);
+        return labRoomService.getRemainQuantityByLabRoomName(name, from, to);
     }
 }

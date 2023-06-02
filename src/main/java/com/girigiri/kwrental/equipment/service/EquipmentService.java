@@ -1,5 +1,17 @@
 package com.girigiri.kwrental.equipment.service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.equipment.domain.Category;
@@ -9,23 +21,13 @@ import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
 import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import jakarta.annotation.Nullable;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import jakarta.annotation.Nullable;
 
 @Service
 public class EquipmentService {
@@ -143,8 +145,9 @@ public class EquipmentService {
     @Transactional(readOnly = true)
     public RemainQuantitiesPerDateResponse getRemainQuantitiesPerDate(final Long equipmentId, final LocalDate from, final LocalDate to) {
         final Equipment equipment = equipmentRepository.findById(equipmentId)
-                .orElseThrow(EquipmentNotFoundException::new);
-        final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountBetween(equipmentId, from, to);
+            .orElseThrow(EquipmentNotFoundException::new);
+        final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(equipmentId,
+            from, to);
         return assetService.getReservableCountPerDate(reservedAmounts, equipment);
     }
 }

@@ -1,8 +1,8 @@
-package com.girigiri.kwrental.equipment.dto.response;
-
-import lombok.Getter;
+package com.girigiri.kwrental.asset.dto.response;
 
 import java.time.LocalDate;
+
+import lombok.Getter;
 
 @Getter
 public class RemainQuantityPerDateResponse {

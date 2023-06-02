@@ -25,61 +25,82 @@ import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 @Service
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
 
-    private final ReservationSpecRepository reservationSpecRepository;
-    private final AssetService assetService;
+	private final ReservationSpecRepository reservationSpecRepository;
+	private final AssetService assetService;
 
-    public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository, final AssetService assetService) {
-        this.reservationSpecRepository = reservationSpecRepository;
-        this.assetService = assetService;
-    }
+	public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository,
+		final AssetService assetService) {
+		this.reservationSpecRepository = reservationSpecRepository;
+		this.assetService = assetService;
+	}
 
-    @Override
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> rentableIds, final LocalDate date) {
-        return reservationSpecRepository.findRentalAmountsByEquipmentIds(rentableIds, date)
-                .stream()
-                .collect(toMap(ReservedAmount::getEquipmentId, ReservedAmount::getRemainingAmount));
-    }
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> rentableIds,
+		final LocalDate date) {
+		return reservationSpecRepository.findRentalAmountsByEquipmentIds(rentableIds, date)
+			.stream()
+			.collect(toMap(ReservedAmount::getEquipmentId, ReservedAmount::getRemainingAmount));
+	}
 
-    @Override   // TODO: 2023/04/23 반복문을 두번 도는 로직을 최적화 할 수 있다.
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public void validateAmount(final Long assetId, final Integer amount, final RentalPeriod rentalPeriod) {
-        final Rentable rentable = assetService.getRentableById(assetId);
-        final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(
-            assetId, rentalPeriod);
-        for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(
-            rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
-            final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
-            validateTotalAmount(amount + rentedAmountByDate, rentable);
-        }
-    }
+	@Override   // TODO: 2023/04/23 반복문을 두번 도는 로직을 최적화 할 수 있다.
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public void validateAmount(final Long assetId, final Integer amount, final RentalPeriod rentalPeriod) {
+		final Rentable rentable = assetService.getRentableById(assetId);
+		final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(
+			assetId, rentalPeriod);
+		for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(
+			rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
+			final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
+			validateTotalAmount(amount + rentedAmountByDate, rentable);
+		}
+	}
 
-    private void validateTotalAmount(final Integer amount, final Rentable rentable) {
-        if (amount > rentable.getTotalQuantity()) {
-            throw new NotEnoughAmountException();
-        }
-    }
+	private void validateTotalAmount(final Integer amount, final Rentable rentable) {
+		if (amount > rentable.getTotalQuantity()) {
+			throw new NotEnoughAmountException();
+		}
+	}
 
-    private int sumRentedAmountByDate(final List<ReservationSpec> overlappedReservationSpecs, final LocalDate date) {
-        return overlappedReservationSpecs.stream()
-            .filter(spec -> spec.containsDate(date))
-            .mapToInt(spec -> spec.getAmount().getAmount())
-                .sum();
-    }
+	private int sumRentedAmountByDate(final List<ReservationSpec> overlappedReservationSpecs, final LocalDate date) {
+		return overlappedReservationSpecs.stream()
+			.filter(spec -> spec.containsDate(date))
+			.mapToInt(spec -> spec.getAmount().getAmount())
+			.sum();
+	}
 
-    @Override
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Map<LocalDate, Integer> getReservedAmountBetween(final Long rentableId, final LocalDate from, final LocalDate to) {
-        final List<ReservationSpec> overlappedByPeriod = reservationSpecRepository.findOverlappedBetween(rentableId, from, to);
-        final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
-        return operatingPeriod.getRentalAvailableDates().stream()
-                .collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedByPeriod, date)));
-    }
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public Map<LocalDate, Integer> getReservedAmountInclusive(
+		final Long rentableId, final LocalDate from, final LocalDate to) {
+		final List<ReservationSpec> overlappedSpecs =
+			reservationSpecRepository.findOverlappedReservedOrRentedInclusive(rentableId, from, to);
+		final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
+		return operatingPeriod.getRentalAvailableDates().stream()
+			.collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedSpecs, date)));
+	}
 
-    private int getReservedAmountsByDate(final List<ReservationSpec> reservationSpecs, final LocalDate date) {
-        return reservationSpecs.stream()
-                .filter(it -> it.containsDate(date))
-                .mapToInt(it -> it.getAmount().getAmount())
-                .sum();
-    }
+	private int getReservedAmountsByDate(final List<ReservationSpec> reservationSpecs, final LocalDate date) {
+		return reservationSpecs.stream()
+			.filter(it -> it.containsDate(date))
+			.mapToInt(it -> it.getAmount().getAmount())
+			.sum();
+	}
+
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public Map<LocalDate, Integer> getReservationCountInclusive(
+		final Long rentableId, final LocalDate from, final LocalDate to) {
+		List<ReservationSpec> overlappedSpecs = reservationSpecRepository.findOverlappedReservedOrRentedInclusive(
+			rentableId, from, to);
+		final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
+		return operatingPeriod.getRentalAvailableDates().stream()
+			.collect(toMap(Function.identity(), date -> getSpecCount(overlappedSpecs, date)));
+	}
+
+	private int getSpecCount(List<ReservationSpec> specs, LocalDate date) {
+		return (int)specs.stream()
+			.filter(it -> it.containsDate(date))
+			.count();
+	}
 }

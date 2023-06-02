@@ -87,7 +87,7 @@ class RemainingQuantityServiceImplTest {
     }
 
     @Test
-    @DisplayName("기간 사이의 대여 ")
+    @DisplayName("기간 사이의 대여 신청 대여 갯수를 센다.")
     void getReservedAmountBetween() {
         // given
         final Equipment equipment = EquipmentFixture.builder().id(1L).totalQuantity(10).build();
@@ -108,11 +108,11 @@ class RemainingQuantityServiceImplTest {
             .amount(RentalAmount.ofPositive(4))
             .period(new RentalPeriod(monday.plusDays(3), monday.plusDays(4)))
             .build();
-        given(reservationSpecRepository.findOverlappedBetween(any(), any(), any()))
+        given(reservationSpecRepository.findOverlappedReservedOrRentedInclusive(any(), any(), any()))
             .willReturn(List.of(reservationSpec1, reservationSpec2, reservationSpec3, reservationSpec4));
 
         // when
-        final Map<LocalDate, Integer> reservedAmount = remainingQuantityService.getReservedAmountBetween(
+        final Map<LocalDate, Integer> reservedAmount = remainingQuantityService.getReservedAmountInclusive(
             equipment.getId(), monday, monday.plusDays(4));
 
         // then
@@ -121,5 +121,42 @@ class RemainingQuantityServiceImplTest {
             .containsEntry(monday.plusDays(1), 2)
             .containsEntry(monday.plusDays(2), 3)
             .containsEntry(monday.plusDays(3), 4);
+    }
+
+    @Test
+    @DisplayName("기간 사이의 대여 신청 수를 센다.")
+    void getReservationCountInclusive() {
+        // given
+        final Equipment equipment = EquipmentFixture.builder().id(1L).totalQuantity(10).build();
+        final LocalDate monday = LocalDate.of(2023, 5, 15);
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment)
+            .amount(RentalAmount.ofPositive(1))
+            .period(new RentalPeriod(monday, monday.plusDays(1)))
+            .build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(equipment)
+            .amount(RentalAmount.ofPositive(2))
+            .period(new RentalPeriod(monday.plusDays(1), monday.plusDays(2)))
+            .build();
+        final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(equipment)
+            .amount(RentalAmount.ofPositive(3))
+            .period(new RentalPeriod(monday.plusDays(2), monday.plusDays(3)))
+            .build();
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(equipment)
+            .amount(RentalAmount.ofPositive(4))
+            .period(new RentalPeriod(monday.plusDays(3), monday.plusDays(4)))
+            .build();
+        given(reservationSpecRepository.findOverlappedReservedOrRentedInclusive(any(), any(), any()))
+            .willReturn(List.of(reservationSpec1, reservationSpec2, reservationSpec3, reservationSpec4));
+
+        // when
+        final Map<LocalDate, Integer> reservedAmount = remainingQuantityService.getReservationCountInclusive(
+            equipment.getId(), monday, monday.plusDays(4));
+
+        // then
+        Assertions.assertThat(reservedAmount)
+            .containsEntry(monday, 1)
+            .containsEntry(monday.plusDays(1), 1)
+            .containsEntry(monday.plusDays(2), 1)
+            .containsEntry(monday.plusDays(3), 1);
     }
 }

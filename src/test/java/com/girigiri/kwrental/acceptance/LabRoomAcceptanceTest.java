@@ -1,7 +1,17 @@
 package com.girigiri.kwrental.acceptance;
 
-import com.girigiri.kwrental.equipment.dto.response.RemainQuantitiesPerDateResponse;
-import com.girigiri.kwrental.equipment.dto.response.RemainQuantityPerDateResponse;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
+
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+
+import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
@@ -9,16 +19,8 @@ import com.girigiri.kwrental.labroom.repository.LabRoomRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 public class LabRoomAcceptanceTest extends AcceptanceTest {
 

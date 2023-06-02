@@ -14,7 +14,7 @@ import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 public interface ReservationSpecRepositoryCustom {
     List<ReservationSpec> findOverlappedReservedOrRentedByPeriod(Long equipmentId, RentalPeriod rentalPeriod);
 
-    List<ReservationSpec> findOverlappedBetween(Long equipmentId, LocalDate start, LocalDate end);
+    List<ReservationSpec> findOverlappedReservedOrRentedInclusive(Long equipmentId, LocalDate start, LocalDate end);
 
     List<ReservedAmount> findRentalAmountsByEquipmentIds(List<Long> equipmentIds, LocalDate date);
 
