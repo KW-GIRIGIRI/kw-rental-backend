@@ -45,7 +45,7 @@ class LabRoomServiceTest {
 			.willReturn(Map.of(now, 1, now.plusDays(1), 0));
 
 		// when
-		RemainReservationCountsPerDateResponse actual = labRoomService.getLabRoomRemainReservationCountPerDateResponse(
+		RemainReservationCountsPerDateResponse actual = labRoomService.getRemainReservationCountByLabRoomName(
 			"hwado", now, now.plusDays(1));
 
 		// then

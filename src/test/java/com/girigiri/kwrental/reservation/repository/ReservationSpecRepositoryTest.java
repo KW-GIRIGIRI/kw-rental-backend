@@ -83,8 +83,38 @@ class ReservationSpecRepositoryTest {
 		// when
 		final RentalPeriod period = new RentalPeriod(NOW.plusDays(1), NOW.plusDays(4));
 		final List<ReservationSpec> expect = reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(
-			equipment.getId(),
-			period);
+			equipment.getId(), period);
+
+		// then
+		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
+			.extracting(ReservationSpec::getPeriod)
+			.containsExactlyInAnyOrder(overlappedLeft, overlappedMid, overlappedRight, overlappedBoth);
+	}
+
+	@Test
+	@DisplayName("주어진 두 날짜값에 겹치는 대여 예약 상세를 조회한다.")
+	void findOverlappedReservedOrRentedInclusive() {
+		// given
+		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentalPeriod notOverlappedLeft = new RentalPeriod(NOW, NOW.plusDays(1));
+		final RentalPeriod overlappedLeft = new RentalPeriod(NOW, NOW.plusDays(2));
+		final RentalPeriod overlappedMid = new RentalPeriod(NOW.plusDays(2), NOW.plusDays(3));
+		final RentalPeriod overlappedRight = new RentalPeriod(NOW.plusDays(4), NOW.plusDays(8));
+		final RentalPeriod notOverlappedRight = new RentalPeriod(NOW.plusDays(6), NOW.plusDays(8));
+		final RentalPeriod overlappedBoth = new RentalPeriod(NOW.plusDays(1), NOW.plusDays(4));
+
+		List<RentalPeriod> periods = List.of(notOverlappedLeft, overlappedLeft, overlappedMid,
+			overlappedRight, notOverlappedRight, overlappedBoth);
+
+		periods.forEach(
+			it -> reservationSpecRepository.save(ReservationSpecFixture.builder(equipment).period(it).build()));
+		periods.forEach(
+			it -> reservationSpecRepository.save(
+				ReservationSpecFixture.builder(equipment).period(it).status(ReservationSpecStatus.CANCELED).build()));
+
+		// when
+		final List<ReservationSpec> expect = reservationSpecRepository.findOverlappedReservedOrRentedInclusive(
+			equipment.getId(), NOW.plusDays(1), NOW.plusDays(4));
 
 		// then
 		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
@@ -251,7 +281,7 @@ class ReservationSpecRepositoryTest {
 		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 
 		final LocalDate now = LocalDate.now();
-		final LocalDate start = now.minusDays(1);
+		final LocalDate start = now.minusDays(2);
 		final Member member = memberRepository.save(MemberFixture.create());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1)
 			.period(new RentalPeriod(start, now.minusDays(1)))

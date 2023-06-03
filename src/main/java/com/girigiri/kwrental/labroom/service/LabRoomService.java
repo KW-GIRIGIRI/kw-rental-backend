@@ -30,29 +30,38 @@ public class LabRoomService {
 		this.assetService = assetService;
 	}
 
-	@Transactional(readOnly = true)
-	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
-		final LocalDate to) {
-		final LabRoom labRoom = labRoomRepository.findLabRoomByName(name)
-			.orElseThrow(LabRoomNotFoundException::new);
-		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(
-			labRoom.getId(), from, to);
-		return assetService.getReservableCountPerDate(reservedAmounts, labRoom);
-	}
-
-	@Transactional(readOnly = true)
-	public RemainReservationCountsPerDateResponse getLabRoomRemainReservationCountPerDateResponse(final String name,
-		final LocalDate from, final LocalDate to) {
-		final LabRoom labRoom = labRoomRepository.findLabRoomByName(name)
-			.orElseThrow(LabRoomNotFoundException::new);
-		Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
-			labRoom.getId(), from, to);
-		List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = reservationCounts.keySet()
+	private static List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
+		LabRoom labRoom, Map<LocalDate, Integer> reservationCounts) {
+		return reservationCounts.keySet()
 			.stream()
 			.map(date -> new RemainReservationCountPerDateResponse(date,
 				labRoom.getReservationCountPerDay() - reservationCounts.get(date)))
 			.sorted(Comparator.comparing(RemainReservationCountPerDateResponse::getDate))
 			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
+		final LocalDate to) {
+		final LabRoom labRoom = getLabRoom(name);
+		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(
+			labRoom.getId(), from, to);
+		return assetService.getReservableCountPerDate(reservedAmounts, labRoom);
+	}
+
+	private LabRoom getLabRoom(String name) {
+		return labRoomRepository.findLabRoomByName(name)
+			.orElseThrow(LabRoomNotFoundException::new);
+	}
+
+	@Transactional(readOnly = true)
+	public RemainReservationCountsPerDateResponse getRemainReservationCountByLabRoomName(final String name,
+		final LocalDate from, final LocalDate to) {
+		final LabRoom labRoom = getLabRoom(name);
+		Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
+			labRoom.getId(), from, to);
+		List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = getRemainReservationCountPerDateResponses(
+			labRoom, reservationCounts);
 		return new RemainReservationCountsPerDateResponse(labRoom.getId(), remainReservationCountPerDateResponses);
 	}
 }

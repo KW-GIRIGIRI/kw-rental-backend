@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.labroom.service.LabRoomService;
 
 @RestController
@@ -21,7 +22,14 @@ public class AdminLabRoomController {
     }
 
     @GetMapping("/{name}/remainQuantities")
-    public RemainQuantitiesPerDateResponse getRemainQuantities(@PathVariable final String name, final LocalDate from, final LocalDate to) {
+    public RemainQuantitiesPerDateResponse getRemainQuantities(@PathVariable final String name, final LocalDate from,
+        final LocalDate to) {
         return labRoomService.getRemainQuantityByLabRoomName(name, from, to);
+    }
+
+    @GetMapping("/{name}/remainReservationCounts")
+    public RemainReservationCountsPerDateResponse getRemainReservationCounts(@PathVariable final String name,
+        final LocalDate from, final LocalDate to) {
+        return labRoomService.getRemainReservationCountByLabRoomName(name, from, to);
     }
 }
