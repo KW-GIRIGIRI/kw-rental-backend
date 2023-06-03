@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.inventory.domain;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 
 @Embeddable
 @Getter
@@ -33,6 +34,9 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         }
         if (rentalEndDate.isBefore(rentalStartDate)) {
             throw new RentalDateException("반납일자는 대여일자보다 이전일 수 없습니다.");
+        }
+        if (rentalStartDate.equals(rentalEndDate)) {
+            throw new RentalDateException("대여일자와 반납일자가 동일할 수 없습니다.");
         }
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;

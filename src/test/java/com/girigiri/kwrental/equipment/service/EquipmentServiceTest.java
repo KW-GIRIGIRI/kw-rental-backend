@@ -1,15 +1,16 @@
 package com.girigiri.kwrental.equipment.service;
 
-import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.request.*;
-import com.girigiri.kwrental.equipment.dto.response.*;
-import com.girigiri.kwrental.equipment.exception.EquipmentException;
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,16 +23,24 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
+import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.equipment.dto.request.EquipmentSearchCondition;
+import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.exception.EquipmentException;
+import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.equipment.exception.InvalidCategoryException;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @ExtendWith(MockitoExtension.class)
 class EquipmentServiceTest {
@@ -270,7 +279,7 @@ class EquipmentServiceTest {
         final LocalDate now = LocalDate.now();
         given(equipmentRepository.findById(any())).willReturn(Optional.of(equipment));
         final Map<LocalDate, Integer> reservedAmounts = Map.of(now, 10, now.plusDays(1), 5);
-        given(remainingQuantityService.getReservedAmountBetween(any(), any(), any()))
+	    given(remainingQuantityService.getReservedAmountInclusive(any(), any(), any()))
                 .willReturn(reservedAmounts);
         given(assetService.getReservableCountPerDate(reservedAmounts, equipment))
                 .willReturn(new RemainQuantitiesPerDateResponse(List.of(new RemainQuantityPerDateResponse(now, 0), new RemainQuantityPerDateResponse(now.plusDays(1), 5))));

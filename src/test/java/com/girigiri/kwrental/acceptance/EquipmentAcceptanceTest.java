@@ -1,19 +1,18 @@
 package com.girigiri.kwrental.acceptance;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.response.*;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import static com.girigiri.kwrental.equipment.domain.Category.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +20,27 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.net.URL;
-import java.time.LocalDate;
-import java.util.List;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
+import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
+import com.girigiri.kwrental.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
+import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
-import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
-import static com.girigiri.kwrental.equipment.domain.Category.ETC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 
 class EquipmentAcceptanceTest extends AcceptanceTest {
 
