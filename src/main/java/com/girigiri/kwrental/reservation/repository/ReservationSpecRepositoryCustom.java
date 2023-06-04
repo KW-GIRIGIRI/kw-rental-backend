@@ -8,6 +8,7 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 
@@ -33,4 +34,6 @@ public interface ReservationSpecRepositoryCustom {
     Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationWhenReturn(LocalDate date);
 
     void updateStatusByIds(List<Long> ids, ReservationSpecStatus status);
+
+    HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate);
 }
