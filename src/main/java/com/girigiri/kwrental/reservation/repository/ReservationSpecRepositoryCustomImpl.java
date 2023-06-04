@@ -9,6 +9,7 @@ import static com.querydsl.core.group.GroupBy.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -18,12 +19,14 @@ import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
@@ -170,6 +173,29 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.set(reservationSpec.status, status)
 			.where(reservationSpec.id.in(ids))
 			.execute();
+	}
+
+	@Override
+	public HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate) {
+		int abnormalCount = Objects.requireNonNull(queryFactory.select(reservationSpec.count())
+			.from(reservationSpec)
+			.where(reservationSpec.period.rentalStartDate.goe(startDate),
+				reservationSpec.period.rentalEndDate.loe(endDate),
+				reservationSpec.status.eq(ReservationSpecStatus.ABNORMAL_RETURNED))
+			.fetchOne()).intValue();
+
+		return queryFactory
+			.from(reservationSpec)
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id), rentableAsset.name.eq(name))
+			.where(reservationSpec.period.rentalStartDate.goe(startDate),
+				reservationSpec.period.rentalEndDate.loe(endDate),
+				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED))
+			.select(
+				Projections.constructor(HistoryStatResponse.class, rentableAsset.name,
+					reservationSpec.count().intValue(),
+					reservationSpec.amount.amount.sum(),
+					Expressions.constant(abnormalCount)))
+			.fetchOne();
 	}
 
 	private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(

@@ -26,6 +26,7 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
@@ -507,5 +508,55 @@ class ReservationSpecRepositoryTest {
 
 		// then
 		assertThat(reservationSpec1.getStatus()).isEqualTo(ReservationSpecStatus.CANCELED);
+	}
+
+	@Test
+	@DisplayName("대여 히스토리 통계를 조회한다.")
+	void findHistoryStat() {
+		// given
+		LocalDate start = LocalDate.now().minusDays(10);
+		LocalDate end = LocalDate.now();
+		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final ReservationSpec reservationSpec1 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom1)
+				.period(new RentalPeriod(start, end))
+				.status(ReservationSpecStatus.RETURNED)
+				.build());
+		final ReservationSpec reservationSpec2 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom1)
+				.period(new RentalPeriod(start.minusDays(1), end))
+				.status(ReservationSpecStatus.RETURNED)
+				.build());
+		final ReservationSpec reservationSpec3 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom1)
+				.period(new RentalPeriod(start, end.plusDays(1)))
+				.status(ReservationSpecStatus.RETURNED)
+				.build());
+		final ReservationSpec reservationSpec4 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom1)
+				.period(new RentalPeriod(start.minusDays(1), end.plusDays(1)))
+				.status(ReservationSpecStatus.RETURNED)
+				.build());
+		final ReservationSpec reservationSpec5 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom2)
+				.period(new RentalPeriod(start, end))
+				.status(ReservationSpecStatus.RETURNED)
+				.build());
+		final ReservationSpec reservationSpec6 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom1)
+				.period(new RentalPeriod(start, end))
+				.status(ReservationSpecStatus.ABNORMAL_RETURNED)
+				.build());
+
+		// when
+		HistoryStatResponse actual = reservationSpecRepository.findHistoryStat(
+			labRoom1.getName(), start, end);
+
+		// then
+		assertThat(actual).usingRecursiveComparison()
+			.isEqualTo(
+				new HistoryStatResponse(labRoom1.getName(), 2,
+					reservationSpec1.getAmount().getAmount() + reservationSpec6.getAmount().getAmount(), 1));
 	}
 }
