@@ -63,3 +63,7 @@ operation::admin_getLabRoomReservations[snippets='http-request,http-response']
 ==== `RETURNED` 는 정상 반납된 의미. 기존에 불량 반납인 대여를 정상 반납으로 바꾸고 관련 패널티도 삭제한다.
 
 operation::updateLabRoomRentalSpecStatuses[snippets='http-request,http-response']
+
+=== 랩실 대여 히스토리 조회
+
+operation::getLabRoomHistory[snippets='http-request,http-response']
