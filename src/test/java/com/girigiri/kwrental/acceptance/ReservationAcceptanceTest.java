@@ -1,5 +1,19 @@
 package com.girigiri.kwrental.acceptance;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
@@ -17,24 +31,26 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
-import com.girigiri.kwrental.reservation.dto.response.*;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
+import com.girigiri.kwrental.reservation.dto.response.ReservationInfoResponse;
+import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
-import com.girigiri.kwrental.testsupport.fixture.*;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
+import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
+import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
 
@@ -281,14 +297,42 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
         // when
         final UnterminatedLabRoomReservationsResponse response = RestAssured.given(requestSpec)
-                .filter(document("getUnterminatedLabRoomReservations"))
-                .sessionId(sessionId)
-                .when().log().all().get("/api/reservations/labRooms?terminated=false")
-                .then().log().all().statusCode(HttpStatus.OK.value())
-                .extract().as(UnterminatedLabRoomReservationsResponse.class);
+            .filter(document("getUnterminatedLabRoomReservations"))
+            .sessionId(sessionId)
+            .when().log().all().get("/api/reservations/labRooms?terminated=false")
+            .then().log().all().statusCode(HttpStatus.OK.value())
+            .extract().as(UnterminatedLabRoomReservationsResponse.class);
 
         // then
         assertThat(response).usingRecursiveComparison()
-                .isEqualTo(UnterminatedLabRoomReservationsResponse.from(List.of(reservation1, reservation2)));
+            .isEqualTo(UnterminatedLabRoomReservationsResponse.from(List.of(reservation1, reservation2)));
+    }
+
+    @Test
+    @DisplayName("특정 랩실 대여와 동일한 기간동안 동일한 랩실을 대여 신청한 대여를 조회한다.")
+    void getRelatedReservationsInfo() {
+        // given
+        final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+        final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
+            .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
+            .build();
+        final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(labRoom1)
+            .period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
+            .build();
+        final Reservation reservation1 = reservationRepository.save(
+            ReservationFixture.builder(List.of(reservationSpec1)).build());
+        final Reservation reservation2 = reservationRepository.save(
+            ReservationFixture.builder(List.of(reservationSpec2)).build());
+
+        // when
+        final RelatedReservationsInfoResponse response = RestAssured.given(requestSpec)
+            .filter(document("getRelatedReservationsInfo"))
+            .when().log().all().get("/api/reservations/{id}?related=true", reservation1.getId())
+            .then().log().all().statusCode(HttpStatus.OK.value())
+            .extract().as(RelatedReservationsInfoResponse.class);
+
+        // then
+        assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(ReservationInfoResponse.from(reservation1), ReservationInfoResponse.from(reservation2));
     }
 }

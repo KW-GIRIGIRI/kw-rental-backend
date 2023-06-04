@@ -1,13 +1,15 @@
 package com.girigiri.kwrental.reservation.domain;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.IllegalRentDateException;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationNotRentedWhenReturnException;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationNotReservedWhenAcceptException;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationSpecNotOneException;
-import lombok.Getter;
 
-import java.time.LocalDate;
-import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class LabRoomReservation {
@@ -35,7 +37,11 @@ public class LabRoomReservation {
     }
 
     public Long getReservationSpecId() {
-        return reservation.getReservationSpecs().iterator().next().getId();
+        return getReservationSpec().getId();
+    }
+
+    public ReservationSpec getReservationSpec() {
+        return reservation.getReservationSpecs().iterator().next();
     }
 
     public Long getId() {
@@ -46,5 +52,13 @@ public class LabRoomReservation {
         final List<ReservationSpec> specs = reservation.getReservationSpecs();
         specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
         reservation.updateIfTerminated();
+    }
+
+    public Long getLabRoomId() {
+        return getReservationSpec().getRentable().getId();
+    }
+
+    public RentalPeriod getPeriod() {
+        return getReservationSpec().getPeriod();
     }
 }
