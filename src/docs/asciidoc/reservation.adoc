@@ -40,3 +40,7 @@ operation::getUnterminatedLabRoomReservations[snippets='http-request,http-respon
 === 대여 취소하기
 
 operation::admin_cancelReservationSpec[snippets='http-request,http-response']
+
+=== 같은 날짜에 같은 랩실 대여하는 다른 대여 정보 조회
+
+operation::getRelatedReservationsInfo[snippets='http-request,http-response']

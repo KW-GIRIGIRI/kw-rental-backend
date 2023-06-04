@@ -1,10 +1,11 @@
 package com.girigiri.kwrental.reservation.repository;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
+import com.girigiri.kwrental.reservation.domain.Reservation;
 
 public interface ReservationRepositoryCustom {
 
@@ -19,4 +20,6 @@ public interface ReservationRepositoryCustom {
     List<Reservation> findByReservationSpecIds(List<Long> reservationSpecIds);
 
     Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
+
+    List<Reservation> findRelatedReservation(LabRoomReservation from);
 }
