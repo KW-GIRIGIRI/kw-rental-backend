@@ -1,5 +1,19 @@
 package com.girigiri.kwrental.rental.repository;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
@@ -22,22 +36,16 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.testsupport.fixture.*;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
+import com.girigiri.kwrental.testsupport.fixture.LabRoomRentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -244,7 +252,8 @@ class RentalSpecRepositoryTest {
         rentalSpecRepository.saveAll(List.of(rentalSpec));
 
         // when
-        final List<LabRoomReservationResponse> actual = rentalSpecRepository.getLabRoomReservationWithRentalSpec(labRoom.getName(), reservationSpec.getPeriod().getRentalStartDate());
+        final List<LabRoomReservationResponse> actual = rentalSpecRepository.getReturnedLabRoomReservationResponse(
+            labRoom.getName(), reservationSpec.getPeriod().getRentalStartDate());
 
         // then
         assertThat(actual).usingRecursiveFieldByFieldElementComparator()
