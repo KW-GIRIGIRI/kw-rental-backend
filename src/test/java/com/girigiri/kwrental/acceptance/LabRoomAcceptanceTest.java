@@ -15,6 +15,8 @@ import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
+import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
+import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.labroom.repository.LabRoomRepository;
@@ -23,6 +25,7 @@ import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 
 public class LabRoomAcceptanceTest extends AcceptanceTest {
 
@@ -109,5 +112,48 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 				new RemainReservationCountPerDateResponse(monday.plusDays(2), 0),
 				new RemainReservationCountPerDateResponse(monday.plusDays(3), 1)
 			);
+	}
+
+	@Test
+	@DisplayName("랩실 공지사항을 업데이트 한다.")
+	void updateNotice() {
+		// given
+		LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").build());
+
+		LabRoomNoticeRequest requestBody = new LabRoomNoticeRequest("이러쿵 저러쿵하니까 잘 이용해주세요!!!!!!");
+
+		// when
+		RestAssured.given(requestSpec)
+			.filter(document("setNotice"))
+			.contentType(ContentType.JSON)
+			.body(requestBody)
+			.when().log().all()
+			.put("/api/admin/labRooms/{name}/notice", hanul.getName())
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		LabRoom actual = labRoomRepository.findLabRoomByName(hanul.getName())
+			.orElseThrow();
+		assertThat(actual.getNotice()).isEqualTo(requestBody.getNotice());
+	}
+
+	@Test
+	@DisplayName("랩실 공지사항을 조회한다.")
+	void getNotice() {
+		// given
+		LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").notice("notice").build());
+
+		// when
+		LabRoomNoticeResponse response = RestAssured.given(requestSpec)
+			.filter(document("getNotice"))
+			.when().log().all()
+			.get("/api/admin/labRooms/{name}/notice", hanul.getName())
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value())
+			.extract().as(LabRoomNoticeResponse.class);
+
+		// then
+		assertThat(response.getNotice()).isEqualTo(hanul.getNotice());
 	}
 }

@@ -9,3 +9,11 @@ operation::admin_getLabRoomRemainQuantities[snippets='http-request,http-response
 === 랩실의 날짜별 남은 대여 가능 횟수 조회 API
 
 operation::getRemainReservationCounts[snippets='http-request,http-response']
+
+=== 랩실 공지사항 조회
+
+operation::getNotice[snippets='http-request,http-response']
+
+=== 랩실 공지사항 등록
+
+operation::setNotice[snippets='http-request,http-response']
