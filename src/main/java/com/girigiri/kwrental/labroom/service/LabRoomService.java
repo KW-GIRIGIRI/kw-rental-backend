@@ -12,6 +12,8 @@ import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
+import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
+import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotFoundException;
@@ -63,5 +65,16 @@ public class LabRoomService {
 		List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = getRemainReservationCountPerDateResponses(
 			labRoom, reservationCounts);
 		return new RemainReservationCountsPerDateResponse(labRoom.getId(), remainReservationCountPerDateResponses);
+	}
+
+	@Transactional
+	public void setNotice(String name, LabRoomNoticeRequest labRoomNoticeRequest) {
+		LabRoom labRoom = getLabRoom(name);
+		labRoomRepository.updateNotice(labRoom.getId(), labRoomNoticeRequest.getNotice());
+	}
+
+	public LabRoomNoticeResponse getNotice(String name) {
+		LabRoom labRoom = getLabRoom(name);
+		return new LabRoomNoticeResponse(labRoom.getNotice());
 	}
 }
