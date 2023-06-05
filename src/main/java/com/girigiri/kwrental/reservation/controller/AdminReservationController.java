@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
@@ -65,5 +66,10 @@ public class AdminReservationController {
 		@NotNull final LocalDate startDate,
 		@NotNull final LocalDate endDate) {
 		return reservationService.getHistoryStat(name, startDate, endDate);
+	}
+
+	@GetMapping("/{id}/purpose")
+	public ReservationPurposeResponse getPurpose(@PathVariable final Long id) {
+		return reservationService.getPurpose(id);
 	}
 }

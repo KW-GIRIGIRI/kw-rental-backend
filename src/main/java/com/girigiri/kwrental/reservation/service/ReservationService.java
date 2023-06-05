@@ -38,6 +38,7 @@ import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
+import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
@@ -333,5 +334,10 @@ public class ReservationService {
 	@Transactional(readOnly = true)
 	public HistoryStatResponse getHistoryStat(String name, LocalDate startDate, LocalDate endDate) {
 		return reservationSpecRepository.findHistoryStat(name, startDate, endDate);
+	}
+
+	@Transactional(readOnly = true)
+	public ReservationPurposeResponse getPurpose(Long id) {
+		return new ReservationPurposeResponse(getReservationById(id).getPurpose());
 	}
 }
