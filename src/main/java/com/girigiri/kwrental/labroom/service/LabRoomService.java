@@ -17,9 +17,11 @@ import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
+import com.girigiri.kwrental.labroom.dto.response.LabRoomAvailableResponse;
 import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
+import com.girigiri.kwrental.labroom.exception.LabRoomAvailableDateFailureException;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotAvailableException;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotFoundException;
 import com.girigiri.kwrental.labroom.repository.LabRoomDailyBanRepository;
@@ -95,14 +97,17 @@ public class LabRoomService {
 	}
 
 	@Transactional
-	public void setAvailable(String name, LocalDate date, boolean available) {
+	public void setAvailable(final String name, final LocalDate date, final boolean available) {
 		final LabRoom labRoom = getLabRoom(name);
 		labRoomDailyBanRepository.findByLabRoomIdAndBanDate(labRoom.getId(), date)
-			.ifPresentOrElse(labRoomDailyBan -> makeAvailable(labRoomDailyBan, available),
+			.ifPresentOrElse(labRoomDailyBan -> makeAvailable(labRoom, labRoomDailyBan, available),
 				() -> makeUnavailable(labRoom, available, date));
 	}
 
-	private void makeAvailable(final LabRoomDailyBan labRoomDailyBan, final boolean available) {
+	private void makeAvailable(LabRoom labRoom, final LabRoomDailyBan labRoomDailyBan, final boolean available) {
+		if (!labRoom.isAvailable()) {
+			throw new LabRoomAvailableDateFailureException();
+		}
 		if (available) {
 			labRoomDailyBanRepository.deleteById(labRoomDailyBan.getId());
 		}
@@ -115,11 +120,26 @@ public class LabRoomService {
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-	public void validateDays(Rentable rentable, Set<LocalDate> rentalDays) {
+	public void validateDays(final Rentable rentable, final Set<LocalDate> rentalDays) {
 		List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomId(rentable.getId());
 		boolean isBanned = bans.stream()
 			.anyMatch(ban -> ban.hasAny(rentalDays));
 		if (isBanned)
 			throw new LabRoomNotAvailableException();
+	}
+
+	@Transactional(readOnly = true)
+	public LabRoomAvailableResponse getAvailableByDate(final String name, final LocalDate date) {
+		LabRoom labRoom = getLabRoom(name);
+		boolean availableByDate = labRoomDailyBanRepository.findByLabRoomIdAndBanDate(labRoom.getId(), date)
+			.isEmpty() && labRoom.isAvailable();
+		return new LabRoomAvailableResponse(labRoom.getId(), availableByDate, date);
+	}
+
+	@Transactional(readOnly = true)
+	public LabRoomAvailableResponse getAvailable(final String name) {
+		final LabRoom labRoom = getLabRoom(name);
+		final boolean available = labRoom.isAvailable();
+		return new LabRoomAvailableResponse(labRoom.getId(), available, null);
 	}
 }

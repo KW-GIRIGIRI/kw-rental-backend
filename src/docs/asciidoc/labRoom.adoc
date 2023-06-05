@@ -31,3 +31,11 @@ operation::setAvailableEntirePeriod[snippets='http-request,http-response']
 사용 가능 처리는 `available` 을 `true` 로 전달한다.
 
 operation::setAvailable[snippets='http-request,http-response']
+
+=== 특정 랩실 전체 기간 운영 여부 조회
+
+operation::getAvailable[snippets='http-request,http-response']
+
+=== 특정 랩실 특정 날짜 운영 여부 조회
+
+operation::getAvailableByDate[snippets='http-request,http-response']

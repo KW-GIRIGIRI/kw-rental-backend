@@ -18,6 +18,7 @@ import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.labroom.dto.request.LabRoomAvailableRequest;
 import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
+import com.girigiri.kwrental.labroom.dto.response.LabRoomAvailableResponse;
 import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
@@ -208,5 +209,49 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 			now).orElseThrow();
 		assertThat(actual.getLabRoomId()).isEqualTo(hanul.getId());
 		assertThat(actual.getBanDate()).isEqualTo(now);
+	}
+
+	@Test
+	@DisplayName("랩실 전체 사용 불가 인지 확인한다.")
+	void getAvailable() {
+		// given
+		final LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").isAvailable(true).build());
+
+		// when
+		final LabRoomAvailableResponse response = RestAssured.given(requestSpec)
+			.filter(document("getAvailable"))
+			.given().log().all()
+			.get("/api/labRooms/{name}/available", hanul.getName())
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value())
+			.extract().as(LabRoomAvailableResponse.class);
+
+		// then
+		assertThat(response).usingRecursiveComparison()
+			.isEqualTo(new LabRoomAvailableResponse(hanul.getId(), true, null));
+
+	}
+
+	@Test
+	@DisplayName("특정 날짜에 랩실 사용 불가 인지 확인한다.")
+	void getAvailableByDate() {
+		// given
+		final LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").isAvailable(true).build());
+		labRoomDailyBanRepository.save(
+			LabRoomDailyBan.builder().labRoomId(hanul.getId()).banDate(LocalDate.now()).build());
+
+		// when
+		final LabRoomAvailableResponse response = RestAssured.given(requestSpec)
+			.filter(document("getAvailableByDate"))
+			.given().log().all()
+			.get("/api/labRooms/{name}/available?date={date}", hanul.getName(), LocalDate.now().toString())
+			.then().log().all()
+			.statusCode(HttpStatus.OK.value())
+			.extract().as(LabRoomAvailableResponse.class);
+
+		// then
+		assertThat(response).usingRecursiveComparison()
+			.isEqualTo(new LabRoomAvailableResponse(hanul.getId(), false, LocalDate.now()));
+
 	}
 }
