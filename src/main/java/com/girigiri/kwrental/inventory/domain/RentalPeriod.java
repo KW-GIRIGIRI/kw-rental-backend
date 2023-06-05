@@ -2,6 +2,8 @@ package com.girigiri.kwrental.inventory.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
 
@@ -42,7 +44,12 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         this.rentalEndDate = rentalEndDate;
     }
 
-    public Integer getRentalDays() {
+    public static boolean isNotSupportedDayOfWeek(final LocalDate date) {
+        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
+            || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
+    }
+
+    public Integer getRentalDayCount() {
         int rentalDays = 0;
         for (LocalDate date = rentalStartDate; date.isBefore(rentalEndDate); date = date.plusDays(1)) {
             if (isNotSupportedDayOfWeek(date)) {
@@ -53,14 +60,21 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         return rentalDays;
     }
 
-    public static boolean isNotSupportedDayOfWeek(final LocalDate date) {
-        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
-                || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
+    public Set<LocalDate> getRentalDays() {
+        Set<LocalDate> rentalDays = new HashSet<>();
+        for (LocalDate date = rentalStartDate; !date.isEqual(rentalEndDate); date = date.plusDays(1)) {
+            if (isNotSupportedDayOfWeek(date))
+                continue;
+            rentalDays.add(date);
+        }
+        return rentalDays;
     }
 
     public boolean contains(final LocalDate date) {
-        if (date == null) return false;
-        return date.isEqual(rentalStartDate) || (date.isAfter(getRentalStartDate()) && date.isBefore(getRentalEndDate()));
+        if (date == null)
+            return false;
+        return date.isEqual(rentalStartDate) || (date.isAfter(getRentalStartDate()) && date.isBefore(
+            getRentalEndDate()));
     }
 
     public boolean isLegalReturnIn(final LocalDate date) {

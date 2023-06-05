@@ -19,4 +19,12 @@ public class LabRoomRepositoryCustomImpl implements LabRoomRepositoryCustom {
             .where(labRoom.id.eq(id))
             .execute();
     }
+
+    @Override
+    public void updateAvailable(final Long id, final boolean available) {
+        queryFactory.update(labRoom)
+            .set(labRoom.isAvailable, available)
+            .where(labRoom.id.eq(id))
+            .execute();
+    }
 }
