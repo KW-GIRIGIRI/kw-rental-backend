@@ -285,15 +285,18 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
 					List.of(
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
+							reservationSpec1.getReservation().getId(),
 							reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(),
 							reservation1.getPhoneNumber()),
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
+							reservationSpec2.getReservation().getId(),
 							reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(),
 							reservation2.getPhoneNumber())
 					)),
 				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(),
 					List.of(
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(),
+							reservationSpec3.getReservation().getId(),
 							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
 							reservation3.getPhoneNumber())
 					))
@@ -353,15 +356,18 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
 					List.of(
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
+							reservationSpec1.getReservation().getId(),
 							reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(),
 							reservation1.getPhoneNumber()),
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
+							reservationSpec2.getReservation().getId(),
 							reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(),
 							reservation2.getPhoneNumber())
 					)),
 				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(),
 					List.of(
 						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(),
+							reservationSpec3.getReservation().getId(),
 							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
 							reservation3.getPhoneNumber())
 					))

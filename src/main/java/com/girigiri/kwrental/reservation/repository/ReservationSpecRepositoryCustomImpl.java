@@ -212,10 +212,9 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 					.as(Projections.constructor(LabRoomReservationWithMemberNumberResponse.class,
 						rentableAsset.name, reservation.acceptDateTime,
 						list(Projections.constructor(LabRoomReservationSpecWithMemberNumberResponse.class,
-							reservationSpec.id, reservation.name, member.memberNumber, reservationSpec.amount.amount,
-							reservation.phoneNumber)))
-					)
-				).values()
+							reservationSpec.id, reservationSpec.reservation.id, reservation.name, member.memberNumber,
+							reservationSpec.amount.amount, reservation.phoneNumber)))))
+				.values()
 		);
 	}
 }
