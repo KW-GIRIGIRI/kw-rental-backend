@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.labroom.domain;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,5 +33,9 @@ public class LabRoomDailyBan {
 		this.id = id;
 		this.banDate = banDate;
 		this.labRoomId = labRoomId;
+	}
+
+	public boolean hasAny(Set<LocalDate> dates) {
+		return dates.contains(banDate);
 	}
 }

@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
@@ -17,6 +20,7 @@ import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
 import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
+import com.girigiri.kwrental.labroom.exception.LabRoomNotAvailableException;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotFoundException;
 import com.girigiri.kwrental.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.labroom.repository.LabRoomRepository;
@@ -108,5 +112,14 @@ public class LabRoomService {
 		if (!available) {
 			labRoomDailyBanRepository.save(LabRoomDailyBan.builder().labRoomId(labRoom.getId()).banDate(date).build());
 		}
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public void validateDays(Rentable rentable, Set<LocalDate> rentalDays) {
+		List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomId(rentable.getId());
+		boolean isBanned = bans.stream()
+			.anyMatch(ban -> ban.hasAny(rentalDays));
+		if (isBanned)
+			throw new LabRoomNotAvailableException();
 	}
 }

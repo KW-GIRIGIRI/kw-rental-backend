@@ -1,16 +1,17 @@
 package com.girigiri.kwrental.inventory.domain;
 
-import com.girigiri.kwrental.inventory.exception.RentalDateException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import com.girigiri.kwrental.inventory.exception.RentalDateException;
 
 class RentalPeriodTest {
 
@@ -36,7 +37,7 @@ class RentalPeriodTest {
         final RentalPeriod rentalPeriod = new RentalPeriod(thursday, monday);
 
         // when
-        final Integer expect = rentalPeriod.getRentalDays();
+        final Integer expect = rentalPeriod.getRentalDayCount();
 
         // then
         assertThat(expect).isOne();

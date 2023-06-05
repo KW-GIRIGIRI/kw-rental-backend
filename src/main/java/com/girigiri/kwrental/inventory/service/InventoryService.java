@@ -1,5 +1,12 @@
 package com.girigiri.kwrental.inventory.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
@@ -12,12 +19,6 @@ import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
 import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -39,7 +40,8 @@ public class InventoryService {
         final Long equipmentId = addInventoryRequest.getEquipmentId();
         final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(rentalPeriod, equipmentId, memberId);
         if (foundInventory.isEmpty()) {
-            final Equipment equipment = equipmentService.validateRentalDays(equipmentId, rentalPeriod.getRentalDays());
+            final Equipment equipment = equipmentService.validateRentalDays(equipmentId,
+                rentalPeriod.getRentalDayCount());
             amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
             final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
             return inventory.getId();
