@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.girigiri.kwrental.auth.argumentresolver.Login;
 import com.girigiri.kwrental.auth.domain.SessionMember;
-import com.girigiri.kwrental.auth.interceptor.UserMember;
 import com.girigiri.kwrental.common.exception.BadRequestException;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
@@ -31,14 +31,14 @@ public class ReservationController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> reserve(@UserMember final SessionMember sessionMember,
+	public ResponseEntity<?> reserve(@Login final SessionMember sessionMember,
 		@RequestBody final AddReservationRequest addReservationRequest) {
 		final Long id = reservationService.reserve(sessionMember.getId(), addReservationRequest);
 		return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
 	}
 
 	@PostMapping("/labRooms")
-	public ResponseEntity<?> reserveLabRoom(@UserMember final SessionMember sessionMember,
+	public ResponseEntity<?> reserveLabRoom(@Login final SessionMember sessionMember,
 		@RequestBody final AddLabRoomReservationRequest addLabRoomReservationRequest) {
 		final Long id = reservationService.reserve(sessionMember.getId(), addLabRoomReservationRequest);
 		return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
@@ -55,7 +55,7 @@ public class ReservationController {
 
 	@GetMapping(params = "terminated")
 	public UnterminatedEquipmentReservationsResponse findUnterminatedEquipmentReservations(
-		@UserMember final SessionMember sessionMember, final Boolean terminated) {
+		@Login final SessionMember sessionMember, final Boolean terminated) {
 		if (!terminated)
 			return reservationService.getUnterminatedEquipmentReservations(sessionMember.getId());
 		throw new BadRequestException("terminated가 true인 경우는 제공하지 않습니다.");
@@ -63,7 +63,7 @@ public class ReservationController {
 
 	@GetMapping(path = "/labRooms", params = "terminated")
 	public UnterminatedLabRoomReservationsResponse findUnterminatedLabRoomReservations(
-		@UserMember final SessionMember sessionMember, final Boolean terminated) {
+		@Login final SessionMember sessionMember, final Boolean terminated) {
 		if (!terminated)
 			return reservationService.getUnterminatedLabRoomReservations(sessionMember.getId());
 		throw new BadRequestException("terminated가 true인 경우는 제공하지 않습니다.");
