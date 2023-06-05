@@ -48,3 +48,7 @@ operation::getRelatedReservationsInfo[snippets='http-request,http-response']
 === 대여 히스토리 통계 조회
 
 operation::getHistoryStat[snippets='http-request,http-response']
+
+=== 대여 목적 조회
+
+operation::getPurpose[snippets='http-request,http-response']

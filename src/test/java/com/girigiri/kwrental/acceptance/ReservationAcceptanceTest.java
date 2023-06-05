@@ -37,6 +37,7 @@ import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemb
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationInfoResponse;
+import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
@@ -462,5 +463,31 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		// then
 		assertThat(response).usingRecursiveComparison()
 			.isEqualTo(new HistoryStatResponse(labRoom1.getName(), 2, 2, 1));
+	}
+
+	@Test
+	@DisplayName("대여 목적을 조회한다.")
+	void getPurpose() {
+		// given
+		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+		LocalDate now = LocalDate.now();
+		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
+			.period(new RentalPeriod(now, now.plusDays(1)))
+			.status(ReservationSpecStatus.RETURNED)
+			.build();
+		final Reservation reservation1 = reservationRepository.save(
+			ReservationFixture.builder(List.of(reservationSpec1)).purpose("이러저러해서 빌리고 싶었습니다. 허락해줘잉.").build());
+
+		// when
+		ReservationPurposeResponse response = RestAssured.given(requestSpec)
+			.filter(document("getPurpose"))
+			.when().log().all()
+			.get("/api/admin/reservations/{id}/purpose", labRoom1.getId())
+			.then().log().all()
+			.extract().as(ReservationPurposeResponse.class);
+
+		// then
+		assertThat(response.getPurpose())
+			.isEqualTo(reservation1.getPurpose());
 	}
 }
