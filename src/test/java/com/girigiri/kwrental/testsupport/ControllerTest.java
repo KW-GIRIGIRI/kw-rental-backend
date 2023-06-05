@@ -1,8 +1,14 @@
 package com.girigiri.kwrental.testsupport;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.servlet.MockMvc;
+
 import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.auth.argumentresolver.LoginArgumentResolver;
 import com.girigiri.kwrental.auth.controller.SessionCookieSupport;
-import com.girigiri.kwrental.auth.interceptor.UserMemberArgumentResolver;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.auth.service.AuthService;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
@@ -13,14 +19,9 @@ import com.girigiri.kwrental.labroom.service.LabRoomService;
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
 import com.girigiri.kwrental.rental.service.RentalService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest
-@Import(UserMemberArgumentResolver.class)
+@Import(LoginArgumentResolver.class)
 public abstract class ControllerTest {
 
     @Autowired

@@ -19,3 +19,15 @@ operation::getMember[snippets='http-request,http-response']
 === 회원 학번 조회 API
 
 operation::getMemberNumber[snippets='http-request,http-response']
+
+=== 회원 비밀번호 확인
+
+operation::checkPassword[snippets='http-request,http-response']
+
+=== 사용자 정보 수정
+
+operation::updateUser[snippets='http-request,http-response']
+
+=== 관리자 정보 수정
+
+operation::updateAdmin[snippets='http-request,http-response']
