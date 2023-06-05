@@ -21,6 +21,7 @@ import com.girigiri.kwrental.labroom.dto.response.LabRoomAvailableResponse;
 import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
+import com.girigiri.kwrental.labroom.exception.LabRoomAvailableDateFailureException;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotAvailableException;
 import com.girigiri.kwrental.labroom.exception.LabRoomNotFoundException;
 import com.girigiri.kwrental.labroom.repository.LabRoomDailyBanRepository;
@@ -99,11 +100,14 @@ public class LabRoomService {
 	public void setAvailable(final String name, final LocalDate date, final boolean available) {
 		final LabRoom labRoom = getLabRoom(name);
 		labRoomDailyBanRepository.findByLabRoomIdAndBanDate(labRoom.getId(), date)
-			.ifPresentOrElse(labRoomDailyBan -> makeAvailable(labRoomDailyBan, available),
+			.ifPresentOrElse(labRoomDailyBan -> makeAvailable(labRoom, labRoomDailyBan, available),
 				() -> makeUnavailable(labRoom, available, date));
 	}
 
-	private void makeAvailable(final LabRoomDailyBan labRoomDailyBan, final boolean available) {
+	private void makeAvailable(LabRoom labRoom, final LabRoomDailyBan labRoomDailyBan, final boolean available) {
+		if (!labRoom.isAvailable()) {
+			throw new LabRoomAvailableDateFailureException();
+		}
 		if (available) {
 			labRoomDailyBanRepository.deleteById(labRoomDailyBan.getId());
 		}
