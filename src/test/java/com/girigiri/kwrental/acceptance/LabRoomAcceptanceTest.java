@@ -15,10 +15,13 @@ import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
+import com.girigiri.kwrental.labroom.domain.LabRoomDailyBan;
+import com.girigiri.kwrental.labroom.dto.request.LabRoomAvailableRequest;
 import com.girigiri.kwrental.labroom.dto.request.LabRoomNoticeRequest;
 import com.girigiri.kwrental.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
+import com.girigiri.kwrental.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.labroom.repository.LabRoomRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
@@ -34,6 +37,9 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
 	private ReservationSpecRepository reservationSpecRepository;
+
+	@Autowired
+	private LabRoomDailyBanRepository labRoomDailyBanRepository;
 
 	@Test
 	@DisplayName("특정 랩실의 날짜별 남은 갯수를 조회한다.")
@@ -155,5 +161,52 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 
 		// then
 		assertThat(response.getNotice()).isEqualTo(hanul.getNotice());
+	}
+
+	@Test
+	@DisplayName("특정 랩실을 사용불가 처리한다.")
+	void setAvailableEntirePeriod() {
+		// given
+		LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").notice("notice").build());
+
+		// when
+		LabRoomAvailableRequest requestBody = new LabRoomAvailableRequest(true, null, false);
+		RestAssured.given(requestSpec)
+			.filter(document("setAvailableEntirePeriod"))
+			.contentType(ContentType.JSON)
+			.body(requestBody)
+			.when().log().all()
+			.patch("/api/admin/labRooms/{name}/available", hanul.getName())
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		LabRoom actual = labRoomRepository.findLabRoomByName(hanul.getName()).orElseThrow();
+		assertThat(actual.isAvailable()).isFalse();
+	}
+
+	@Test
+	@DisplayName("특정 랩실의 특정 일자를 사용 불가 처리한다.")
+	void setAvailable() {
+		// given
+		LabRoom hanul = labRoomRepository.save(LabRoomFixture.builder().name("hanul").notice("notice").build());
+
+		// when
+		LocalDate now = LocalDate.now();
+		LabRoomAvailableRequest requestBody = new LabRoomAvailableRequest(false, now, false);
+		RestAssured.given(requestSpec)
+			.filter(document("setAvailable"))
+			.contentType(ContentType.JSON)
+			.body(requestBody)
+			.when().log().all()
+			.patch("/api/admin/labRooms/{name}/available", hanul.getName())
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		LabRoomDailyBan actual = labRoomDailyBanRepository.findByLabRoomIdAndBanDate(hanul.getId(),
+			now).orElseThrow();
+		assertThat(actual.getLabRoomId()).isEqualTo(hanul.getId());
+		assertThat(actual.getBanDate()).isEqualTo(now);
 	}
 }
