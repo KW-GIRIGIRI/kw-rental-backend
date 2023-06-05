@@ -179,6 +179,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	public HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate) {
 		int abnormalCount = Objects.requireNonNull(queryFactory.select(reservationSpec.count())
 			.from(reservationSpec)
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id), rentableAsset.name.eq(name))
 			.where(reservationSpec.period.rentalStartDate.goe(startDate),
 				reservationSpec.period.rentalEndDate.loe(endDate),
 				reservationSpec.status.eq(ReservationSpecStatus.ABNORMAL_RETURNED))

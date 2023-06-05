@@ -548,6 +548,11 @@ class ReservationSpecRepositoryTest {
 				.period(new RentalPeriod(start, end))
 				.status(ReservationSpecStatus.ABNORMAL_RETURNED)
 				.build());
+		final ReservationSpec reservationSpec7 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(labRoom2)
+				.period(new RentalPeriod(start, end))
+				.status(ReservationSpecStatus.ABNORMAL_RETURNED)
+				.build());
 
 		// when
 		HistoryStatResponse actual = reservationSpecRepository.findHistoryStat(
