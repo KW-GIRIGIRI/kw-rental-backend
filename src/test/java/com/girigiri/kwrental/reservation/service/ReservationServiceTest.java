@@ -1,28 +1,9 @@
 package com.girigiri.kwrental.reservation.service;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import com.girigiri.kwrental.reservation.repository.ReservationRepository;
-import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -31,17 +12,44 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.deepRefEq;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.girigiri.kwrental.asset.service.AssetService;
+import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.service.InventoryService;
+import com.girigiri.kwrental.labroom.domain.LabRoom;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
+import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
+import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
+import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
+import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
+import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
+import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
     @Mock
     private InventoryService inventoryService;
+
+    @Mock
+    private AssetService assetService;
 
     @Mock
     private RemainingQuantityServiceImpl remainingQuantityService;
@@ -76,8 +84,8 @@ class ReservationServiceTest {
                 .purpose(addReservationRequest.getRentalPurpose())
                 .email(addReservationRequest.getRenterEmail())
                 .name(addReservationRequest.getRenterName())
-                .reservationSpecs(List.of(ReservationSpecFixture.create(equipment)))
-                .build();
+            .reservationSpecs(List.of(ReservationSpecFixture.create(equipment)))
+            .build();
         given(reservationRepository.save(any())).willReturn(reservation);
 
         // when
@@ -88,6 +96,27 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("랩실 대여를 할 때 이미 해당 랩실을 해당 기간동안 해당 회원이 대여 했으면 안된다.")
+    void reserve_alreadyLabRoomReserved() {
+        // given
+        LabRoom labRoom = LabRoomFixture.builder().id(1L).build();
+        given(assetService.getRentableByName(any())).willReturn(labRoom);
+        ReservationSpec spec = ReservationSpecFixture.builder(labRoom).build();
+        given(reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(anyLong()))
+            .willReturn(Set.of(ReservationFixture.create(List.of(spec))));
+        AddLabRoomReservationRequest request = AddLabRoomReservationRequest.builder()
+            .renterCount(1)
+            .labRoomName(labRoom.getName())
+            .startDate(spec.getStartDate())
+            .endDate(spec.getEndDate())
+            .build();
+
+        // when, then
+        assertThatThrownBy(() -> reservationService.reserve(1L, request))
+            .isExactlyInstanceOf(AlreadyReservedLabRoomException.class);
+    }
+
+    @Test
     @DisplayName("특정 기간에 수령하는 특정 기자재의 대여 예약을 조회한다.")
     void getReservationsByEquipmentsPerYearMonth() {
         // given
@@ -95,7 +124,7 @@ class ReservationServiceTest {
         final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
         final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
         given(reservationSpecRepository.findByStartDateBetween(any(), any(), any()))
-                .willReturn(List.of(reservationSpec));
+            .willReturn(List.of(reservationSpec));
 
         // when
         final ReservationsByEquipmentPerYearMonthResponse expect = reservationService.getReservationsByEquipmentsPerYearMonth(equipment.getId(), YearMonth.now());
