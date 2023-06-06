@@ -12,6 +12,7 @@ import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -70,11 +71,12 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 	}
 
 	@Override
-	public List<Reservation> findRelatedReservation(LabRoomReservation from) {
+	public List<Reservation> findNotTerminatedRelatedReservation(LabRoomReservation from) {
 		return queryFactory.selectFrom(reservation)
 			.join(reservationSpec).on(reservationSpec.reservation.id.eq(reservation.id),
 				reservationSpec.rentable.id.eq(from.getLabRoomId()))
-			.where(reservationSpec.period.eq(from.getPeriod()))
+			.where(reservationSpec.period.eq(from.getPeriod()),
+				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED))
 			.fetch();
 	}
 

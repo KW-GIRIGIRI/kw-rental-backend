@@ -339,7 +339,8 @@ public class ReservationService {
 	public RelatedReservationsInfoResponse getRelatedReservationsInfo(Long id) {
 		Reservation reservation = getReservationById(id);
 		LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-		final List<Reservation> reservations = reservationRepository.findRelatedReservation(labRoomReservation);
+		final List<Reservation> reservations = reservationRepository.findNotTerminatedRelatedReservation(
+			labRoomReservation);
 		return RelatedReservationsInfoResponse.from(reservations);
 	}
 

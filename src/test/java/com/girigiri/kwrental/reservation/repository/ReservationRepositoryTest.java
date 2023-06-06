@@ -188,6 +188,7 @@ class ReservationRepositoryTest {
 
 		ReservationSpec spec2 = ReservationSpecFixture.builder(hanul)
 			.period(new RentalPeriod(now, now.plusDays(1)))
+			.status(ReservationSpecStatus.CANCELED)
 			.build();
 		Reservation reservation2 = reservationRepository.save(
 			ReservationFixture.builder(List.of(spec2)).name("이영현").build());
@@ -205,11 +206,11 @@ class ReservationRepositoryTest {
 			ReservationFixture.builder(List.of(spec4)).name("김효리").build());
 
 		// when
-		List<Reservation> actual = reservationRepository.findRelatedReservation(
+		List<Reservation> actual = reservationRepository.findNotTerminatedRelatedReservation(
 			new LabRoomReservation(reservation1));
 
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(reservation1, reservation2);
+			.containsExactly(reservation1);
 	}
 }

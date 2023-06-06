@@ -21,5 +21,5 @@ public interface ReservationRepositoryCustom {
 
     Set<Reservation> findNotTerminatedReservationsByMemberId(Long memberId);
 
-    List<Reservation> findRelatedReservation(LabRoomReservation from);
+    List<Reservation> findNotTerminatedRelatedReservation(LabRoomReservation from);
 }
