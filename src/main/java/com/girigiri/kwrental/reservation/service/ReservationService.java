@@ -42,6 +42,7 @@ import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
+import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
 import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
@@ -114,6 +115,7 @@ public class ReservationService {
 		final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.getLabRoomName());
 		final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.getStartDate(),
 			addLabRoomReservationRequest.getEndDate());
+		validateAlreadyReserved(memberId, rentable, period);
 		validateLabRoomForReserve(rentable, period);
 		final RentalAmount amount = RentalAmount.ofPositive(addLabRoomReservationRequest.getRenterCount());
 		remainingQuantityService.validateAmount(rentable.getId(), amount.getAmount(), period);
@@ -121,6 +123,16 @@ public class ReservationService {
 		final Reservation reservation = mapToReservation(memberId, addLabRoomReservationRequest, spec);
 		reservationRepository.save(reservation);
 		return reservation.getId();
+	}
+
+	private void validateAlreadyReserved(Long memberId, Rentable rentable, RentalPeriod period) {
+		boolean alreadyReserved = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(
+				memberId).stream()
+			.map(LabRoomReservation::new)
+			.anyMatch(it -> it.has(rentable, period));
+		if (alreadyReserved) {
+			throw new AlreadyReservedLabRoomException();
+		}
 	}
 
 	private void validateLabRoomForReserve(Rentable rentable, RentalPeriod period) {
