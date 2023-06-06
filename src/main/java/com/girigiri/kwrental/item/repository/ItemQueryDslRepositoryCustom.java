@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Set;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
 
 public interface ItemQueryDslRepositoryCustom {
 

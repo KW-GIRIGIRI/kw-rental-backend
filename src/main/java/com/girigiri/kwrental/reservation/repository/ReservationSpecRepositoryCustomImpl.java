@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
+import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.auth.domain.QMember.*;
-import static com.girigiri.kwrental.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.reservation.domain.QReservation.*;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.*;
 import static com.querydsl.core.group.GroupBy.*;
@@ -13,9 +13,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;

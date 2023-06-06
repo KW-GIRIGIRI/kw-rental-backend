@@ -1,8 +1,9 @@
 package com.girigiri.kwrental.equipment.repository;
 
-import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import static com.girigiri.kwrental.asset.equipment.domain.Category.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import static com.girigiri.kwrental.equipment.domain.Category.CAMERA;
-import static com.girigiri.kwrental.equipment.domain.Category.ETC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @DataJpaTest
 @Import(JpaConfig.class)

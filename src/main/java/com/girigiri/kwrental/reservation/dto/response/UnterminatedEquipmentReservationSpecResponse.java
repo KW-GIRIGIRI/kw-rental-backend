@@ -1,9 +1,10 @@
 package com.girigiri.kwrental.reservation.dto.response;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+
 import lombok.Getter;
 
 @Getter

@@ -1,12 +1,13 @@
 package com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import java.util.List;
+
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class ReservationSpecWithRentalSpecsResponse {

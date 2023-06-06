@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
-import static com.girigiri.kwrental.equipment.domain.Category.*;
+import static com.girigiri.kwrental.asset.equipment.domain.Category.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,17 +22,17 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddEquipmentWithItemsRequest;
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentDetailResponse;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentPageResponse;
-import com.girigiri.kwrental.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentResponse;
-import com.girigiri.kwrental.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentRequest;
+import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
+import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentPageResponse;
+import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
+import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentResponse;
+import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;

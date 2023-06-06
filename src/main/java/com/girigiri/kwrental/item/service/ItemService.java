@@ -1,7 +1,20 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.service.EquipmentService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
@@ -9,23 +22,15 @@ import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.response.*;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemHistory.ItemHistoryBuilder;
+import com.girigiri.kwrental.item.dto.response.ItemResponse;
+import com.girigiri.kwrental.item.dto.response.ItemsResponse;
+import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemService {

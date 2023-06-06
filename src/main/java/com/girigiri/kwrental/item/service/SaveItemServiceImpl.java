@@ -1,14 +1,15 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.dto.request.AddItemRequest;
-import com.girigiri.kwrental.equipment.service.SaveItemService;
-import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.repository.ItemRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
+import com.girigiri.kwrental.asset.equipment.service.SaveItemService;
+import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.repository.ItemRepository;
 
 @Service
 public class SaveItemServiceImpl implements SaveItemService {

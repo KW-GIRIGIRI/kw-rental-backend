@@ -1,24 +1,24 @@
 package com.girigiri.kwrental.inventory.repository;
 
-import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 
 @DataJpaTest
 @Import(JpaConfig.class)

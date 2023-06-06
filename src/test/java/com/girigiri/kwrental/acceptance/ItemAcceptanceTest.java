@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;

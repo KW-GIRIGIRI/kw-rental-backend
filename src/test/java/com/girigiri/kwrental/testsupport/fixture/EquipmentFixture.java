@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.domain.Equipment.EquipmentBuilder;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment.EquipmentBuilder;
 
 public class EquipmentFixture {
     private static final String modelName = "modelName";

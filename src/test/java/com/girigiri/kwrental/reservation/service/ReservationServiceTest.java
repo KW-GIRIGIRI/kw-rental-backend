@@ -19,12 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;

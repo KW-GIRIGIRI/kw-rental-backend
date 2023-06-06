@@ -1,14 +1,15 @@
 package com.girigiri.kwrental.item.controller;
 
-import com.girigiri.kwrental.equipment.exception.EquipmentNotFoundException;
-import com.girigiri.kwrental.item.exception.ItemNotFoundException;
-import com.girigiri.kwrental.testsupport.ControllerTest;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.girigiri.kwrental.asset.equipment.exception.EquipmentNotFoundException;
+import com.girigiri.kwrental.item.exception.ItemNotFoundException;
+import com.girigiri.kwrental.testsupport.ControllerTest;
 
 class ItemControllerTest extends ControllerTest {
 

@@ -17,14 +17,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.asset.labroom.exception.LabRoomNotAvailableException;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
-import com.girigiri.kwrental.labroom.exception.LabRoomNotAvailableException;
-import com.girigiri.kwrental.labroom.service.LabRoomService;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;

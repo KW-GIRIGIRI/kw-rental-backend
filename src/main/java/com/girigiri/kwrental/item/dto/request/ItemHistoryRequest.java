@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.item.dto.request;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+
+import jakarta.validation.constraints.NotNull;
+
 public record ItemHistoryRequest(
-        Category category,
-        @NotNull LocalDate from,
-        @NotNull LocalDate to
+	Category category,
+	@NotNull LocalDate from,
+	@NotNull LocalDate to
 ) {
 }

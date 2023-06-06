@@ -1,15 +1,10 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +14,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 @DataJpaTest
 @Import(JpaConfig.class)

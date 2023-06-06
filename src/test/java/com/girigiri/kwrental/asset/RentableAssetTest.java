@@ -1,15 +1,15 @@
 package com.girigiri.kwrental.asset;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
-import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.common.exception.EntityCastException;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.common.exception.EntityCastException;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 class RentableAssetTest {
 

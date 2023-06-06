@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.rental.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
-import static com.girigiri.kwrental.equipment.domain.QEquipment.*;
-import static com.girigiri.kwrental.labroom.domain.QLabRoom.*;
+import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
+import static com.girigiri.kwrental.asset.labroom.domain.QLabRoom.*;
 import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.*;
 import static com.girigiri.kwrental.rental.domain.QEquipmentRentalSpec.*;
 import static com.girigiri.kwrental.reservation.domain.QReservation.*;
@@ -20,8 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;

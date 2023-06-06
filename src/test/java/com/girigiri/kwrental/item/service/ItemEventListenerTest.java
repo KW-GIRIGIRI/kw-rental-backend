@@ -1,7 +1,8 @@
 package com.girigiri.kwrental.item.service;
 
-import com.girigiri.kwrental.equipment.service.EquipmentDeleteEvent;
-import com.girigiri.kwrental.item.repository.ItemRepository;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,8 +13,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentDeleteEvent;
+import com.girigiri.kwrental.item.repository.ItemRepository;
 
 @SpringBootTest
 class ItemEventListenerTest {

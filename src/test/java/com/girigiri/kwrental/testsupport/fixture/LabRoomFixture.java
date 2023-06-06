@@ -1,7 +1,7 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.labroom.domain.LabRoom;
-import com.girigiri.kwrental.labroom.domain.LabRoom.LabRoomBuilder;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom.LabRoomBuilder;
 
 public class LabRoomFixture {
 
