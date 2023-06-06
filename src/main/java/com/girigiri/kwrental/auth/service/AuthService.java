@@ -16,6 +16,7 @@ import com.girigiri.kwrental.auth.dto.request.UpdateAdminRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
 import com.girigiri.kwrental.auth.exception.ForbiddenException;
+import com.girigiri.kwrental.auth.exception.MemberException;
 import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
 import com.girigiri.kwrental.auth.exception.PasswordNotMatchesException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -37,6 +38,9 @@ public class AuthService {
 
     @Transactional
     public Long register(final RegisterMemberRequest registerMemberRequest) {
+        if (memberRepository.findByMemberNumber(registerMemberRequest.getMemberNumber()).isPresent()) {
+            throw new MemberException("이미 존재하는 회원입니다.");
+        }
         final Member member = Member.builder()
             .name(registerMemberRequest.getName())
             .birthDate(registerMemberRequest.getBirthDate())
