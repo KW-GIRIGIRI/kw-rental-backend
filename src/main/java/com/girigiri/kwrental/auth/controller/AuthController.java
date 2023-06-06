@@ -19,6 +19,7 @@ import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.dto.request.PasswordCheckRequest;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
 import com.girigiri.kwrental.auth.exception.SessionNotFoundException;
@@ -91,6 +92,12 @@ public class AuthController {
 	public ResponseEntity<?> checkPassword(@Login({Role.ADMIN, Role.USER}) final SessionMember sessionMember,
 		@RequestBody final PasswordCheckRequest passwordCheckRequest) {
 		authService.checkPassword(sessionMember.getId(), passwordCheckRequest.getPassword());
+		return ResponseEntity.noContent().build();
+	}
+
+	@PatchMapping("/password")
+	public ResponseEntity<?> resetPassword(@RequestBody final ResetPasswordRequest resetPasswordRequest) {
+		authService.resetPassword(resetPasswordRequest);
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.auth.service;
 
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +11,7 @@ import com.girigiri.kwrental.auth.domain.Role;
 import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateAdminRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
@@ -16,16 +19,20 @@ import com.girigiri.kwrental.auth.exception.ForbiddenException;
 import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
 import com.girigiri.kwrental.auth.exception.PasswordNotMatchesException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
+import com.girigiri.kwrental.mail.EmailService;
 
 @Service
 public class AuthService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    public AuthService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder) {
+    public AuthService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder,
+        EmailService emailService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -45,12 +52,16 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public SessionMember login(final LoginRequest loginRequest) {
-        final Member member = memberRepository.findByMemberNumber(loginRequest.getMemberNumber())
-            .orElseThrow(MemberNotFoundException::new);
+        final Member member = getMemberByMemberNumber(loginRequest.getMemberNumber());
         final boolean matches = passwordEncoder.matches(loginRequest.getPassword(), member.getPassword());
         if (!matches)
             throw new PasswordNotMatchesException();
         return SessionMember.from(member);
+    }
+
+    private Member getMemberByMemberNumber(final String memberNumber) {
+        return memberRepository.findByMemberNumber(memberNumber)
+            .orElseThrow(MemberNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -90,5 +101,19 @@ public class AuthService {
         if (!matches) {
             throw new PasswordNotMatchesException();
         }
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        final Member member = getMemberByMemberNumber(resetPasswordRequest.getMemberNumber());
+        final String randomPassword = getRandomPassword();
+        final String encodedPassword = passwordEncoder.encode(randomPassword);
+        member.updatePassword(encodedPassword);
+        emailService.sendRenewPassword(member.getEmail(), randomPassword);
+    }
+
+    private String getRandomPassword() {
+        String randomUUID = UUID.randomUUID().toString().replaceAll("-", "");
+        return randomUUID.substring(0, 8);
     }
 }
