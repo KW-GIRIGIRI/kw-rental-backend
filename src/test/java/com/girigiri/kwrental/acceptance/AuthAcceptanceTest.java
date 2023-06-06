@@ -2,6 +2,7 @@ package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.dto.request.PasswordCheckRequest;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateAdminRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
@@ -211,5 +213,33 @@ class AuthAcceptanceTest extends AcceptanceTest {
 		final Member actual = memberRepository.findById(member.getId()).orElseThrow();
 		boolean matches = new BCryptPasswordEncoder().matches(updatedPassword, actual.getPassword());
 		assertThat(matches).isTrue();
+	}
+
+	@Test
+	@DisplayName("비밀번호 초기화를 실행한다.")
+	void resetPassword() {
+		// given
+		final String password = "12345678";
+		final Member member = memberRepository.save(MemberFixture.builder(password).role(Role.USER).build());
+		final String sessionId = getSessionId(member.getMemberNumber(), password);
+
+		final ResetPasswordRequest requestBody = new ResetPasswordRequest(member.getMemberNumber(),
+			"djwhy5510@naver.com");
+		doNothing().when(emailService).sendRenewPassword(eq(requestBody.getEmail()), anyString());
+
+		// when
+		RestAssured.given(requestSpec)
+			.filter(document("resetPassword"))
+			.sessionId(sessionId)
+			.contentType(ContentType.JSON)
+			.body(requestBody)
+			.when().log().all().patch("/api/members/password")
+			.then().log().all()
+			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		final Member actual = memberRepository.findById(member.getId()).orElseThrow();
+		boolean matches = new BCryptPasswordEncoder().matches(password, actual.getPassword());
+		assertThat(matches).isFalse();
 	}
 }
