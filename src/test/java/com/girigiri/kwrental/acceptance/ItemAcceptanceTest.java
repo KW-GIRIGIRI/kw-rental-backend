@@ -101,7 +101,8 @@ class ItemAcceptanceTest extends AcceptanceTest {
 	@DisplayName("관리자 품목 대여 가능 상태 변경 API")
 	void updateRentalAvailable() {
 		// given
-		final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+		final Equipment equipment = equipmentRepository.save(
+			EquipmentFixture.builder().totalQuantity(1).rentableQuantity(1).build());
 		final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
 		itemRepository.save(item1);
 		final ItemRentalAvailableRequest requestBody = new ItemRentalAvailableRequest(false);
@@ -113,6 +114,10 @@ class ItemAcceptanceTest extends AcceptanceTest {
 			.body(requestBody)
 			.when().log().all().patch("/api/admin/items/" + item1.getId() + "/rentalAvailable")
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		Equipment actual = equipmentRepository.findById(equipment.getId()).orElseThrow();
+		assertThat(actual.getRentableQuantity()).isEqualTo(0);
 	}
 
 	@Test

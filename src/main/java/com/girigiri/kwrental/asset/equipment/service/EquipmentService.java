@@ -50,15 +50,13 @@ public class EquipmentService {
 
 	@Transactional(readOnly = true)
 	public EquipmentDetailResponse findById(final Long id) {
-		final Equipment equipment = equipmentRepository.findById(id)
-			.orElseThrow(EquipmentNotFoundException::new);
+		final Equipment equipment = getEquipment(id);
 		return EquipmentDetailResponse.from(equipment);
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public void validateExistsById(final Long id) {
-		equipmentRepository.findById(id)
-			.orElseThrow(EquipmentNotFoundException::new);
+		getEquipment(id);
 	}
 
 	@Transactional(readOnly = true)
@@ -112,16 +110,14 @@ public class EquipmentService {
 
 	@Transactional
 	public void deleteEquipment(final Long id) {
-		equipmentRepository.findById(id)
-			.orElseThrow(EquipmentNotFoundException::new);
+		getEquipment(id);
 		equipmentRepository.deleteById(id);
 		eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
 	}
 
 	@Transactional
 	public EquipmentDetailResponse update(final Long id, final UpdateEquipmentRequest updateEquipmentRequest) {
-		Equipment equipment = equipmentRepository.findById(id)
-			.orElseThrow(EquipmentNotFoundException::new);
+		Equipment equipment = getEquipment(id);
 
 		equipment.setName(updateEquipmentRequest.modelName());
 		equipment.setComponents(updateEquipmentRequest.components());
@@ -138,21 +134,30 @@ public class EquipmentService {
 
 	@Transactional(readOnly = true)
 	public Equipment validateRentalDays(final Long id, final Integer rentalDays) {
-		final Equipment equipment = equipmentRepository.findById(id)
-			.orElseThrow(EquipmentNotFoundException::new);
+		final Equipment equipment = getEquipment(id);
 		if (!equipment.canRentDaysFor(rentalDays)) {
 			throw new EquipmentException("최대 대여일 보다 더 길게 대여할 수 없습니다.");
 		}
 		return equipment;
 	}
 
+	private Equipment getEquipment(Long id) {
+		return equipmentRepository.findById(id)
+			.orElseThrow(EquipmentNotFoundException::new);
+	}
+
 	@Transactional(readOnly = true)
 	public RemainQuantitiesPerDateResponse getRemainQuantitiesPerDate(final Long equipmentId, final LocalDate from,
 		final LocalDate to) {
-		final Equipment equipment = equipmentRepository.findById(equipmentId)
-			.orElseThrow(EquipmentNotFoundException::new);
+		final Equipment equipment = getEquipment(equipmentId);
 		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(equipmentId,
 			from, to);
 		return assetService.getReservableCountPerDate(reservedAmounts, equipment);
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void adjustRentableQuantity(Long equipmentId, int operand) {
+		getEquipment(equipmentId);
+		assetService.adjustRentableQuantity(equipmentId, operand);
 	}
 }

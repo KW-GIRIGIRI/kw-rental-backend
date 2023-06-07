@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.asset.domain;
 
+import com.girigiri.kwrental.asset.exception.RentableAssetException;
 import com.girigiri.kwrental.common.AbstractSuperEntity;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 
@@ -43,6 +44,15 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 
 	protected RentableAsset(final Long id, final String name, final Integer totalQuantity,
 		final Integer rentableQuantity, final Integer maxRentalDays) {
+		if (totalQuantity < rentableQuantity) {
+			throw new RentableAssetException("전체 갯수가 대여 가능 갯수보다 작으면 안됩니다.");
+		}
+		if (totalQuantity < 0) {
+			throw new RentableAssetException("전체 갯수는 0보다 커야 합니다.");
+		}
+		if (rentableQuantity < 0) {
+			throw new RentableAssetException("대여 가능 갯수는 0보다 커야 합니다.");
+		}
 		this.id = id;
 		this.name = name;
 		this.rentableQuantity = rentableQuantity;
@@ -60,5 +70,16 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 		if (amount > rentableQuantity) {
 			throw new NotEnoughAmountException();
 		}
+	}
+
+	public void validateAdjustToRentableQuantity(int operand) {
+		final int adjustedRentableQuantity = this.rentableQuantity + operand;
+		if (adjustedRentableQuantity > this.totalQuantity) {
+			throw new RentableAssetException("대여 가능 갯수가 전체 갯수보다 클 수 없습니다.");
+		}
+		if (adjustedRentableQuantity < 0) {
+			throw new RentableAssetException("대여 가능 갯수가 0보다 작을 수 없습니다.");
+		}
+
 	}
 }

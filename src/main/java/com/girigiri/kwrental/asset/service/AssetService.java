@@ -36,12 +36,19 @@ public class AssetService {
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Rentable getRentableByName(final String name) {
         return assetRepository.findByName(name)
-                .orElseThrow(AssetNotFoundException::new);
+            .orElseThrow(AssetNotFoundException::new);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
     public Rentable getRentableById(final Long id) {
         return assetRepository.findById(id)
-                .orElseThrow(AssetNotFoundException::new);
+            .orElseThrow(AssetNotFoundException::new);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void adjustRentableQuantity(Long assetId, int operand) {
+        Rentable rentable = getRentableById(assetId);
+        rentable.validateAmountForRent(operand);
+        assetRepository.updateRentableQuantity(assetId, rentable.getRentableQuantity() + operand);
     }
 }
