@@ -569,4 +569,24 @@ class ReservationSpecRepositoryTest {
 				new HistoryStatResponse(labRoom1.getName(), 2,
 					reservationSpec1.getAmount().getAmount() + reservationSpec6.getAmount().getAmount(), 1));
 	}
+
+	@Test
+	@DisplayName("특정 기자재의 대여 예약 상세를 조회한다.")
+	void findByAssetId() {
+		// given
+		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final ReservationSpec spec1 = ReservationSpecFixture.create(equipment1);
+		reservationRepository.save(ReservationFixture.create(List.of(spec1)));
+		final ReservationSpec spec2 = ReservationSpecFixture.create(equipment2);
+		reservationRepository.save(ReservationFixture.create(List.of(spec2)));
+
+		// when
+		final List<ReservationSpec> actual = reservationSpecRepository.findReservedOrRentedByAssetId(
+			equipment1.getId());
+
+		// then
+		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyInAnyOrder(spec1);
+	}
 }

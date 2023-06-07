@@ -196,6 +196,15 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.fetchOne();
 	}
 
+	@Override
+	public List<ReservationSpec> findReservedOrRentedByAssetId(Long assetId) {
+		return queryFactory.selectFrom(reservationSpec)
+			.join(reservation).fetchJoin()
+			.where(reservationSpec.rentable.id.eq(assetId),
+				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED))
+			.fetch();
+	}
+
 	private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(
 		final Predicate... predicates) {
 		return Set.copyOf(

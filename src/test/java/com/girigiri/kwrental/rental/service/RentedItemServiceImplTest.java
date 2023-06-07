@@ -1,16 +1,9 @@
 package com.girigiri.kwrental.rental.service;
 
-import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
-import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,11 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.BDDMockito.given;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
+import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class RentedItemServiceImplTest {
@@ -37,7 +37,7 @@ class RentedItemServiceImplTest {
     @DisplayName("대여 중인 품목의 자산번호를 조회한다.")
     void getRentedPropertyNumbers() {
         // given
-        given(rentalSpecRepository.findRentedRentalSpecs(any(), any()))
+        given(rentalSpecRepository.findRentedRentalSpecsByAssetId(any(), any()))
                 .willReturn(Set.of(EquipmentRentalSpecFixture.builder().propertyNumber("12345678").build()));
 
         // when

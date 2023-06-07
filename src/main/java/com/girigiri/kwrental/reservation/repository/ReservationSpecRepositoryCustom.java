@@ -36,4 +36,6 @@ public interface ReservationSpecRepositoryCustom {
     void updateStatusByIds(List<Long> ids, ReservationSpecStatus status);
 
     HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate);
+
+    List<ReservationSpec> findReservedOrRentedByAssetId(Long assetId);
 }
