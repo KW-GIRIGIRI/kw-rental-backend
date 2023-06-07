@@ -3,7 +3,7 @@ package com.girigiri.kwrental.asset.domain;
 import com.girigiri.kwrental.common.SuperEntity;
 
 public interface Rentable extends SuperEntity {
-    boolean canRentFor(Integer rentalDays);
+    boolean canRentDaysFor(Integer rentalDays);
 
     Long getId();
 
@@ -11,5 +11,9 @@ public interface Rentable extends SuperEntity {
 
     Integer getTotalQuantity();
 
+    Integer getRentableQuantity();
+
     Integer getMaxRentalDays();
+
+    void validateAmountForRent(int amount);
 }

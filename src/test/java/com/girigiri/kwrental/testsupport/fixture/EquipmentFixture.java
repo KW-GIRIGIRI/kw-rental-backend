@@ -21,16 +21,16 @@ public class EquipmentFixture {
             .name(modelName)
             .totalQuantity(totalQuantity)
             .rentableQuantity(totalQuantity)
-                .imgUrl(imgUrl)
-                .description(description)
-                .components(components)
-                .purpose(purpose)
-                .rentalPlace(rentalPlace)
-                .maxRentalDays(1);
+            .imgUrl(imgUrl)
+            .description(description)
+            .components(components)
+            .purpose(purpose)
+            .rentalPlace(rentalPlace)
+            .maxRentalDays(1);
     }
 
     public static Equipment create() {
         return builder()
-                .build();
+            .build();
     }
 }

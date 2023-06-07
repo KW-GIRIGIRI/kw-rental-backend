@@ -19,11 +19,10 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
-import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -71,10 +70,8 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
 		return queryFactory
-			.select(
-				new QReservedAmount(equipment.id, equipment.totalQuantity,
-					reservationSpec.amount.amount.sum().coalesce(0))
-			)
+			.select(Projections.constructor(ReservedAmount.class, equipment.id, equipment.rentableQuantity,
+				reservationSpec.amount.amount.sum().coalesce(0)))
 			.from(reservationSpec)
 			.rightJoin(equipment).on(reservationSpec.rentable.id.eq(equipment.id).
 				and(reservationSpec.period.rentalStartDate.loe(date))

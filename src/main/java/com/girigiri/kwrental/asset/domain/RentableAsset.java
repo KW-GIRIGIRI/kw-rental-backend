@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.asset.domain;
 
 import com.girigiri.kwrental.common.AbstractSuperEntity;
+import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,7 +51,14 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 	}
 
 	@Override
-	public boolean canRentFor(final Integer rentalDays) {
+	public boolean canRentDaysFor(final Integer rentalDays) {
 		return this.maxRentalDays.compareTo(rentalDays) >= 0;
+	}
+
+	@Override
+	public void validateAmountForRent(int amount) {
+		if (amount > rentableQuantity) {
+			throw new NotEnoughAmountException();
+		}
 	}
 }
