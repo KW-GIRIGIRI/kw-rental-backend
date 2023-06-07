@@ -19,7 +19,6 @@ import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
-import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
@@ -65,12 +64,12 @@ public class ItemService {
 	}
 
 	@Transactional
-	public int updateRentalAvailable(final Long id, final ItemRentalAvailableRequest rentalAvailableRequest) {
+	public int updateRentalAvailable(final Long id, final boolean rentalAvailable) {
 		final Item item = itemRepository.findById(id)
 			.orElseThrow(ItemNotFoundException::new);
-		int operand = getOperandOfRentableQuantity(item, rentalAvailableRequest.rentalAvailable());
+		int operand = getOperandOfRentableQuantity(item, rentalAvailable);
 		equipmentService.adjustRentableQuantity(item.getAssetId(), operand);
-		return itemRepository.updateRentalAvailable(id, rentalAvailableRequest.rentalAvailable());
+		return itemRepository.updateRentalAvailable(id, rentalAvailable);
 	}
 
 	private int getOperandOfRentableQuantity(final Item item, final boolean rentalAvailable) {
@@ -86,8 +85,9 @@ public class ItemService {
 
 	@Transactional
 	public int updatePropertyNumber(final Long id, final ItemPropertyNumberRequest propertyNumberRequest) {
-		itemRepository.findById(id)
+		Item item = itemRepository.findById(id)
 			.orElseThrow(ItemNotFoundException::new);
+		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumberRequest.propertyNumber());
 		return itemRepository.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
 	}
 

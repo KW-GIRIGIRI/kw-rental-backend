@@ -28,7 +28,6 @@ import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
-import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
@@ -96,7 +95,7 @@ class ItemServiceTest {
         given(itemRepository.findById(any())).willReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> itemService.updateRentalAvailable(1L, new ItemRentalAvailableRequest(false)))
+        assertThatThrownBy(() -> itemService.updateRentalAvailable(1L, false))
                 .isInstanceOf(ItemNotFoundException.class);
     }
 

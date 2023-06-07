@@ -196,6 +196,14 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 		return new PageImpl<>(query.fetch(), pageable, countBy(query));
 	}
 
+	@Override
+	public void updatePropertyNumber(String from, String to) {
+		queryFactory.update(equipmentRentalSpec)
+			.set(equipmentRentalSpec.propertyNumber, to)
+			.where(equipmentRentalSpec.propertyNumber.eq(from))
+			.execute();
+	}
+
 	private long countBy(final JPAQuery<?> query) {
 		final Long count = queryFactory.select(abstractRentalSpec.count())
 			.from(abstractRentalSpec)

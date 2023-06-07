@@ -278,23 +278,57 @@ class RentalSpecRepositoryTest {
 
         final ReservationSpec reservationSpec3 = ReservationSpecFixture.builder(labRoom1).period(new RentalPeriod(now, now.plusDays(2))).build();
         final Reservation reservation3 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec3)).memberId(member2.getId()).build());
-        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(labRoom2).period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
-        final Reservation reservation4 = reservationRepository.save(ReservationFixture.builder(List.of(reservationSpec4)).memberId(member2.getId()).build());
+        final ReservationSpec reservationSpec4 = ReservationSpecFixture.builder(labRoom2)
+            .period(new RentalPeriod(now.plusDays(1), now.plusDays(2)))
+            .build();
+        final Reservation reservation4 = reservationRepository.save(
+            ReservationFixture.builder(List.of(reservationSpec4)).memberId(member2.getId()).build());
 
-        final LabRoomRentalSpec rentalSpec1 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec1.getId()).reservationId(reservation1.getId()).build();
-        final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec2.getId()).reservationId(reservation2.getId()).build();
-        final LabRoomRentalSpec rentalSpec3 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec3.getId()).reservationId(reservation3.getId()).build();
-        final LabRoomRentalSpec rentalSpec4 = LabRoomRentalSpecFixture.builder().reservationSpecId(reservationSpec4.getId()).reservationId(reservation4.getId()).build();
+        final LabRoomRentalSpec rentalSpec1 = LabRoomRentalSpecFixture.builder()
+            .reservationSpecId(reservationSpec1.getId())
+            .reservationId(reservation1.getId())
+            .build();
+        final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder()
+            .reservationSpecId(reservationSpec2.getId())
+            .reservationId(reservation2.getId())
+            .build();
+        final LabRoomRentalSpec rentalSpec3 = LabRoomRentalSpecFixture.builder()
+            .reservationSpecId(reservationSpec3.getId())
+            .reservationId(reservation3.getId())
+            .build();
+        final LabRoomRentalSpec rentalSpec4 = LabRoomRentalSpecFixture.builder()
+            .reservationSpecId(reservationSpec4.getId())
+            .reservationId(reservation4.getId())
+            .build();
         rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
 
         // when
-        final List<LabRoomRentalDto> rentalDtos = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(member1.getId(), now, now.plusDays(2));
+        final List<LabRoomRentalDto> rentalDtos = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(member1.getId(),
+            now, now.plusDays(2));
 
         // then
         assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(
-                        new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(), reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
-                        new LabRoomRentalDto(reservation2.getStartDate(), reservation2.getEndDate(), labRoom2.getName(), reservationSpec2.getAmount().getAmount(), rentalSpec2.getStatus())
-                );
+            .containsExactly(
+                new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(),
+                    reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
+                new LabRoomRentalDto(reservation2.getStartDate(), reservation2.getEndDate(), labRoom2.getName(),
+                    reservationSpec2.getAmount().getAmount(), rentalSpec2.getStatus())
+            );
+    }
+
+    @Test
+    @DisplayName("자산번호를 업데이트 한다.")
+    void updatePropertyNumber() {
+        // given
+        final EquipmentRentalSpec spec = EquipmentRentalSpecFixture.builder().propertyNumber("11111111").build();
+        rentalSpecRepository.saveAll(List.of(spec));
+
+        // when
+        final String updatedPropertyNumber = "22222222";
+        rentalSpecRepository.updatePropertyNumber(spec.getPropertyNumber(), updatedPropertyNumber);
+
+        // then
+        entityManager.refresh(spec);
+        assertThat(spec.getPropertyNumber()).isEqualTo(updatedPropertyNumber);
     }
 }
