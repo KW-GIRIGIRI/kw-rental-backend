@@ -16,10 +16,11 @@ public class EquipmentFixture {
 
     public static EquipmentBuilder builder() {
         return Equipment.builder()
-                .category(Category.CAMERA)
-                .maker(maker)
-                .name(modelName)
-                .totalQuantity(totalQuantity)
+            .category(Category.CAMERA)
+            .maker(maker)
+            .name(modelName)
+            .totalQuantity(totalQuantity)
+            .rentableQuantity(totalQuantity)
                 .imgUrl(imgUrl)
                 .description(description)
                 .components(components)

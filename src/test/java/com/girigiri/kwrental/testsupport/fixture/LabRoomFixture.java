@@ -9,6 +9,7 @@ public class LabRoomFixture {
 		return LabRoom.builder()
 			.name("name")
 			.totalQuantity(2)
+			.rentableQuantity(2)
 			.maxRentalDays(1)
 			.isAvailable(true)
 			.reservationCountPerDay(1);

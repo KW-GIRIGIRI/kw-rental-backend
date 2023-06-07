@@ -36,10 +36,10 @@ public class Equipment extends RentableAsset {
 
     @Builder
     public Equipment(final Long id, final Category category, final String maker, final String name,
-                     final String imgUrl, final String description,
-                     final String components, final String purpose, final String rentalPlace,
-                     final Integer totalQuantity, final Integer maxRentalDays) {
-        super(id, name, totalQuantity, maxRentalDays);
+        final String imgUrl, final String description,
+        final String components, final String purpose, final String rentalPlace,
+        final Integer totalQuantity, final Integer rentableQuantity, final Integer maxRentalDays) {
+        super(id, name, totalQuantity, rentableQuantity, maxRentalDays);
         validateNotNull(category, maker, imgUrl, rentalPlace);
         this.category = category;
         this.maker = maker;

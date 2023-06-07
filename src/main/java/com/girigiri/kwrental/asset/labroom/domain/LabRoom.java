@@ -25,9 +25,10 @@ public class LabRoom extends RentableAsset {
 	}
 
 	@Builder
-	private LabRoom(final Long id, final String name, final Integer totalQuantity, final Integer maxRentalDays,
+	private LabRoom(final Long id, final String name, final Integer totalQuantity, final Integer rentableQuantity,
+		final Integer maxRentalDays,
 		final boolean isAvailable, final Integer reservationCountPerDay, final String notice) {
-		super(id, name, totalQuantity, maxRentalDays);
+		super(id, name, totalQuantity, rentableQuantity, maxRentalDays);
 		validateNotNull(isAvailable, reservationCountPerDay);
 		this.isAvailable = isAvailable;
 		this.reservationCountPerDay = reservationCountPerDay;
