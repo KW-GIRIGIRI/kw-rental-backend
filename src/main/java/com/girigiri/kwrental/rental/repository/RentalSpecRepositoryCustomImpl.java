@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
@@ -60,7 +61,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	}
 
 	@Override
-	public Set<EquipmentRentalSpec> findRentedRentalSpecs(final Long equipmentId, final LocalDateTime dateTime) {
+	public Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(final Long equipmentId,
+		final LocalDateTime dateTime) {
 		return Set.copyOf(
 			queryFactory.selectFrom(equipmentRentalSpec)
 				.leftJoin(reservationSpec).on(equipmentRentalSpec.reservationSpecId.eq(reservationSpec.id))
@@ -202,6 +204,22 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.set(equipmentRentalSpec.propertyNumber, to)
 			.where(equipmentRentalSpec.propertyNumber.eq(from))
 			.execute();
+	}
+
+	@Override
+	public List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId) {
+		return queryFactory.selectFrom(abstractRentalSpec)
+			.join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.where(reservationSpec.rentable.id.eq(assetId), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
+			.fetch();
+	}
+
+	@Override
+	public List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(final String propertyNumber) {
+		return queryFactory.selectFrom(equipmentRentalSpec)
+			.where(equipmentRentalSpec.propertyNumber.eq(propertyNumber),
+				equipmentRentalSpec.status.eq(RentalSpecStatus.RENTED))
+			.fetch();
 	}
 
 	private long countBy(final JPAQuery<?> query) {

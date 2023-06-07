@@ -15,4 +15,8 @@ public interface RentedItemService {
         LocalDate from, LocalDate to);
 
     void updatePropertyNumber(final String propertyNumberBefore, final String updatedPropetyNumber);
+
+    void validateNotRentedByAssetId(Long assetId);
+
+    void validateNotRentedByPropertyNumber(String propertyNumber);
 }

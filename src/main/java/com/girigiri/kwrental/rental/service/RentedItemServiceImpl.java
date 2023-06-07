@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.service.RentedItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveAssetException;
+import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveItemException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
@@ -28,7 +30,7 @@ public class RentedItemServiceImpl implements RentedItemService {
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Set<String> getRentedPropertyNumbers(final Long equipmentId, final LocalDateTime dateTime) {
-		return rentalSpecRepository.findRentedRentalSpecs(equipmentId, dateTime)
+		return rentalSpecRepository.findRentedRentalSpecsByAssetId(equipmentId, dateTime)
 			.stream()
 			.map(EquipmentRentalSpec::getPropertyNumber)
 			.collect(Collectors.toSet());
@@ -48,6 +50,24 @@ public class RentedItemServiceImpl implements RentedItemService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void updatePropertyNumber(String propertyNumberBefore, String updatedPropetyNumber) {
 		rentalSpecRepository.updatePropertyNumber(propertyNumberBefore, updatedPropetyNumber);
+	}
+
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public void validateNotRentedByAssetId(Long assetId) {
+		boolean anyRented = !rentalSpecRepository.findRentedRentalSpecsByAssetId(assetId).isEmpty();
+		if (anyRented) {
+			throw new RentalSpecRentedWhenRemoveAssetException();
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public void validateNotRentedByPropertyNumber(final String propertyNumber) {
+		boolean anyRented = !rentalSpecRepository.findRentedRentalSpecsByPropertyNumber(propertyNumber).isEmpty();
+		if (anyRented) {
+			throw new RentalSpecRentedWhenRemoveItemException();
+		}
 	}
 
 	private RentalCountsDto mapToRentalCountsDto(final RentalSpecStatuesPerPropertyNumber rentalSpecStatues) {

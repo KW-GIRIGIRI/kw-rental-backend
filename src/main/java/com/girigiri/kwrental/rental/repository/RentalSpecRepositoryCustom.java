@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
@@ -21,7 +22,7 @@ public interface RentalSpecRepositoryCustom {
 
     List<EquipmentRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 
-    Set<EquipmentRentalSpec> findRentedRentalSpecs(Long equipmentId, LocalDateTime date);
+    Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(Long equipmentId, LocalDateTime date);
 
     List<EquipmentRentalSpec> findByReservationId(Long reservationId);
 
@@ -42,4 +43,8 @@ public interface RentalSpecRepositoryCustom {
         LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     void updatePropertyNumber(String from, String to);
+
+    List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
+
+    List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(String propertyNumber);
 }
