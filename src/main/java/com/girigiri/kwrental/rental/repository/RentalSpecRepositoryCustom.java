@@ -18,33 +18,36 @@ import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
 public interface RentalSpecRepositoryCustom {
-    List<EquipmentRentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
+	List<EquipmentRentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
 
-    List<EquipmentRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
+	List<EquipmentRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 
-    Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(Long equipmentId, LocalDateTime date);
+	Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(Long equipmentId, LocalDateTime date);
 
-    List<EquipmentRentalSpec> findByReservationId(Long reservationId);
+	List<EquipmentRentalSpec> findByReservationId(Long reservationId);
 
-    List<EquipmentRentalDto> findEquipmentRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
+	List<EquipmentRentalDto> findEquipmentRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
 
-    List<LabRoomRentalDto> findLabRoomRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
+	List<LabRoomRentalDto> findLabRoomRentalDtosBetweenDate(Long memberId, LocalDate from, LocalDate to);
 
-    List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(Set<String> propertyNumbers,
-        LocalDate from, LocalDate to);
+	List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(Set<String> propertyNumbers,
+		LocalDate from, LocalDate to);
 
-    List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(String propertyNumber);
+	List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(String propertyNumber);
 
-    void updateNormalReturnedByReservationIds(List<Long> reservationIds, RentalDateTime returnDateTime);
+	void updateNormalReturnedByReservationIds(List<Long> reservationIds, RentalDateTime returnDateTime);
 
-    List<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName, LocalDate date);
+	List<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName, LocalDate date);
 
-    Page<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName,
-        LocalDate startDate, LocalDate endDate, Pageable pageable);
+	Page<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName,
+		LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    void updatePropertyNumber(String from, String to);
+	void updatePropertyNumber(String from, String to);
 
-    List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
+	List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
 
-    List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(String propertyNumber);
+	List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(String propertyNumber);
+
+	List<RentalSpecWithName> findTerminatedWithNameByPropertyAndInclusive(final String propertyNumber,
+		final RentalDateTime startDate, final RentalDateTime endDate);
 }

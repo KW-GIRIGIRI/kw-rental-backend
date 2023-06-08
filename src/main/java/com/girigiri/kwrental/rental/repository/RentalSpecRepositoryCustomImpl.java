@@ -33,6 +33,7 @@ import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -63,13 +64,13 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	@Override
 	public Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(final Long equipmentId,
 		final LocalDateTime dateTime) {
-		return Set.copyOf(
-			queryFactory.selectFrom(equipmentRentalSpec)
-				.leftJoin(reservationSpec).on(equipmentRentalSpec.reservationSpecId.eq(reservationSpec.id))
-				.where(reservationSpec.rentable.id.eq(equipmentId)
-					.and(equipmentRentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
-						.and(equipmentRentalSpec.returnDateTime.isNull())))
-				.fetch());
+		return Set.copyOf(queryFactory.selectFrom(equipmentRentalSpec)
+			.leftJoin(reservationSpec)
+			.on(equipmentRentalSpec.reservationSpecId.eq(reservationSpec.id))
+			.where(reservationSpec.rentable.id.eq(equipmentId)
+				.and(equipmentRentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
+					.and(equipmentRentalSpec.returnDateTime.isNull())))
+			.fetch());
 	}
 
 	@Override
@@ -82,8 +83,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	@Override
 	public List<EquipmentRentalDto> findEquipmentRentalDtosBetweenDate(final Long memberId, final LocalDate from,
 		final LocalDate to) {
-		return queryFactory
-			.from(abstractRentalSpec)
+		return queryFactory.from(abstractRentalSpec)
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.join(reservation)
@@ -91,18 +91,17 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(equipment)
 			.on(equipment.id.eq(reservationSpec.rentable.id))
 			.where(reservationSpecBetweenDate(from, to))
-			.transform(groupBy(reservationSpec.period)
-				.list(Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate,
-					reservationSpec.period.rentalEndDate,
-					GroupBy.set(Projections.constructor(RentalSpecDto.class, abstractRentalSpec.id, equipment.name,
-						abstractRentalSpec.status)))));
+			.transform(groupBy(reservationSpec.period).list(
+				Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate,
+					reservationSpec.period.rentalEndDate, GroupBy.set(
+						Projections.constructor(RentalSpecDto.class, abstractRentalSpec.id, equipment.name,
+							abstractRentalSpec.status)))));
 	}
 
 	@Override
 	public List<LabRoomRentalDto> findLabRoomRentalDtosBetweenDate(final Long memberId, final LocalDate from,
 		final LocalDate to) {
-		return queryFactory
-			.from(abstractRentalSpec)
+		return queryFactory.from(abstractRentalSpec)
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.join(reservation)
@@ -110,9 +109,9 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(labRoom)
 			.on(labRoom.id.eq(reservationSpec.rentable.id))
 			.where(reservationSpecBetweenDate(from, to))
-			.select(Projections.constructor(LabRoomRentalDto.class,
-				reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate,
-				labRoom.name, reservationSpec.amount.amount, abstractRentalSpec.status))
+			.select(Projections.constructor(LabRoomRentalDto.class, reservationSpec.period.rentalStartDate,
+				reservationSpec.period.rentalEndDate, labRoom.name, reservationSpec.amount.amount,
+				abstractRentalSpec.status))
 			.fetch();
 	}
 
@@ -123,27 +122,39 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	@Override
 	public List<RentalSpecStatuesPerPropertyNumber> findStatusesByPropertyNumbersBetweenDate(
 		final Set<String> propertyNumbers, final LocalDate from, final LocalDate to) {
-		final Map<String, List<RentalSpecStatus>> statusPerPropertyNumber = queryFactory
-			.from(equipmentRentalSpec)
+		final Map<String, List<RentalSpecStatus>> statusPerPropertyNumber = queryFactory.from(equipmentRentalSpec)
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(equipmentRentalSpec.reservationSpecId).and(reservationSpecBetweenDate(from, to)))
 			.where(equipmentRentalSpec.propertyNumber.in(propertyNumbers))
-			.transform(groupBy(equipmentRentalSpec.propertyNumber)
-				.as(list(equipmentRentalSpec.status)));
-		return statusPerPropertyNumber.entrySet().stream()
+			.transform(groupBy(equipmentRentalSpec.propertyNumber).as(list(equipmentRentalSpec.status)));
+		return statusPerPropertyNumber.entrySet()
+			.stream()
 			.map(entry -> new RentalSpecStatuesPerPropertyNumber(entry.getKey(), entry.getValue()))
 			.toList();
 	}
 
 	@Override
 	public List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(final String propertyNumber) {
-		return queryFactory
-			.select(
+		return getReturnedEquipmentRentalSpecsWithName(equipmentRentalSpec.propertyNumber.eq(propertyNumber));
+	}
+
+	@Override
+	public List<RentalSpecWithName> findTerminatedWithNameByPropertyAndInclusive(final String propertyNumber,
+		final RentalDateTime startDate, final RentalDateTime endDate) {
+		return getReturnedEquipmentRentalSpecsWithName(
+			equipmentRentalSpec.propertyNumber.eq(propertyNumber),
+			equipmentRentalSpec.returnDateTime.instant.lt(endDate.calculateDay(1).getInstant()),
+			equipmentRentalSpec.acceptDateTime.instant.goe(startDate.getInstant()));
+	}
+
+	private List<RentalSpecWithName> getReturnedEquipmentRentalSpecsWithName(final Predicate... predicates) {
+		return queryFactory.select(
 				Projections.constructor(RentalSpecWithName.class, reservation.name, equipmentRentalSpec.acceptDateTime,
 					equipmentRentalSpec.returnDateTime, equipmentRentalSpec.status))
 			.from(equipmentRentalSpec)
-			.join(reservation).on(reservation.id.eq(equipmentRentalSpec.reservationId), reservation.terminated.isTrue())
-			.where(equipmentRentalSpec.propertyNumber.eq(propertyNumber))
+			.join(reservation)
+			.on(reservation.id.eq(equipmentRentalSpec.reservationId), reservation.terminated.isTrue())
+			.where(predicates)
 			.fetch();
 	}
 
@@ -160,39 +171,39 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	@Override
 	public List<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(final String labRoomName,
 		final LocalDate startDate) {
-		return queryFactory
-			.from(abstractRentalSpec)
-			.join(reservation).on(reservation.id.eq(abstractRentalSpec.reservationId))
-			.join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-			.join(rentableAsset).on(rentableAsset.eq(reservationSpec.rentable))
-			.where(
-				rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
+		return queryFactory.from(abstractRentalSpec)
+			.join(reservation)
+			.on(reservation.id.eq(abstractRentalSpec.reservationId))
+			.join(reservationSpec)
+			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.join(rentableAsset)
+			.on(rentableAsset.eq(reservationSpec.rentable))
+			.where(rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
 				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED),
-				reservationSpec.period.rentalStartDate.eq(startDate)
-			)
-			.select(Projections.constructor(LabRoomReservationResponse.class,
-				reservation.id, reservationSpec.id, reservationSpec.period.rentalStartDate,
-				reservationSpec.period.rentalEndDate, reservation.name, abstractRentalSpec.status))
+				reservationSpec.period.rentalStartDate.eq(startDate))
+			.select(Projections.constructor(LabRoomReservationResponse.class, reservation.id, reservationSpec.id,
+				reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate, reservation.name,
+				abstractRentalSpec.status))
 			.fetch();
 	}
 
 	@Override
 	public Page<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(final String labRoomName,
 		final LocalDate startDate, final LocalDate endDate, final Pageable pageable) {
-		JPAQuery<LabRoomReservationResponse> query = queryFactory
-			.from(abstractRentalSpec)
-			.join(reservation).on(reservation.id.eq(abstractRentalSpec.reservationId))
-			.join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-			.join(rentableAsset).on(rentableAsset.eq(reservationSpec.rentable))
-			.where(
-				rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
+		JPAQuery<LabRoomReservationResponse> query = queryFactory.from(abstractRentalSpec)
+			.join(reservation)
+			.on(reservation.id.eq(abstractRentalSpec.reservationId))
+			.join(reservationSpec)
+			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.join(rentableAsset)
+			.on(rentableAsset.eq(reservationSpec.rentable))
+			.where(rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
 				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED),
 				reservationSpec.period.rentalStartDate.goe(startDate),
-				reservationSpec.period.rentalEndDate.loe(endDate)
-			)
-			.select(Projections.constructor(LabRoomReservationResponse.class,
-				reservation.id, reservationSpec.id, reservationSpec.period.rentalStartDate,
-				reservationSpec.period.rentalEndDate, reservation.name, abstractRentalSpec.status));
+				reservationSpec.period.rentalEndDate.loe(endDate))
+			.select(Projections.constructor(LabRoomReservationResponse.class, reservation.id, reservationSpec.id,
+				reservationSpec.period.rentalStartDate, reservationSpec.period.rentalEndDate, reservation.name,
+				abstractRentalSpec.status));
 
 		setPageable(query, abstractRentalSpec, pageable);
 		return new PageImpl<>(query.fetch(), pageable, countBy(query));
@@ -209,7 +220,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	@Override
 	public List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId) {
 		return queryFactory.selectFrom(abstractRentalSpec)
-			.join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.join(reservationSpec)
+			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.where(reservationSpec.rentable.id.eq(assetId), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
 			.fetch();
 	}
@@ -225,8 +237,10 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	private long countBy(final JPAQuery<?> query) {
 		final Long count = queryFactory.select(abstractRentalSpec.count())
 			.from(abstractRentalSpec)
-			.join(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-			.join(rentableAsset).on(rentableAsset.eq(reservationSpec.rentable))
+			.join(reservationSpec)
+			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.join(rentableAsset)
+			.on(rentableAsset.eq(reservationSpec.rentable))
 			.where(query.getMetadata().getWhere())
 			.fetchOne();
 		return count == null ? 0 : count;

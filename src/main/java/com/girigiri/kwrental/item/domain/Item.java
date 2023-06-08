@@ -23,7 +23,6 @@ public class Item {
     @Column(unique = true, nullable = false)
     private String propertyNumber;
 
-    @Builder.Default
     private boolean available = true;
 
     @Column(nullable = false)

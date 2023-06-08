@@ -291,7 +291,7 @@ class RentalSpecRepositoryTest {
 
 	@Test
 	@DisplayName("자산번호에 해당하는 대여 상세를 대여자의 이름과 함께 조회한다.")
-	void findRentalSpecsWithNameByPropertyNumber() {
+	void findTerminatedRentalSpecsWithNameByPropertyNumber() {
 		// given
 		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
 		final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
@@ -479,5 +479,42 @@ class RentalSpecRepositoryTest {
 
 		// then
 		assertThat(actual).containsExactly(spec1);
+	}
+
+	@Test
+	@DisplayName("특정 기간에 수령과 반납을 특정 자산번호로 된 대여 상세를 이름과 함께 조회")
+	void getReturnedEquipmentRentalSpecsWithNameInclusive() {
+		// given
+		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentalDateTime now = RentalDateTime.now();
+		final Reservation reservation1 = reservationRepository.save(
+			ReservationFixture.builder(List.of(ReservationSpecFixture.create(equipment))).terminated(true).build());
+		final Reservation reservation2 = reservationRepository.save(
+			ReservationFixture.builder(List.of(ReservationSpecFixture.create(equipment))).terminated(false).build());
+		final String propertyNumber = "11111111";
+		final RentalDateTime returnDate = now.calculateDay(1);
+		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
+			.reservationId(reservation1.getId())
+			.acceptDateTime(returnDate)
+			.returnDateTime(now)
+			.propertyNumber(propertyNumber)
+			.status(RentalSpecStatus.LOST)
+			.build();
+		final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder()
+			.reservationId(reservation2.getId())
+			.acceptDateTime(returnDate)
+			.returnDateTime(now)
+			.propertyNumber(propertyNumber)
+			.build();
+		rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+		// when
+		List<RentalSpecWithName> actual = rentalSpecRepository.findTerminatedWithNameByPropertyAndInclusive(
+			propertyNumber, now, returnDate);
+
+		// then
+		assertThat(actual).usingRecursiveFieldByFieldElementComparator().containsExactly(
+			new RentalSpecWithName(reservation1.getName(), rentalSpec1.getAcceptDateTime(),
+				rentalSpec1.getReturnDateTime(), rentalSpec1.getStatus()));
 	}
 }
