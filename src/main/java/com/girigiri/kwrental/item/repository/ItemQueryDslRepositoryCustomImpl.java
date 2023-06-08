@@ -110,4 +110,11 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 			.where(item.id.eq(id))
 			.execute();
 	}
+
+	@Override
+	public List<Item> findByAssetId(Long assetId) {
+		return queryFactory.selectFrom(item)
+			.where(item.assetId.eq(assetId), item.deletedAt.isNull())
+			.fetch();
+	}
 }
