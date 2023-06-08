@@ -39,14 +39,14 @@ import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecResponse;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecByItemResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
@@ -431,7 +431,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
 
 		// when
-		final RentalSpecsByItemResponse response = RestAssured.given(requestSpec)
+		final EquipmentRentalSpecsResponse response = RestAssured.given(requestSpec)
 			.filter(document("admin_getReturnedRentalSpecsByPropertyNumber"))
 			.when()
 			.log()
@@ -442,15 +442,74 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.all()
 			.statusCode(HttpStatus.OK.value())
 			.extract()
-			.as(RentalSpecsByItemResponse.class);
+			.as(EquipmentRentalSpecsResponse.class);
 
 		// then
 		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
-				new RentalSpecByItemResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
+				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
 					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
 					rentalSpec2.getStatus().name())
-				, new RentalSpecByItemResponse("정상 반납", rentalSpec1.getAcceptDateTime().toLocalDate(),
+				, new EquipmentRentalSpecResponse("정상 반납", rentalSpec1.getAcceptDateTime().toLocalDate(),
+					rentalSpec1.getReturnDateTime().toLocalDate(), reservation1.getName(),
+					rentalSpec1.getStatus().name())
+			);
+	}
+
+	@Test
+	@DisplayName("특정 자산번호의 반납된 사용이력을 조회한다.")
+	void getReturnsByPropertyNumberInclusive() {
+		// given
+		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+
+		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
+		final Reservation reservation1 = reservationRepository.save(
+			ReservationFixture.builder(List.of(reservationSpec1)).terminated(true).build());
+		final RentalDateTime now = RentalDateTime.now();
+		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
+			.reservationId(reservation1.getId())
+			.propertyNumber("11111111")
+			.acceptDateTime(now)
+			.returnDateTime(now.calculateDay(1))
+			.status(RentalSpecStatus.RETURNED)
+			.build();
+
+		final ReservationSpec reservationSpec2 = ReservationSpecFixture.create(equipment);
+		final Reservation reservation2 = reservationRepository.save(
+			ReservationFixture.builder(List.of(reservationSpec2)).terminated(true).build());
+		final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder()
+			.reservationId(reservation2.getId())
+			.propertyNumber("11111111")
+			.acceptDateTime(now.calculateDay(2))
+			.returnDateTime(now.calculateDay(3))
+			.status(RentalSpecStatus.LOST)
+			.build();
+
+		rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
+
+		// when
+		final EquipmentRentalSpecsResponse response = RestAssured.given(requestSpec)
+			.filter(document("getReturnsByPropertyNumberInclusive"))
+			.when()
+			.log()
+			.all()
+			.get("/api/admin/rentals/returns?propertyNumber={propertyNumber}&startDate={startDate}&endDate={endDate}",
+				rentalSpec1.getPropertyNumber(), now.toLocalDate().toString(),
+				now.calculateDay(3).toLocalDate().toString())
+			.then()
+			.log()
+			.all()
+			.statusCode(HttpStatus.OK.value())
+			.extract()
+			.as(EquipmentRentalSpecsResponse.class);
+
+		// then
+		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
+			.containsExactly(
+				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
+					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
+					rentalSpec2.getStatus().name())
+				, new EquipmentRentalSpecResponse("정상 반납", rentalSpec1.getAcceptDateTime().toLocalDate(),
 					rentalSpec1.getReturnDateTime().toLocalDate(), reservation1.getName(),
 					rentalSpec1.getStatus().name())
 			);

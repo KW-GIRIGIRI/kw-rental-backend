@@ -29,13 +29,13 @@ import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
@@ -228,11 +228,11 @@ public class RentalService {
 	}
 
 	@Transactional(readOnly = true)
-	public RentalSpecsByItemResponse getReturnedRentalSpecs(final String propertyNumber) {
+	public EquipmentRentalSpecsResponse getReturnedRentalSpecs(final String propertyNumber) {
 		final List<RentalSpecWithName> rentalSpecsWithName = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(
 			propertyNumber);
 		Collections.reverse(rentalSpecsWithName);
-		return RentalSpecsByItemResponse.from(rentalSpecsWithName);
+		return EquipmentRentalSpecsResponse.from(rentalSpecsWithName);
 	}
 
 	@Transactional
@@ -294,5 +294,14 @@ public class RentalService {
 	public Page<LabRoomReservationResponse> getLabRoomHistory(final String labRoomName, final LocalDate startDate,
 		final LocalDate endDate, Pageable pageable) {
 		return rentalSpecRepository.getReturnedLabRoomReservationResponse(labRoomName, startDate, endDate, pageable);
+	}
+
+	@Transactional(readOnly = true)
+	public EquipmentRentalSpecsResponse getReturnedRentalSpecsInclusive(final String propertyNumber,
+		final LocalDate startDate, final LocalDate endDate) {
+		List<RentalSpecWithName> rentalSpecWithNames = rentalSpecRepository.findTerminatedWithNameByPropertyAndInclusive(
+			propertyNumber, RentalDateTime.from(startDate), RentalDateTime.from(endDate));
+		Collections.reverse(rentalSpecWithNames);
+		return EquipmentRentalSpecsResponse.from(rentalSpecWithNames);
 	}
 }

@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
-import com.girigiri.kwrental.rental.dto.response.RentalSpecsByItemResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
@@ -70,8 +70,14 @@ public class AdminRentalController {
 	}
 
 	@GetMapping(value = "/returns", params = "propertyNumber")
-	public RentalSpecsByItemResponse getReturnsByPropertyNumber(final String propertyNumber) {
+	public EquipmentRentalSpecsResponse getReturnsByPropertyNumber(final String propertyNumber) {
 		return rentalService.getReturnedRentalSpecs(propertyNumber);
+	}
+
+	@GetMapping(value = "/returns", params = {"startDate", "endDate", "propertyNumber"})
+	public EquipmentRentalSpecsResponse getReturnsByPropertyNumberInclusive(final String propertyNumber,
+		final LocalDate startDate, final LocalDate endDate) {
+		return rentalService.getReturnedRentalSpecsInclusive(propertyNumber, startDate, endDate);
 	}
 
 	@PostMapping("/labRooms")
