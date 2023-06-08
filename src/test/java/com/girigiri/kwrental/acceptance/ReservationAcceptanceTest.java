@@ -97,7 +97,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.sessionId(sessionId)
 			.when().log().all().post("/api/reservations")
 			.then().log().all().statusCode(HttpStatus.CREATED.value())
-			.header(HttpHeaders.LOCATION, containsString("/api/reservations/"));
+			.header(HttpHeaders.LOCATION, containsString("/api/reservations"));
 	}
 
 	@Test

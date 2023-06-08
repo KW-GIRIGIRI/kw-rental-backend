@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.reservation.service;
 
+import static java.util.stream.Collectors.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -74,15 +76,15 @@ public class ReservationService {
 	}
 
 	@Transactional
-	public Long reserve(final Long memberId, final AddReservationRequest addReservationRequest) {
+	public void reserve(final Long memberId, final AddReservationRequest addReservationRequest) {
 		final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
 		final List<ReservationSpec> reservationSpecs = inventories.stream()
 			.filter(this::isAvailableCountValid)
 			.map(this::mapToReservationSpec)
 			.toList();
-		final Reservation reservation = mapToReservation(memberId, addReservationRequest, reservationSpecs);
+		final List<Reservation> reservations = mapToReservations(memberId, addReservationRequest, reservationSpecs);
 		inventoryService.deleteAll(memberId);
-		return reservationRepository.save(reservation).getId();
+		reservationRepository.saveAll(reservations);
 	}
 
 	private boolean isAvailableCountValid(final Inventory inventory) {
@@ -92,16 +94,27 @@ public class ReservationService {
 	}
 
 	private ReservationSpec mapToReservationSpec(final Inventory inventory) {
-		return ReservationSpec.builder().period(inventory.getRentalPeriod())
+		return ReservationSpec.builder()
+			.period(inventory.getRentalPeriod())
 			.amount(inventory.getRentalAmount())
 			.rentable(inventory.getRentable())
 			.build();
 	}
 
-	private Reservation mapToReservation(final Long memberId, final AddReservationRequest addReservationRequest,
+	private List<Reservation> mapToReservations(final Long memberId, final AddReservationRequest addReservationRequest,
 		final List<ReservationSpec> reservationSpecs) {
+		final Map<RentalPeriod, List<ReservationSpec>> collectByPeriod = reservationSpecs.stream()
+			.collect(groupingBy(ReservationSpec::getPeriod));
+		return collectByPeriod.keySet()
+			.stream()
+			.map(key -> mapToReservation(memberId, addReservationRequest, collectByPeriod.get(key)))
+			.toList();
+	}
+
+	private Reservation mapToReservation(final Long memberId, final AddReservationRequest addReservationRequest,
+		final List<ReservationSpec> samePeriodSpec) {
 		return Reservation.builder()
-			.reservationSpecs(reservationSpecs)
+			.reservationSpecs(samePeriodSpec)
 			.email(addReservationRequest.getRenterEmail())
 			.name(addReservationRequest.getRenterName())
 			.purpose(addReservationRequest.getRentalPurpose())
