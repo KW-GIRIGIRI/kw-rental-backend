@@ -26,21 +26,6 @@ class AssetRepositoryTest {
 	private EntityManager entityManager;
 
 	@Test
-	@DisplayName("대여 가능 갯수를 업데이트 한다.")
-	void updateRentableQuantity() {
-		// given
-		RentableAsset asset = assetRepository.save(
-			EquipmentFixture.builder().totalQuantity(1).rentableQuantity(1).build());
-
-		// when
-		assetRepository.updateRentableQuantity(asset.getId(), 2);
-
-		// then
-		entityManager.refresh(asset);
-		assertThat(asset.getRentableQuantity()).isEqualTo(2);
-	}
-
-	@Test
 	@DisplayName("자산응 삭제 처리한다.")
 	void deleteById() {
 		// given

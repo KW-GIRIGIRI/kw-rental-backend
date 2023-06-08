@@ -33,8 +33,8 @@ public class ReservationController {
 	@PostMapping
 	public ResponseEntity<?> reserve(@Login final SessionMember sessionMember,
 		@RequestBody final AddReservationRequest addReservationRequest) {
-		final Long id = reservationService.reserve(sessionMember.getId(), addReservationRequest);
-		return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
+		reservationService.reserve(sessionMember.getId(), addReservationRequest);
+		return ResponseEntity.created(URI.create("/api/reservations")).build();
 	}
 
 	@PostMapping("/labRooms")

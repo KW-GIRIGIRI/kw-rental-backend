@@ -12,10 +12,6 @@ import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
 
 public interface ItemQueryDslRepositoryCustom {
 
-    int updateRentalAvailable(Long id, boolean rentalAvailable);
-
-    int updatePropertyNumber(Long id, String propertyNumber);
-
     int countAvailable(Long equipmentId);
 
     List<Item> findByEquipmentIds(Set<Long> equipmentIds);
@@ -24,7 +20,7 @@ public interface ItemQueryDslRepositoryCustom {
 
     Page<EquipmentItemDto> findEquipmentItem(Pageable pageable, Category category);
 
-    int updateRentalAvailable(List<Long> ids, boolean available);
+    int updateAvailable(List<Long> ids, boolean available);
 
     int deleteByAssetId(Long assetId);
 

@@ -81,16 +81,6 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 		}
 	}
 
-	public void validateAdjustToRentableQuantity(int operand) {
-		final int adjustedRentableQuantity = this.rentableQuantity + operand;
-		if (adjustedRentableQuantity > this.totalQuantity) {
-			throw new RentableAssetException("대여 가능 갯수가 전체 갯수보다 클 수 없습니다.");
-		}
-		if (adjustedRentableQuantity < 0) {
-			throw new RentableAssetException("대여 가능 갯수가 0보다 작을 수 없습니다.");
-		}
-	}
-
 	@Override
 	public boolean isDeleted() {
 		return this.deletedAt != null;

@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.asset.equipment.domain;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
+import com.girigiri.kwrental.asset.exception.RentableAssetException;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -16,37 +17,62 @@ import lombok.Setter;
 @DiscriminatorValue("equipment")
 public class Equipment extends RentableAsset {
 
-    @Enumerated(EnumType.STRING)
-    private Category category;
+	@Enumerated(EnumType.STRING)
+	private Category category;
 
-    private String maker;
+	private String maker;
 
-    private String imgUrl;
+	private String imgUrl;
 
-    private String description;
+	private String description;
 
-    private String components;
+	private String components;
 
-    private String purpose;
+	private String purpose;
 
-    private String rentalPlace;
+	private String rentalPlace;
 
-    protected Equipment() {
-    }
+	protected Equipment() {
+	}
 
-    @Builder
-    public Equipment(final Long id, final Category category, final String maker, final String name,
-        final String imgUrl, final String description,
-        final String components, final String purpose, final String rentalPlace,
-        final Integer totalQuantity, final Integer rentableQuantity, final Integer maxRentalDays) {
-        super(id, name, totalQuantity, rentableQuantity, maxRentalDays);
-        validateNotNull(category, maker, imgUrl, rentalPlace);
-        this.category = category;
-        this.maker = maker;
-        this.imgUrl = imgUrl;
-        this.description = description;
-        this.components = components;
-        this.purpose = purpose;
-        this.rentalPlace = rentalPlace;
-    }
+	@Builder
+	public Equipment(final Long id, final Category category, final String maker, final String name,
+		final String imgUrl, final String description,
+		final String components, final String purpose, final String rentalPlace,
+		final Integer totalQuantity, final Integer rentableQuantity, final Integer maxRentalDays) {
+		super(id, name, totalQuantity, rentableQuantity, maxRentalDays);
+		validateNotNull(category, maker, imgUrl, rentalPlace);
+		this.category = category;
+		this.maker = maker;
+		this.imgUrl = imgUrl;
+		this.description = description;
+		this.components = components;
+		this.purpose = purpose;
+		this.rentalPlace = rentalPlace;
+	}
+
+	public void adjustToRentalQuantity(final int operand) {
+		validateAdjustToRentableQuantity(operand);
+		this.setRentableQuantity(this.getRentableQuantity() + operand);
+	}
+
+	private void validateAdjustToRentableQuantity(final int operand) {
+		final int adjustedRentableQuantity = this.getRentableQuantity() + operand;
+		if (adjustedRentableQuantity > this.getTotalQuantity()) {
+			throw new RentableAssetException("대여 가능 갯수가 전체 갯수보다 클 수 없습니다.");
+		}
+		if (adjustedRentableQuantity < 0) {
+			throw new RentableAssetException("대여 가능 갯수가 0보다 작을 수 없습니다.");
+		}
+	}
+
+	public void reduceTotalCount(final int count) {
+		if (getTotalQuantity() < count)
+			throw new RentableAssetException("전체 수량을 0이하로 줄일 수 없습니다.");
+		this.setTotalQuantity(this.getTotalQuantity() - count);
+	}
+
+	public void addTotalCount(final int count) {
+		this.setTotalQuantity(this.getTotalQuantity() + count);
+	}
 }

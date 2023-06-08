@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -37,53 +36,6 @@ class ItemQueryDslRepositoryCustomImplTest {
     private EntityManager entityManager;
     @Autowired
     private EquipmentRepository equipmentRepository;
-
-
-    @Test
-    @DisplayName("대여 가능여부 업데이트")
-    void updateRentalAvailable() {
-        // given
-        Item item = ItemFixture.create();
-        itemRepository.save(item);
-
-        // when
-        itemRepository.updateRentalAvailable(item.getId(), false);
-        entityManager.clear();
-
-        // then
-        assertThat(itemRepository.findById(item.getId()).get().isAvailable()).isFalse();
-    }
-
-    @Test
-    @DisplayName("자산 번호 수정")
-    void updatePropertyNumber() {
-        // given
-        Item item = ItemFixture.create();
-        itemRepository.save(item);
-
-        // when
-        String propertyNumber = "87654321";
-        itemRepository.updatePropertyNumber(item.getId(), propertyNumber);
-        entityManager.clear();
-
-        // then
-        assertThat(itemRepository.findById(item.getId()).get().getPropertyNumber()).isEqualTo(propertyNumber);
-    }
-
-    @Test
-    @DisplayName("중복된 자산 번호로 수정하려면 예외")
-    void updatePropertyNumber_duplicateKey() {
-        // given
-        String propertyNumber = "87654321";
-        Item item = ItemFixture.builder().propertyNumber("12345678").build();
-        Item item2 = ItemFixture.builder().propertyNumber(propertyNumber).build();
-        itemRepository.save(item);
-        itemRepository.save(item2);
-
-        // when, then
-        assertThatThrownBy(() -> itemRepository.updatePropertyNumber(item.getId(), propertyNumber))
-                .isInstanceOf(DataIntegrityViolationException.class);
-    }
 
     @Test
     @DisplayName("중복된 자산 번호로 더티체킹 될 경우 예외")
@@ -165,7 +117,7 @@ class ItemQueryDslRepositoryCustomImplTest {
         Item item3 = itemRepository.save(ItemFixture.builder().propertyNumber("33333333").available(false).build());
 
         // when
-        int actual = itemRepository.updateRentalAvailable(List.of(item1.getId(), item2.getId(), item3.getId()), false);
+        int actual = itemRepository.updateAvailable(List.of(item1.getId(), item2.getId(), item3.getId()), false);
 
         // then
         assertThat(actual).isEqualTo(3);

@@ -58,4 +58,8 @@ public class Item {
     public void setAvailable(final boolean available) {
         this.available = available;
     }
+
+    public void setPropertyNumber(final String propertyNumber) {
+        this.propertyNumber = propertyNumber;
+    }
 }

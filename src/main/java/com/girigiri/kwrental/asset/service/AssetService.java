@@ -44,11 +44,4 @@ public class AssetService {
         return assetRepository.findById(id)
             .orElseThrow(AssetNotFoundException::new);
     }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void adjustRentableQuantity(Long assetId, int operand) {
-        Rentable rentable = getRentableById(assetId);
-        rentable.validateAmountForRent(operand);
-        assetRepository.updateRentableQuantity(assetId, rentable.getRentableQuantity() + operand);
-    }
 }
