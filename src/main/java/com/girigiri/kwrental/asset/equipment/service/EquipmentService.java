@@ -161,13 +161,21 @@ public class EquipmentService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void adjustRentableQuantity(Long equipmentId, int operand) {
-		getEquipment(equipmentId);
-		assetService.adjustRentableQuantity(equipmentId, operand);
+		final Equipment equipment = getEquipment(equipmentId);
+		equipment.adjustToRentalQuantity(operand);
 	}
 
+	@Transactional(propagation = Propagation.MANDATORY)
 	public void adjustWhenItemDeleted(final int deletedCount, final int operandOfRentableQuantity, final Long id) {
-		Equipment equipment = getEquipment(id);
-		equipment.setTotalQuantity(equipment.getTotalQuantity() - deletedCount);
-		equipment.setRentableQuantity(equipment.getRentableQuantity() + operandOfRentableQuantity);
+		final Equipment equipment = getEquipment(id);
+		equipment.adjustToRentalQuantity(operandOfRentableQuantity);
+		equipment.reduceTotalCount(deletedCount);
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void adjustWhenItemSaved(final int savedCount, final Long equipmentId) {
+		final Equipment equipment = getEquipment(equipmentId);
+		equipment.addTotalCount(savedCount);
+		equipment.adjustToRentalQuantity(savedCount);
 	}
 }

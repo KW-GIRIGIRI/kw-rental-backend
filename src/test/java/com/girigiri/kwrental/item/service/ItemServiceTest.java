@@ -94,7 +94,7 @@ class ItemServiceTest {
 		given(itemRepository.findById(any())).willReturn(Optional.empty());
 
 		// when, then
-		assertThatThrownBy(() -> itemService.updateRentalAvailable(1L, false))
+		assertThatThrownBy(() -> itemService.updateAvailable(1L, false))
 			.isInstanceOf(ItemNotFoundException.class);
 	}
 
@@ -125,12 +125,11 @@ class ItemServiceTest {
 		given(itemRepository.saveAll(any())).willReturn(1);
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem));
+		doNothing().when(equipmentService).adjustWhenItemSaved(1, equipmentId);
 
 		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
 			updateItemRequest2.propertyNumber());
-		given(itemRepository.updatePropertyNumber(itemForUpdate.getId(), updateItemRequest2.propertyNumber()))
-			.willReturn(1);
 
 		// when
 		ItemsResponse itemsResponse = itemService.saveOrUpdate(equipmentId, updateItemsRequest);
@@ -155,15 +154,14 @@ class ItemServiceTest {
 		given(itemRepository.saveAll(any())).willReturn(1);
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem, itemForDelete));
+		doNothing().when(equipmentService).adjustWhenItemSaved(1, equipmentId);
 
 		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
 			updateItemRequest2.propertyNumber());
-		given(itemRepository.updatePropertyNumber(itemForUpdate.getId(), updateItemRequest2.propertyNumber()))
-			.willReturn(1);
 
 		given(itemRepository.deleteByPropertyNumbers(List.of(itemForDelete.getPropertyNumber()))).willReturn(1);
-		given(itemRepository.updateRentalAvailable(List.of(itemForDelete.getId()), false)).willReturn(1);
+		given(itemRepository.updateAvailable(List.of(itemForDelete.getId()), false)).willReturn(1);
 		doNothing().when(equipmentService).adjustWhenItemDeleted(1, -1, equipmentId);
 
 		// when

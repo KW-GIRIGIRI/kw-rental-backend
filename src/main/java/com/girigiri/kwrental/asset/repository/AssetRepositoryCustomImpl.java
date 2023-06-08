@@ -15,13 +15,6 @@ public class AssetRepositoryCustomImpl implements AssetRepositoryCustom {
 	}
 
 	@Override
-	public void updateRentableQuantity(final Long id, final int rentableQuantity) {
-		queryFactory.update(rentableAsset)
-			.set(rentableAsset.rentableQuantity, rentableQuantity)
-			.execute();
-	}
-
-	@Override
 	public void deleteById(final Long id) {
 		queryFactory.update(rentableAsset)
 			.set(rentableAsset.deletedAt, LocalDate.now())

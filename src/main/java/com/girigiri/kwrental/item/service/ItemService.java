@@ -59,15 +59,15 @@ public class ItemService {
 	}
 
 	@Transactional
-	public int updateRentalAvailable(final Long id, final boolean rentalAvailable) {
+	public void updateAvailable(final Long id, final boolean rentalAvailable) {
 		final Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
-		return updateRentalAvailableAndAdjustEquipment(rentalAvailable, item);
+		updateAvailableAndAdjustEquipment(rentalAvailable, item);
 	}
 
-	private int updateRentalAvailableAndAdjustEquipment(final boolean rentalAvailable, final Item item) {
-		int operand = getOperandOfRentableQuantity(item, rentalAvailable);
+	private void updateAvailableAndAdjustEquipment(final boolean available, final Item item) {
+		int operand = getOperandOfRentableQuantity(item, available);
+		item.setAvailable(available);
 		equipmentService.adjustRentableQuantity(item.getAssetId(), operand);
-		return itemRepository.updateRentalAvailable(item.getId(), rentalAvailable);
 	}
 
 	private int getOperandOfRentableQuantity(final Item item, final boolean rentalAvailable) {
@@ -82,10 +82,10 @@ public class ItemService {
 	}
 
 	@Transactional
-	public int updatePropertyNumber(final Long id, final String propertyNumber) {
+	public void updatePropertyNumber(final Long id, final String propertyNumber) {
 		Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
 		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumber);
-		return itemRepository.updatePropertyNumber(id, propertyNumber);
+		item.setPropertyNumber(propertyNumber);
 	}
 
 	@Transactional
@@ -115,6 +115,7 @@ public class ItemService {
 			return;
 		List<Item> itemsToSave = saveItemRequests.stream().map(it -> mapToItem(equipmentId, it)).toList();
 		itemRepository.saveAll(itemsToSave);
+		equipmentService.adjustWhenItemSaved(itemsToSave.size(), equipmentId);
 	}
 
 	private EquipmentItems getEquipmentItems(final Long equipmentId) {
@@ -122,14 +123,12 @@ public class ItemService {
 		return EquipmentItems.from(items);
 	}
 
-
 	private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
 		if (updateItemRequests == null)
 			return;
 		for (UpdateItemRequest request : updateItemRequests) {
 			final Item item = equipmentItems.getItem(request.id());
 			updatePropertyNumber(item.getId(), request.propertyNumber());
-			equipmentItems.updatePropertyNumberById(item.getId(), request.propertyNumber());
 		}
 	}
 
@@ -144,7 +143,7 @@ public class ItemService {
 		int operandSumOfRentableQuantity = itemToRemove.stream()
 			.mapToInt(item -> getOperandOfRentableQuantity(item, false))
 			.sum();
-		itemRepository.updateRentalAvailable(itemToRemove.stream().map(Item::getId).toList(), false);
+		itemRepository.updateAvailable(itemToRemove.stream().map(Item::getId).toList(), false);
 		equipmentService.adjustWhenItemDeleted(deletedCount, operandSumOfRentableQuantity, equipmentId);
 		equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
 	}
@@ -163,7 +162,8 @@ public class ItemService {
 	}
 
 	private Item mapToItem(final Long equipmentId, final UpdateItemRequest updateItemRequest) {
-		return Item.builder().propertyNumber(updateItemRequest.propertyNumber()).assetId(equipmentId).build();
+		return Item.builder().propertyNumber(updateItemRequest.propertyNumber()).available(true)
+			.assetId(equipmentId).build();
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -203,7 +203,7 @@ public class ItemService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void setAvailable(final String propertyNumber, final boolean available) {
 		Item item = itemRepository.findByPropertyNumber(propertyNumber).orElseThrow(ItemNotFoundException::new);
-		updateRentalAvailableAndAdjustEquipment(available, item);
+		updateAvailableAndAdjustEquipment(available, item);
 	}
 
 	@Transactional(readOnly = true)
@@ -247,6 +247,6 @@ public class ItemService {
 			.filter(item -> item.isAvailable() == available)
 			.map(Item::getId)
 			.toList();
-		return itemRepository.updateRentalAvailable(ids, available);
+		return itemRepository.updateAvailable(ids, available);
 	}
 }

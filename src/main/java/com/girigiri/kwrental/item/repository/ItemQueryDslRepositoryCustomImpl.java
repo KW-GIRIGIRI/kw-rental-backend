@@ -29,22 +29,6 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 	}
 
 	@Override
-	public int updateRentalAvailable(final Long id, final boolean available) {
-		return (int)queryFactory.update(item)
-			.where(item.id.eq(id))
-			.set(item.available, available)
-			.execute();
-	}
-
-	@Override
-	public int updatePropertyNumber(final Long id, final String propertyNumber) {
-		return (int)queryFactory.update(item)
-			.where(item.id.eq(id))
-			.set(item.propertyNumber, propertyNumber)
-			.execute();
-	}
-
-	@Override
 	public int countAvailable(final Long equipmentId) {
 		return Objects.requireNonNull(queryFactory.select(item.count())
 			.from(item)
@@ -79,7 +63,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 	}
 
 	@Override
-	public int updateRentalAvailable(List<Long> ids, boolean available) {
+	public int updateAvailable(List<Long> ids, boolean available) {
 		return (int)queryFactory.update(item)
 			.set(item.available, available)
 			.where(item.id.in(ids))

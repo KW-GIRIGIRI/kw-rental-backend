@@ -41,7 +41,7 @@ public class AdminItemController {
     @PatchMapping("/{id}/rentalAvailable")
     public ResponseEntity<?> updateRentalAvailable(@PathVariable final Long id,
                                                    @RequestBody ItemRentalAvailableRequest rentalAvailableRequest) {
-        itemService.updateRentalAvailable(id, rentalAvailableRequest.rentalAvailable());
+        itemService.updateAvailable(id, rentalAvailableRequest.rentalAvailable());
         return ResponseEntity.noContent().build();
     }
 
