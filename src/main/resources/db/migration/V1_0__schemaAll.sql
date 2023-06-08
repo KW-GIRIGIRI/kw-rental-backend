@@ -38,7 +38,7 @@ CREATE TABLE if not exists `inventory`
   AUTO_INCREMENT = 73
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `item`
+CREATE TABLE if not exists `item`
 (
     `id`              bigint      NOT NULL AUTO_INCREMENT,
     `available`       tinyint(1)  NOT NULL DEFAULT '1',
@@ -52,7 +52,7 @@ CREATE TABLE `item`
   AUTO_INCREMENT = 33
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `member`
+CREATE TABLE if not exists `member`
 (
     `id`            bigint       NOT NULL AUTO_INCREMENT,
     `birth_date`    varchar(10)  NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `member`
   AUTO_INCREMENT = 6
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `penalty`
+CREATE TABLE if not exists `penalty`
 (
     `id`                  bigint      NOT NULL AUTO_INCREMENT,
     `member_id`           bigint      NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE `penalty`
   AUTO_INCREMENT = 36
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `rental_spec`
+CREATE TABLE if not exists `rental_spec`
 (
     `id`                  bigint       NOT NULL AUTO_INCREMENT,
     `accept_date_time`    timestamp(6) NULL DEFAULT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE `rental_spec`
   AUTO_INCREMENT = 56
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `reservation`
+CREATE TABLE if not exists `reservation`
 (
     `id`               bigint       NOT NULL AUTO_INCREMENT,
     `accept_date_time` timestamp(6) NULL DEFAULT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE `reservation`
   AUTO_INCREMENT = 108
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `reservation_spec`
+CREATE TABLE if not exists `reservation_spec`
 (
     `id`                bigint      NOT NULL AUTO_INCREMENT,
     `amount`            int         NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE `reservation_spec`
   AUTO_INCREMENT = 121
   DEFAULT CHARSET = utf8mb3;
 
-CREATE TABLE `lab_room_daily_ban`
+CREATE TABLE if not exists `lab_room_daily_ban`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT,
     `ban_date`    date   NOT NULL,
