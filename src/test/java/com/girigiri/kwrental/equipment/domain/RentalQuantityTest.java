@@ -1,10 +1,12 @@
 package com.girigiri.kwrental.equipment.domain;
 
-import com.girigiri.kwrental.equipment.exception.RentalQuantityException;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import com.girigiri.kwrental.asset.equipment.domain.RentalQuantity;
+import com.girigiri.kwrental.asset.equipment.exception.RentalQuantityException;
 
 class RentalQuantityTest {
 

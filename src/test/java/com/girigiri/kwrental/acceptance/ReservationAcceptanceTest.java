@@ -108,7 +108,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable asset = assetRepository.save(LabRoomFixture.builder().name("hanul").totalQuantity(16).build());
+		final Rentable asset = assetRepository.save(
+			LabRoomFixture.builder().name("hanul").totalQuantity(16).rentableQuantity(16).build());
 
 		final AddLabRoomReservationRequest request = AddLabRoomReservationRequest.builder()
 			.renterName("대여자")

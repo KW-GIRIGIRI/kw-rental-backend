@@ -26,10 +26,10 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
@@ -128,11 +128,11 @@ class ReservationSpecRepositoryTest {
 	void findRentalAmountsByEquipmentIds() {
 		// given
 		final Rentable equipment1 = assetRepository.save(
-			EquipmentFixture.builder().name("모델이름1").totalQuantity(4).build());
+			EquipmentFixture.builder().name("모델이름1").totalQuantity(4).rentableQuantity(3).build());
 		final Rentable equipment2 = assetRepository.save(
-			EquipmentFixture.builder().name("모델이름2").totalQuantity(4).build());
+			EquipmentFixture.builder().name("모델이름2").totalQuantity(4).rentableQuantity(2).build());
 		final Rentable equipment3 = assetRepository.save(
-			EquipmentFixture.builder().name("모델이름3").totalQuantity(4).build());
+			EquipmentFixture.builder().name("모델이름3").totalQuantity(4).rentableQuantity(2).build());
 
 		final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
 		final ReservationSpec reservationSpec1 = rentalSpec1Builder.amount(RentalAmount.ofPositive(2))
@@ -153,9 +153,9 @@ class ReservationSpecRepositoryTest {
 			List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
 
 		// then
-		final ReservedAmount reservedAmount1 = new ReservedAmount(equipment1.getId(), 4, 3);
-		final ReservedAmount reservedAmount2 = new ReservedAmount(equipment2.getId(), 4, 0);
-		final ReservedAmount reservedAmount3 = new ReservedAmount(equipment3.getId(), 4, 0);
+		final ReservedAmount reservedAmount1 = new ReservedAmount(equipment1.getId(), 3, 3);
+		final ReservedAmount reservedAmount2 = new ReservedAmount(equipment2.getId(), 2, 0);
+		final ReservedAmount reservedAmount3 = new ReservedAmount(equipment3.getId(), 2, 0);
 		assertAll(
 			() -> assertThat(expect).hasSize(3),
 			() -> assertThat(expect.get(0)).usingRecursiveComparison().isEqualTo(reservedAmount1),
@@ -568,5 +568,25 @@ class ReservationSpecRepositoryTest {
 			.isEqualTo(
 				new HistoryStatResponse(labRoom1.getName(), 2,
 					reservationSpec1.getAmount().getAmount() + reservationSpec6.getAmount().getAmount(), 1));
+	}
+
+	@Test
+	@DisplayName("특정 기자재의 대여 예약 상세를 조회한다.")
+	void findByAssetId() {
+		// given
+		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final ReservationSpec spec1 = ReservationSpecFixture.create(equipment1);
+		reservationRepository.save(ReservationFixture.create(List.of(spec1)));
+		final ReservationSpec spec2 = ReservationSpecFixture.create(equipment2);
+		reservationRepository.save(ReservationFixture.create(List.of(spec2)));
+
+		// when
+		final List<ReservationSpec> actual = reservationSpecRepository.findReservedOrRentedByAssetId(
+			equipment1.getId());
+
+		// then
+		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyInAnyOrder(spec1);
 	}
 }

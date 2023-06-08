@@ -17,14 +17,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.asset.labroom.exception.LabRoomNotAvailableException;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
-import com.girigiri.kwrental.labroom.exception.LabRoomNotAvailableException;
-import com.girigiri.kwrental.labroom.service.LabRoomService;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -352,5 +352,21 @@ public class ReservationService {
 	@Transactional(readOnly = true)
 	public ReservationPurposeResponse getPurpose(Long id) {
 		return new ReservationPurposeResponse(getReservationById(id).getPurpose());
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void cancelByAssetId(Long assetId) {
+		List<ReservationSpec> reservedOrRentedSpecs = reservationSpecRepository.findReservedOrRentedByAssetId(
+			assetId);
+		validateAllReserved(reservedOrRentedSpecs);
+		reservedOrRentedSpecs
+			.forEach(spec -> cancelReservationSpec(spec.getId(), spec.getAmount().getAmount()));
+	}
+
+	private void validateAllReserved(List<ReservationSpec> reservedOrRentedSpecs) {
+		boolean anyRented = reservedOrRentedSpecs.stream()
+			.anyMatch(ReservationSpec::isRented);
+		if (anyRented)
+			throw new ReservationSpecException("대여 중인 대여 예약 상세는 취소할 수 없습니다.");
 	}
 }

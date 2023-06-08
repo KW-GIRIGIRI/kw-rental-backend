@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
@@ -107,5 +107,10 @@ public class InventoryService {
             throw new InventoryNotFoundException();
         }
         return inventories;
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void deleteByEquipmentId(Long equipmentId) {
+        inventoryRepository.deleteByEquipmentId(equipmentId);
     }
 }

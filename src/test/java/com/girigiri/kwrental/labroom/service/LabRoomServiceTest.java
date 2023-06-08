@@ -14,11 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountPerDateResponse;
+import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountsPerDateResponse;
+import com.girigiri.kwrental.asset.labroom.repository.LabRoomRepository;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
-import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountPerDateResponse;
-import com.girigiri.kwrental.labroom.dto.response.RemainReservationCountsPerDateResponse;
-import com.girigiri.kwrental.labroom.repository.LabRoomRepository;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 
 @ExtendWith(MockitoExtension.class)

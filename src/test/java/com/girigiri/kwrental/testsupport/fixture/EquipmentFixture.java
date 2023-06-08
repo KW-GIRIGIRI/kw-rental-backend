@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.domain.Equipment.EquipmentBuilder;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment.EquipmentBuilder;
 
 public class EquipmentFixture {
     private static final String modelName = "modelName";
@@ -16,20 +16,21 @@ public class EquipmentFixture {
 
     public static EquipmentBuilder builder() {
         return Equipment.builder()
-                .category(Category.CAMERA)
-                .maker(maker)
-                .name(modelName)
-                .totalQuantity(totalQuantity)
-                .imgUrl(imgUrl)
-                .description(description)
-                .components(components)
-                .purpose(purpose)
-                .rentalPlace(rentalPlace)
-                .maxRentalDays(1);
+            .category(Category.CAMERA)
+            .maker(maker)
+            .name(modelName)
+            .totalQuantity(totalQuantity)
+            .rentableQuantity(totalQuantity)
+            .imgUrl(imgUrl)
+            .description(description)
+            .components(components)
+            .purpose(purpose)
+            .rentalPlace(rentalPlace)
+            .maxRentalDays(1);
     }
 
     public static Equipment create() {
         return builder()
-                .build();
+            .build();
     }
 }

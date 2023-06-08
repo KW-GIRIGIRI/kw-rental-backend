@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.asset.labroom.repository.LabRoomRepository;
 import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 
 import jakarta.persistence.EntityManager;

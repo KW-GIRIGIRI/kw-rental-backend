@@ -1,86 +1,120 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.equipment.domain.Category;
+import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
+import static com.girigiri.kwrental.item.domain.QItem.*;
+import static com.girigiri.kwrental.util.QueryDSLUtils.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import static com.girigiri.kwrental.equipment.domain.QEquipment.equipment;
-import static com.girigiri.kwrental.item.domain.QItem.item;
-import static com.girigiri.kwrental.util.QueryDSLUtils.isEqualTo;
-import static com.girigiri.kwrental.util.QueryDSLUtils.setPageable;
 
 public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryCustom {
 
-    private final JPAQueryFactory jpaQueryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public ItemQueryDslRepositoryCustomImpl(final JPAQueryFactory jpaQueryFactory) {
-        this.jpaQueryFactory = jpaQueryFactory;
-    }
+	public ItemQueryDslRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
+		this.queryFactory = queryFactory;
+	}
 
-    @Override
-    public int updateRentalAvailable(final Long id, final boolean available) {
-        return (int) jpaQueryFactory.update(item)
-                .where(item.id.eq(id))
-                .set(item.available, available)
-                .execute();
-    }
+	@Override
+	public int updateRentalAvailable(final Long id, final boolean available) {
+		return (int)queryFactory.update(item)
+			.where(item.id.eq(id))
+			.set(item.available, available)
+			.execute();
+	}
 
-    @Override
-    public int updatePropertyNumber(final Long id, final String propertyNumber) {
-        return (int) jpaQueryFactory.update(item)
-                .where(item.id.eq(id))
-                .set(item.propertyNumber, propertyNumber)
-                .execute();
-    }
+	@Override
+	public int updatePropertyNumber(final Long id, final String propertyNumber) {
+		return (int)queryFactory.update(item)
+			.where(item.id.eq(id))
+			.set(item.propertyNumber, propertyNumber)
+			.execute();
+	}
 
-    @Override
-    public int countAvailable(final Long equipmentId) {
-        return Objects.requireNonNull(jpaQueryFactory.select(item.count())
-                .from(item)
-                .where(item.assetId.eq(equipmentId).and(item.available.isTrue()))
-                .fetchOne()).intValue();
-    }
+	@Override
+	public int countAvailable(final Long equipmentId) {
+		return Objects.requireNonNull(queryFactory.select(item.count())
+			.from(item)
+			.where(item.assetId.eq(equipmentId), item.available.isTrue(), item.deletedAt.isNull())
+			.fetchOne()).intValue();
+	}
 
-    @Override
-    public List<Item> findByEquipmentIds(final Set<Long> equipmentIds) {
-        return jpaQueryFactory.selectFrom(item)
-                .where(item.assetId.in(equipmentIds))
-                .fetch();
-    }
+	@Override
+	public List<Item> findByEquipmentIds(final Set<Long> equipmentIds) {
+		return queryFactory.selectFrom(item)
+			.where(item.assetId.in(equipmentIds), item.deletedAt.isNull())
+			.fetch();
+	}
 
-    @Override
-    public long deleteByPropertyNumbers(final List<String> propertyNumbers) {
-        return jpaQueryFactory.delete(item)
-                .where(item.propertyNumber.in(propertyNumbers))
-                .execute();
-    }
+	@Override
+	public int deleteByPropertyNumbers(final List<String> propertyNumbers) {
+		return (int)queryFactory.update(item)
+			.set(item.deletedAt, LocalDate.now())
+			.where(item.propertyNumber.in(propertyNumbers))
+			.execute();
+	}
 
-    @Override
-    public Page<EquipmentItemDto> findEquipmentItem(final Pageable pageable, final Category category) {
-        final JPAQuery<EquipmentItemDto> query = jpaQueryFactory.select(Projections.constructor(EquipmentItemDto.class, equipment.name, equipment.category, item.propertyNumber))
-                .from(item)
-                .join(equipment).on(equipment.id.eq(item.assetId))
-                .where(isEqualTo(category, equipment.category));
-        setPageable(query, item, pageable);
-        return new PageImpl<>(query.fetch(), pageable, countBy(query));
-    }
+	@Override
+	public Page<EquipmentItemDto> findEquipmentItem(final Pageable pageable, final Category category) {
+		final JPAQuery<EquipmentItemDto> query = queryFactory.select(
+				Projections.constructor(EquipmentItemDto.class, equipment.name, equipment.category, item.propertyNumber))
+			.from(item)
+			.join(equipment).on(equipment.id.eq(item.assetId))
+			.where(isEqualTo(category, equipment.category), item.deletedAt.isNull());
+		setPageable(query, item, pageable);
+		return new PageImpl<>(query.fetch(), pageable, countBy(query));
+	}
 
-    private long countBy(final JPAQuery<?> query) {
-        final Long count = jpaQueryFactory.select(item.count())
-                .from(item)
-                .join(equipment).on(equipment.id.eq(item.assetId))
-                .where(query.getMetadata().getWhere())
-                .fetchOne();
-        return count == null ? 0 : count;
-    }
+	@Override
+	public int updateRentalAvailable(List<Long> ids, boolean available) {
+		return (int)queryFactory.update(item)
+			.set(item.available, available)
+			.where(item.id.in(ids))
+			.execute();
+	}
+
+	private long countBy(final JPAQuery<?> query) {
+		final Long count = queryFactory.select(item.count())
+			.from(item)
+			.join(equipment).on(equipment.id.eq(item.assetId))
+			.where(query.getMetadata().getWhere())
+			.fetchOne();
+		return count == null ? 0 : count;
+	}
+
+	@Override
+	public int deleteByAssetId(final Long assetId) {
+		return (int)queryFactory.update(item)
+			.set(item.deletedAt, LocalDate.now())
+			.where(item.assetId.eq(assetId))
+			.execute();
+	}
+
+	@Override
+	public int deleteById(Long id) {
+		return (int)queryFactory.update(item)
+			.set(item.deletedAt, LocalDate.now())
+			.where(item.id.eq(id))
+			.execute();
+	}
+
+	@Override
+	public List<Item> findByAssetId(Long assetId) {
+		return queryFactory.selectFrom(item)
+			.where(item.assetId.eq(assetId), item.deletedAt.isNull())
+			.fetch();
+	}
 }

@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.item.dto.response;
 
-import com.girigiri.kwrental.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+
 import lombok.Getter;
 
 @Getter

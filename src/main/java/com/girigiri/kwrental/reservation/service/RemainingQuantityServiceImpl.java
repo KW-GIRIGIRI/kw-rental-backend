@@ -18,9 +18,8 @@ import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.AmountValidator;
 import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
+import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
-import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 
 @Service
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
@@ -52,13 +51,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 		for (LocalDate i = rentalPeriod.getRentalStartDate(); i.isBefore(
 			rentalPeriod.getRentalEndDate()); i = i.plusDays(1)) {
 			final int rentedAmountByDate = sumRentedAmountByDate(overlappedReservationSpecs, i);
-			validateTotalAmount(amount + rentedAmountByDate, rentable);
-		}
-	}
-
-	private void validateTotalAmount(final Integer amount, final Rentable rentable) {
-		if (amount > rentable.getTotalQuantity()) {
-			throw new NotEnoughAmountException();
+			rentable.validateAmountForRent(amount + rentedAmountByDate);
 		}
 	}
 

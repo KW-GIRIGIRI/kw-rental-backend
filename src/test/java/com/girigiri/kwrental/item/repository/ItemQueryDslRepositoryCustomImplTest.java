@@ -1,15 +1,10 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.equipment.domain.Category;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
-import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +14,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
+import com.girigiri.kwrental.asset.equipment.domain.Category;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 @DataJpaTest
 @Import(JpaConfig.class)
@@ -148,10 +149,25 @@ class ItemQueryDslRepositoryCustomImplTest {
         // then
         final String modelName = equipment.getName();
         assertAll(
-                () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
-                () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactly(new EquipmentItemDto(modelName, category, item1.getPropertyNumber()),
-                                new EquipmentItemDto(modelName, category, item2.getPropertyNumber()))
+            () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
+            () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new EquipmentItemDto(modelName, category, item1.getPropertyNumber()),
+                    new EquipmentItemDto(modelName, category, item2.getPropertyNumber()))
         );
+    }
+
+    @Test
+    @DisplayName("여러 품목을 비활성화한다.")
+    void updateRentalAvailable_ids() {
+        // given
+        Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").build());
+        Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").build());
+        Item item3 = itemRepository.save(ItemFixture.builder().propertyNumber("33333333").available(false).build());
+
+        // when
+        int actual = itemRepository.updateRentalAvailable(List.of(item1.getId(), item2.getId(), item3.getId()), false);
+
+        // then
+        assertThat(actual).isEqualTo(3);
     }
 }

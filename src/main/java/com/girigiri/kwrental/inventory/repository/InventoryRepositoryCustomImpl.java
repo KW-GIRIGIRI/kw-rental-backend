@@ -1,14 +1,14 @@
 package com.girigiri.kwrental.inventory.repository;
 
-import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import static com.girigiri.kwrental.inventory.domain.QInventory.*;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.girigiri.kwrental.inventory.domain.QInventory.inventory;
+import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom {
 
@@ -55,8 +55,15 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public void updateAmount(final Long id, final RentalAmount amount) {
         jpaQueryFactory.update(inventory)
-                .set(inventory.rentalAmount, amount)
-                .where(inventory.id.eq(id))
-                .execute();
+            .set(inventory.rentalAmount, amount)
+            .where(inventory.id.eq(id))
+            .execute();
+    }
+
+    @Override
+    public void deleteByEquipmentId(Long assetId) {
+        jpaQueryFactory.delete(inventory)
+            .where(inventory.rentable.id.eq(assetId))
+            .execute();
     }
 }

@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
+import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.auth.domain.QMember.*;
-import static com.girigiri.kwrental.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.reservation.domain.QReservation.*;
 import static com.girigiri.kwrental.reservation.domain.QReservationSpec.*;
 import static com.querydsl.core.group.GroupBy.*;
@@ -13,17 +13,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.repository.dto.QReservedAmount;
-import com.girigiri.kwrental.reservation.repository.dto.ReservedAmount;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -71,10 +70,8 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
 		return queryFactory
-			.select(
-				new QReservedAmount(equipment.id, equipment.totalQuantity,
-					reservationSpec.amount.amount.sum().coalesce(0))
-			)
+			.select(Projections.constructor(ReservedAmount.class, equipment.id, equipment.rentableQuantity,
+				reservationSpec.amount.amount.sum().coalesce(0)))
 			.from(reservationSpec)
 			.rightJoin(equipment).on(reservationSpec.rentable.id.eq(equipment.id).
 				and(reservationSpec.period.rentalStartDate.loe(date))
@@ -197,6 +194,15 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 					reservationSpec.amount.amount.sum(),
 					Expressions.constant(abnormalCount)))
 			.fetchOne();
+	}
+
+	@Override
+	public List<ReservationSpec> findReservedOrRentedByAssetId(Long assetId) {
+		return queryFactory.selectFrom(reservationSpec)
+			.join(reservation).fetchJoin()
+			.where(reservationSpec.rentable.id.eq(assetId),
+				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED))
+			.fetch();
 	}
 
 	private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(

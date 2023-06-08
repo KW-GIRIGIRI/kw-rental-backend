@@ -1,33 +1,33 @@
 package com.girigiri.kwrental.asset;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
-import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.common.exception.EntityCastException;
-import com.girigiri.kwrental.equipment.domain.Equipment;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.common.exception.EntityCastException;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 class RentableAssetTest {
 
     @Test
     @DisplayName("대여일만큼 대여할 수 잇는지 판단한다.")
     void canRentFor() {
-        // given
-        final RentableAsset rentableAsset = EquipmentFixture.builder().maxRentalDays(2).build();
+	    // given
+	    final RentableAsset rentableAsset = EquipmentFixture.builder().maxRentalDays(2).build();
 
-        // when
-        final boolean biggerInput = rentableAsset.canRentFor(3);
-        final boolean sameInput = rentableAsset.canRentFor(2);
-        final boolean smallerInput = rentableAsset.canRentFor(1);
+	    // when
+	    final boolean biggerInput = rentableAsset.canRentDaysFor(3);
+	    final boolean sameInput = rentableAsset.canRentDaysFor(2);
+	    final boolean smallerInput = rentableAsset.canRentDaysFor(1);
 
-        // then
-        assertThat(biggerInput).isFalse();
-        assertThat(sameInput).isTrue();
-        assertThat(smallerInput).isTrue();
+	    // then
+	    assertThat(biggerInput).isFalse();
+	    assertThat(sameInput).isTrue();
+	    assertThat(smallerInput).isTrue();
     }
 
     @Test

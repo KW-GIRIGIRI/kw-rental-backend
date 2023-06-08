@@ -1,11 +1,12 @@
 package com.girigiri.kwrental.inventory.dto.response;
 
-import com.girigiri.kwrental.equipment.domain.Equipment;
+import java.time.LocalDate;
+
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.inventory.domain.Inventory;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
 
 @Getter
 @Builder
