@@ -48,7 +48,7 @@ public class AdminItemController {
     @PatchMapping("/{id}/propertyNumber")
     public ResponseEntity<?> updatePropertyNumber(@PathVariable final Long id,
                                                   @RequestBody ItemPropertyNumberRequest propertyNumberRequest) {
-        itemService.updatePropertyNumber(id, propertyNumberRequest);
+        itemService.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
         return ResponseEntity.noContent().build();
     }
 

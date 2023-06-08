@@ -14,28 +14,29 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 public class EquipmentRepositoryCustomImpl implements EquipmentRepositoryCustom {
 
-    private final JPAQueryFactory jpaQueryFactory;
+	private final JPAQueryFactory queryFactory;
 
-    public EquipmentRepositoryCustomImpl(final JPAQueryFactory jpaQueryFactory) {
-        this.jpaQueryFactory = jpaQueryFactory;
-    }
+	public EquipmentRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
+		this.queryFactory = queryFactory;
+	}
 
-    @Override
-    public Page<Equipment> findEquipmentBy(final Pageable pageable, final String keyword, final Category category) {
-        final JPAQuery<Equipment> query = jpaQueryFactory.selectFrom(equipment)
-                .where(
-                        isContains(keyword, equipment.name),
-                        isEqualTo(category, equipment.category)
-                );
-        setPageable(query, equipment, pageable);
-        return new PageImpl<>(query.fetch(), pageable, countBy(query));
-    }
+	@Override
+	public Page<Equipment> findEquipmentBy(final Pageable pageable, final String keyword, final Category category) {
+		final JPAQuery<Equipment> query = queryFactory.selectFrom(equipment)
+			.where(
+				isContains(keyword, equipment.name),
+				isEqualTo(category, equipment.category),
+				equipment.deletedAt.isNull()
+			);
+		setPageable(query, equipment, pageable);
+		return new PageImpl<>(query.fetch(), pageable, countBy(query));
+	}
 
-    private long countBy(final JPAQuery<?> query) {
-        final Long count = jpaQueryFactory.select(equipment.count())
-                .from(equipment)
-                .where(query.getMetadata().getWhere())
-                .fetchOne();
-        return count == null ? 0 : count;
-    }
+	private long countBy(final JPAQuery<?> query) {
+		final Long count = queryFactory.select(equipment.count())
+			.from(equipment)
+			.where(query.getMetadata().getWhere())
+			.fetchOne();
+		return count == null ? 0 : count;
+	}
 }

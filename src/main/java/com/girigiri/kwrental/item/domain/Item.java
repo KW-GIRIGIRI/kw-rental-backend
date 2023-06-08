@@ -1,13 +1,19 @@
 package com.girigiri.kwrental.item.domain;
 
+import java.time.LocalDate;
+
 import com.girigiri.kwrental.item.exception.ItemException;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 
 @Entity
 @Getter
-@Builder
 public class Item {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +29,23 @@ public class Item {
     @Column(nullable = false)
     private Long assetId;
 
+    private LocalDate deletedAt;
+
     protected Item() {
     }
 
-    public Item(final Long id, final String propertyNumber, final boolean available, final Long assetId) {
+    @Builder
+    private Item(final Long id, final String propertyNumber, final boolean available, final Long assetId,
+        final LocalDate deletedAt) {
         this.id = id;
         this.propertyNumber = propertyNumber;
         this.available = available;
         this.assetId = assetId;
+        this.deletedAt = deletedAt;
+    }
+
+    public Item(final Long id, final String propertyNumber, final boolean available, final Long assetId) {
+        this(id, propertyNumber, available, assetId, null);
     }
 
     public void updatePropertyNumber(String propertyNumber) {

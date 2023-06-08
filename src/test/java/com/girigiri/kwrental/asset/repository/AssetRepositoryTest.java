@@ -2,6 +2,7 @@ package com.girigiri.kwrental.asset.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,6 +26,7 @@ class AssetRepositoryTest {
 	private EntityManager entityManager;
 
 	@Test
+	@DisplayName("대여 가능 갯수를 업데이트 한다.")
 	void updateRentableQuantity() {
 		// given
 		RentableAsset asset = assetRepository.save(
@@ -36,5 +38,20 @@ class AssetRepositoryTest {
 		// then
 		entityManager.refresh(asset);
 		assertThat(asset.getRentableQuantity()).isEqualTo(2);
+	}
+
+	@Test
+	@DisplayName("자산응 삭제 처리한다.")
+	void deleteById() {
+		// given
+		RentableAsset asset = assetRepository.save(
+			EquipmentFixture.builder().totalQuantity(1).rentableQuantity(1).build());
+
+		// when
+		assetRepository.deleteById(asset.getId());
+
+		// then
+		entityManager.refresh(asset);
+		assertThat(asset.getDeletedAt()).isNotNull();
 	}
 }

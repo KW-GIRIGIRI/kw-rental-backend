@@ -149,10 +149,25 @@ class ItemQueryDslRepositoryCustomImplTest {
         // then
         final String modelName = equipment.getName();
         assertAll(
-                () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
-                () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()
-                        .containsExactly(new EquipmentItemDto(modelName, category, item1.getPropertyNumber()),
-                                new EquipmentItemDto(modelName, category, item2.getPropertyNumber()))
+            () -> assertThat(equipmentItem.getTotalElements()).isEqualTo(2L),
+            () -> assertThat(equipmentItem.getContent()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new EquipmentItemDto(modelName, category, item1.getPropertyNumber()),
+                    new EquipmentItemDto(modelName, category, item2.getPropertyNumber()))
         );
+    }
+
+    @Test
+    @DisplayName("여러 품목을 비활성화한다.")
+    void updateRentalAvailable_ids() {
+        // given
+        Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").build());
+        Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").build());
+        Item item3 = itemRepository.save(ItemFixture.builder().propertyNumber("33333333").available(false).build());
+
+        // when
+        int actual = itemRepository.updateRentalAvailable(List.of(item1.getId(), item2.getId(), item3.getId()), false);
+
+        // then
+        assertThat(actual).isEqualTo(3);
     }
 }

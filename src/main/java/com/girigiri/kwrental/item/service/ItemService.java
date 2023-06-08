@@ -18,7 +18,6 @@ import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
-import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
@@ -45,10 +44,6 @@ public class ItemService {
 		this.rentedItemService = rentedItemService;
 	}
 
-	private static boolean canRentalAvailable(final Set<String> rentedPropertyNumbers, final Item it) {
-		return !rentedPropertyNumbers.contains(it.getPropertyNumber()) && it.isAvailable();
-	}
-
 	@Transactional(readOnly = true)
 	public ItemsResponse getItems(final Long equipmentId) {
 		equipmentService.validateExistsById(equipmentId);
@@ -65,11 +60,14 @@ public class ItemService {
 
 	@Transactional
 	public int updateRentalAvailable(final Long id, final boolean rentalAvailable) {
-		final Item item = itemRepository.findById(id)
-			.orElseThrow(ItemNotFoundException::new);
+		final Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
+		return updateRentalAvailableAndAdjustEquipment(rentalAvailable, item);
+	}
+
+	private int updateRentalAvailableAndAdjustEquipment(final boolean rentalAvailable, final Item item) {
 		int operand = getOperandOfRentableQuantity(item, rentalAvailable);
 		equipmentService.adjustRentableQuantity(item.getAssetId(), operand);
-		return itemRepository.updateRentalAvailable(id, rentalAvailable);
+		return itemRepository.updateRentalAvailable(item.getId(), rentalAvailable);
 	}
 
 	private int getOperandOfRentableQuantity(final Item item, final boolean rentalAvailable) {
@@ -84,18 +82,20 @@ public class ItemService {
 	}
 
 	@Transactional
-	public int updatePropertyNumber(final Long id, final ItemPropertyNumberRequest propertyNumberRequest) {
-		Item item = itemRepository.findById(id)
-			.orElseThrow(ItemNotFoundException::new);
-		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumberRequest.propertyNumber());
-		return itemRepository.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
+	public int updatePropertyNumber(final Long id, final String propertyNumber) {
+		Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
+		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumber);
+		return itemRepository.updatePropertyNumber(id, propertyNumber);
 	}
 
 	@Transactional
 	public void delete(final Long id) {
-		itemRepository.findById(id)
-			.orElseThrow(ItemNotFoundException::new);
-		itemRepository.deleteById(id);
+		Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
+		rentedItemService.validateNotRentedByPropertyNumber(item.getPropertyNumber());
+		int deletedCount = itemRepository.deleteById(id);
+		equipmentService.adjustWhenItemDeleted(deletedCount, getOperandOfRentableQuantity(item, false),
+			item.getAssetId());
+		item.setAvailable(false);
 	}
 
 	@Transactional
@@ -106,17 +106,14 @@ public class ItemService {
 		final EquipmentItems equipmentItems = getEquipmentItems(equipmentId);
 		List<UpdateItemRequest> updateItemRequests = itemRequestsGroup.get(false);
 		update(equipmentItems, updateItemRequests);
-		deleteNotRequested(equipmentItems, saveOrUpdateItemsRequest.items());
+		deleteNotRequested(equipmentItems, saveOrUpdateItemsRequest.items(), equipmentId);
 		return ItemsResponse.of(equipmentItems.getItems());
 	}
 
 	private void save(final Long equipmentId, final List<UpdateItemRequest> saveItemRequests) {
 		if (saveItemRequests == null)
 			return;
-		List<Item> itemsToSave = saveItemRequests
-			.stream()
-			.map(it -> mapToItem(equipmentId, it))
-			.toList();
+		List<Item> itemsToSave = saveItemRequests.stream().map(it -> mapToItem(equipmentId, it)).toList();
 		itemRepository.saveAll(itemsToSave);
 	}
 
@@ -125,40 +122,48 @@ public class ItemService {
 		return EquipmentItems.from(items);
 	}
 
+
 	private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
 		if (updateItemRequests == null)
 			return;
 		for (UpdateItemRequest request : updateItemRequests) {
-			equipmentItems.updatePropertyNumberById(request.id(), request.propertyNumber());
+			final Item item = equipmentItems.getItem(request.id());
+			updatePropertyNumber(item.getId(), request.propertyNumber());
+			equipmentItems.updatePropertyNumberById(item.getId(), request.propertyNumber());
 		}
 	}
 
 	private void deleteNotRequested(final EquipmentItems equipmentItems,
-		final List<UpdateItemRequest> updateItemRequests) {
+		final List<UpdateItemRequest> updateItemRequests, Long equipmentId) {
 		if (updateItemRequests == null)
 			return;
+		final List<String> notRequestedPropertyNumbers = getNotRequestedPropertyNumbers(equipmentItems,
+			updateItemRequests);
+		List<Item> itemToRemove = equipmentItems.getItemsByPropertyNumbers(notRequestedPropertyNumbers);
+		int deletedCount = itemRepository.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+		int operandSumOfRentableQuantity = itemToRemove.stream()
+			.mapToInt(item -> getOperandOfRentableQuantity(item, false))
+			.sum();
+		itemRepository.updateRentalAvailable(itemToRemove.stream().map(Item::getId).toList(), false);
+		equipmentService.adjustWhenItemDeleted(deletedCount, operandSumOfRentableQuantity, equipmentId);
+		equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+	}
+
+	private List<String> getNotRequestedPropertyNumbers(EquipmentItems equipmentItems,
+		List<UpdateItemRequest> updateItemRequests) {
 		final List<String> propertyNumbers = equipmentItems.getPropertyNumbers();
 		final Set<String> requestedIds = updateItemRequests.stream()
 			.map(UpdateItemRequest::propertyNumber)
 			.collect(Collectors.toSet());
-		final List<String> notRequestedPropertyNumbers = propertyNumbers.stream()
-			.filter(id -> !requestedIds.contains(id))
-			.toList();
-		itemRepository.deleteByPropertyNumbers(notRequestedPropertyNumbers);
-		equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+		return propertyNumbers.stream().filter(id -> !requestedIds.contains(id)).toList();
 	}
 
 	private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(SaveOrUpdateItemsRequest updateItemsRequest) {
-		return updateItemsRequest.items()
-			.stream()
-			.collect(Collectors.groupingBy(it -> it.id() == null));
+		return updateItemsRequest.items().stream().collect(Collectors.groupingBy(it -> it.id() == null));
 	}
 
 	private Item mapToItem(final Long equipmentId, final UpdateItemRequest updateItemRequest) {
-		return Item.builder()
-			.propertyNumber(updateItemRequest.propertyNumber())
-			.assetId(equipmentId)
-			.build();
+		return Item.builder().propertyNumber(updateItemRequest.propertyNumber()).assetId(equipmentId).build();
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -191,18 +196,22 @@ public class ItemService {
 		return ItemsResponse.of(rentalAvailableItems);
 	}
 
+	private boolean canRentalAvailable(final Set<String> rentedPropertyNumbers, final Item it) {
+		return !rentedPropertyNumbers.contains(it.getPropertyNumber()) && it.isAvailable();
+	}
+
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void setAvailable(final String propertyNumber, final boolean available) {
-		Item item = itemRepository.findByPropertyNumber(propertyNumber)
-			.orElseThrow(ItemNotFoundException::new);
-		item.setAvailable(available);
+		Item item = itemRepository.findByPropertyNumber(propertyNumber).orElseThrow(ItemNotFoundException::new);
+		updateRentalAvailableAndAdjustEquipment(available, item);
 	}
 
 	@Transactional(readOnly = true)
 	public Page<ItemHistory> getItemHistories(final Pageable pageable, final Category category, final LocalDate from,
 		final LocalDate to) {
 		final Page<EquipmentItemDto> itemDtosPage = itemRepository.findEquipmentItem(pageable, category);
-		final Set<String> propertyNumbers = itemDtosPage.getContent().stream()
+		final Set<String> propertyNumbers = itemDtosPage.getContent()
+			.stream()
 			.map(EquipmentItemDto::getPropertyNumber)
 			.collect(Collectors.toSet());
 		final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers = rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(
@@ -217,14 +226,27 @@ public class ItemService {
 			.propertyNumber(equipmentItemDto.getPropertyNumber());
 
 		if (rentalCountsDto == null) {
-			return builder
-				.normalRentalCount(0)
-				.abnormalRentalCount(0)
-				.build();
+			return builder.normalRentalCount(0).abnormalRentalCount(0).build();
 		}
-		return builder
-			.normalRentalCount(rentalCountsDto.getNormalRentalCount())
+		return builder.normalRentalCount(rentalCountsDto.getNormalRentalCount())
 			.abnormalRentalCount(rentalCountsDto.getAbnormalRentalCount())
 			.build();
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void deleteByAssetId(Long assetId) {
+		rentedItemService.validateNotRentedByAssetId(assetId);
+		int updatedNotAvailableCount = setAvailableByAssetId(assetId, false);
+		int deletedCount = itemRepository.deleteByAssetId(assetId);
+		equipmentService.adjustWhenItemDeleted(deletedCount, -updatedNotAvailableCount, assetId);
+	}
+
+	private int setAvailableByAssetId(Long assetId, boolean available) {
+		List<Long> ids = itemRepository.findByAssetId(assetId)
+			.stream()
+			.filter(item -> item.isAvailable() == available)
+			.map(Item::getId)
+			.toList();
+		return itemRepository.updateRentalAvailable(ids, available);
 	}
 }

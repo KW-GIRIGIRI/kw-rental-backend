@@ -127,6 +127,9 @@ class ItemAcceptanceTest extends AcceptanceTest {
 		final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
 		final Item item1 = ItemFixture.builder().assetId(equipment.getId()).build();
 		itemRepository.save(item1);
+		EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().propertyNumber(
+			item1.getPropertyNumber()).build();
+		rentalSpecRepository.saveAll(List.of(rentalSpec));
 		final ItemPropertyNumberRequest requestBody = new ItemPropertyNumberRequest("updatedNumber");
 
 		// when
@@ -136,15 +139,26 @@ class ItemAcceptanceTest extends AcceptanceTest {
 			.body(requestBody)
 			.when().log().all().patch("/api/admin/items/" + item1.getId() + "/propertyNumber")
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		EquipmentRentalSpec actual = rentalSpecRepository.findById(rentalSpec.getId())
+			.orElseThrow()
+			.as(EquipmentRentalSpec.class);
+		assertThat(actual.getPropertyNumber()).isEqualTo(requestBody.propertyNumber());
 	}
 
 	@Test
 	@DisplayName("관리자 품목 삭제 API")
 	void deleteItem() {
 		// given
-		final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-		final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
+		final Equipment equipment = equipmentRepository.save(
+			EquipmentFixture.builder().rentableQuantity(0).totalQuantity(1).build());
+		final Item item = ItemFixture.builder().assetId(equipment.getId()).available(false).build();
 		itemRepository.save(item);
+
+		EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.builder().status(RentalSpecStatus.RETURNED)
+			.propertyNumber(item.getPropertyNumber()).build();
+		rentalSpecRepository.saveAll(List.of(rentalSpec));
 
 		// when
 		RestAssured.given(requestSpec)
@@ -152,6 +166,15 @@ class ItemAcceptanceTest extends AcceptanceTest {
 			.contentType(ContentType.APPLICATION_JSON.getMimeType())
 			.when().log().all().delete("/api/admin/items/" + item.getId())
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		Equipment actualEquipment = equipmentRepository.findById(equipment.getId()).orElseThrow();
+		assertThat(actualEquipment.getTotalQuantity()).isZero();
+		assertThat(actualEquipment.getRentableQuantity()).isZero();
+
+		Item actualItem = itemRepository.findById(item.getId()).orElseThrow();
+		assertThat(actualItem.getDeletedAt()).isNotNull();
+		assertThat(actualItem.isAvailable()).isFalse();
 	}
 
 	@Test

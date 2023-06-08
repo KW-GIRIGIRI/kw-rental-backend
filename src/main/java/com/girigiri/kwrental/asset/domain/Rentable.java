@@ -16,4 +16,6 @@ public interface Rentable extends SuperEntity {
     Integer getMaxRentalDays();
 
     void validateAmountForRent(int amount);
+
+    boolean isDeleted();
 }

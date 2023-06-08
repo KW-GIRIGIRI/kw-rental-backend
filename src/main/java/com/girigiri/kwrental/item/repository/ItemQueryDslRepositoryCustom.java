@@ -20,7 +20,13 @@ public interface ItemQueryDslRepositoryCustom {
 
     List<Item> findByEquipmentIds(Set<Long> equipmentIds);
 
-    long deleteByPropertyNumbers(List<String> propertyNumbers);
+    int deleteByPropertyNumbers(List<String> propertyNumbers);
 
     Page<EquipmentItemDto> findEquipmentItem(Pageable pageable, Category category);
+
+    int updateRentalAvailable(List<Long> ids, boolean available);
+
+    int deleteByAssetId(Long assetId);
+
+    int deleteById(Long id);
 }

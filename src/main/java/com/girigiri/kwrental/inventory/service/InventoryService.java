@@ -108,4 +108,9 @@ public class InventoryService {
         }
         return inventories;
     }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void deleteByEquipmentId(Long equipmentId) {
+        inventoryRepository.deleteByEquipmentId(equipmentId);
+    }
 }

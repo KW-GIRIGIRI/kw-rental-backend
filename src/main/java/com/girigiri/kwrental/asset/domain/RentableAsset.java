@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.asset.domain;
 
+import java.time.LocalDate;
+
 import com.girigiri.kwrental.asset.exception.RentableAssetException;
 import com.girigiri.kwrental.common.AbstractSuperEntity;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
@@ -38,12 +40,13 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 
 	@Column(nullable = false)
 	private Integer maxRentalDays;
+	private LocalDate deletedAt;
 
 	protected RentableAsset() {
 	}
 
-	protected RentableAsset(final Long id, final String name, final Integer totalQuantity,
-		final Integer rentableQuantity, final Integer maxRentalDays) {
+	private RentableAsset(final Long id, final String name, final Integer totalQuantity,
+		final Integer rentableQuantity, final Integer maxRentalDays, final LocalDate deletedAt) {
 		if (totalQuantity < rentableQuantity) {
 			throw new RentableAssetException("전체 갯수가 대여 가능 갯수보다 작으면 안됩니다.");
 		}
@@ -58,6 +61,12 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 		this.rentableQuantity = rentableQuantity;
 		this.totalQuantity = totalQuantity;
 		this.maxRentalDays = maxRentalDays;
+		this.deletedAt = deletedAt;
+	}
+
+	protected RentableAsset(Long id, String name, Integer totalQuantity, Integer rentableQuantity,
+		Integer maxRentalDays) {
+		this(id, name, totalQuantity, rentableQuantity, maxRentalDays, null);
 	}
 
 	@Override
@@ -80,6 +89,10 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 		if (adjustedRentableQuantity < 0) {
 			throw new RentableAssetException("대여 가능 갯수가 0보다 작을 수 없습니다.");
 		}
+	}
 
+	@Override
+	public boolean isDeleted() {
+		return this.deletedAt != null;
 	}
 }

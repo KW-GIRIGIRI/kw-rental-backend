@@ -56,7 +56,10 @@ public class EquipmentService {
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public void validateExistsById(final Long id) {
-		getEquipment(id);
+		boolean deleted = getEquipment(id).isDeleted();
+		if (deleted) {
+			throw new EquipmentNotFoundException();
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -112,6 +115,7 @@ public class EquipmentService {
 	public void deleteEquipment(final Long id) {
 		getEquipment(id);
 		equipmentRepository.deleteById(id);
+		equipmentRepository.updateTotalQuantityAndRentableQuantityById(0, 0, id);
 		eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
 	}
 
@@ -159,5 +163,11 @@ public class EquipmentService {
 	public void adjustRentableQuantity(Long equipmentId, int operand) {
 		getEquipment(equipmentId);
 		assetService.adjustRentableQuantity(equipmentId, operand);
+	}
+
+	public void adjustWhenItemDeleted(final int deletedCount, final int operandOfRentableQuantity, final Long id) {
+		Equipment equipment = getEquipment(id);
+		equipment.setTotalQuantity(equipment.getTotalQuantity() - deletedCount);
+		equipment.setRentableQuantity(equipment.getRentableQuantity() + operandOfRentableQuantity);
 	}
 }
