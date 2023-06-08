@@ -5,6 +5,7 @@ CREATE TABLE if not exists `asset`
     `max_rental_days`           int         NOT NULL,
     `name`                      varchar(50) NOT NULL,
     `total_quantity`            int         NOT NULL,
+    `rentable_quantity`         int         NOT NULL,
     `category`                  varchar(15)  DEFAULT NULL,
     `components`                varchar(100) DEFAULT NULL,
     `description`               varchar(100) DEFAULT NULL,
@@ -14,8 +15,7 @@ CREATE TABLE if not exists `asset`
     `rental_place`              varchar(20)  DEFAULT NULL,
     `is_available`              tinyint(1)   DEFAULT NULL,
     `reservation_count_per_day` int          DEFAULT NULL,
-    `notice`                    text,
-    `rentable_quantity`         int         NOT NULL,
+    `notice`                    text         DEFAULT NULL,
     `deleted_at`                date         DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_ASSET_NAME` (`name`)
