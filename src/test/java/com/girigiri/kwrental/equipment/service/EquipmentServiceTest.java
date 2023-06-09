@@ -182,15 +182,16 @@ class EquipmentServiceTest {
     @DisplayName("기자재 삭제")
     void deleteEquipment() {
         // given
-        given(equipmentRepository.findById(1L)).willReturn(Optional.of(EquipmentFixture.create()));
+        Equipment equipment = EquipmentFixture.create();
+        given(equipmentRepository.findById(1L)).willReturn(Optional.of(equipment));
 
         // when
         equipmentService.deleteEquipment(1L);
 
         // then
         verify(equipmentRepository).findById(1L);
-        verify(equipmentRepository).deleteById(1L);
         verify(eventPublisher).publishEvent(any(EquipmentDeleteEvent.class));
+        assertThat(equipment.getDeletedAt()).isNotNull();
     }
 
     @Test

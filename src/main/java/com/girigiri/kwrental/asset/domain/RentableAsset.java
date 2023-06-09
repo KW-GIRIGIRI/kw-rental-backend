@@ -85,4 +85,9 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 	public boolean isDeleted() {
 		return this.deletedAt != null;
 	}
+
+	@Override
+	public void delete() {
+		this.deletedAt = LocalDate.now();
+	}
 }

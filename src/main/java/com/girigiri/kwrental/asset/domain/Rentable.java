@@ -18,4 +18,6 @@ public interface Rentable extends SuperEntity {
     void validateAmountForRent(int amount);
 
     boolean isDeleted();
+
+    void delete();
 }

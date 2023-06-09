@@ -35,8 +35,10 @@ import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRen
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 import io.restassured.RestAssured;
@@ -46,6 +48,9 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
 	private EquipmentRepository equipmentRepository;
+
+	@Autowired
+	private ItemRepository itemRepository;
 
 	@Autowired
 	private ReservationSpecRepository reservationSpecRepository;
@@ -308,6 +313,7 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 		// given
 		final Equipment equipment = EquipmentFixture.create();
 		equipmentRepository.save(equipment);
+		itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
 
 		// when
 		RestAssured.given(this.requestSpec)
@@ -321,6 +327,10 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 			.log()
 			.all()
 			.statusCode(HttpStatus.NO_CONTENT.value());
+
+		// then
+		Equipment actual = equipmentRepository.findById(equipment.getId()).orElseThrow();
+		assertThat(actual.getDeletedAt()).isNotNull();
 	}
 
 	@Test

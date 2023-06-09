@@ -113,9 +113,8 @@ public class EquipmentService {
 
 	@Transactional
 	public void deleteEquipment(final Long id) {
-		getEquipment(id);
-		equipmentRepository.deleteById(id);
-		equipmentRepository.updateTotalQuantityAndRentableQuantityById(0, 0, id);
+		Equipment equipment = getEquipment(id);
+		equipment.delete();
 		eventPublisher.publishEvent(new EquipmentDeleteEvent(this, id));
 	}
 
