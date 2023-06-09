@@ -37,7 +37,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService, A
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(final List<Long> rentableIds,
 		final LocalDate date) {
-		return reservationSpecRepository.findRentalAmountsByEquipmentIds(rentableIds, date)
+		return reservationSpecRepository.findRentalAmountsByAssetIds(rentableIds, date)
 			.stream()
 			.collect(toMap(ReservedAmount::getEquipmentId, ReservedAmount::getRemainingAmount));
 	}

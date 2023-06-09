@@ -149,7 +149,7 @@ class ReservationSpecRepositoryTest {
 		reservationSpecRepository.save(reservationSpec3);
 
 		// when
-		final List<ReservedAmount> expect = reservationSpecRepository.findRentalAmountsByEquipmentIds(
+		final List<ReservedAmount> expect = reservationSpecRepository.findRentalAmountsByAssetIds(
 			List.of(equipment1.getId(), equipment2.getId(), equipment3.getId()), NOW);
 
 		// then

@@ -68,7 +68,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	}
 
 	@Override
-	public List<ReservedAmount> findRentalAmountsByEquipmentIds(final List<Long> equipmentIds, final LocalDate date) {
+	public List<ReservedAmount> findRentalAmountsByAssetIds(final List<Long> assetIds, final LocalDate date) {
 		return queryFactory
 			.select(Projections.constructor(ReservedAmount.class, equipment.id, equipment.rentableQuantity,
 				reservationSpec.amount.amount.sum().coalesce(0)))
@@ -76,7 +76,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.rightJoin(equipment).on(reservationSpec.rentable.id.eq(equipment.id).
 				and(reservationSpec.period.rentalStartDate.loe(date))
 				.and(reservationSpec.period.rentalEndDate.after(date)))
-			.where(equipment.id.in(equipmentIds))
+			.where(equipment.id.in(assetIds))
 			.groupBy(equipment.id)
 			.fetch();
 	}

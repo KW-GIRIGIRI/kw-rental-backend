@@ -20,4 +20,6 @@ public interface Rentable extends SuperEntity {
     boolean isDeleted();
 
     void delete();
+
+    Integer getRemainQuantity(int amount);
 }

@@ -55,4 +55,26 @@ class LabRoomServiceTest {
 			.containsExactly(new RemainReservationCountPerDateResponse(now, 0),
 				new RemainReservationCountPerDateResponse(now.plusDays(1), 1));
 	}
+
+	@Test
+	@DisplayName("닫은 랩실은 남은 대여 신청 횟수가 0으로 조회된다.")
+	void getRemainReservationCountPerDateResponse_notAvailable() {
+		// given
+		LocalDate now = LocalDate.now();
+		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).isAvailable(false).build();
+		given(labRoomRepository.findLabRoomByName("hwado"))
+			.willReturn(Optional.of(hwado));
+		given(remainingQuantityService.getReservationCountInclusive(hwado.getId(), now, now.plusDays(1)))
+			.willReturn(Map.of(now, 1, now.plusDays(1), 0));
+
+		// when
+		RemainReservationCountsPerDateResponse actual = labRoomService.getRemainReservationCountByLabRoomName(
+			"hwado", now, now.plusDays(1));
+
+		// then
+		assertThat(actual.getId()).isEqualTo(hwado.getId());
+		assertThat(actual.getRemainReservationCounts()).usingRecursiveFieldByFieldElementComparator()
+			.containsExactly(new RemainReservationCountPerDateResponse(now, 0),
+				new RemainReservationCountPerDateResponse(now.plusDays(1), 0));
+	}
 }

@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.asset.equipment.domain;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
+import com.girigiri.kwrental.asset.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.asset.exception.RentableAssetException;
 
 import jakarta.persistence.DiscriminatorValue;
@@ -74,5 +75,13 @@ public class Equipment extends RentableAsset {
 
 	public void addTotalCount(final int count) {
 		this.setTotalQuantity(this.getTotalQuantity() + count);
+	}
+
+	@Override
+	public Integer getRemainQuantity(int reservedCount) {
+		if (reservedCount > getRentableQuantity()) {
+			throw new EquipmentException("대여 가능 갯수가 대여 된 갯수보다 크면 안됩니다!");
+		}
+		return getRentableQuantity() - reservedCount;
 	}
 }

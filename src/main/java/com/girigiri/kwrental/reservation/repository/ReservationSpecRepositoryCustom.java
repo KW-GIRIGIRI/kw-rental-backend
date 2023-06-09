@@ -17,7 +17,7 @@ public interface ReservationSpecRepositoryCustom {
 
     List<ReservationSpec> findOverlappedReservedOrRentedInclusive(Long equipmentId, LocalDate start, LocalDate end);
 
-    List<ReservedAmount> findRentalAmountsByEquipmentIds(List<Long> equipmentIds, LocalDate date);
+    List<ReservedAmount> findRentalAmountsByAssetIds(List<Long> assetIds, LocalDate date);
 
     List<ReservationSpec> findByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);
 

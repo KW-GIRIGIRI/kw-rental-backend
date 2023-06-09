@@ -43,12 +43,12 @@ public class LabRoomService {
 		this.labRoomDailyBanRepository = labRoomDailyBanRepository;
 	}
 
-	private static List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
+	private List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
 		LabRoom labRoom, Map<LocalDate, Integer> reservationCounts) {
 		return reservationCounts.keySet()
 			.stream()
 			.map(date -> new RemainReservationCountPerDateResponse(date,
-				labRoom.getReservationCountPerDay() - reservationCounts.get(date)))
+				labRoom.getRemainReservationCount(reservationCounts.get(date))))
 			.sorted(Comparator.comparing(RemainReservationCountPerDateResponse::getDate))
 			.toList();
 	}
