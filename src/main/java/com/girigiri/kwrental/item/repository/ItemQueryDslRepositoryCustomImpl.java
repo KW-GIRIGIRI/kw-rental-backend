@@ -83,7 +83,7 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 	public int deleteByAssetId(final Long assetId) {
 		return (int)queryFactory.update(item)
 			.set(item.deletedAt, LocalDate.now())
-			.where(item.assetId.eq(assetId))
+			.where(item.assetId.eq(assetId), item.deletedAt.isNull())
 			.execute();
 	}
 
