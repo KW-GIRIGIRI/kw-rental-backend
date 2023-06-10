@@ -33,6 +33,7 @@ import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationReques
 import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
+import com.girigiri.kwrental.reservation.exception.ReservationException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -61,11 +62,14 @@ class ReservationServiceTest {
 	@Mock
 	private ReservationSpecRepository reservationSpecRepository;
 
+	@Mock
+	private PenaltyService penaltyService;
+
 	@InjectMocks
 	private ReservationService reservationService;
 
 	@Test
-	@DisplayName("대여 예약을 생성한다.")
+	@DisplayName("기자재 대여 예약을 생성한다.")
 	void reserve() {
 		// given
 		final Equipment equipment = EquipmentFixture.builder().id(1L).build();
@@ -73,6 +77,7 @@ class ReservationServiceTest {
 		given(inventoryService.getInventoriesWithEquipment(any())).willReturn(List.of(inventory));
 		doNothing().when(remainingQuantityService).validateAmount(any(), any(), any());
 		doNothing().when(inventoryService).deleteAll(any());
+		given(penaltyService.hasOngoingPenalty(any())).willReturn(false);
 
 		final AddReservationRequest addReservationRequest = AddReservationRequest.builder()
 			.renterEmail("email@email.com")
@@ -95,7 +100,7 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	@DisplayName("대여 예약을 생성한다.")
+	@DisplayName("다양한 기간으로 이뤄진 기자재 대여 예약을 생성한다.")
 	void reserve_multiplePeriod() {
 		// given
 		final Equipment equipment = EquipmentFixture.builder().id(1L).build();
@@ -108,6 +113,7 @@ class ReservationServiceTest {
 		final Inventory inventory2 = InventoryFixture.builder(equipment)
 			.rentalPeriod(rentalPeriod2)
 			.build();
+		given(penaltyService.hasOngoingPenalty(any())).willReturn(false);
 		given(inventoryService.getInventoriesWithEquipment(any())).willReturn(List.of(inventory1, inventory2));
 		doNothing().when(remainingQuantityService).validateAmount(any(), any(), any());
 		doNothing().when(inventoryService).deleteAll(any());
@@ -142,6 +148,45 @@ class ReservationServiceTest {
 	}
 
 	@Test
+	@DisplayName("이미 진행 중인 페널티가 있으면 기자재 대여를 할 수 없다.")
+	void reserve_equipment_hasOngoingPenalty() {
+		// given
+		given(penaltyService.hasOngoingPenalty(any())).willReturn(true);
+
+		final AddReservationRequest addReservationRequest = AddReservationRequest.builder()
+			.renterEmail("email@email.com")
+			.rentalPurpose("purpose")
+			.renterPhoneNumber("01012341234")
+			.renterName("name").build();
+
+		// when, then
+		assertThatThrownBy(() -> reservationService.reserve(1L, addReservationRequest))
+			.isExactlyInstanceOf(ReservationException.class);
+	}
+
+	@Test
+	@DisplayName("이미 진행 중인 페널티가 있으면 랩실 대여를 할 수 없다.")
+	void reserve_labRoom_hasOngoingPenalty() {
+		// given
+		given(penaltyService.hasOngoingPenalty(any())).willReturn(true);
+
+		final AddLabRoomReservationRequest addReservationRequest = AddLabRoomReservationRequest.builder()
+			.renterEmail("email@email.com")
+			.rentalPurpose("purpose")
+			.renterPhoneNumber("01012341234")
+			.renterName("name")
+			.labRoomName("hanul")
+			.startDate(LocalDate.now())
+			.endDate(LocalDate.now().plusDays(1))
+			.renterCount(5)
+			.build();
+
+		// when, then
+		assertThatThrownBy(() -> reservationService.reserve(1L, addReservationRequest))
+			.isExactlyInstanceOf(ReservationException.class);
+	}
+
+	@Test
 	@DisplayName("랩실 대여를 할 때 이미 해당 랩실을 해당 기간동안 해당 회원이 대여 했으면 안된다.")
 	void reserve_alreadyLabRoomReserved() {
 		// given
@@ -150,6 +195,7 @@ class ReservationServiceTest {
 		ReservationSpec spec = ReservationSpecFixture.builder(labRoom).build();
 		given(reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(anyLong()))
 			.willReturn(Set.of(ReservationFixture.create(List.of(spec))));
+		given(penaltyService.hasOngoingPenalty(any())).willReturn(false);
 		AddLabRoomReservationRequest request = AddLabRoomReservationRequest.builder()
 			.renterCount(1)
 			.labRoomName(labRoom.getName())

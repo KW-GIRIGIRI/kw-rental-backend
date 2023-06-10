@@ -48,6 +48,7 @@ import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
+import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
 @Service
@@ -195,7 +196,7 @@ public class RentalService {
 
 	private void setPenalty(final RentalSpec rentalSpec, final Long memberId) {
 		if (rentalSpec.isOverdueReturned() || rentalSpec.isUnavailableAfterReturn()) {
-			penaltyService.create(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(),
+			penaltyService.createOrUpdate(memberId, rentalSpec.getReservationId(), rentalSpec.getReservationSpecId(),
 				rentalSpec.getId(), rentalSpec.getStatus());
 		} else {
 			penaltyService.deleteByRentalSpecIdIfExists(rentalSpec.getId());

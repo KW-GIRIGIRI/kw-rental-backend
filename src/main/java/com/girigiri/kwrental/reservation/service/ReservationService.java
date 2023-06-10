@@ -46,6 +46,7 @@ import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReser
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
 import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
+import com.girigiri.kwrental.reservation.exception.ReservationException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
@@ -61,22 +62,25 @@ public class ReservationService {
 	private final ReservationSpecRepository reservationSpecRepository;
 	private final AssetService assetService;
 	private final LabRoomService labRoomService;
+	private final PenaltyService penaltyService;
 
 	public ReservationService(final ReservationRepository reservationRepository,
 		final InventoryService inventoryService,
 		final RemainingQuantityServiceImpl remainingQuantityService,
 		final ReservationSpecRepository reservationSpecRepository, final AssetService assetService,
-		LabRoomService labRoomService) {
+		LabRoomService labRoomService, final PenaltyService penaltyService) {
 		this.reservationRepository = reservationRepository;
 		this.inventoryService = inventoryService;
 		this.remainingQuantityService = remainingQuantityService;
 		this.reservationSpecRepository = reservationSpecRepository;
 		this.assetService = assetService;
 		this.labRoomService = labRoomService;
+		this.penaltyService = penaltyService;
 	}
 
 	@Transactional
 	public void reserve(final Long memberId, final AddReservationRequest addReservationRequest) {
+		validatePenalty(memberId);
 		final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
 		final List<ReservationSpec> reservationSpecs = inventories.stream()
 			.filter(this::isAvailableCountValid)
@@ -85,6 +89,12 @@ public class ReservationService {
 		final List<Reservation> reservations = mapToReservations(memberId, addReservationRequest, reservationSpecs);
 		inventoryService.deleteAll(memberId);
 		reservationRepository.saveAll(reservations);
+	}
+
+	private void validatePenalty(final Long memberId) {
+		if (penaltyService.hasOngoingPenalty(memberId)) {
+			throw new ReservationException("페널티에 적용되는 기간에는 대여 예약을 할 수 없습니다.");
+		}
 	}
 
 	private boolean isAvailableCountValid(final Inventory inventory) {
@@ -125,6 +135,7 @@ public class ReservationService {
 
 	@Transactional
 	public Long reserve(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
+		validatePenalty(memberId);
 		final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.getLabRoomName());
 		final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.getStartDate(),
 			addLabRoomReservationRequest.getEndDate());

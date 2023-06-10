@@ -41,6 +41,7 @@ import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNu
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
@@ -170,11 +171,17 @@ class RentalServiceTest {
         given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
 
         doNothing().when(itemService).setAvailable(rentalSpec2.getPropertyNumber(), false);
-        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec2.getReservationSpecId(), rentalSpec2.getId(), RentalSpecStatus.LOST);
+        doNothing().when(penaltyService)
+            .createOrUpdate(reservation.getMemberId(), reservationId, rentalSpec2.getReservationSpecId(),
+                rentalSpec2.getId(), RentalSpecStatus.LOST);
         doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), false);
-        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec3.getReservationSpecId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RENTED);
+        doNothing().when(penaltyService)
+            .createOrUpdate(reservation.getMemberId(), reservationId, rentalSpec3.getReservationSpecId(),
+                rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RENTED);
         doNothing().when(itemService).setAvailable(rentalSpec4.getPropertyNumber(), false);
-        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, rentalSpec4.getReservationSpecId(), rentalSpec4.getId(), RentalSpecStatus.BROKEN);
+        doNothing().when(penaltyService)
+            .createOrUpdate(reservation.getMemberId(), reservationId, rentalSpec4.getReservationSpecId(),
+                rentalSpec4.getId(), RentalSpecStatus.BROKEN);
 
         // when
         assertThatCode(() -> rentalService.returnRental(returnReturnRequest))
@@ -221,8 +228,11 @@ class RentalServiceTest {
         final EquipmentRentalSpec rentalSpec4 = EquipmentRentalSpecFixture.builder().reservationId(reservationId).reservationSpecId(reservationSpec3.getId()).status(RentalSpecStatus.BROKEN)
                 .id(5L).propertyNumber("44444444").build();
 
-        given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
-        doNothing().when(penaltyService).create(reservation.getMemberId(), reservationId, reservationSpec2.getId(), rentalSpec3.getId(), RentalSpecStatus.OVERDUE_RETURNED);
+        given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(
+            List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
+        doNothing().when(penaltyService)
+            .createOrUpdate(reservation.getMemberId(), reservationId, reservationSpec2.getId(), rentalSpec3.getId(),
+                RentalSpecStatus.OVERDUE_RETURNED);
         doNothing().when(itemService).setAvailable(rentalSpec3.getPropertyNumber(), true);
 
         // when
