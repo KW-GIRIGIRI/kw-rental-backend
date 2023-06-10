@@ -19,7 +19,7 @@ public interface ReservationSpecRepositoryCustom {
 
     List<ReservedAmount> findRentalAmountsByAssetIds(List<Long> assetIds, LocalDate date);
 
-    List<ReservationSpec> findByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);
+    List<ReservationSpec> findNotCanceldByStartDateBetween(Long equipmentId, LocalDate start, LocalDate end);
 
     void adjustAmountAndStatus(ReservationSpec reservationSpec);
 

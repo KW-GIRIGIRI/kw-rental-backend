@@ -215,7 +215,7 @@ class ReservationServiceTest {
 		final Equipment equipment = EquipmentFixture.create();
 		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
 		final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-		given(reservationSpecRepository.findByStartDateBetween(any(), any(), any()))
+		given(reservationSpecRepository.findNotCanceldByStartDateBetween(any(), any(), any()))
 			.willReturn(List.of(reservationSpec));
 
 		// when

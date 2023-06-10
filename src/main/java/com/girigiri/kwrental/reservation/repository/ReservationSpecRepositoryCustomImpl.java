@@ -82,13 +82,13 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	}
 
 	@Override
-	public List<ReservationSpec> findByStartDateBetween(final Long equipmentId, final LocalDate start,
+	public List<ReservationSpec> findNotCanceldByStartDateBetween(final Long equipmentId, final LocalDate start,
 		final LocalDate end) {
 		return queryFactory
 			.selectFrom(reservationSpec)
 			.leftJoin(reservationSpec.reservation).fetchJoin()
 			.where(
-				reservationSpec.rentable.id.eq(equipmentId)
+				reservationSpec.rentable.id.eq(equipmentId), reservationSpec.status.ne(ReservationSpecStatus.CANCELED)
 					.and(reservationSpec.period.rentalStartDate.goe(start))
 					.and(reservationSpec.period.rentalStartDate.loe(end)))
 			.fetch();
