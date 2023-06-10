@@ -165,8 +165,8 @@ class ReservationSpecRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("특정 기간에 대여 수령하는 대여 상세를 조회한다.")
-	void findByStartDateBetween() {
+	@DisplayName("특정 기간에 대여 수령하는 취소되지 않은 대여 상세를 조회한다.")
+	void findNotCanceldByStartDateBetween() {
 		// given
 		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
 		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
@@ -183,9 +183,15 @@ class ReservationSpecRepositoryTest {
 			ReservationSpecFixture.builder(equipment1)
 				.period(new RentalPeriod(now.atEndOfMonth().plusDays(1), now.atEndOfMonth().plusDays(2)))
 				.build());
+		final ReservationSpec reservationSpec4 = reservationSpecRepository.save(
+			ReservationSpecFixture.builder(equipment1)
+				.period(new RentalPeriod(now.atDay(1), now.atEndOfMonth()))
+				.status(ReservationSpecStatus.CANCELED)
+				.build());
 
 		// when
-		final List<ReservationSpec> expect = reservationSpecRepository.findByStartDateBetween(equipment1.getId(),
+		final List<ReservationSpec> expect = reservationSpecRepository.findNotCanceldByStartDateBetween(
+			equipment1.getId(),
 			now.atDay(1), now.atEndOfMonth());
 
 		// then
