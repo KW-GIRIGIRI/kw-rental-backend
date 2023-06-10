@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface RemainingQuantityService {
 
-	Map<Long, Integer> getRemainingQuantityByEquipmentIdAndDate(List<Long> rentableIds, LocalDate date);
+	Map<Long, Integer> getRemainingQuantityByAssetIdAndDate(List<Long> rentableIds, LocalDate date);
 
 	Map<LocalDate, Integer> getReservedAmountInclusive(Long rentableId, LocalDate from, LocalDate to);
 

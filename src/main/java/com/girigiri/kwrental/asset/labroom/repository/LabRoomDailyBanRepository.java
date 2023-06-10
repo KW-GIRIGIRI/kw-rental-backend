@@ -8,7 +8,7 @@ import org.springframework.data.repository.Repository;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 
-public interface LabRoomDailyBanRepository extends Repository<LabRoomDailyBan, Long> {
+public interface LabRoomDailyBanRepository extends Repository<LabRoomDailyBan, Long>, LabRoomDailyBanRepositoryCustom {
 	List<LabRoomDailyBan> findByLabRoomId(Long labRoomId);
 
 	void deleteById(Long id);

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
+import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.asset.labroom.dto.request.LabRoomNoticeRequest;
@@ -43,23 +46,30 @@ public class LabRoomService {
 		this.labRoomDailyBanRepository = labRoomDailyBanRepository;
 	}
 
-	private List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
-		LabRoom labRoom, Map<LocalDate, Integer> reservationCounts) {
-		return reservationCounts.keySet()
-			.stream()
-			.map(date -> new RemainReservationCountPerDateResponse(date,
-				labRoom.getRemainReservationCount(reservationCounts.get(date))))
-			.sorted(Comparator.comparing(RemainReservationCountPerDateResponse::getDate))
-			.toList();
-	}
-
 	@Transactional(readOnly = true)
 	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
 		final LocalDate to) {
 		final LabRoom labRoom = getLabRoom(name);
 		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(
 			labRoom.getId(), from, to);
-		return assetService.getReservableCountPerDate(reservedAmounts, labRoom);
+		final RemainQuantitiesPerDateResponse remainQuantitiesPerDateResponse = assetService.getReservableCountPerDate(
+			reservedAmounts, labRoom);
+		final List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomIdAndInclusive(labRoom.getId(), from,
+			to);
+		return adjustBans(remainQuantitiesPerDateResponse, bans);
+	}
+
+	private RemainQuantitiesPerDateResponse adjustBans(
+		final RemainQuantitiesPerDateResponse remainQuantitiesPerDateResponse, final List<LabRoomDailyBan> bans) {
+		final Map<LocalDate, LabRoomDailyBan> banMap = bans.stream()
+			.collect(Collectors.toMap(LabRoomDailyBan::getBanDate, Function.identity()));
+		for (final RemainQuantityPerDateResponse remainQuantityPerDateResponse : remainQuantitiesPerDateResponse.getRemainQuantities()) {
+			final LocalDate date = remainQuantityPerDateResponse.getDate();
+			if (banMap.get(date) != null) {
+				remainQuantityPerDateResponse.setRemainQuantity(0);
+			}
+		}
+		return remainQuantitiesPerDateResponse;
 	}
 
 	private LabRoom getLabRoom(String name) {
@@ -71,11 +81,33 @@ public class LabRoomService {
 	public RemainReservationCountsPerDateResponse getRemainReservationCountByLabRoomName(final String name,
 		final LocalDate from, final LocalDate to) {
 		final LabRoom labRoom = getLabRoom(name);
-		Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
+		final Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
 			labRoom.getId(), from, to);
-		List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = getRemainReservationCountPerDateResponses(
-			labRoom, reservationCounts);
+		final List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomIdAndInclusive(
+			labRoom.getId(), from, to);
+		final List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = getRemainReservationCountPerDateResponses(
+			labRoom, reservationCounts, bans);
 		return new RemainReservationCountsPerDateResponse(labRoom.getId(), remainReservationCountPerDateResponses);
+	}
+
+	private List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
+		final LabRoom labRoom, final Map<LocalDate, Integer> reservationCounts, final List<LabRoomDailyBan> bans) {
+		final Map<LocalDate, LabRoomDailyBan> banMap = bans.stream()
+			.collect(Collectors.toMap(LabRoomDailyBan::getBanDate, Function.identity()));
+		return reservationCounts.keySet()
+			.stream()
+			.map(date -> createRemainReservationCountPerDateResponse(date, labRoom.getRemainReservationCount(
+				reservationCounts.get(date)), banMap.get(date)))
+			.sorted(Comparator.comparing(RemainReservationCountPerDateResponse::getDate))
+			.toList();
+	}
+
+	private RemainReservationCountPerDateResponse createRemainReservationCountPerDateResponse(final LocalDate date,
+		final Integer remainReservationCount, final LabRoomDailyBan ban) {
+		if (ban != null) {
+			return new RemainReservationCountPerDateResponse(date, 0);
+		}
+		return new RemainReservationCountPerDateResponse(date, remainReservationCount);
 	}
 
 	@Transactional

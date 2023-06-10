@@ -101,7 +101,7 @@ class EquipmentServiceTest {
         final Equipment equipment = EquipmentFixture.builder().id(2L).build();
         given(equipmentRepository.findEquipmentBy(any(), any(), any()))
                 .willReturn(new PageImpl<>(List.of(equipment), pageable, 3));
-        given(remainingQuantityService.getRemainingQuantityByEquipmentIdAndDate(any(), any()))
+        given(remainingQuantityService.getRemainingQuantityByAssetIdAndDate(any(), any()))
                 .willReturn(Map.of(equipment.getId(), equipment.getTotalQuantity()));
 
         // when
