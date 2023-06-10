@@ -26,8 +26,7 @@ public class AssetService {
 
     public RemainQuantitiesPerDateResponse getReservableCountPerDate(final Map<LocalDate, Integer> reservedAmounts, final Rentable rentable) {
         final List<RemainQuantityPerDateResponse> remainQuantityPerDateResponses = reservedAmounts.keySet().stream()
-            .map(date -> new RemainQuantityPerDateResponse(date,
-                rentable.getTotalQuantity() - reservedAmounts.get(date)))
+            .map(date -> new RemainQuantityPerDateResponse(date, rentable.getRemainQuantity(reservedAmounts.get(date))))
             .sorted(Comparator.comparing(RemainQuantityPerDateResponse::getDate))
             .toList();
         return new RemainQuantitiesPerDateResponse(remainQuantityPerDateResponses);

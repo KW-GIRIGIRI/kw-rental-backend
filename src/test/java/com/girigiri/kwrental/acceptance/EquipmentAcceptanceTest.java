@@ -386,7 +386,11 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특정 기자재의 날짜별 남은 갯수를 조회한다.")
 	void getRemainQuantitiesBetween() {
 		// given
-		final Equipment equipment1 = EquipmentFixture.builder().name("equipment1").totalQuantity(10).build();
+		final Equipment equipment1 = EquipmentFixture.builder()
+			.name("equipment1")
+			.totalQuantity(10)
+			.rentableQuantity(10)
+			.build();
 		equipmentRepository.save(equipment1);
 		LocalDate monday = LocalDate.of(2023, 5, 15);
 		reservationSpecRepository.save(ReservationSpecFixture.builder(equipment1)

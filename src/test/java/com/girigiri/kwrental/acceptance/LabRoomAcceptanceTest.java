@@ -46,7 +46,7 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특정 랩실의 날짜별 남은 갯수를 조회한다.")
 	void getRemainQuantitiesBetween() {
 		// given
-		final LabRoom labRoom = LabRoomFixture.builder().name("hanul").totalQuantity(16).build();
+		final LabRoom labRoom = LabRoomFixture.builder().name("hanul").totalQuantity(16).rentableQuantity(16).build();
 		labRoomRepository.save(labRoom);
 		LocalDate monday = LocalDate.of(2023, 5, 15);
 		reservationSpecRepository.save(ReservationSpecFixture.builder(labRoom)
