@@ -77,7 +77,7 @@ public class EquipmentService {
 		final List<Long> ids = equipments.stream()
 			.map(Equipment::getId)
 			.toList();
-		return remainingQuantityService.getRemainingQuantityByEquipmentIdAndDate(ids, date);
+		return remainingQuantityService.getRemainingQuantityByAssetIdAndDate(ids, date);
 	}
 
 	@Transactional(readOnly = true)
