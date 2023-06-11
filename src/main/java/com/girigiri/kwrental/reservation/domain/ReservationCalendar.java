@@ -1,12 +1,12 @@
 package com.girigiri.kwrental.reservation.domain;
 
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Getter;
 
 @Getter
 public class ReservationCalendar {
@@ -31,7 +31,13 @@ public class ReservationCalendar {
 
     public void addAll(final List<ReservationSpec> reservationSpecs) {
         for (ReservationSpec reservationSpec : reservationSpecs) {
-            final int dayOfMonth = reservationSpec.getStartDate().getDayOfMonth();
+            add(reservationSpec);
+        }
+    }
+
+    private void add(final ReservationSpec reservationSpec) {
+        final int dayOfMonth = reservationSpec.getStartDate().getDayOfMonth();
+        for (int i = 0; i < reservationSpec.getAmount().getAmount(); i++) {
             calendar.get(dayOfMonth).add(reservationSpec.getReservation().getName());
         }
     }

@@ -214,7 +214,9 @@ class ReservationServiceTest {
 	void getReservationsByEquipmentsPerYearMonth() {
 		// given
 		final Equipment equipment = EquipmentFixture.create();
-		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
+		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment)
+			.amount(RentalAmount.ofPositive(2))
+			.build();
 		final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
 		given(reservationSpecRepository.findNotCanceldByStartDateBetween(any(), any(), any()))
 			.willReturn(List.of(reservationSpec));
@@ -226,7 +228,7 @@ class ReservationServiceTest {
 		// then
 		assertThat(
 			expect.getReservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(
-			reservation.getName());
+			reservation.getName(), reservation.getName());
 	}
 
 	@Test

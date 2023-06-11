@@ -193,8 +193,7 @@ public class ReservationService {
 		LocalDate startOfMonth = yearMonth.atDay(1);
 		LocalDate endOfMonth = yearMonth.atEndOfMonth();
 		final List<ReservationSpec> reservationSpecs = reservationSpecRepository.findNotCanceldByStartDateBetween(
-			equipmentId,
-			startOfMonth, endOfMonth);
+			equipmentId, startOfMonth, endOfMonth);
 		final ReservationCalendar calendar = ReservationCalendar.from(startOfMonth, endOfMonth);
 		calendar.addAll(reservationSpecs);
 		return ReservationsByEquipmentPerYearMonthResponse.from(calendar);
