@@ -187,18 +187,19 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	@DisplayName("랩실 대여를 할 때 이미 해당 랩실을 해당 기간동안 해당 회원이 대여 했으면 안된다.")
+	@DisplayName("랩실 대여를 할 때 랩실을 해당 기간동안 해당 회원이 대여 했으면 안된다.")
 	void reserve_alreadyLabRoomReserved() {
 		// given
-		LabRoom labRoom = LabRoomFixture.builder().id(1L).build();
-		given(assetService.getRentableByName(any())).willReturn(labRoom);
-		ReservationSpec spec = ReservationSpecFixture.builder(labRoom).build();
+		LabRoom labRoom1 = LabRoomFixture.builder().id(1L).build();
+		LabRoom labRoom2 = LabRoomFixture.builder().id(2L).build();
+		given(assetService.getRentableByName(any())).willReturn(labRoom1);
+		ReservationSpec spec = ReservationSpecFixture.builder(labRoom2).build();
 		given(reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(anyLong()))
 			.willReturn(Set.of(ReservationFixture.create(List.of(spec))));
 		given(penaltyService.hasOngoingPenalty(any())).willReturn(false);
 		AddLabRoomReservationRequest request = AddLabRoomReservationRequest.builder()
 			.renterCount(1)
-			.labRoomName(labRoom.getName())
+			.labRoomName(labRoom1.getName())
 			.startDate(spec.getStartDate())
 			.endDate(spec.getEndDate())
 			.build();

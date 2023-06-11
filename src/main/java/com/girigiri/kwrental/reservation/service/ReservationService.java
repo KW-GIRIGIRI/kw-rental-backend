@@ -139,7 +139,7 @@ public class ReservationService {
 		final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.getLabRoomName());
 		final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.getStartDate(),
 			addLabRoomReservationRequest.getEndDate());
-		validateAlreadyReserved(memberId, rentable, period);
+		validateAlreadyReserved(memberId, period);
 		validateLabRoomForReserve(rentable, period);
 		final RentalAmount amount = RentalAmount.ofPositive(addLabRoomReservationRequest.getRenterCount());
 		remainingQuantityService.validateAmount(rentable.getId(), amount.getAmount(), period);
@@ -149,11 +149,11 @@ public class ReservationService {
 		return reservation.getId();
 	}
 
-	private void validateAlreadyReserved(Long memberId, Rentable rentable, RentalPeriod period) {
+	private void validateAlreadyReserved(final Long memberId, final RentalPeriod period) {
 		boolean alreadyReserved = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(
 				memberId).stream()
 			.map(LabRoomReservation::new)
-			.anyMatch(it -> it.has(rentable, period));
+			.anyMatch(it -> it.has(period));
 		if (alreadyReserved) {
 			throw new AlreadyReservedLabRoomException();
 		}

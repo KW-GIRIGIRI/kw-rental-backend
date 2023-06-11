@@ -3,7 +3,6 @@ package com.girigiri.kwrental.reservation.domain;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.IllegalRentDateException;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationNotRentedWhenReturnException;
@@ -64,9 +63,8 @@ public class LabRoomReservation {
 		return getReservationSpec().getPeriod();
 	}
 
-	public boolean has(Rentable rentable, RentalPeriod period) {
+	public boolean has(final RentalPeriod period) {
 		ReservationSpec spec = getReservationSpec();
-		return spec.getRentable().getId().equals(rentable.getId())
-			&& spec.hasPeriod(period);
+		return spec.hasPeriod(period);
 	}
 }
