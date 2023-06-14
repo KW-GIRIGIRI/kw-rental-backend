@@ -116,6 +116,7 @@ public class RentalService {
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpecId)
 			.propertyNumber(propertyNumber)
+			.acceptDateTime(RentalDateTime.now())
 			.build();
 	}
 
@@ -249,6 +250,7 @@ public class RentalService {
 		return LabRoomRentalSpec.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpecId)
+			.acceptDateTime(RentalDateTime.now())
 			.build();
 	}
 

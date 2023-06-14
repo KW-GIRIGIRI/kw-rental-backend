@@ -1,17 +1,19 @@
 package com.girigiri.kwrental.penalty.dto.response;
 
+import java.time.LocalDate;
+
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
-import lombok.Getter;
 
-import java.time.LocalDate;
+import lombok.Getter;
 
 @Getter
 public class UserPenaltyResponse {
 
     private Long id;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate acceptDate;
+    private LocalDate returnDate;
     private String status;
     private String assetName;
     private PenaltyReason reason;
@@ -19,16 +21,19 @@ public class UserPenaltyResponse {
     private UserPenaltyResponse() {
     }
 
-    public UserPenaltyResponse(final Long id, final PenaltyPeriod period,
-                               final String assetName, final PenaltyReason reason) {
-        this(id, period.getStartDate(), period.getEndDate(), period.getStatus().getMessage(), assetName, reason);
+    public UserPenaltyResponse(final Long id, final RentalDateTime acceptDate, final RentalDateTime returnDate,
+        final PenaltyPeriod period,
+        final String assetName, final PenaltyReason reason) {
+        this(id, acceptDate.toLocalDate(), returnDate.toLocalDate(), period.getStatus().getMessage(), assetName,
+            reason);
     }
 
-    private UserPenaltyResponse(final Long id, final LocalDate startDate, final LocalDate endDate, final String status,
-                                final String assetName, final PenaltyReason reason) {
+    public UserPenaltyResponse(final Long id, final LocalDate acceptDate, final LocalDate returnDate,
+        final String status,
+        final String assetName, final PenaltyReason reason) {
         this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.acceptDate = acceptDate;
+        this.returnDate = returnDate;
         this.status = status;
         this.assetName = assetName;
         this.reason = reason;
