@@ -220,11 +220,13 @@ class AuthAcceptanceTest extends AcceptanceTest {
 	void resetPassword() {
 		// given
 		final String password = "12345678";
-		final Member member = memberRepository.save(MemberFixture.builder(password).role(Role.USER).build());
+		final String email = "djwhy5510@naver.com";
+		final Member member = memberRepository.save(
+			MemberFixture.builder(password).role(Role.USER).email(email).build());
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
 		final ResetPasswordRequest requestBody = new ResetPasswordRequest(member.getMemberNumber(),
-			"djwhy5510@naver.com");
+			email);
 		doNothing().when(emailService).sendRenewPassword(eq(requestBody.getEmail()), anyString());
 
 		// when
