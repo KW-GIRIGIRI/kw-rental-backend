@@ -1,19 +1,28 @@
 package com.girigiri.kwrental.rental.domain;
 
+import java.time.LocalDateTime;
+
 import com.girigiri.kwrental.common.AbstractSuperEntity;
 import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import jakarta.persistence.*;
-import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
 @Getter
 @Table(name = "rental_spec")
-@EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractRentalSpec extends AbstractSuperEntity implements RentalSpec {
 
     @Id
@@ -30,7 +39,6 @@ public abstract class AbstractRentalSpec extends AbstractSuperEntity implements 
     @Column(nullable = false)
     private RentalSpecStatus status = RentalSpecStatus.RENTED;
 
-    @CreatedDate
     @Embedded
     @AttributeOverride(name = "instant", column = @Column(name = "accept_date_time"))
     private RentalDateTime acceptDateTime;
@@ -47,8 +55,12 @@ public abstract class AbstractRentalSpec extends AbstractSuperEntity implements 
         this.id = id;
         this.reservationSpecId = reservationSpecId;
         this.reservationId = reservationId;
-        if (status != null) this.status = status;
-        this.acceptDateTime = acceptDateTime;
+        if (status != null)
+            this.status = status;
+        if (acceptDateTime == null)
+            this.acceptDateTime = RentalDateTime.now();
+        if (acceptDateTime != null)
+            this.acceptDateTime = acceptDateTime;
         this.returnDateTime = returnDateTime;
     }
 

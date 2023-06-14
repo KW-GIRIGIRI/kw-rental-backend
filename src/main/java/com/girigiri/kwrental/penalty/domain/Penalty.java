@@ -60,4 +60,8 @@ public class Penalty {
     public void setReason(final PenaltyReason reason) {
         this.reason = reason;
     }
+
+    public String getStatusMessage() {
+        return this.period.getStatus().getMessage();
+    }
 }
