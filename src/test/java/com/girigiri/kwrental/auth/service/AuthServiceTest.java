@@ -14,7 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.dto.request.RegisterMemberRequest;
+import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
+import com.girigiri.kwrental.auth.exception.EmailNotMatchesException;
 import com.girigiri.kwrental.auth.exception.MemberException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.mail.EmailService;
@@ -52,5 +55,33 @@ class AuthServiceTest {
 		// when, then
 		assertThatThrownBy(() -> authService.register(request))
 			.isExactlyInstanceOf(MemberException.class);
+	}
+
+	@Test
+	@DisplayName("회원의 비밀번호를 재설정한다.")
+	void resetPassword() {
+		// given
+		final Member member = MemberFixture.create();
+		given(memberRepository.findByMemberNumber(any())).willReturn(Optional.of(member));
+		given(passwordEncoder.encode(any())).willReturn("password");
+		doNothing().when(emailService).sendRenewPassword(anyString(), anyString());
+		final ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest("2016317016", member.getEmail());
+
+		// when
+		assertThatCode(() -> authService.resetPassword(resetPasswordRequest))
+			.doesNotThrowAnyException();
+	}
+
+	@Test
+	@DisplayName("회원의 비밀번호를 재설정한다.")
+	void resetPassword_emailNotMatches() {
+		// given
+		final Member member = MemberFixture.builder().email("email@email.com").build();
+		given(memberRepository.findByMemberNumber(any())).willReturn(Optional.of(member));
+		final ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest("2016317016", "notMache@email.com");
+
+		// when
+		assertThatThrownBy(() -> authService.resetPassword(resetPasswordRequest))
+			.isExactlyInstanceOf(EmailNotMatchesException.class);
 	}
 }

@@ -86,4 +86,8 @@ public class Member {
 	public boolean isAdmin() {
 		return this.role == Role.ADMIN;
 	}
+
+	public boolean hasSameEmail(final String email) {
+		return this.email.equals(email);
+	}
 }

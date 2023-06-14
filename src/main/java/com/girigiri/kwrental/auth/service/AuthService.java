@@ -15,6 +15,7 @@ import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateAdminRequest;
 import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
+import com.girigiri.kwrental.auth.exception.EmailNotMatchesException;
 import com.girigiri.kwrental.auth.exception.ForbiddenException;
 import com.girigiri.kwrental.auth.exception.MemberException;
 import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
@@ -99,7 +100,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public void checkPassword(Long id, String password) {
+    public void checkPassword(final Long id, final String password) {
         final String encodedPassword = getMember(id).getPassword();
         boolean matches = passwordEncoder.matches(password, encodedPassword);
         if (!matches) {
@@ -108,8 +109,11 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+    public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
         final Member member = getMemberByMemberNumber(resetPasswordRequest.getMemberNumber());
+        if (!member.hasSameEmail(resetPasswordRequest.getEmail())) {
+            throw new EmailNotMatchesException();
+        }
         final String randomPassword = getRandomPassword();
         final String encodedPassword = passwordEncoder.encode(randomPassword);
         member.updatePassword(encodedPassword);
