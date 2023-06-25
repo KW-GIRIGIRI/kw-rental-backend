@@ -317,8 +317,9 @@ class ReservationSpecRepositoryTest {
 
 		// then
 		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2),
-				member.getMemberNumber()));
+			.containsExactly(
+				new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+					member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec2)));
 	}
 
 	@Test
@@ -372,8 +373,9 @@ class ReservationSpecRepositoryTest {
 
 		// then
 		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1),
-				member.getMemberNumber()));
+			.containsExactly(
+				new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+					member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec1)));
 	}
 
 	@Test

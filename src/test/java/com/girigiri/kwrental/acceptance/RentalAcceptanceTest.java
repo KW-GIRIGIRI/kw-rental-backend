@@ -191,11 +191,13 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(
-					EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1, reservationSpec2),
-						member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)),
+					new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+						member.getMemberNumber(), reservation1.getAcceptDateTime(),
+						List.of(reservationSpec1, reservationSpec2)), List.of(rentalSpec1, rentalSpec2)),
 				EquipmentReservationWithRentalSpecsResponse.of(
-					EquipmentReservationWithMemberNumber.of(reservation2, List.of(reservationSpec3, reservationSpec4),
-						member.getMemberNumber()), Collections.emptyList()));
+					new EquipmentReservationWithMemberNumber(reservation2.getId(), reservation2.getName(),
+						member.getMemberNumber(), reservation2.getAcceptDateTime(),
+						List.of(reservationSpec3, reservationSpec4)), Collections.emptyList()));
 	}
 
 	@Test
@@ -269,13 +271,15 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			() -> assertThat(
 				response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrder(OverdueReservationResponse.of(
-					EquipmentReservationWithMemberNumber.of(reservation2, List.of(reservationSpec3),
-						member.getMemberNumber()), List.of(rentalSpec3))),
+					new EquipmentReservationWithMemberNumber(reservation2.getId(), reservation2.getName(),
+						member.getMemberNumber(), reservation2.getAcceptDateTime(), List.of(reservationSpec3)),
+					List.of(rentalSpec3))),
 			() -> assertThat(
 				response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(
-					EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2),
-						member.getMemberNumber()), List.of(rentalSpec1, rentalSpec2)))
+					new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+						member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec2)),
+					List.of(rentalSpec1, rentalSpec2)))
 		);
 	}
 

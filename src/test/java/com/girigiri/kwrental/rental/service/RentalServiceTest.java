@@ -138,8 +138,9 @@ class RentalServiceTest {
 		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
 			.reservationSpecId(reservationSpec1.getId())
 			.build();
-		final EquipmentReservationWithMemberNumber equipmentReservation = EquipmentReservationWithMemberNumber.of(
-			reservation, List.of(reservationSpec1), "11111111");
+		final EquipmentReservationWithMemberNumber equipmentReservation =
+			new EquipmentReservationWithMemberNumber(reservation.getId(), reservation.getName(), "11111111",
+				reservation.getAcceptDateTime(), List.of(reservationSpec1));
 		given(reservationService.getReservationsByStartDate(any())).willReturn(Set.of(equipmentReservation));
 		given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId()))).willReturn(
 			List.of(rentalSpec1));

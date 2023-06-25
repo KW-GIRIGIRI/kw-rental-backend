@@ -238,8 +238,9 @@ class ReservationServiceTest {
 		final Equipment equipment = EquipmentFixture.create();
 		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment).build();
 		final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-		final EquipmentReservationWithMemberNumber equipmentReservation = EquipmentReservationWithMemberNumber.of(
-			reservation, List.of(reservationSpec), "11111111");
+		final EquipmentReservationWithMemberNumber equipmentReservation = new EquipmentReservationWithMemberNumber(
+			reservation.getId(), reservation.getName(), "11111111", reservation.getAcceptDateTime(),
+			List.of(reservationSpec));
 		given(reservationSpecRepository.findEquipmentReservationWhenAccept(any()))
 			.willReturn(Set.of(equipmentReservation));
 

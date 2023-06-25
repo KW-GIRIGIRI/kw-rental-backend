@@ -1,9 +1,10 @@
 package com.girigiri.kwrental.reservation.domain;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import lombok.Getter;
-
 import java.util.List;
+
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+
+import lombok.Getter;
 
 @Getter
 public class EquipmentReservationWithMemberNumber {
@@ -22,10 +23,6 @@ public class EquipmentReservationWithMemberNumber {
         this.memberNumber = memberNumber;
         this.acceptDateTime = acceptDateTime;
         this.reservationSpecs = reservationSpecs;
-    }
-
-    public static EquipmentReservationWithMemberNumber of(final Reservation reservation, final List<ReservationSpec> specs, final String memberNumber) {
-        return new EquipmentReservationWithMemberNumber(reservation.getId(), reservation.getName(), memberNumber, reservation.getAcceptDateTime(), specs);
     }
 
     public List<Long> getReservationSpecIds() {
