@@ -1,15 +1,25 @@
 package com.girigiri.kwrental.reservation.domain;
 
+import java.time.LocalDate;
+
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -98,10 +108,6 @@ public class ReservationSpec {
         return status != ReservationSpecStatus.RESERVED
                 && status != ReservationSpecStatus.RENTED
                 && status != ReservationSpecStatus.OVERDUE_RENTED;
-    }
-
-    public boolean isReservedOrRented() {
-        return this.status == ReservationSpecStatus.RESERVED || this.status == ReservationSpecStatus.RENTED;
     }
 
     public boolean isRentFor(final String rentableName) {
