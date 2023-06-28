@@ -1,26 +1,17 @@
 package com.girigiri.kwrental.reservation.dto.response;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
-public class UnterminatedEquipmentReservationsResponse {
+import com.girigiri.kwrental.reservation.domain.Reservation;
 
-    private List<UnterminatedEquipmentReservationResponse> reservations;
+public record UnterminatedEquipmentReservationsResponse(
 
-    private UnterminatedEquipmentReservationsResponse() {
-    }
-
-    private UnterminatedEquipmentReservationsResponse(final List<UnterminatedEquipmentReservationResponse> reservations) {
-        this.reservations = reservations;
-    }
-
+    List<UnterminatedEquipmentReservationResponse> reservations
+) {
     public static UnterminatedEquipmentReservationsResponse from(final List<Reservation> unterminatedReservations) {
         final List<UnterminatedEquipmentReservationResponse> reservationResponses = unterminatedReservations.stream()
-                .map(UnterminatedEquipmentReservationResponse::from)
-                .toList();
+            .map(UnterminatedEquipmentReservationResponse::from)
+            .toList();
         return new UnterminatedEquipmentReservationsResponse(reservationResponses);
     }
 }

@@ -165,7 +165,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.as(ReservationsByEquipmentPerYearMonthResponse.class);
 
 		// then
-		assertThat(response.getReservations().get(LocalDate.now().getDayOfMonth()))
+		assertThat(response.reservations().get(LocalDate.now().getDayOfMonth()))
 			.usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(reservation1.getName());
 	}
 
@@ -203,7 +203,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.extract().as(UnterminatedEquipmentReservationsResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(UnterminatedEquipmentReservationResponse.from(reservation1),
 				UnterminatedEquipmentReservationResponse.from(reservation2));
 	}
@@ -281,7 +281,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.as(LabRoomReservationsWithMemberNumberResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
 					List.of(
@@ -352,7 +352,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomReservationsWithMemberNumberResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
 					List.of(
@@ -433,7 +433,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.extract().as(RelatedReservationsInfoResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(ReservationInfoResponse.from(reservation1), ReservationInfoResponse.from(reservation2));
 	}
 
@@ -494,7 +494,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.extract().as(ReservationPurposeResponse.class);
 
 		// then
-		assertThat(response.getPurpose())
+		assertThat(response.purpose())
 			.isEqualTo(reservation1.getPurpose());
 	}
 }

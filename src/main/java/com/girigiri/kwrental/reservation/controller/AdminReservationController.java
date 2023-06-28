@@ -43,8 +43,7 @@ public class AdminReservationController {
 	@PatchMapping("/specs/{reservationSpecId}")
 	public ResponseEntity<?> cancelReservationSpec(@PathVariable Long reservationSpecId,
 		@Validated @RequestBody final CancelReservationSpecRequest body) {
-		final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId,
-			body.getAmount());
+		final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId, body.amount());
 		return ResponseEntity.noContent()
 			.location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();
 	}

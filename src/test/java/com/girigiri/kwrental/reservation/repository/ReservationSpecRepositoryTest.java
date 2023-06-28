@@ -20,6 +20,7 @@ import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
+import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.Reservation;
@@ -411,7 +412,7 @@ class ReservationSpecRepositoryTest {
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
 			.containsExactlyInAnyOrder(
-				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
+				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), (RentalDateTime)null,
 					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
 							reservationSpec1.getReservation().getId(), reservation1.getName(), member.getMemberNumber(),
 							reservationSpec1.getAmount().getAmount(),
@@ -420,7 +421,7 @@ class ReservationSpecRepositoryTest {
 							reservationSpec3.getReservation().getId(),
 							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
 							reservation3.getPhoneNumber()))),
-				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
+				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), (RentalDateTime)null,
 					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
 						reservationSpec2.getReservation().getId(), reservation2.getName(), member.getMemberNumber(),
 						reservationSpec2.getAmount().getAmount(),
@@ -466,12 +467,12 @@ class ReservationSpecRepositoryTest {
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
 			.containsExactlyInAnyOrder(
-				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
+				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), (RentalDateTime)null,
 					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
 						reservationSpec1.getReservation().getId(), reservation1.getName(), member.getMemberNumber(),
 						reservationSpec1.getAmount().getAmount(),
 						reservation1.getPhoneNumber()))),
-				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
+				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), (RentalDateTime)null,
 					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
 						reservationSpec2.getReservation().getId(), reservation2.getName(), member.getMemberNumber(),
 						reservationSpec2.getAmount().getAmount(),

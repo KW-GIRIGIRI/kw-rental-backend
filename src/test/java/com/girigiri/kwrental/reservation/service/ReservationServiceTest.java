@@ -86,10 +86,10 @@ class ReservationServiceTest {
 			.renterName("name").build();
 		final Reservation reservation = Reservation.builder()
 			.id(1L)
-			.phoneNumber(addReservationRequest.getRenterPhoneNumber())
-			.purpose(addReservationRequest.getRentalPurpose())
-			.email(addReservationRequest.getRenterEmail())
-			.name(addReservationRequest.getRenterName())
+			.phoneNumber(addReservationRequest.renterPhoneNumber())
+			.purpose(addReservationRequest.rentalPurpose())
+			.email(addReservationRequest.renterEmail())
+			.name(addReservationRequest.renterName())
 			.reservationSpecs(List.of(ReservationSpecFixture.create(equipment)))
 			.build();
 		given(reservationRepository.saveAll(any())).willReturn(List.of(reservation));
@@ -125,18 +125,18 @@ class ReservationServiceTest {
 			.renterName("name").build();
 		final Reservation reservation1 = Reservation.builder()
 			.id(1L)
-			.phoneNumber(addReservationRequest.getRenterPhoneNumber())
-			.purpose(addReservationRequest.getRentalPurpose())
-			.email(addReservationRequest.getRenterEmail())
-			.name(addReservationRequest.getRenterName())
+			.phoneNumber(addReservationRequest.renterPhoneNumber())
+			.purpose(addReservationRequest.rentalPurpose())
+			.email(addReservationRequest.renterEmail())
+			.name(addReservationRequest.renterName())
 			.reservationSpecs(List.of(ReservationSpecFixture.builder(equipment).period(rentalPeriod1).build()))
 			.build();
 		final Reservation reservation2 = Reservation.builder()
 			.id(2L)
-			.phoneNumber(addReservationRequest.getRenterPhoneNumber())
-			.purpose(addReservationRequest.getRentalPurpose())
-			.email(addReservationRequest.getRenterEmail())
-			.name(addReservationRequest.getRenterName())
+			.phoneNumber(addReservationRequest.renterPhoneNumber())
+			.purpose(addReservationRequest.rentalPurpose())
+			.email(addReservationRequest.renterEmail())
+			.name(addReservationRequest.renterName())
 			.reservationSpecs(List.of(ReservationSpecFixture.builder(equipment).period(rentalPeriod2).build()))
 			.build();
 		given(reservationRepository.saveAll(anyList()))
@@ -227,7 +227,7 @@ class ReservationServiceTest {
 
 		// then
 		assertThat(
-			expect.getReservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(
+			expect.reservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(
 			reservation.getName(), reservation.getName());
 	}
 

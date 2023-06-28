@@ -125,10 +125,10 @@ public class ReservationService {
 		final List<ReservationSpec> samePeriodSpec) {
 		return Reservation.builder()
 			.reservationSpecs(samePeriodSpec)
-			.email(addReservationRequest.getRenterEmail())
-			.name(addReservationRequest.getRenterName())
-			.purpose(addReservationRequest.getRentalPurpose())
-			.phoneNumber(addReservationRequest.getRenterPhoneNumber())
+			.email(addReservationRequest.renterEmail())
+			.name(addReservationRequest.renterName())
+			.purpose(addReservationRequest.rentalPurpose())
+			.phoneNumber(addReservationRequest.renterPhoneNumber())
 			.memberId(memberId)
 			.build();
 	}
@@ -234,8 +234,8 @@ public class ReservationService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
 		final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(
-			rentLabRoomRequest.getReservationSpecIds());
-		validateSameLabRoom(rentLabRoomRequest.getName(), reservations);
+			rentLabRoomRequest.reservationSpecIds());
+		validateSameLabRoom(rentLabRoomRequest.name(), reservations);
 		for (Reservation reservation : reservations) {
 			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 			labRoomReservation.validateWhenRent();
@@ -338,8 +338,8 @@ public class ReservationService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public List<Reservation> returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
 		final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(
-			returnLabRoomRequest.getReservationSpecIds());
-		validateSameLabRoom(returnLabRoomRequest.getName(), reservations);
+			returnLabRoomRequest.reservationSpecIds());
+		validateSameLabRoom(returnLabRoomRequest.name(), reservations);
 		for (Reservation reservation : reservations) {
 			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 			labRoomReservation.validateWhenReturn();

@@ -4,18 +4,8 @@ import java.util.List;
 
 import com.girigiri.kwrental.reservation.domain.Reservation;
 
-import lombok.Getter;
-
-@Getter
-public class RelatedReservationsInfoResponse {
-	private List<ReservationInfoResponse> reservations;
-
-	private RelatedReservationsInfoResponse() {
-	}
-
-	private RelatedReservationsInfoResponse(List<ReservationInfoResponse> reservations) {
-		this.reservations = reservations;
-	}
+public record RelatedReservationsInfoResponse(
+	List<ReservationInfoResponse> reservations) {
 
 	public static RelatedReservationsInfoResponse from(final List<Reservation> reservations) {
 		List<ReservationInfoResponse> reservationInfoResponses = reservations.stream()
