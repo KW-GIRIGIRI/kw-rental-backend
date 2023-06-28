@@ -136,12 +136,12 @@ public class ReservationService {
 	@Transactional
 	public Long reserve(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
 		validatePenalty(memberId);
-		final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.getLabRoomName());
-		final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.getStartDate(),
-			addLabRoomReservationRequest.getEndDate());
+		final Rentable rentable = assetService.getRentableByName(addLabRoomReservationRequest.labRoomName());
+		final RentalPeriod period = new RentalPeriod(addLabRoomReservationRequest.startDate(),
+			addLabRoomReservationRequest.endDate());
 		validateAlreadyReserved(memberId, period);
 		validateLabRoomForReserve(rentable, period);
-		final RentalAmount amount = RentalAmount.ofPositive(addLabRoomReservationRequest.getRenterCount());
+		final RentalAmount amount = RentalAmount.ofPositive(addLabRoomReservationRequest.renterCount());
 		remainingQuantityService.validateAmount(rentable.getId(), amount.getAmount(), period);
 		final ReservationSpec spec = mapToReservationSpec(rentable, period, amount);
 		final Reservation reservation = mapToReservation(memberId, addLabRoomReservationRequest, spec);
@@ -180,10 +180,10 @@ public class ReservationService {
 		return Reservation.builder()
 			.reservationSpecs(List.of(spec))
 			.memberId(memberId)
-			.email(addLabRoomReservationRequest.getRenterEmail())
-			.name(addLabRoomReservationRequest.getRenterName())
-			.purpose(addLabRoomReservationRequest.getRentalPurpose())
-			.phoneNumber(addLabRoomReservationRequest.getRenterPhoneNumber())
+			.email(addLabRoomReservationRequest.renterEmail())
+			.name(addLabRoomReservationRequest.renterName())
+			.purpose(addLabRoomReservationRequest.rentalPurpose())
+			.phoneNumber(addLabRoomReservationRequest.renterPhoneNumber())
 			.build();
 	}
 
