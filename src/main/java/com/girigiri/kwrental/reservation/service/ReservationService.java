@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -49,11 +48,11 @@ import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 @Service
+@Transactional
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
@@ -63,12 +62,14 @@ public class ReservationService {
 	private final AssetService assetService;
 	private final LabRoomService labRoomService;
 	private final PenaltyService penaltyService;
+	private final ReservationCancelService reservationCancelService;
 
 	public ReservationService(final ReservationRepository reservationRepository,
 		final InventoryService inventoryService,
 		final RemainingQuantityServiceImpl remainingQuantityService,
 		final ReservationSpecRepository reservationSpecRepository, final AssetService assetService,
-		LabRoomService labRoomService, final PenaltyService penaltyService) {
+		LabRoomService labRoomService, final PenaltyService penaltyService,
+		final ReservationCancelService reservationCancelService) {
 		this.reservationRepository = reservationRepository;
 		this.inventoryService = inventoryService;
 		this.remainingQuantityService = remainingQuantityService;
@@ -76,6 +77,7 @@ public class ReservationService {
 		this.assetService = assetService;
 		this.labRoomService = labRoomService;
 		this.penaltyService = penaltyService;
+		this.reservationCancelService = reservationCancelService;
 	}
 
 	@Transactional
@@ -281,29 +283,7 @@ public class ReservationService {
 
 	@Transactional
 	public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
-		final ReservationSpec reservationSpec = getReservationSpec(reservationSpecId);
-		cancelAndAdjust(reservationSpec, amount);
-		return reservationSpec.getId();
-	}
-
-	private ReservationSpec getReservationSpec(final Long reservationSpecId) {
-		return reservationSpecRepository.findById(reservationSpecId)
-			.orElseThrow(ReservationSpecNotFoundException::new);
-	}
-
-	private void cancelAndAdjust(final ReservationSpec reservationSpec, final Integer amount) {
-		reservationSpec.cancelAmount(amount);
-		reservationSpecRepository.adjustAmountAndStatus(reservationSpec);
-		final Long reservationId = reservationSpec.getReservation().getId();
-		updateAndAdjustTerminated(reservationId);
-	}
-
-	private void updateAndAdjustTerminated(final Long reservationId) {
-		final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
-			.orElseThrow(ReservationNotFoundException::new);
-		reservation.updateIfTerminated();
-		if (reservation.isTerminated())
-			reservationRepository.adjustTerminated(reservation);
+		return reservationCancelService.cancelReservationSpec(reservationSpecId, amount);
 	}
 
 	@Transactional(readOnly = true)
@@ -350,16 +330,10 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void cancelAll(final Long memberId) {
-		Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
-		final List<ReservationSpec> specs = reservations.stream()
-			.filter(reservation -> !reservation.isAccepted())
-			.map(Reservation::getReservationSpecs)
-			.flatMap(Collection::stream)
-			.filter(ReservationSpec::isReserved)
-			.toList();
-		specs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
+		reservationCancelService.cancelAll(memberId);
 	}
 
+	@Transactional(readOnly = true)
 	public RelatedReservationsInfoResponse getRelatedReservationsInfo(Long id) {
 		Reservation reservation = getReservationById(id);
 		LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
@@ -380,17 +354,6 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void cancelByAssetId(Long assetId) {
-		List<ReservationSpec> reservedOrRentedSpecs = reservationSpecRepository.findReservedOrRentedByAssetId(
-			assetId);
-		validateAllReserved(reservedOrRentedSpecs);
-		reservedOrRentedSpecs
-			.forEach(spec -> cancelReservationSpec(spec.getId(), spec.getAmount().getAmount()));
-	}
-
-	private void validateAllReserved(List<ReservationSpec> reservedOrRentedSpecs) {
-		boolean anyRented = reservedOrRentedSpecs.stream()
-			.anyMatch(ReservationSpec::isRented);
-		if (anyRented)
-			throw new ReservationSpecException("대여 중인 대여 예약 상세는 취소할 수 없습니다.");
+		reservationCancelService.cancelByAssetId(assetId);
 	}
 }

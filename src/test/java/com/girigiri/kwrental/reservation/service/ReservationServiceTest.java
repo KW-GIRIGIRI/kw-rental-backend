@@ -1,8 +1,6 @@
 package com.girigiri.kwrental.reservation.service;
 
-import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
@@ -333,79 +331,5 @@ class ReservationServiceTest {
 		// when, then
 		assertThatThrownBy(() -> reservationService.getReservationWithReservationSpecsById(1L))
 			.isExactlyInstanceOf(ReservationNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("대여 예약 상세를 전량 취소하고 대여 예약이 취소된다.")
-	void cancelReservationSpec_cancelReservation() {
-		// given
-		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(null)
-			.id(1L)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		final ReservationSpec afterCanceledSpec = ReservationSpecFixture.builder(null)
-			.id(1L)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		afterCanceledSpec.cancelAmount(2);
-		final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).terminated(false).build();
-		final Reservation afterCanceledReservation = ReservationFixture.builder(List.of(afterCanceledSpec))
-			.terminated(true)
-			.build();
-		reservation.updateIfTerminated();
-
-		given(reservationSpecRepository.findById(any())).willReturn(Optional.of(reservationSpec));
-		doNothing().when(reservationSpecRepository).adjustAmountAndStatus(deepRefEq(afterCanceledSpec, "reservation"));
-		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
-		doNothing().when(reservationRepository).adjustTerminated(deepRefEq(afterCanceledReservation));
-
-		// when
-		final Long actual = reservationService.cancelReservationSpec(any(), 2);
-
-		// then
-		assertAll(
-			() -> assertThat(reservationSpec).usingRecursiveComparison().isEqualTo(afterCanceledSpec),
-			() -> assertThat(reservation).usingRecursiveComparison().isEqualTo(afterCanceledReservation),
-			() -> assertThat(actual).isEqualTo(reservationSpec.getId())
-		);
-	}
-
-	@Test
-	@DisplayName("대여 예약 상세를 전량 취소하지만 대여 예약이 종결되지 않아 취소되지 않는다.")
-	void cancelReservationSpec() {
-		// given
-		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(null)
-			.id(1L)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		final ReservationSpec afterCanceledSpec = ReservationSpecFixture.builder(null)
-			.id(1L)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		afterCanceledSpec.cancelAmount(2);
-		final ReservationSpec reservationSpec2 = ReservationSpecFixture.builder(null)
-			.id(2L)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2))
-			.terminated(false)
-			.build();
-		final Reservation afterCanceledReservation = ReservationFixture.builder(
-			List.of(afterCanceledSpec, reservationSpec2)).terminated(false).build();
-		reservation.updateIfTerminated();
-
-		given(reservationSpecRepository.findById(any())).willReturn(Optional.of(reservationSpec1));
-		doNothing().when(reservationSpecRepository).adjustAmountAndStatus(deepRefEq(afterCanceledSpec, "reservation"));
-		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
-
-		// when
-		final Long actual = reservationService.cancelReservationSpec(any(), 2);
-
-		// then
-		assertAll(
-			() -> assertThat(reservationSpec1).usingRecursiveComparison().isEqualTo(afterCanceledSpec),
-			() -> assertThat(reservation).usingRecursiveComparison().isEqualTo(afterCanceledReservation),
-			() -> assertThat(actual).isEqualTo(reservationSpec1.getId())
-		);
 	}
 }
