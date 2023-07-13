@@ -22,17 +22,15 @@ import com.girigiri.kwrental.reservation.service.ReservationService;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 
-@RestController
-@RequestMapping("/api/admin/reservations")
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/admin/reservations")
 public class AdminReservationController {
 
 	private final ReservationService reservationService;
-
-	public AdminReservationController(final ReservationService reservationService) {
-		this.reservationService = reservationService;
-	}
 
 	@GetMapping
 	public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentPerYearMonth(final Long equipmentId,

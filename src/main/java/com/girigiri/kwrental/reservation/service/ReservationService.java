@@ -1,7 +1,6 @@
 package com.girigiri.kwrental.reservation.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
@@ -26,10 +23,6 @@ import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
-import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
-import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
-import com.girigiri.kwrental.reservation.repository.ReservationRepository;
-import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,12 +30,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationService {
 
-	private final ReservationRepository reservationRepository;
-	private final ReservationSpecRepository reservationSpecRepository;
 	private final ReservationCancelService reservationCancelService;
 	private final ReservationReserveService reservationReserveService;
 	private final ReservationRetrieveService reservationRetrieveService;
 	private final ReservationValidateService reservationValidateService;
+	private final ReservationRentalService reservationRentalService;
 
 	@Transactional
 	public void reserveEquipment(final Long memberId, final AddEquipmentReservationRequest addReservationRequest) {
@@ -74,15 +66,7 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
-		final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(
-			rentLabRoomRequest.reservationSpecIds());
-		validateSameLabRoom(rentLabRoomRequest.name(), reservations);
-		for (Reservation reservation : reservations) {
-			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-			labRoomReservation.validateWhenRent();
-			acceptReservation(labRoomReservation.getId(), List.of(labRoomReservation.getReservationSpecId()));
-		}
-		return reservations;
+		return reservationRentalService.rentLabRoom(rentLabRoomRequest);
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -128,34 +112,12 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
-		final Reservation reservation = getReservationById(id);
-		reservation.acceptAt(LocalDateTime.now());
-		reservationSpecRepository.updateStatusByIds(rentedReservationSpecIds, ReservationSpecStatus.RENTED);
-	}
-
-	private Reservation getReservationById(Long id) {
-		return reservationRepository.findById(id)
-			.orElseThrow(ReservationNotFoundException::new);
-	}
-
-	private void validateSameLabRoom(final String labRoomName, final List<Reservation> reservations) {
-		final boolean isSameRentable = reservations.stream()
-			.allMatch(reservation -> reservation.isOnlyRentFor(labRoomName));
-		if (!isSameRentable)
-			throw new NotSameRentableRentException();
+		reservationRentalService.acceptReservation(id, rentedReservationSpecIds);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public List<Reservation> returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
-		final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(
-			returnLabRoomRequest.reservationSpecIds());
-		validateSameLabRoom(returnLabRoomRequest.name(), reservations);
-		for (Reservation reservation : reservations) {
-			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-			labRoomReservation.validateWhenReturn();
-			labRoomReservation.normalReturnAll();
-		}
-		return reservations;
+		return reservationRentalService.returnLabRoom(returnLabRoomRequest);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)

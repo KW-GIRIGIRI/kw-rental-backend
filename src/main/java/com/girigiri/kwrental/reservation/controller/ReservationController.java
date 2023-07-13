@@ -20,15 +20,14 @@ import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReser
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
 	private final ReservationService reservationService;
-
-	private ReservationController(final ReservationService reservationService) {
-		this.reservationService = reservationService;
-	}
 
 	@PostMapping
 	public ResponseEntity<?> reserve(@Login final SessionMember sessionMember,
