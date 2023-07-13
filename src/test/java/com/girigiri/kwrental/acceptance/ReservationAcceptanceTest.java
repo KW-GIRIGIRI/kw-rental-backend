@@ -28,8 +28,8 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.AddReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
@@ -83,7 +83,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Item item = itemRepository.save(ItemFixture.builder().assetId(asset.getId()).build());
 		final Inventory inventory = inventoryRepository.save(InventoryFixture.create(asset, member.getId()));
 
-		final AddReservationRequest request = AddReservationRequest.builder()
+		final AddEquipmentReservationRequest request = AddEquipmentReservationRequest.builder()
 			.renterName("대여자")
 			.renterEmail("djwhy5510@naver.com")
 			.renterPhoneNumber("010-7301-5510")
