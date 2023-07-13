@@ -21,17 +21,14 @@ import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.ReservedAmount;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class RemainingQuantityServiceImpl implements RemainingQuantityService, AmountValidator {
 
 	private final ReservationSpecRepository reservationSpecRepository;
 	private final AssetService assetService;
-
-	public RemainingQuantityServiceImpl(final ReservationSpecRepository reservationSpecRepository,
-		final AssetService assetService) {
-		this.reservationSpecRepository = reservationSpecRepository;
-		this.assetService = assetService;
-	}
 
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)

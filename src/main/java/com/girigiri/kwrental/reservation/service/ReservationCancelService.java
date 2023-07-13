@@ -14,17 +14,14 @@ import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundExcept
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ReservationCancelService {
 
 	private final ReservationRepository reservationRepository;
 	private final ReservationSpecRepository reservationSpecRepository;
-
-	public ReservationCancelService(final ReservationRepository reservationRepository,
-		final ReservationSpecRepository reservationSpecRepository) {
-		this.reservationRepository = reservationRepository;
-		this.reservationSpecRepository = reservationSpecRepository;
-	}
 
 	void cancelAll(final Long memberId) {
 		Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);

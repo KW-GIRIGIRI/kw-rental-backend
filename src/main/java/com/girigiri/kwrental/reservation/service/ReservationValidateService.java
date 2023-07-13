@@ -20,17 +20,17 @@ import lombok.RequiredArgsConstructor;
 public class ReservationValidateService {
 	private final ReservationRepository reservationRepository;
 
-	public Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId,
-		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
-		final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
-			.orElseThrow(ReservationNotFoundException::new);
-		validateReservationSpecIdContainsAll(reservation, propertyNumbersByReservationSpecId.keySet());
-		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
-		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
-			reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
-			collectedByEquipmentId.put(reservationSpec.getRentable().getId(),
-				propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
-		}
+	 Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId,
+		 final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
+		 final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
+			 .orElseThrow(ReservationNotFoundException::new);
+		 validateReservationSpecIdContainsAll(reservation, propertyNumbersByReservationSpecId.keySet());
+		 Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
+		 for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+			 reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
+			 collectedByEquipmentId.put(reservationSpec.getRentable().getId(),
+				 propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
+		 }
 		return collectedByEquipmentId;
 	}
 

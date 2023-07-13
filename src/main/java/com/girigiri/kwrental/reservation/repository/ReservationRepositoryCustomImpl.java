@@ -17,16 +17,13 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ReservationRepositoryCustomImpl implements ReservationRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 	private final EntityManager entityManager;
-
-	public ReservationRepositoryCustomImpl(final JPAQueryFactory queryFactory, final EntityManager entityManager) {
-		this.queryFactory = queryFactory;
-		this.entityManager = entityManager;
-	}
 
 	@Override
 	public Optional<Reservation> findByIdWithSpecs(final Long id) {

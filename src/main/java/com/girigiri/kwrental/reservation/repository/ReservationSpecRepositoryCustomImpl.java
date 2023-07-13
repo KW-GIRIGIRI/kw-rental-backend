@@ -29,16 +29,13 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 	private final EntityManager entityManager;
-
-	public ReservationSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory, final EntityManager entityManager) {
-		this.queryFactory = queryFactory;
-		this.entityManager = entityManager;
-	}
 
 	@Override
 	public List<ReservationSpec> findOverlappedReservedOrRentedInclusive(final Long rentableId, final LocalDate start,
