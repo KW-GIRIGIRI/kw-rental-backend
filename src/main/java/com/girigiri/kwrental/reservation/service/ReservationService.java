@@ -60,7 +60,10 @@ public class ReservationService {
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId,
 		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
-		return reservationValidateService.validatePropertyNumbersCountAndGroupByEquipmentId(reservationId,
+		reservationValidateService.validateReservationSpecAmount(reservationId, propertyNumbersByReservationSpecId);
+		reservationValidateService.validateReservationSpecIdContainsAll(reservationId,
+			propertyNumbersByReservationSpecId.keySet());
+		return reservationRetrieveService.groupPropertyNumbersCountByEquipmentId(reservationId,
 			propertyNumbersByReservationSpecId);
 	}
 

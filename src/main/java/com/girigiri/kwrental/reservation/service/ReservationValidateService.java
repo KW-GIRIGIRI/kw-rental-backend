@@ -1,6 +1,5 @@
 package com.girigiri.kwrental.reservation.service;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,22 +19,9 @@ import lombok.RequiredArgsConstructor;
 public class ReservationValidateService {
 	private final ReservationRepository reservationRepository;
 
-	 Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId,
-		 final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
-		 final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
-			 .orElseThrow(ReservationNotFoundException::new);
-		 validateReservationSpecIdContainsAll(reservation, propertyNumbersByReservationSpecId.keySet());
-		 Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
-		 for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
-			 reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
-			 collectedByEquipmentId.put(reservationSpec.getRentable().getId(),
-				 propertyNumbersByReservationSpecId.get(reservationSpec.getId()));
-		 }
-		return collectedByEquipmentId;
-	}
-
-	private void validateReservationSpecIdContainsAll(final Reservation reservation,
+	void validateReservationSpecIdContainsAll(final Long reservationId,
 		final Set<Long> reservationSpecIdsFromInput) {
+		final Reservation reservation = getReservationWithSpecs(reservationId);
 		final Set<Long> reservationSpecIdsFromReservation = reservation.getReservationSpecs().stream()
 			.filter(ReservationSpec::isReserved)
 			.map(ReservationSpec::getId)
@@ -44,5 +30,18 @@ public class ReservationValidateService {
 			reservationSpecIdsFromReservation.containsAll(reservationSpecIdsFromInput))
 			return;
 		throw new ReservationSpecException("신청한 대여 상세와 입력된 대여 상세가 일치하지 않습니다.");
+	}
+
+	void validateReservationSpecAmount(final Long reservationId,
+		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
+		final Reservation reservation = getReservationWithSpecs(reservationId);
+		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+			reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
+		}
+	}
+
+	private Reservation getReservationWithSpecs(final Long reservationId) {
+		return reservationRepository.findByIdWithSpecs(reservationId)
+			.orElseThrow(ReservationNotFoundException::new);
 	}
 }

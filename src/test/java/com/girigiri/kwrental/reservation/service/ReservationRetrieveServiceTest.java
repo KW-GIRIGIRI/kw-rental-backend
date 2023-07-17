@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -94,5 +95,27 @@ class ReservationRetrieveServiceTest {
 		// when, then
 		assertThatThrownBy(() -> reservationRetrieveService.getReservationWithReservationSpecsById(1L))
 			.isExactlyInstanceOf(ReservationNotFoundException.class);
+	}
+
+	@Test
+	@DisplayName("대여 예약 상세에 해당하는 품목 자산 번호의 갯수를 기자재 별로 분류한다.")
+	void groupPropertyNumbersCountByEquipmentId() {
+		// given
+		final Equipment equipment = EquipmentFixture.builder().id(1L).build();
+		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment)
+			.id(2L)
+			.amount(RentalAmount.ofPositive(2))
+			.build();
+		final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec)).id(3L).build();
+		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
+
+		// when
+		final Map<Long, Set<String>> propertyNumbersByEquipmentId = reservationRetrieveService.groupPropertyNumbersCountByEquipmentId(
+			reservation.getId(), Map.of(reservationSpec.getId(), Set.of("1111111", "222222222"))
+		);
+
+		// then
+		assertThat(propertyNumbersByEquipmentId.get(equipment.getId())).containsExactlyInAnyOrder("1111111",
+			"222222222");
 	}
 }

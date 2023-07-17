@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -103,5 +105,22 @@ public class ReservationRetrieveService {
 
 	ReservationPurposeResponse getPurpose(final Long id) {
 		return new ReservationPurposeResponse(getReservationById(id).getPurpose());
+	}
+
+	Map<Long, Set<String>> groupPropertyNumbersCountByEquipmentId(final Long reservationId,
+		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
+		final Reservation reservation = getReservationWithSpecs(reservationId);
+		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
+		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
+			collectedByEquipmentId.put(reservationSpec.getRentable().getId(),
+				propertyNumbers);
+		}
+		return collectedByEquipmentId;
+	}
+
+	private Reservation getReservationWithSpecs(final Long reservationId) {
+		return reservationRepository.findByIdWithSpecs(reservationId)
+			.orElseThrow(ReservationNotFoundException::new);
 	}
 }
