@@ -1,10 +1,10 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import static com.girigiri.kwrental.rental.domain.LabRoomRentalSpec.*;
+
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-
-import static com.girigiri.kwrental.rental.domain.LabRoomRentalSpec.LabRoomRentalSpecBuilder;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
 
 public class LabRoomRentalSpecFixture {
 

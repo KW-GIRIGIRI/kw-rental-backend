@@ -8,8 +8,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.inventory.service.InventoryService;
+import com.girigiri.kwrental.reservation.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;

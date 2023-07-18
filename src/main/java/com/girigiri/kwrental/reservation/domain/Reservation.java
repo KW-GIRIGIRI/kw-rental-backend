@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 
 import jakarta.persistence.AttributeOverride;

@@ -15,9 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.inventory.service.AmountValidator;
+import com.girigiri.kwrental.reservation.domain.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;

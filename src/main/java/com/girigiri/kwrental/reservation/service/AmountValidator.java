@@ -1,6 +1,6 @@
-package com.girigiri.kwrental.inventory.service;
+package com.girigiri.kwrental.reservation.service;
 
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.RentalPeriod;
 
 public interface AmountValidator {
 

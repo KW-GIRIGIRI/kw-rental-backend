@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.inventory.domain;
+package com.girigiri.kwrental.reservation.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -9,12 +9,15 @@ import com.girigiri.kwrental.inventory.exception.RentalDateException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Embeddable
 @Getter
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RentalPeriod implements Comparable<RentalPeriod> {
 
     @Column(nullable = false)
@@ -22,9 +25,6 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
 
     @Column(nullable = false)
     private LocalDate rentalEndDate;
-
-    protected RentalPeriod() {
-    }
 
     public RentalPeriod(final RentalDateTime start, final RentalDateTime end) {
         this(start.toLocalDate(), end.toLocalDate());

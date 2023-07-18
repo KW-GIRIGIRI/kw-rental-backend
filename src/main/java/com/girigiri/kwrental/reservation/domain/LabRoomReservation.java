@@ -3,7 +3,6 @@ package com.girigiri.kwrental.reservation.domain;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationException;
 
 import lombok.Getter;

@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
@@ -31,6 +30,7 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Predicate;

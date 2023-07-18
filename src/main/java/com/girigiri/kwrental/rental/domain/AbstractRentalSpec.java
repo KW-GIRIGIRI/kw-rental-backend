@@ -3,7 +3,7 @@ package com.girigiri.kwrental.rental.domain;
 import java.time.LocalDateTime;
 
 import com.girigiri.kwrental.common.AbstractSuperEntity;
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;

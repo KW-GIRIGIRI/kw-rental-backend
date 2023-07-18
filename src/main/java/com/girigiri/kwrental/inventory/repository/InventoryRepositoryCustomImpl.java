@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.RentalPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom {

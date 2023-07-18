@@ -3,7 +3,7 @@ package com.girigiri.kwrental.reservation.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
 
 public record LabRoomReservationWithMemberNumberResponse(
 	String labRoomName,

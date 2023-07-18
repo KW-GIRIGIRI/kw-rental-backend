@@ -1,10 +1,11 @@
 package com.girigiri.kwrental.rental.dto.response;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+
+import lombok.Getter;
 
 @Getter
 public class RentalSpecWithName {

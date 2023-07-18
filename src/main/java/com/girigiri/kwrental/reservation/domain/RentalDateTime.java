@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.inventory.domain;
+package com.girigiri.kwrental.reservation.domain;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -8,19 +8,19 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RentalDateTime {
 
 	private static final RentalDateTime NULL = new RentalDateTime();
 	private static final ZoneId SEOUL_ZONE_ID = ZoneId.of("Asia/Seoul");
 
 	private Instant instant;
-
-	protected RentalDateTime() {
-	}
 
 	private RentalDateTime(final Instant instant) {
 		this.instant = instant.truncatedTo(ChronoUnit.MILLIS);

@@ -2,8 +2,6 @@ package com.girigiri.kwrental.reservation.domain;
 
 import java.util.List;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-
 import lombok.Getter;
 
 @Getter

@@ -1,21 +1,22 @@
-package com.girigiri.kwrental.inventory.domain;
+package com.girigiri.kwrental.reservation.domain;
 
 import com.girigiri.kwrental.inventory.exception.RentalAmountException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Embeddable
 @Getter
+@Embeddable
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RentalAmount {
 
     @Column(nullable = false)
     private Integer amount;
-
-    protected RentalAmount() {
-    }
 
     private RentalAmount(final Integer amount) {
         if (amount == null || amount < 0) {
@@ -42,3 +43,4 @@ public class RentalAmount {
         return this.amount == 0;
     }
 }
+

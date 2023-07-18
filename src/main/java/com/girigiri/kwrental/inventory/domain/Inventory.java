@@ -1,16 +1,32 @@
 package com.girigiri.kwrental.inventory.domain;
 
+import java.util.Objects;
+
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
-import jakarta.persistence.*;
+import com.girigiri.kwrental.reservation.domain.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.RentalPeriod;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Objects;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inventory {
 
     @Id
@@ -29,17 +45,6 @@ public class Inventory {
 
     @Column(nullable = false)
     private Long memberId;
-
-    protected Inventory() {
-    }
-
-    public Inventory(final Long id, final RentalPeriod rentalPeriod, final RentalAmount rentalAmount, final Rentable rentable, final Long memberId) {
-        this.id = id;
-        this.rentalPeriod = rentalPeriod;
-        this.rentalAmount = rentalAmount;
-        this.rentable = rentable;
-        this.memberId = memberId;
-    }
 
     public void setRentalPeriod(final RentalPeriod rentalPeriod) {
         this.rentalPeriod = rentalPeriod;

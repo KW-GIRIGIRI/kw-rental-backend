@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 
 import jakarta.persistence.Column;

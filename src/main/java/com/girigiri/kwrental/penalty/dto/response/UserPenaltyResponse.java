@@ -2,9 +2,9 @@ package com.girigiri.kwrental.penalty.dto.response;
 
 import java.time.LocalDate;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
+import com.girigiri.kwrental.reservation.domain.RentalDateTime;
 
 import lombok.Getter;
 
