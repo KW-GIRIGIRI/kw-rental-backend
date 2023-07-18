@@ -49,7 +49,7 @@ public class LabRoomService {
 	@Transactional(readOnly = true)
 	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
 		final LocalDate to) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(
 			labRoom.getId(), from, to);
 		final RemainQuantitiesPerDateResponse remainQuantitiesPerDateResponse = assetService.getReservableCountPerDate(
@@ -72,7 +72,8 @@ public class LabRoomService {
 		return remainQuantitiesPerDateResponse;
 	}
 
-	private LabRoom getLabRoom(String name) {
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public LabRoom getLabRoomByName(String name) {
 		return labRoomRepository.findLabRoomByName(name)
 			.orElseThrow(LabRoomNotFoundException::new);
 	}
@@ -80,7 +81,7 @@ public class LabRoomService {
 	@Transactional(readOnly = true)
 	public RemainReservationCountsPerDateResponse getRemainReservationCountByLabRoomName(final String name,
 		final LocalDate from, final LocalDate to) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		final Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
 			labRoom.getId(), from, to);
 		final List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomIdAndInclusive(
@@ -112,25 +113,25 @@ public class LabRoomService {
 
 	@Transactional
 	public void setNotice(String name, LabRoomNoticeRequest labRoomNoticeRequest) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		labRoomRepository.updateNotice(labRoom.getId(), labRoomNoticeRequest.getNotice());
 	}
 
 	@Transactional(readOnly = true)
 	public LabRoomNoticeResponse getNotice(String name) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		return new LabRoomNoticeResponse(labRoom.getNotice());
 	}
 
 	@Transactional
 	public void setAvailableForEntirePeriod(String name, boolean available) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		labRoomRepository.updateAvailable(labRoom.getId(), available);
 	}
 
 	@Transactional
 	public void setAvailable(final String name, final LocalDate date, final boolean available) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		labRoomDailyBanRepository.findByLabRoomIdAndBanDate(labRoom.getId(), date)
 			.ifPresentOrElse(labRoomDailyBan -> makeAvailable(labRoom, labRoomDailyBan, available),
 				() -> makeUnavailable(labRoom, available, date));
@@ -162,7 +163,7 @@ public class LabRoomService {
 
 	@Transactional(readOnly = true)
 	public LabRoomAvailableResponse getAvailableByDate(final String name, final LocalDate date) {
-		LabRoom labRoom = getLabRoom(name);
+		LabRoom labRoom = getLabRoomByName(name);
 		boolean availableByDate = labRoomDailyBanRepository.findByLabRoomIdAndBanDate(labRoom.getId(), date)
 			.isEmpty() && labRoom.isAvailable();
 		return new LabRoomAvailableResponse(labRoom.getId(), availableByDate, date);
@@ -170,7 +171,7 @@ public class LabRoomService {
 
 	@Transactional(readOnly = true)
 	public LabRoomAvailableResponse getAvailable(final String name) {
-		final LabRoom labRoom = getLabRoom(name);
+		final LabRoom labRoom = getLabRoomByName(name);
 		final boolean available = labRoom.isAvailable();
 		return new LabRoomAvailableResponse(labRoom.getId(), available, null);
 	}

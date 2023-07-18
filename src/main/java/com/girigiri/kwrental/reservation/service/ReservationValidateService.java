@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -43,5 +46,17 @@ public class ReservationValidateService {
 	private Reservation getReservationWithSpecs(final Long reservationId) {
 		return reservationRepository.findByIdWithSpecs(reservationId)
 			.orElseThrow(ReservationNotFoundException::new);
+	}
+
+	void validateAlreadyReservedSamePeriod(final Reservation reservation) {
+		final Long memberId = reservation.getMemberId();
+		final RentalPeriod period = reservation.getRentalPeriod();
+		boolean alreadyReserved = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(memberId)
+			.stream()
+			.map(LabRoomReservation::new)
+			.anyMatch(it -> it.has(period));
+		if (alreadyReserved) {
+			throw new AlreadyReservedLabRoomException();
+		}
 	}
 }

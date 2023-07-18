@@ -23,6 +23,8 @@ import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
+import com.girigiri.kwrental.reservation.service.creator.EquipmentReservationCreator;
+import com.girigiri.kwrental.reservation.service.creator.LabRoomReservationCreator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,15 +37,21 @@ public class ReservationService {
 	private final ReservationRetrieveService reservationRetrieveService;
 	private final ReservationValidateService reservationValidateService;
 	private final ReservationRentalService reservationRentalService;
+	private final EquipmentReservationCreator equipmentReservationCreator;
+	private final LabRoomReservationCreator labRoomReservationCreator;
 
 	@Transactional
 	public void reserveEquipment(final Long memberId, final AddEquipmentReservationRequest addReservationRequest) {
-		reservationReserveService.reserveEquipment(memberId, addReservationRequest);
+		final List<Reservation> reservations = equipmentReservationCreator.create(memberId, addReservationRequest);
+		reservationReserveService.reserve(memberId, reservations, ReserveValidator.noExtraValidation());
 	}
 
 	@Transactional
 	public Long reserveLabRoom(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
-		return reservationReserveService.reserveLabRoom(memberId, addLabRoomReservationRequest);
+		final Reservation reservation = labRoomReservationCreator.create(memberId, addLabRoomReservationRequest);
+		reservationReserveService.reserve(memberId, List.of(reservation),
+			reservationValidateService::validateAlreadyReservedSamePeriod);
+		return reservation.getId();
 	}
 
 	@Transactional(readOnly = true)

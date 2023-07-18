@@ -17,12 +17,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
+import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.inventory.domain.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
+import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
@@ -85,5 +88,24 @@ class ReservationValidateServiceTest {
 		assertThatThrownBy(
 			() -> reservationValidateService.validateReservationSpecIdContainsAll(reservation.getId(), Set.of(4L, 2L)))
 			.isExactlyInstanceOf(ReservationSpecException.class);
+	}
+
+	@Test
+	@DisplayName("랩실 대여 예약하려는 기간에 이미 같은 사용자가 대여 예약하였는지 검증한다.")
+	void validateAlreadyReservedSamePeriod() {
+		// given
+		final LabRoom labRoom1 = LabRoomFixture.builder().id(1L).build();
+		final LabRoom labRoom2 = LabRoomFixture.builder().id(2L).build();
+		final ReservationSpec specToValidate = ReservationSpecFixture.create(labRoom1);
+		final Reservation reservationToValidate = ReservationFixture.create(List.of(specToValidate));
+
+		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom2).build();
+		final Reservation reservation = ReservationFixture.create(List.of(spec));
+		given(reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(reservationToValidate.getMemberId()))
+			.willReturn(Set.of(reservation));
+
+		// when, then
+		assertThatThrownBy(() -> reservationValidateService.validateAlreadyReservedSamePeriod(reservationToValidate))
+			.isExactlyInstanceOf(AlreadyReservedLabRoomException.class);
 	}
 }
