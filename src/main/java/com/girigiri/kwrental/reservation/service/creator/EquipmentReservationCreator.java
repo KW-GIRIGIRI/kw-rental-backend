@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.reservation.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
@@ -19,28 +17,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class EquipmentReservationCreator {
-	private final InventoryService inventoryService;
+	private final ReservationSpecMapper reservationSpecMapper;
 
 	public List<Reservation> create(final Long memberId,
 		final AddEquipmentReservationRequest addReservationRequest) {
-		final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
-		final List<ReservationSpec> reservationSpecs = mapToSpecs(inventories);
-		inventoryService.deleteAll(memberId);
-		return mapToReservations(memberId, addReservationRequest, reservationSpecs);
-	}
-
-	private List<ReservationSpec> mapToSpecs(final List<Inventory> inventories) {
-		return inventories.stream()
-			.map(this::mapToReservationSpec)
-			.toList();
-	}
-
-	private ReservationSpec mapToReservationSpec(final Inventory inventory) {
-		return ReservationSpec.builder()
-			.period(inventory.getRentalPeriod())
-			.amount(inventory.getRentalAmount())
-			.rentable(inventory.getRentable())
-			.build();
+		final List<ReservationSpec> specs = reservationSpecMapper.map(memberId);
+		return mapToReservations(memberId, addReservationRequest, specs);
 	}
 
 	private List<Reservation> mapToReservations(final Long memberId,
