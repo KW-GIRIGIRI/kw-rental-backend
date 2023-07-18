@@ -27,7 +27,7 @@ import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.reservation.domain.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.service.AmountValidator;
+import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 
@@ -38,7 +38,7 @@ class InventoryServiceTest {
     private InventoryRepository inventoryRepository;
 
     @Mock
-    private AmountValidator amountValidator;
+    private RemainQuantityValidator remainQuantityValidator;
 
     @Mock
     private EquipmentService equipmentService;
@@ -51,8 +51,8 @@ class InventoryServiceTest {
     void saveInventory() {
         // given
         given(inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(any(), any(), any()))
-                .willReturn(Optional.empty());
-        doNothing().when(amountValidator).validateAmount(any(), any(), any());
+            .willReturn(Optional.empty());
+        doNothing().when(remainQuantityValidator).validateAmount(any(), any(), any());
         final Equipment equipment = EquipmentFixture.builder().id(1L).build();
         given(equipmentService.validateRentalDays(any(), any())).willReturn(equipment);
         given(inventoryRepository.save(any())).willReturn(InventoryFixture.builder(equipment).id(1L).build());
@@ -81,8 +81,8 @@ class InventoryServiceTest {
         given(inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(any(), any(), any()))
                 .willReturn(Optional.of(inventory));
         final int updateAmount = inventory.getRentalAmount().getAmount() + 1;
-        doNothing().when(amountValidator).validateAmount(
-                eq(1L), eq(updateAmount), eq(inventory.getRentalPeriod()));
+        doNothing().when(remainQuantityValidator).validateAmount(
+            eq(1L), eq(updateAmount), eq(inventory.getRentalPeriod()));
         doNothing().when(inventoryRepository).updateAmount(inventory.getId(), RentalAmount.ofPositive(updateAmount));
         final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()
                 .equipmentId(1L)
@@ -160,7 +160,7 @@ class InventoryServiceTest {
                 .rentalEndDate(rentalEndDate)
                 .build();
         given(inventoryRepository.findWithEquipmentById(any())).willReturn(Optional.of(inventory));
-        doNothing().when(amountValidator).validateAmount(any(), any(), any());
+        doNothing().when(remainQuantityValidator).validateAmount(any(), any(), any());
 
         // when
         final InventoryResponse response = inventoryService.update(1L, 1L, updateInventoryRequest);

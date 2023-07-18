@@ -3,6 +3,8 @@ package com.girigiri.kwrental.inventory.service;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
@@ -16,6 +18,7 @@ public class InventoryReservationSpecMapper implements ReservationSpecMapper {
 	private final InventoryService inventoryService;
 
 	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
 	public List<ReservationSpec> map(final Long memberId) {
 		final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
 		inventoryService.deleteAll(memberId);

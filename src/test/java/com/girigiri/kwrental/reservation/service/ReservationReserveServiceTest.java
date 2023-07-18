@@ -21,6 +21,7 @@ import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.domain.ReservationSpec;
 import com.girigiri.kwrental.reservation.exception.NotEnoughAmountException;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
+import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
@@ -31,7 +32,7 @@ class ReservationReserveServiceTest {
 	@Mock
 	private PenaltyService penaltyService;
 	@Mock
-	private AmountValidator amountValidator;
+	private RemainQuantityValidator remainQuantityValidator;
 	@InjectMocks
 	private ReservationReserveService reservationReserveService;
 
@@ -60,7 +61,8 @@ class ReservationReserveServiceTest {
 			.period(rentalPeriod)
 			.build();
 		final Reservation reservation = ReservationFixture.builder(List.of(spec)).build();
-		doThrow(NotEnoughAmountException.class).when(amountValidator).validateAmount(assetId, amount, rentalPeriod);
+		doThrow(NotEnoughAmountException.class).when(remainQuantityValidator)
+			.validateAmount(assetId, amount, rentalPeriod);
 
 		// when, then
 		assertThatThrownBy(() -> reservationReserveService.reserve(memberId, List.of(reservation),

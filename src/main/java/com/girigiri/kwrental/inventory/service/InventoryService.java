@@ -19,21 +19,17 @@ import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
 import com.girigiri.kwrental.reservation.domain.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.service.AmountValidator;
+import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class InventoryService {
 
     private final EquipmentService equipmentService;
-    private final AmountValidator amountValidator;
+    private final RemainQuantityValidator remainQuantityValidator;
     private final InventoryRepository inventoryRepository;
-
-    public InventoryService(final EquipmentService equipmentService, final AmountValidator amountValidator,
-                            final InventoryRepository inventoryRepository) {
-        this.equipmentService = equipmentService;
-        this.amountValidator = amountValidator;
-        this.inventoryRepository = inventoryRepository;
-    }
 
     @Transactional
     public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
@@ -43,13 +39,13 @@ public class InventoryService {
         if (foundInventory.isEmpty()) {
             final Equipment equipment = equipmentService.validateRentalDays(equipmentId,
                 rentalPeriod.getRentalDayCount());
-            amountValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
+            remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
             final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
             return inventory.getId();
         }
         final Inventory inventory = foundInventory.get();
         final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.getAmount();
-        amountValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
+        remainQuantityValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
         inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
         return inventory.getId();
     }
@@ -94,8 +90,8 @@ public class InventoryService {
         final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
                 .orElseThrow(InventoryNotFoundException::new);
         validateInventoryMemberId(memberId, inventory);
-        amountValidator.validateAmount(inventory.getRentable().getId(), request.getAmount(),
-                new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
+        remainQuantityValidator.validateAmount(inventory.getRentable().getId(), request.getAmount(),
+            new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         inventory.setRentalAmount(RentalAmount.ofPositive(request.getAmount()));
         inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
         return InventoryResponse.from(inventory);

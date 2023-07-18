@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.girigiri.kwrental.reservation.domain.Reservation;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +17,7 @@ public class ReservationReserveService {
 
 	private final ReservationRepository reservationRepository;
 	private final PenaltyService penaltyService;
-	private final AmountValidator amountValidator;
+	private final RemainQuantityValidator remainQuantityValidator;
 
 	void reserve(final Long memberId, final List<Reservation> reservations, final ReserveValidator reserveValidator) {
 		validatePenalty(memberId);
@@ -35,7 +36,7 @@ public class ReservationReserveService {
 
 	private void validateAvailableCount(final Reservation reservation) {
 		reservation.getReservationSpecs()
-			.forEach(spec -> amountValidator.validateAmount(spec.getRentable().getId(),
+			.forEach(spec -> remainQuantityValidator.validateAmount(spec.getRentable().getId(),
 				spec.getAmount().getAmount(), spec.getPeriod()));
 	}
 }
