@@ -1,16 +1,18 @@
 package com.girigiri.kwrental.reservation.domain;
 
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 class ReservationSpecTest {
 

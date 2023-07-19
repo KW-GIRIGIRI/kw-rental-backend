@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.Repository;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public interface ReservationRepository extends Repository<Reservation, Long>, ReservationRepositoryCustom {
 

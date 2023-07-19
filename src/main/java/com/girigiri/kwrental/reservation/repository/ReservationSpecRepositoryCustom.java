@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
 
 public interface ReservationSpecRepositoryCustom {
     List<ReservationSpec> findOverlappedReservedOrRentedByPeriod(Long equipmentId, RentalPeriod rentalPeriod);

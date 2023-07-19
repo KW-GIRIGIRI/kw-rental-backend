@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.rental.domain;
 
-import com.girigiri.kwrental.common.SuperEntity;
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-
 import java.time.LocalDateTime;
+
+import com.girigiri.kwrental.common.SuperEntity;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public interface RentalSpec extends SuperEntity {
     boolean isNowRental();

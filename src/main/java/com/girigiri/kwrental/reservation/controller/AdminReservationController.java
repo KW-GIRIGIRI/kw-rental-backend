@@ -22,17 +22,15 @@ import com.girigiri.kwrental.reservation.service.ReservationService;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 
-@RestController
-@RequestMapping("/api/admin/reservations")
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/admin/reservations")
 public class AdminReservationController {
 
 	private final ReservationService reservationService;
-
-	public AdminReservationController(final ReservationService reservationService) {
-		this.reservationService = reservationService;
-	}
 
 	@GetMapping
 	public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentPerYearMonth(final Long equipmentId,
@@ -43,8 +41,7 @@ public class AdminReservationController {
 	@PatchMapping("/specs/{reservationSpecId}")
 	public ResponseEntity<?> cancelReservationSpec(@PathVariable Long reservationSpecId,
 		@Validated @RequestBody final CancelReservationSpecRequest body) {
-		final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId,
-			body.getAmount());
+		final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId, body.amount());
 		return ResponseEntity.noContent()
 			.location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();
 	}

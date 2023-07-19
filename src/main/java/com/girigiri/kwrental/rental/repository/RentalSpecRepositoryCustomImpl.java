@@ -5,8 +5,8 @@ import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.asset.labroom.domain.QLabRoom.*;
 import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.*;
 import static com.girigiri.kwrental.rental.domain.QEquipmentRentalSpec.*;
-import static com.girigiri.kwrental.reservation.domain.QReservation.*;
-import static com.girigiri.kwrental.reservation.domain.QReservationSpec.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 import static com.girigiri.kwrental.util.QueryDSLUtils.*;
 import static com.querydsl.core.group.GroupBy.*;
 
@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
@@ -31,7 +30,8 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;

@@ -1,15 +1,16 @@
 package com.girigiri.kwrental.rental.dto.response.overduereservations;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
-import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import lombok.Getter;
+import static java.util.stream.Collectors.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.groupingBy;
+import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+
+import lombok.Getter;
 
 @Getter
 public class OverdueReservationResponse {

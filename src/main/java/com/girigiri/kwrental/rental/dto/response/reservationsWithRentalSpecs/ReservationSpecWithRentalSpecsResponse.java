@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 
 import lombok.Builder;
 import lombok.Getter;

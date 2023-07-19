@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 
 class RentalPeriodTest {
 

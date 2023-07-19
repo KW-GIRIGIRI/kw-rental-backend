@@ -19,17 +19,18 @@ import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec.ReservationSpecBuilder;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec.ReservationSpecBuilder;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
@@ -317,8 +318,9 @@ class ReservationSpecRepositoryTest {
 
 		// then
 		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec2),
-				member.getMemberNumber()));
+			.containsExactly(
+				new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+					member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec2)));
 	}
 
 	@Test
@@ -372,8 +374,9 @@ class ReservationSpecRepositoryTest {
 
 		// then
 		assertThat(expect).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(EquipmentReservationWithMemberNumber.of(reservation1, List.of(reservationSpec1),
-				member.getMemberNumber()));
+			.containsExactly(
+				new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
+					member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec1)));
 	}
 
 	@Test
@@ -409,21 +412,15 @@ class ReservationSpecRepositoryTest {
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
 			.containsExactlyInAnyOrder(
-				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
-					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
-							reservationSpec1.getReservation().getId(), reservation1.getName(), member.getMemberNumber(),
-							reservationSpec1.getAmount().getAmount(),
-							reservation1.getPhoneNumber()),
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(),
-							reservationSpec3.getReservation().getId(),
-							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
-							reservation3.getPhoneNumber()))),
-				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
-					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
-						reservationSpec2.getReservation().getId(), reservation2.getName(), member.getMemberNumber(),
-						reservationSpec2.getAmount().getAmount(),
-						reservation2.getPhoneNumber())))
-			);
+				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), (RentalDateTime)null,
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(member.getMemberNumber(), reservation1,
+							reservationSpec1)
+						, createLabRoomReservationSpecWithMemberNumberResponse(member.getMemberNumber(), reservation3,
+							reservationSpec3))),
+				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), (RentalDateTime)null,
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(member.getMemberNumber(), reservation2,
+						reservationSpec2))
+				));
 	}
 
 	@Test
@@ -464,17 +461,13 @@ class ReservationSpecRepositoryTest {
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields()
 			.containsExactlyInAnyOrder(
-				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), null,
-					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
-						reservationSpec1.getReservation().getId(), reservation1.getName(), member.getMemberNumber(),
-						reservationSpec1.getAmount().getAmount(),
-						reservation1.getPhoneNumber()))),
-				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), null,
-					List.of(new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
-						reservationSpec2.getReservation().getId(), reservation2.getName(), member.getMemberNumber(),
-						reservationSpec2.getAmount().getAmount(),
-						reservation2.getPhoneNumber())))
-			);
+				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), (RentalDateTime)null,
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(member.getMemberNumber(), reservation1,
+						reservationSpec1))),
+				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), (RentalDateTime)null,
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(member.getMemberNumber(), reservation2,
+						reservationSpec2))
+				));
 	}
 
 	@Test
@@ -594,5 +587,13 @@ class ReservationSpecRepositoryTest {
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(spec1);
+	}
+
+	private LabRoomReservationSpecWithMemberNumberResponse createLabRoomReservationSpecWithMemberNumberResponse(
+		final String memberNumber, final Reservation reservation2, final ReservationSpec reservationSpec2) {
+		return new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
+			reservationSpec2.getReservation().getId(), reservation2.getName(), memberNumber,
+			reservationSpec2.getAmount().getAmount(),
+			reservation2.getPhoneNumber());
 	}
 }

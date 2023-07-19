@@ -1,19 +1,32 @@
-package com.girigiri.kwrental.reservation.domain;
+package com.girigiri.kwrental.reservation.domain.entity;
+
+import java.time.LocalDate;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDate;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationSpec {
 
     @Id
@@ -38,20 +51,7 @@ public class ReservationSpec {
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    protected ReservationSpec() {
-    }
-
-    private ReservationSpec(final Long id, final RentalAmount amount, final RentalPeriod period,
-                            final ReservationSpecStatus status, final Rentable rentable, final Reservation reservation) {
-        this.id = id;
-        this.amount = amount;
-        this.period = period;
-        this.status = status;
-        this.rentable = rentable;
-        this.reservation = reservation;
-    }
-
-    public void setReservation(final Reservation reservation) {
+    void setReservation(final Reservation reservation) {
         this.reservation = reservation;
     }
 
@@ -96,12 +96,8 @@ public class ReservationSpec {
 
     public boolean isTerminated() {
         return status != ReservationSpecStatus.RESERVED
-                && status != ReservationSpecStatus.RENTED
-                && status != ReservationSpecStatus.OVERDUE_RENTED;
-    }
-
-    public boolean isReservedOrRented() {
-        return this.status == ReservationSpecStatus.RESERVED || this.status == ReservationSpecStatus.RENTED;
+            && status != ReservationSpecStatus.RENTED
+            && status != ReservationSpecStatus.OVERDUE_RENTED;
     }
 
     public boolean isRentFor(final String rentableName) {

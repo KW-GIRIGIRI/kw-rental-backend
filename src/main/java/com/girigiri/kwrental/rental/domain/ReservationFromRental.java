@@ -1,18 +1,18 @@
 package com.girigiri.kwrental.rental.domain;
 
-import com.girigiri.kwrental.rental.exception.NotExpectedRentalStatusException;
-import com.girigiri.kwrental.rental.exception.RentedStatusWhenReturnException;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
+import static java.util.stream.Collectors.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toMap;
+import com.girigiri.kwrental.rental.exception.NotExpectedRentalStatusException;
+import com.girigiri.kwrental.rental.exception.RentedStatusWhenReturnException;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.exception.ReservationSpecNotFoundException;
 
 public class ReservationFromRental {
     private final Map<Long, ReservationSpec> reservationSpecMap;

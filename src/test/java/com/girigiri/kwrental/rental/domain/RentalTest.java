@@ -1,22 +1,22 @@
 package com.girigiri.kwrental.rental.domain;
 
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
-import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
-import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
-import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
+import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
+import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 class RentalTest {
 

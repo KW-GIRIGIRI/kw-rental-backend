@@ -22,9 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
@@ -38,9 +35,12 @@ import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.Res
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher;
@@ -138,8 +138,9 @@ class RentalServiceTest {
 		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
 			.reservationSpecId(reservationSpec1.getId())
 			.build();
-		final EquipmentReservationWithMemberNumber equipmentReservation = EquipmentReservationWithMemberNumber.of(
-			reservation, List.of(reservationSpec1), "11111111");
+		final EquipmentReservationWithMemberNumber equipmentReservation =
+			new EquipmentReservationWithMemberNumber(reservation.getId(), reservation.getName(), "11111111",
+				reservation.getAcceptDateTime(), List.of(reservationSpec1));
 		given(reservationService.getReservationsByStartDate(any())).willReturn(Set.of(equipmentReservation));
 		given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId()))).willReturn(
 			List.of(rentalSpec1));

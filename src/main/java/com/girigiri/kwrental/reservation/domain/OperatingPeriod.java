@@ -1,13 +1,10 @@
 package com.girigiri.kwrental.reservation.domain;
 
-import lombok.Getter;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
 public class OperatingPeriod {
     private final LocalDate start;
     private final LocalDate end;

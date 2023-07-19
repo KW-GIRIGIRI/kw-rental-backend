@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 
 public interface InventoryRepositoryCustom {
     List<Inventory> findAllWithEquipment(final Long memberId);

@@ -1,13 +1,13 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
-import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import static com.girigiri.kwrental.inventory.domain.Inventory.*;
 
 import java.time.LocalDate;
 
-import static com.girigiri.kwrental.inventory.domain.Inventory.InventoryBuilder;
+import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.inventory.domain.Inventory;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 
 public class InventoryFixture {
 

@@ -33,9 +33,9 @@ import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentsWithRentalQu
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;

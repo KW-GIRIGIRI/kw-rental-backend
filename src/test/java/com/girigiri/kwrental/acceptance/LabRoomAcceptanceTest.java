@@ -22,8 +22,8 @@ import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountPe
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomRepository;
-import com.girigiri.kwrental.inventory.domain.RentalAmount;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;

@@ -1,17 +1,35 @@
 package com.girigiri.kwrental.reservation.dto.response;
 
-import lombok.Getter;
-
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
-@Getter
-public class LabRoomReservationsWithMemberNumberResponse {
-    private Collection<LabRoomReservationWithMemberNumberResponse> reservations;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
-    private LabRoomReservationsWithMemberNumberResponse() {
-    }
+import lombok.Builder;
 
-    public LabRoomReservationsWithMemberNumberResponse(final Collection<LabRoomReservationWithMemberNumberResponse> reservations) {
-        this.reservations = reservations;
-    }
+public record LabRoomReservationsWithMemberNumberResponse(
+	Collection<LabRoomReservationWithMemberNumberResponse> reservations) {
+
+	public record LabRoomReservationWithMemberNumberResponse(
+		String labRoomName,
+		LocalDateTime acceptTime,
+		List<LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse> specsWithMemberNumber
+	) {
+		public LabRoomReservationWithMemberNumberResponse(final String labRoomName, final RentalDateTime acceptTime,
+			final List<LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse> specsWithMemberNumber) {
+			this(labRoomName, acceptTime == null ? null : acceptTime.toLocalDateTime(), specsWithMemberNumber);
+		}
+
+		@Builder
+		public record LabRoomReservationSpecWithMemberNumberResponse(
+			Long id,
+			Long reservationId,
+			String renterName,
+			String memberNumber,
+			Integer rentalAmount,
+			String phoneNumber
+		) {
+		}
+	}
 }

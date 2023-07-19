@@ -1,16 +1,17 @@
 package com.girigiri.kwrental.rental.domain;
 
-import com.girigiri.kwrental.inventory.domain.RentalDateTime;
-import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 
 class RentalSpecTest {
 

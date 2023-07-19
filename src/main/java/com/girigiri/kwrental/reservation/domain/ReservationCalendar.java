@@ -6,16 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationCalendar {
-
     private final Map<Integer, List<String>> calendar;
-
-    private ReservationCalendar(final Map<Integer, List<String>> calendar) {
-        this.calendar = calendar;
-    }
 
     public static ReservationCalendar from(final LocalDate start, final LocalDate end) {
         return new ReservationCalendar(initCalendar(start, end));

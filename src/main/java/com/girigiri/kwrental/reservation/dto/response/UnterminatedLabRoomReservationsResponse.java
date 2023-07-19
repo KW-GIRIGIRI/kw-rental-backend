@@ -1,26 +1,36 @@
 package com.girigiri.kwrental.reservation.dto.response;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import lombok.Getter;
-
+import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-public class UnterminatedLabRoomReservationsResponse {
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 
-    private List<UnterminatedLabRoomReservationResponse> reservations;
+public record UnterminatedLabRoomReservationsResponse(
+	List<UnterminatedLabRoomReservationResponse> reservations
+) {
+	public static UnterminatedLabRoomReservationsResponse from(final List<Reservation> reservations) {
+		final List<UnterminatedLabRoomReservationResponse> unterminatedLabRoomReservationResponses = reservations.stream()
+			.map(UnterminatedLabRoomReservationResponse::from)
+			.toList();
+		return new UnterminatedLabRoomReservationsResponse(unterminatedLabRoomReservationResponses);
+	}
 
-    private UnterminatedLabRoomReservationsResponse() {
-    }
+	public record UnterminatedLabRoomReservationResponse(
 
-    private UnterminatedLabRoomReservationsResponse(final List<UnterminatedLabRoomReservationResponse> reservations) {
-        this.reservations = reservations;
-    }
-
-    public static UnterminatedLabRoomReservationsResponse from(final List<Reservation> reservations) {
-        final List<UnterminatedLabRoomReservationResponse> unterminatedLabRoomReservationResponses = reservations.stream()
-                .map(UnterminatedLabRoomReservationResponse::from)
-                .toList();
-        return new UnterminatedLabRoomReservationsResponse(unterminatedLabRoomReservationResponses);
-    }
+		Long reservationId,
+		Long reservationSpecId,
+		LocalDate startDate,
+		LocalDate endDate,
+		String name,
+		Integer amount,
+		ReservationSpecStatus status
+	) {
+		public static UnterminatedLabRoomReservationResponse from(final Reservation reservation) {
+			final ReservationSpec spec = reservation.getReservationSpecs().iterator().next();
+			return new UnterminatedLabRoomReservationResponse(reservation.getId(), spec.getId(), spec.getStartDate(),
+				spec.getEndDate(), spec.getRentable().getName(), spec.getAmount().getAmount(), spec.getStatus());
+		}
+	}
 }

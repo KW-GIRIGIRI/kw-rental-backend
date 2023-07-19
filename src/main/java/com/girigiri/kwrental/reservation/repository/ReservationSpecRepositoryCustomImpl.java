@@ -3,8 +3,8 @@ package com.girigiri.kwrental.reservation.repository;
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
 import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.auth.domain.QMember.*;
-import static com.girigiri.kwrental.reservation.domain.QReservation.*;
-import static com.girigiri.kwrental.reservation.domain.QReservationSpec.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 import static com.querydsl.core.group.GroupBy.*;
 
 import java.time.LocalDate;
@@ -15,30 +15,26 @@ import java.util.stream.Stream;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
-import com.girigiri.kwrental.inventory.domain.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
 	private final EntityManager entityManager;
-
-	public ReservationSpecRepositoryCustomImpl(final JPAQueryFactory queryFactory, final EntityManager entityManager) {
-		this.queryFactory = queryFactory;
-		this.entityManager = entityManager;
-	}
 
 	@Override
 	public List<ReservationSpec> findOverlappedReservedOrRentedInclusive(final Long rentableId, final LocalDate start,
@@ -215,9 +211,11 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 				.leftJoin(member).on(member.id.eq(reservation.memberId))
 				.where(predicates)
 				.transform(groupBy(rentableAsset.id)
-					.as(Projections.constructor(LabRoomReservationWithMemberNumberResponse.class,
+					.as(Projections.constructor(
+						LabRoomReservationWithMemberNumberResponse.class,
 						rentableAsset.name, reservation.acceptDateTime,
-						list(Projections.constructor(LabRoomReservationSpecWithMemberNumberResponse.class,
+						list(Projections.constructor(
+							LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse.class,
 							reservationSpec.id, reservationSpec.reservation.id, reservation.name, member.memberNumber,
 							reservationSpec.amount.amount, reservation.phoneNumber)))))
 				.values()

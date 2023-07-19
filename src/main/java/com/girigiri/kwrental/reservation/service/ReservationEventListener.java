@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.service.AssetDeleteEvent;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ReservationEventListener {
 
 	private final ReservationService reservationService;
-
-	public ReservationEventListener(ReservationService reservationService) {
-		this.reservationService = reservationService;
-	}
 
 	@EventListener
 	@Transactional(propagation = Propagation.MANDATORY)

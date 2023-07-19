@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
 import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public class Rental {
 
