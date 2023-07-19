@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.girigiri.kwrental.inventory.exception.RentalAmountException;
-import com.girigiri.kwrental.reservation.domain.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 
 class RentalAmountTest {
 

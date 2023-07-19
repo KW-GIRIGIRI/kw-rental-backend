@@ -4,8 +4,8 @@ import java.util.Objects;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.reservation.domain.RentalAmount;
-import com.girigiri.kwrental.reservation.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

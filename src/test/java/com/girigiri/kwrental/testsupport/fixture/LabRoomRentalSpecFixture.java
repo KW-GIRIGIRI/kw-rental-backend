@@ -4,7 +4,7 @@ import static com.girigiri.kwrental.rental.domain.LabRoomRentalSpec.*;
 
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public class LabRoomRentalSpecFixture {
 

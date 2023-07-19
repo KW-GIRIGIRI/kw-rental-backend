@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.reservation.service;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 @FunctionalInterface
 public interface ReserveValidator {

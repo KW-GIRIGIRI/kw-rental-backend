@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
 import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
-import com.girigiri.kwrental.reservation.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;

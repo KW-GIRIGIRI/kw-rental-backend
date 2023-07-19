@@ -3,6 +3,10 @@ package com.girigiri.kwrental.reservation.domain;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationException;
 
 import lombok.Getter;
@@ -33,6 +37,18 @@ public class LabRoomReservation {
 			throw new LabRoomReservationException("반납하려는 대여 예약 상세가 대여 중 상태가 아닙니다.");
 	}
 
+	public void normalReturnAll() {
+		validateWhenReturn();
+		final List<ReservationSpec> specs = reservation.getReservationSpecs();
+		specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
+		reservation.updateIfTerminated();
+	}
+
+	public boolean has(final RentalPeriod period) {
+		ReservationSpec spec = getReservationSpec();
+		return spec.hasPeriod(period);
+	}
+
 	public Long getReservationSpecId() {
 		return getReservationSpec().getId();
 	}
@@ -45,23 +61,11 @@ public class LabRoomReservation {
 		return reservation.getId();
 	}
 
-	public void normalReturnAll() {
-		validateWhenReturn();
-		final List<ReservationSpec> specs = reservation.getReservationSpecs();
-		specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
-		reservation.updateIfTerminated();
-	}
-
 	public Long getLabRoomId() {
 		return getReservationSpec().getRentable().getId();
 	}
 
 	public RentalPeriod getPeriod() {
 		return getReservationSpec().getPeriod();
-	}
-
-	public boolean has(final RentalPeriod period) {
-		ReservationSpec spec = getReservationSpec();
-		return spec.hasPeriod(period);
 	}
 }

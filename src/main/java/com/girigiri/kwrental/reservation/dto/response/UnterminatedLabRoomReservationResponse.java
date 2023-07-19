@@ -2,9 +2,9 @@ package com.girigiri.kwrental.reservation.dto.response;
 
 import java.time.LocalDate;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 
 public record UnterminatedLabRoomReservationResponse(
 

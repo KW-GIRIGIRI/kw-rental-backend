@@ -15,7 +15,7 @@ import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
-import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public interface RentalSpecRepositoryCustom {
 	List<EquipmentRentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);

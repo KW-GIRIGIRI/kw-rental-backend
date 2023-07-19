@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.domain;
+package com.girigiri.kwrental.reservation.domain.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,9 +19,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Reservation {
 
 	@Id
@@ -52,10 +54,6 @@ public class Reservation {
 
 	@Column(nullable = false)
 	private Long memberId;
-
-	protected Reservation() {
-
-	}
 
 	@Builder
 	private Reservation(final Long id, final List<ReservationSpec> reservationSpecs, final String name,

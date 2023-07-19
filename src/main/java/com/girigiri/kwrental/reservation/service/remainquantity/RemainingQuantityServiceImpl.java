@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
 import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservedAmount;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,7 @@ package com.girigiri.kwrental.rental.dto.response;
 import java.time.LocalDateTime;
 
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 import lombok.Getter;
 

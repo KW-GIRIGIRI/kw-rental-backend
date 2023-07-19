@@ -2,7 +2,7 @@ package com.girigiri.kwrental.testsupport.fixture;
 
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public class EquipmentRentalSpecFixture {
 

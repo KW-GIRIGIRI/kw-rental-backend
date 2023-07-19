@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.reservation.dto.response;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public record ReservationInfoResponse(
 	Long id,

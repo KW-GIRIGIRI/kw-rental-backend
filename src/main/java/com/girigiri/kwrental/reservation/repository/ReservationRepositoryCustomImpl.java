@@ -1,8 +1,8 @@
 package com.girigiri.kwrental.reservation.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
-import static com.girigiri.kwrental.reservation.domain.QReservation.*;
-import static com.girigiri.kwrental.reservation.domain.QReservationSpec.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
+import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,8 +11,8 @@ import java.util.Set;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

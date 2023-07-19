@@ -3,7 +3,7 @@ package com.girigiri.kwrental.rental.domain;
 import java.time.LocalDateTime;
 
 import com.girigiri.kwrental.common.SuperEntity;
-import com.girigiri.kwrental.reservation.domain.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public interface RentalSpec extends SuperEntity {
     boolean isNowRental();

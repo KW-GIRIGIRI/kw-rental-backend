@@ -6,8 +6,8 @@ import java.time.LocalDate;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.inventory.domain.Inventory;
-import com.girigiri.kwrental.reservation.domain.RentalAmount;
-import com.girigiri.kwrental.reservation.domain.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 
 public class InventoryFixture {
 

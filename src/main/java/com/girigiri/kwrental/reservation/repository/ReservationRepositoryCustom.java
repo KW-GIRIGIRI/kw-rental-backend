@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public interface ReservationRepositoryCustom {
 

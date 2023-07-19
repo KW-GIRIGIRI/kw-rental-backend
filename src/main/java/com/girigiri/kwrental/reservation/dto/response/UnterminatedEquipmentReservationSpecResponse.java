@@ -2,8 +2,8 @@ package com.girigiri.kwrental.reservation.dto.response;
 
 import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.ReservationSpecStatus;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 
 public record UnterminatedEquipmentReservationSpecResponse(
 

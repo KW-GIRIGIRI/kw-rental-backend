@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.domain;
+package com.girigiri.kwrental.reservation.domain.entity;
 
 import com.girigiri.kwrental.inventory.exception.RentalAmountException;
 

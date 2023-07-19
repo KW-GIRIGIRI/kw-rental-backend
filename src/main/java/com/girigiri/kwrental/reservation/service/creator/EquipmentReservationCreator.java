@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.girigiri.kwrental.reservation.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.Reservation;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
 
 import lombok.RequiredArgsConstructor;

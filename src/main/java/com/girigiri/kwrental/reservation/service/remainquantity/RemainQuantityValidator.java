@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.reservation.domain.RentalPeriod;
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;

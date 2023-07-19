@@ -2,9 +2,14 @@ package com.girigiri.kwrental.reservation.domain;
 
 import java.util.List;
 
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
+
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class EquipmentReservationWithMemberNumber {
     private final Long id;
     private final String renterName;
@@ -12,16 +17,6 @@ public class EquipmentReservationWithMemberNumber {
     private final RentalDateTime acceptDateTime;
 
     private final List<ReservationSpec> reservationSpecs;
-
-    public EquipmentReservationWithMemberNumber(final Long id, final String renterName, final String memberNumber,
-                                                final RentalDateTime acceptDateTime,
-                                                final List<ReservationSpec> reservationSpecs) {
-        this.id = id;
-        this.renterName = renterName;
-        this.memberNumber = memberNumber;
-        this.acceptDateTime = acceptDateTime;
-        this.reservationSpecs = reservationSpecs;
-    }
 
     public List<Long> getReservationSpecIds() {
         return this.reservationSpecs.stream()

@@ -1,13 +1,14 @@
 package com.girigiri.kwrental.reservation.repository;
 
-import com.girigiri.kwrental.reservation.domain.ReservationSpec;
+import java.util.Optional;
+
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
+import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 
 public interface ReservationSpecRepository extends Repository<ReservationSpec, Long>, ReservationSpecRepositoryCustom {
 
-    ReservationSpec save(ReservationSpec reservationSpec);
+	ReservationSpec save(ReservationSpec reservationSpec);
 
-    Optional<ReservationSpec> findById(Long id);
+	Optional<ReservationSpec> findById(Long id);
 }

@@ -3,7 +3,7 @@ package com.girigiri.kwrental.reservation.dto.response;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public record UnterminatedEquipmentReservationResponse(
 

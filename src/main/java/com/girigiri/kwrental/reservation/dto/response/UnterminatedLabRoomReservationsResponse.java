@@ -2,7 +2,7 @@ package com.girigiri.kwrental.reservation.dto.response;
 
 import java.util.List;
 
-import com.girigiri.kwrental.reservation.domain.Reservation;
+import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 
 public record UnterminatedLabRoomReservationsResponse(
     List<UnterminatedLabRoomReservationResponse> reservations
