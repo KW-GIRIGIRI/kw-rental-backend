@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.reservation.service;
 
+import static com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.*;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -17,7 +19,6 @@ import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationReques
 import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;

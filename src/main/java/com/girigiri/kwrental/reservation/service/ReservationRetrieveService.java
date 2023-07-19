@@ -17,7 +17,7 @@ import com.girigiri.kwrental.reservation.domain.ReservationCalendar;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;

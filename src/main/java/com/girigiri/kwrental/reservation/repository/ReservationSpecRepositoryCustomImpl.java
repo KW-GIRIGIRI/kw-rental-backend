@@ -21,8 +21,7 @@ import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -212,9 +211,11 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 				.leftJoin(member).on(member.id.eq(reservation.memberId))
 				.where(predicates)
 				.transform(groupBy(rentableAsset.id)
-					.as(Projections.constructor(LabRoomReservationWithMemberNumberResponse.class,
+					.as(Projections.constructor(
+						LabRoomReservationWithMemberNumberResponse.class,
 						rentableAsset.name, reservation.acceptDateTime,
-						list(Projections.constructor(LabRoomReservationSpecWithMemberNumberResponse.class,
+						list(Projections.constructor(
+							LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse.class,
 							reservationSpec.id, reservationSpec.reservation.id, reservation.name, member.memberNumber,
 							reservationSpec.amount.amount, reservation.phoneNumber)))))
 				.values()

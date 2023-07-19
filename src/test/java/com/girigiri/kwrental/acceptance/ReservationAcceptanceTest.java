@@ -32,15 +32,15 @@ import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequ
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.CancelReservationSpecRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationSpecWithMemberNumberResponse;
-import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
+import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse.LabRoomReservationSpecWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
+import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse.UnterminatedEquipmentReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -281,26 +281,17 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.as(LabRoomReservationsWithMemberNumberResponse.class);
 
 		// then
+		final String memberNumber = member.getMemberNumber();
 		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
-					List.of(
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
-							reservationSpec1.getReservation().getId(),
-							reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(),
-							reservation1.getPhoneNumber()),
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
-							reservationSpec2.getReservation().getId(),
-							reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(),
-							reservation2.getPhoneNumber())
-					)),
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation1,
+							reservationSpec1),
+						createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation2,
+							reservationSpec2))),
 				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(),
-					List.of(
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(),
-							reservationSpec3.getReservation().getId(),
-							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
-							reservation3.getPhoneNumber())
-					))
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation3,
+						reservationSpec3)))
 			);
 	}
 
@@ -352,26 +343,17 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomReservationsWithMemberNumberResponse.class);
 
 		// then
+		final String memberNumber = member.getMemberNumber();
 		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomReservationWithMemberNumberResponse(labRoom1.getName(), reservation1.getAcceptDateTime(),
-					List.of(
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec1.getId(),
-							reservationSpec1.getReservation().getId(),
-							reservation1.getName(), member.getMemberNumber(), reservationSpec1.getAmount().getAmount(),
-							reservation1.getPhoneNumber()),
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec2.getId(),
-							reservationSpec2.getReservation().getId(),
-							reservation2.getName(), member.getMemberNumber(), reservationSpec2.getAmount().getAmount(),
-							reservation2.getPhoneNumber())
-					)),
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation1,
+							reservationSpec1),
+						createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation2,
+							reservationSpec2))),
 				new LabRoomReservationWithMemberNumberResponse(labRoom2.getName(), reservation3.getAcceptDateTime(),
-					List.of(
-						new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec3.getId(),
-							reservationSpec3.getReservation().getId(),
-							reservation3.getName(), member.getMemberNumber(), reservationSpec3.getAmount().getAmount(),
-							reservation3.getPhoneNumber())
-					))
+					List.of(createLabRoomReservationSpecWithMemberNumberResponse(memberNumber, reservation3,
+						reservationSpec3)))
 			);
 	}
 
@@ -496,5 +478,13 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		// then
 		assertThat(response.purpose())
 			.isEqualTo(reservation1.getPurpose());
+	}
+
+	private LabRoomReservationSpecWithMemberNumberResponse createLabRoomReservationSpecWithMemberNumberResponse(
+		final String memberNumber, final Reservation reservation, final ReservationSpec reservationSpec) {
+		return new LabRoomReservationSpecWithMemberNumberResponse(reservationSpec.getId(),
+			reservationSpec.getReservation().getId(), reservation.getName(), memberNumber,
+			reservationSpec.getAmount().getAmount(),
+			reservation.getPhoneNumber());
 	}
 }
