@@ -234,6 +234,17 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.fetch();
 	}
 
+	@Override
+	public List<AbstractRentalSpec> findNowRentedRentalSpecsByName(final String name) {
+		final LocalDate now = LocalDate.now();
+		return queryFactory.selectFrom(abstractRentalSpec)
+			.leftJoin(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
+			.leftJoin(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id))
+			.where(rentableAsset.name.eq(name), reservationSpec.period.rentalStartDate.loe(now),
+				reservationSpec.period.rentalEndDate.after(now), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
+			.fetch();
+	}
+
 	private long countBy(final JPAQuery<?> query) {
 		final Long count = queryFactory.select(abstractRentalSpec.count())
 			.from(abstractRentalSpec)

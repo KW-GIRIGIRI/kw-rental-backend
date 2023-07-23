@@ -50,4 +50,6 @@ public interface RentalSpecRepositoryCustom {
 
 	List<RentalSpecWithName> findTerminatedWithNameByPropertyAndInclusive(final String propertyNumber,
 		final RentalDateTime startDate, final RentalDateTime endDate);
+
+	List<AbstractRentalSpec> findNowRentedRentalSpecsByName(String name);
 }
