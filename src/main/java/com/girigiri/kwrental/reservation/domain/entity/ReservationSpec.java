@@ -67,7 +67,7 @@ public class ReservationSpec {
         return this.period.equals(period);
     }
 
-    public void validateAmount(final int amount) {
+    public void validateAmountIsSame(final int amount) {
         if (!this.amount.equals(RentalAmount.ofPositive(amount)))
             throw new ReservationSpecException("대여 신청 갯수가 맞지 않습니다.");
     }

@@ -22,8 +22,6 @@ import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.Rental;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
@@ -38,87 +36,29 @@ import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class RentalService {
 
 	private final ItemService itemService;
 	private final ReservationService reservationService;
 	private final RentalSpecRepository rentalSpecRepository;
-
 	private final PenaltyService penaltyService;
-
-	public RentalService(final ItemService itemService, final ReservationService reservationService,
-		final RentalSpecRepository rentalSpecRepository, final PenaltyService penaltyService) {
-		this.itemService = itemService;
-		this.reservationService = reservationService;
-		this.rentalSpecRepository = rentalSpecRepository;
-		this.penaltyService = penaltyService;
-	}
-
-	@Transactional
-	public void rent(final CreateRentalRequest createRentalRequest) {
-		final Map<Long, Set<String>> propertyNumbersByReservationSpecId = createRentalRequest.getRentalSpecsRequests()
-			.stream()
-			.collect(toMap(RentalSpecsRequest::getReservationSpecId, it -> Set.copyOf(it.getPropertyNumbers())));
-		Map<Long, Set<String>> collectedByEquipmentId = reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(
-			createRentalRequest.getReservationId(), propertyNumbersByReservationSpecId);
-		itemService.validatePropertyNumbers(collectedByEquipmentId);
-		validateNowRental(collectedByEquipmentId);
-		final List<EquipmentRentalSpec> rentalSpecs = mapToRentalSpecs(createRentalRequest);
-		rentalSpecRepository.saveAll(rentalSpecs);
-		final List<Long> rentedReservationSpecIds = rentalSpecs.stream()
-			.map(AbstractRentalSpec::getReservationSpecId)
-			.toList();
-		reservationService.acceptReservation(createRentalRequest.getReservationId(), rentedReservationSpecIds);
-	}
-
-	private void validateNowRental(final Map<Long, Set<String>> collectedByEquipmentId) {
-		final Set<String> propertyNumbers = collectedByEquipmentId.values().stream()
-			.flatMap(Set::stream)
-			.collect(Collectors.toSet());
-		final boolean nowRental = rentalSpecRepository.findByPropertyNumbers(propertyNumbers).stream()
-			.anyMatch(EquipmentRentalSpec::isNowRental);
-		if (nowRental)
-			throw new DuplicateRentalException();
-	}
-
-	private List<EquipmentRentalSpec> mapToRentalSpecs(final CreateRentalRequest createRentalRequest) {
-		return createRentalRequest.getRentalSpecsRequests().stream()
-			.map(it -> mapToRentalSpecPerReservationSpec(createRentalRequest.getReservationId(), it))
-			.flatMap(List::stream)
-			.toList();
-	}
-
-	private List<EquipmentRentalSpec> mapToRentalSpecPerReservationSpec(final Long reservationId,
-		final RentalSpecsRequest rentalSpecsRequest) {
-		final Long reservationSpecId = rentalSpecsRequest.getReservationSpecId();
-		return rentalSpecsRequest.getPropertyNumbers().stream()
-			.map(propertyNumber -> mapToRentalSpec(reservationId, reservationSpecId, propertyNumber))
-			.toList();
-	}
-
-	private EquipmentRentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId,
-		final String propertyNumber) {
-		return EquipmentRentalSpec.builder()
-			.reservationId(reservationId)
-			.reservationSpecId(reservationSpecId)
-			.propertyNumber(propertyNumber)
-			.acceptDateTime(RentalDateTime.now())
-			.build();
-	}
+	private final RentalRentService rentalRentService;
 
 	@Transactional(readOnly = true)
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
@@ -235,23 +175,6 @@ public class RentalService {
 			propertyNumber);
 		Collections.reverse(rentalSpecsWithName);
 		return EquipmentRentalSpecsResponse.from(rentalSpecsWithName);
-	}
-
-	@Transactional
-	public void rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
-		final List<Reservation> rentedReservations = reservationService.rentLabRoom(rentLabRoomRequest);
-		final List<LabRoomRentalSpec> labRoomRentalSpecs = rentedReservations.stream()
-			.map(reservation -> mapToRentalSpec(reservation.getId(), reservation.getReservationSpecs().get(0).getId()))
-			.toList();
-		rentalSpecRepository.saveAll(labRoomRentalSpecs);
-	}
-
-	private LabRoomRentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId) {
-		return LabRoomRentalSpec.builder()
-			.reservationId(reservationId)
-			.reservationSpecId(reservationSpecId)
-			.acceptDateTime(RentalDateTime.now())
-			.build();
 	}
 
 	@Transactional

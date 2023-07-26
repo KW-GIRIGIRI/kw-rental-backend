@@ -1,13 +1,15 @@
 package com.girigiri.kwrental.rental.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-
 import java.util.List;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Getter;
+
 @Getter
-public class CreateRentalRequest {
+@Builder
+public class CreateEquipmentRentalRequest {
 
     @NotNull
     private Long reservationId;
@@ -15,11 +17,10 @@ public class CreateRentalRequest {
     @NotEmpty
     private List<RentalSpecsRequest> rentalSpecsRequests;
 
-    private CreateRentalRequest() {
+    private CreateEquipmentRentalRequest() {
     }
 
-
-    public CreateRentalRequest(final Long reservationId, final List<RentalSpecsRequest> rentalSpecsRequests) {
+    public CreateEquipmentRentalRequest(final Long reservationId, final List<RentalSpecsRequest> rentalSpecsRequests) {
         this.reservationId = reservationId;
         this.rentalSpecsRequests = rentalSpecsRequests;
     }

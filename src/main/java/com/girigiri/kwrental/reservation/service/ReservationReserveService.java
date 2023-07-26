@@ -1,9 +1,13 @@
 package com.girigiri.kwrental.reservation.service;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
@@ -38,5 +42,12 @@ public class ReservationReserveService {
 		reservation.getReservationSpecs()
 			.forEach(spec -> remainQuantityValidator.validateAmount(spec.getRentable().getId(),
 				spec.getAmount().getAmount(), spec.getPeriod()));
+	}
+
+	Map<Long, Long> findLabRoomReservationIdsBySpecIds(final List<Long> specIds) {
+		return reservationRepository.findByReservationSpecIds(specIds)
+			.stream()
+			.map(LabRoomReservation::new)
+			.collect(toMap(LabRoomReservation::getReservationSpecId, LabRoomReservation::getId));
 	}
 }

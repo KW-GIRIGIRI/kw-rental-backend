@@ -23,12 +23,18 @@ public class LabRoomReservation {
 		this.reservation = reservation;
 	}
 
-	public void validateWhenRent() {
+	public void validateCanRentNow() {
 		final List<ReservationSpec> specs = reservation.getReservationSpecs();
 		if (!specs.stream().allMatch(ReservationSpec::isReserved))
 			throw new LabRoomReservationException("랩실 대여를 하려는 예약 상세는 예약 상태여야 합니다.");
 		if (!specs.stream().allMatch(spec -> spec.containsDate(LocalDate.now())))
 			throw new LabRoomReservationException("대여 수령 날짜가 대여 신청 기간에 없습니다.");
+	}
+
+	public void validateLabRoomName(final String labRoomName) {
+		final boolean onlyRentFor = this.reservation.isOnlyRentFor(labRoomName);
+		if (!onlyRentFor)
+			throw new LabRoomReservationException("랩실 대여 예약의 랩실 이름이 불일치 합니다.");
 	}
 
 	public void validateWhenReturn() {

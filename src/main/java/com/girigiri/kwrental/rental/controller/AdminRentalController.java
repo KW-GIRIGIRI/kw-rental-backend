@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
@@ -28,20 +28,21 @@ import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.rental.service.rent.RentalRentService;
+import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.util.EndPointUtils;
 
-@RestController
-@RequestMapping("/api/admin/rentals")
+import lombok.RequiredArgsConstructor;
+
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
 
 	private final RentalService rentalService;
-
-	public AdminRentalController(final RentalService rentalService) {
-		this.rentalService = rentalService;
-	}
+	private final RentalRentService rentalRentService;
 
 	@GetMapping(params = "startDate")
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
@@ -56,10 +57,10 @@ public class AdminRentalController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> rent(@RequestBody final CreateRentalRequest createRentalRequest) {
-		rentalService.rent(createRentalRequest);
+	public ResponseEntity<?> rent(@RequestBody final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
+		rentalRentService.rentEquipment(createEquipmentRentalRequest);
 		return ResponseEntity
-			.created(URI.create("/api/rentals?reservationId=" + createRentalRequest.getReservationId()))
+			.created(URI.create("/api/rentals?reservationId=" + createEquipmentRentalRequest.getReservationId()))
 			.build();
 	}
 
@@ -81,8 +82,9 @@ public class AdminRentalController {
 	}
 
 	@PostMapping("/labRooms")
-	public ResponseEntity<?> rentLabRoom(@Validated @RequestBody RentLabRoomRequest rentLabRoomRequest) {
-		rentalService.rentLabRoom(rentLabRoomRequest);
+	public ResponseEntity<?> rentLabRoom(
+		@Validated @RequestBody CreateLabRoomRentalRequest createLabRoomRentalRequest) {
+		rentalRentService.rentLabRoom(createLabRoomRentalRequest);
 		return ResponseEntity.noContent().build();
 	}
 

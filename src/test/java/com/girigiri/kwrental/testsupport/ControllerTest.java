@@ -18,6 +18,7 @@ import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
 import com.girigiri.kwrental.rental.service.RentalService;
+import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
 @WebMvcTest
@@ -62,4 +63,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected PenaltyServiceImpl penaltyService;
+
+    @MockBean
+    protected RentalRentService rentalRentService;
 }

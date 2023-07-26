@@ -31,7 +31,7 @@ import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
@@ -58,7 +58,7 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -106,7 +106,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
 
-		CreateRentalRequest request = new CreateRentalRequest(
+		CreateEquipmentRentalRequest request = new CreateEquipmentRentalRequest(
 			reservation1.getId(),
 			List.of(
 				new RentalSpecsRequest(reservation1.getReservationSpecs().get(0).getId(),
@@ -532,7 +532,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
 
-		final RentLabRoomRequest requestBody = RentLabRoomRequest.builder()
+		final CreateLabRoomRentalRequest requestBody = CreateLabRoomRentalRequest.builder()
 			.reservationSpecIds(List.of(reservationSpec1.getId()))
 			.name(labRoom1.getName())
 			.build();

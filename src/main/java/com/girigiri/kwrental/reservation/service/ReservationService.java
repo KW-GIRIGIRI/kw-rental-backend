@@ -16,7 +16,7 @@ import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNu
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
@@ -67,18 +67,22 @@ public class ReservationService {
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-	public Map<Long, Set<String>> validatePropertyNumbersCountAndGroupByEquipmentId(final Long reservationId,
+	public Map<Long, Set<String>> groupPropertyNumbersByEquipmentId(final Long reservationId,
 		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
-		reservationValidateService.validateReservationSpecAmount(reservationId, propertyNumbersByReservationSpecId);
 		reservationValidateService.validateReservationSpecIdContainsAll(reservationId,
 			propertyNumbersByReservationSpecId.keySet());
 		return reservationRetrieveService.groupPropertyNumbersCountByEquipmentId(reservationId,
 			propertyNumbersByReservationSpecId);
 	}
 
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public void validateReservationSpecHasSameAmount(final Map<Long, Integer> amountBySpecId) {
+		reservationValidateService.validateAmountIsSame(amountBySpecId);
+	}
+
 	@Transactional(propagation = Propagation.MANDATORY)
-	public List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
-		return reservationRentalService.rentLabRoom(rentLabRoomRequest);
+	public List<Reservation> rentLabRoom(final CreateLabRoomRentalRequest createLabRoomRentalRequest) {
+		return reservationRentalService.rentLabRoom(createLabRoomRentalRequest);
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -124,7 +128,7 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
-		reservationRentalService.acceptReservation(id, rentedReservationSpecIds);
+		reservationRentalService.rentReservation(id, rentedReservationSpecIds);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
@@ -155,5 +159,15 @@ public class ReservationService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void cancelByAssetId(Long assetId) {
 		reservationCancelService.cancelByAssetId(assetId);
+	}
+
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void validateLabRoomReservationForAccept(final String labRoomName, final List<Long> reservationSpecIds) {
+		reservationValidateService.validateLabRoomReservationForAccept(labRoomName, reservationSpecIds);
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public Map<Long, Long> getLabRoomReservationIdsByReservationSpecIds(final List<Long> reservationSpecIds) {
+		return reservationReserveService.findLabRoomReservationIdsBySpecIds(reservationSpecIds);
 	}
 }

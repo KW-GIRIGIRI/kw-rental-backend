@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 
 @Builder
-public record RentLabRoomRequest(
-    @NotEmpty
-    String name,
-    @NotEmpty
-    List<Long> reservationSpecIds) {
+public record CreateLabRoomRentalRequest(
+	@NotEmpty
+	String name,
+	@NotEmpty
+	List<Long> reservationSpecIds) {
 }

@@ -2,15 +2,12 @@ package com.girigiri.kwrental.rental.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,14 +22,11 @@ import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationSpecWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
@@ -43,7 +37,6 @@ import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
-import com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
@@ -63,59 +56,8 @@ class RentalServiceTest {
 	private RentalSpecRepository rentalSpecRepository;
 	@Mock
 	private PenaltyService penaltyService;
-
 	@InjectMocks
 	private RentalService rentalService;
-
-	@Test
-	@DisplayName("대여를 생성할 때 이미 대여 중인 품목으로 대여하려면 예외 발생")
-	void rent_duplicateRental() {
-		// given
-		final Long reservationId = 1L;
-		final String propertyNumber = "12345678";
-		final Long reservationSpecId = 2L;
-		final CreateRentalRequest request = new CreateRentalRequest(
-			reservationId, List.of(new RentalSpecsRequest(reservationSpecId, List.of(propertyNumber)))
-		);
-		given(reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(any(), any()))
-			.willReturn(Map.of(1L, Set.of(propertyNumber)));
-		doNothing().when(itemService).validatePropertyNumbers(any());
-		given(rentalSpecRepository.findByPropertyNumbers(any()))
-			.willReturn(
-				List.of(EquipmentRentalSpecFixture.builder().id(1L).reservationSpecId(reservationSpecId).build()));
-
-		// when, then
-		assertThatThrownBy(() -> rentalService.rent(request))
-			.isExactlyInstanceOf(DuplicateRentalException.class);
-	}
-
-	@Test
-	@DisplayName("대여를 생성한다.")
-	void rent() {
-		// given
-		final Long reservationId = 1L;
-		final String propertyNumber = "12345678";
-		final Long reservationSpecId = 2L;
-		final CreateRentalRequest request = new CreateRentalRequest(
-			reservationId, List.of(new RentalSpecsRequest(reservationSpecId, List.of(propertyNumber)))
-		);
-		given(reservationService.validatePropertyNumbersCountAndGroupByEquipmentId(any(), any()))
-			.willReturn(Map.of(1L, Set.of(propertyNumber)));
-		doNothing().when(itemService).validatePropertyNumbers(any());
-		given(rentalSpecRepository.findByPropertyNumbers(any()))
-			.willReturn(Collections.emptyList());
-		final List<EquipmentRentalSpec> output = List.of(
-			EquipmentRentalSpecFixture.builder().reservationId(reservationId)
-				.propertyNumber(propertyNumber).reservationSpecId(reservationSpecId).id(1L).build());
-		final EquipmentRentalSpec expect = EquipmentRentalSpecFixture.builder().reservationId(reservationId)
-			.propertyNumber(propertyNumber).reservationSpecId(reservationSpecId).build();
-		given(rentalSpecRepository.saveAll(DeepReflectionEqMatcher.deepRefEq(List.of(expect), "acceptDateTime")))
-			.willReturn(output);
-
-		// when, then
-		assertThatCode(() -> rentalService.rent(request))
-			.doesNotThrowAnyException();
-	}
 
 	@Test
 	@DisplayName("특정 날짜가 대여 수령일인 대여 예약을 대여 수령 시간과 대여 상세를 함께 조회한다.")

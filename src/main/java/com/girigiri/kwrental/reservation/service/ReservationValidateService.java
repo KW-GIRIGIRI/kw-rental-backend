@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.reservation.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomExcepti
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationValidateService {
 	private final ReservationRepository reservationRepository;
+	private final ReservationSpecRepository reservationSpecRepository;
 
 	void validateReservationSpecIdContainsAll(final Long reservationId,
 		final Set<Long> reservationSpecIdsFromInput) {
@@ -35,17 +38,17 @@ public class ReservationValidateService {
 		throw new ReservationSpecException("신청한 대여 상세와 입력된 대여 상세가 일치하지 않습니다.");
 	}
 
-	void validateReservationSpecAmount(final Long reservationId,
-		final Map<Long, Set<String>> propertyNumbersByReservationSpecId) {
-		final Reservation reservation = getReservationWithSpecs(reservationId);
-		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
-			reservationSpec.validateAmount(propertyNumbersByReservationSpecId.get(reservationSpec.getId()).size());
-		}
-	}
-
 	private Reservation getReservationWithSpecs(final Long reservationId) {
 		return reservationRepository.findByIdWithSpecs(reservationId)
 			.orElseThrow(ReservationNotFoundException::new);
+	}
+
+	void validateAmountIsSame(final Map<Long, Integer> amountByReservationSpecId) {
+		final List<ReservationSpec> specs = reservationSpecRepository.findByIdIn(amountByReservationSpecId.keySet());
+		for (ReservationSpec spec : specs) {
+			final Integer amount = amountByReservationSpecId.get(spec.getId());
+			spec.validateAmountIsSame(amount);
+		}
 	}
 
 	void validateAlreadyReservedSamePeriod(final Reservation reservation) {
@@ -58,5 +61,20 @@ public class ReservationValidateService {
 		if (alreadyReserved) {
 			throw new AlreadyReservedLabRoomException();
 		}
+	}
+
+	void validateLabRoomReservationForAccept(final String labRoomName, final List<Long> reservationSpecIds) {
+		final List<LabRoomReservation> labRoomReservations = mapToLabRoomReservations(reservationSpecIds);
+		for (LabRoomReservation labRoomReservation : labRoomReservations) {
+			labRoomReservation.validateLabRoomName(labRoomName);
+			labRoomReservation.validateCanRentNow();
+		}
+	}
+
+	private List<LabRoomReservation> mapToLabRoomReservations(final List<Long> reservationSpecIds) {
+		return reservationRepository.findByReservationSpecIds(reservationSpecIds)
+			.stream()
+			.map(LabRoomReservation::new)
+			.toList();
 	}
 }

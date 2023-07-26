@@ -1,12 +1,14 @@
 package com.girigiri.kwrental.rental.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-
 import java.util.List;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Getter;
+
 @Getter
+@Builder
 public class RentalSpecsRequest {
 
     @NotNull

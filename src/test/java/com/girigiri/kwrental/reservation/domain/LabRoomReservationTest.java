@@ -60,7 +60,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatCode(labRoomReservation::validateWhenRent)
+		assertThatCode(labRoomReservation::validateCanRentNow)
 			.doesNotThrowAnyException();
 	}
 
@@ -77,7 +77,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatThrownBy(labRoomReservation::validateWhenRent)
+		assertThatThrownBy(labRoomReservation::validateCanRentNow)
 			.isExactlyInstanceOf(LabRoomReservationException.class);
 	}
 
@@ -94,7 +94,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatThrownBy(labRoomReservation::validateWhenRent)
+		assertThatThrownBy(labRoomReservation::validateCanRentNow)
 			.isExactlyInstanceOf(LabRoomReservationException.class);
 	}
 

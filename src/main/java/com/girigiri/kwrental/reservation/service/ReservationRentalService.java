@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.exception.NotSameRentableRentException;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
@@ -35,14 +35,14 @@ public class ReservationRentalService {
 		return reservations;
 	}
 
-	List<Reservation> rentLabRoom(final RentLabRoomRequest rentLabRoomRequest) {
+	List<Reservation> rentLabRoom(final CreateLabRoomRentalRequest createLabRoomRentalRequest) {
 		final List<Reservation> reservations = reservationRepository.findByReservationSpecIds(
-			rentLabRoomRequest.reservationSpecIds());
-		validateSameLabRoom(rentLabRoomRequest.name(), reservations);
+			createLabRoomRentalRequest.reservationSpecIds());
+		validateSameLabRoom(createLabRoomRentalRequest.name(), reservations);
 		for (Reservation reservation : reservations) {
 			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-			labRoomReservation.validateWhenRent();
-			acceptReservation(labRoomReservation.getId(), List.of(labRoomReservation.getReservationSpecId()));
+			labRoomReservation.validateCanRentNow();
+			rentReservation(labRoomReservation.getId(), List.of(labRoomReservation.getReservationSpecId()));
 		}
 		return reservations;
 	}
@@ -54,7 +54,7 @@ public class ReservationRentalService {
 			throw new NotSameRentableRentException();
 	}
 
-	void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
+	void rentReservation(final Long id, final List<Long> rentedReservationSpecIds) {
 		final Reservation reservation = getReservationById(id);
 		reservation.acceptAt(LocalDateTime.now());
 		reservationSpecRepository.updateStatusByIds(rentedReservationSpecIds, ReservationSpecStatus.RENTED);
