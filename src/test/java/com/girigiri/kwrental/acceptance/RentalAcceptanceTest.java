@@ -38,8 +38,8 @@ import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
-import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse.EquipmentRentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
@@ -449,7 +449,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.as(EquipmentRentalSpecsResponse.class);
 
 		// then
-		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentalSpecs()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
 					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
@@ -508,7 +508,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.as(EquipmentRentalSpecsResponse.class);
 
 		// then
-		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentalSpecs()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
 					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
