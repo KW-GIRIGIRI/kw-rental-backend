@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.service;
 
+import static com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest.*;
 import static java.util.stream.Collectors.*;
 
 import java.time.LocalDate;
@@ -23,8 +24,7 @@ import com.girigiri.kwrental.rental.domain.Rental;
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
+import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
@@ -108,10 +108,10 @@ public class RentalService {
 	@Transactional
 	public void returnRental(final ReturnRentalRequest returnRentalRequest) {
 		final Reservation reservation = reservationService.getReservationWithReservationSpecsById(
-			returnRentalRequest.getReservationId());
+			returnRentalRequest.reservationId());
 		Rental rental = getRental(reservation, returnRentalRequest);
-		final Map<Long, RentalSpecStatus> returnRequest = returnRentalRequest.getRentalSpecs().stream()
-			.collect(toMap(ReturnRentalSpecRequest::getId, ReturnRentalSpecRequest::getStatus));
+		final Map<Long, RentalSpecStatus> returnRequest = returnRentalRequest.rentalSpecs().stream()
+			.collect(toMap(ReturnRentalSpecRequest::id, ReturnRentalSpecRequest::status));
 		for (Long rentalSpecId : returnRequest.keySet()) {
 			final RentalSpecStatus status = returnRequest.get(rentalSpecId);
 			rental.returnByRentalSpecId(rentalSpecId, status);
@@ -128,7 +128,7 @@ public class RentalService {
 
 	private Rental getRental(final Reservation reservation, final ReturnRentalRequest returnRentalRequest) {
 		final List<EquipmentRentalSpec> rentalSpecList = rentalSpecRepository.findByReservationId(
-			returnRentalRequest.getReservationId());
+			returnRentalRequest.reservationId());
 		return Rental.of(rentalSpecList, reservation);
 	}
 
@@ -193,10 +193,10 @@ public class RentalService {
 	@Transactional
 	public void updateLabRoomRentalSpecStatuses(
 		final UpdateLabRoomRentalSpecStatusesRequest updateLabRoomRentalSpecStatusesRequest) {
-		final List<UpdateLabRoomRentalSpecStatusRequest> updateLabRoomRentalSpecStatusRequests = updateLabRoomRentalSpecStatusesRequest.getReservations();
+		final List<UpdateLabRoomRentalSpecStatusRequest> updateLabRoomRentalSpecStatusRequests = updateLabRoomRentalSpecStatusesRequest.reservations();
 		for (UpdateLabRoomRentalSpecStatusRequest request : updateLabRoomRentalSpecStatusRequests) {
 			final Reservation reservation = reservationService.getReservationWithReservationSpecsById(
-				request.getReservationId());
+				request.reservationId());
 			final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 			final Long reservationSpecId = labRoomReservation.getReservationSpecId();
 			final List<AbstractRentalSpec> rentalSpecs = rentalSpecRepository.findByReservationSpecId(
@@ -205,7 +205,7 @@ public class RentalService {
 				throw new LabRoomRentalSpecNotOneException();
 			final AbstractRentalSpec rentalSpec = rentalSpecs.iterator().next();
 			final Rental rental = Rental.of(rentalSpecs, labRoomReservation.getReservation());
-			rental.updateStatusByRentalSpecId(rentalSpec.getId(), request.getRentalSpecStatus());
+			rental.updateStatusByRentalSpecId(rentalSpec.getId(), request.rentalSpecStatus());
 			final LabRoomRentalSpec labRoomRentalSpec = rental.getRentalSpecAs(rentalSpec.getId(),
 				LabRoomRentalSpec.class);
 			setPenalty(labRoomRentalSpec, labRoomReservation.getReservation().getMemberId());

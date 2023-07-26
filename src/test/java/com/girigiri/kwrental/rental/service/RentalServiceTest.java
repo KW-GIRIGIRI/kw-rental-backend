@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.rental.service;
 
+import static com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,6 @@ import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse.EquipmentReservationSpecWithRentalSpecsResponse;
@@ -140,7 +140,7 @@ class RentalServiceTest {
 			.id(5L)
 			.status(RentalSpecStatus.BROKEN)
 			.build();
-		final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+		final ReturnRentalRequest returnReturnRequest = builder()
 			.reservationId(reservationId)
 			.rentalSpecs(List.of(rentalSpecRequest1, rentalSpecRequest2, rentalSpecRequest3, rentalSpecRequest4))
 			.build();
@@ -148,25 +148,25 @@ class RentalServiceTest {
 		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpec1.getId())
-			.id(rentalSpecRequest1.getId())
+			.id(rentalSpecRequest1.id())
 			.propertyNumber("11111111")
 			.build();
 		final EquipmentRentalSpec rentalSpec2 = EquipmentRentalSpecFixture.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpec2.getId())
-			.id(rentalSpecRequest2.getId())
+			.id(rentalSpecRequest2.id())
 			.propertyNumber("22222222")
 			.build();
 		final EquipmentRentalSpec rentalSpec3 = EquipmentRentalSpecFixture.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpec2.getId())
-			.id(rentalSpecRequest3.getId())
+			.id(rentalSpecRequest3.id())
 			.propertyNumber("33333333")
 			.build();
 		final EquipmentRentalSpec rentalSpec4 = EquipmentRentalSpecFixture.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpec3.getId())
-			.id(rentalSpecRequest4.getId())
+			.id(rentalSpecRequest4.id())
 			.propertyNumber("44444444")
 			.build();
 
@@ -234,7 +234,7 @@ class RentalServiceTest {
 			.id(4L)
 			.status(RentalSpecStatus.RETURNED)
 			.build();
-		final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+		final ReturnRentalRequest returnReturnRequest = builder()
 			.reservationId(reservationId)
 			.rentalSpecs(List.of(rentalSpecRequest3)).build();
 
@@ -256,7 +256,7 @@ class RentalServiceTest {
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpec2.getId())
 			.status(RentalSpecStatus.OVERDUE_RENTED)
-			.id(rentalSpecRequest3.getId())
+			.id(rentalSpecRequest3.id())
 			.propertyNumber("33333333")
 			.build();
 		final EquipmentRentalSpec rentalSpec4 = EquipmentRentalSpecFixture.builder()
@@ -339,7 +339,7 @@ class RentalServiceTest {
 			.status(RentalSpecStatus.RETURNED)
 			.build();
 
-		final ReturnRentalRequest returnReturnRequest = ReturnRentalRequest.builder()
+		final ReturnRentalRequest returnReturnRequest = builder()
 			.reservationId(reservationId)
 			.rentalSpecs(List.of(rentalSpecRequest1, rentalSpecRequest2)).build();
 

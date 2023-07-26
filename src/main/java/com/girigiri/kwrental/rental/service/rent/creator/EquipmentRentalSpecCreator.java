@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 import lombok.RequiredArgsConstructor;
@@ -18,16 +18,16 @@ public class EquipmentRentalSpecCreator implements RentalSpecCreator<CreateEquip
 
 	@Override
 	public List<AbstractRentalSpec> create(final CreateEquipmentRentalRequest rentalSpecRequest) {
-		return rentalSpecRequest.getRentalSpecsRequests().stream()
-			.map(it -> mapToRentalSpecPerReservationSpec(rentalSpecRequest.getReservationId(), it))
+		return rentalSpecRequest.equipmentRentalSpecsRequests().stream()
+			.map(it -> mapToRentalSpecPerReservationSpec(rentalSpecRequest.reservationId(), it))
 			.flatMap(List::stream)
 			.toList();
 	}
 
 	private List<AbstractRentalSpec> mapToRentalSpecPerReservationSpec(final Long reservationId,
-		final RentalSpecsRequest rentalSpecsRequest) {
-		final Long reservationSpecId = rentalSpecsRequest.getReservationSpecId();
-		return rentalSpecsRequest.getPropertyNumbers().stream()
+		final EquipmentRentalSpecsRequest equipmentRentalSpecsRequest) {
+		final Long reservationSpecId = equipmentRentalSpecsRequest.reservationSpecId();
+		return equipmentRentalSpecsRequest.propertyNumbers().stream()
 			.map(propertyNumber -> mapToRentalSpec(reservationId, reservationSpecId, propertyNumber))
 			.toList();
 	}

@@ -62,16 +62,16 @@ class RentedItemServiceImplTest {
 	    final LocalDate now = LocalDate.now();
 	    final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers =
 		    rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(
-			    Set.of(statuses1.getPropertyNumber(), statuses2.getPropertyNumber()), now.minusDays(1), now);
+			    Set.of(statuses1.propertyNumber(), statuses2.propertyNumber()), now.minusDays(1), now);
 
 	    // then
 	    assertAll(
 		    () -> assertThat(
-			    rentalCountsByPropertyNumbers.get(statuses1.getPropertyNumber())).usingRecursiveComparison()
-			    .isEqualTo(new RentalCountsDto(statuses1.getPropertyNumber(), 2, 1)),
+			    rentalCountsByPropertyNumbers.get(statuses1.propertyNumber())).usingRecursiveComparison()
+			    .isEqualTo(new RentalCountsDto(statuses1.propertyNumber(), 2, 1)),
 		    () -> assertThat(
-			    rentalCountsByPropertyNumbers.get(statuses2.getPropertyNumber())).usingRecursiveComparison()
-			    .isEqualTo(new RentalCountsDto(statuses2.getPropertyNumber(), 0, 2))
+			    rentalCountsByPropertyNumbers.get(statuses2.propertyNumber())).usingRecursiveComparison()
+			    .isEqualTo(new RentalCountsDto(statuses2.propertyNumber(), 0, 2))
 	    );
     }
 }

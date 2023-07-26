@@ -43,7 +43,7 @@ public class RentedItemServiceImpl implements RentedItemService {
 		return rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(propertyNumbers, from, to)
 			.stream()
 			.collect(
-				Collectors.toMap(RentalSpecStatuesPerPropertyNumber::getPropertyNumber, this::mapToRentalCountsDto));
+				Collectors.toMap(RentalSpecStatuesPerPropertyNumber::propertyNumber, this::mapToRentalCountsDto));
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class RentedItemServiceImpl implements RentedItemService {
 	}
 
 	private RentalCountsDto mapToRentalCountsDto(final RentalSpecStatuesPerPropertyNumber rentalSpecStatues) {
-		return new RentalCountsDto(rentalSpecStatues.getPropertyNumber(), rentalSpecStatues.getNormalReturnedCount(),
+		return new RentalCountsDto(rentalSpecStatues.propertyNumber(), rentalSpecStatues.getNormalReturnedCount(),
 			rentalSpecStatues.getAbnormalReturnedCount());
 	}
 }

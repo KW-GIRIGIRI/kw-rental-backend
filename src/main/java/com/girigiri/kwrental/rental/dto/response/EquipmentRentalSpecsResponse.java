@@ -18,11 +18,11 @@ public record EquipmentRentalSpecsResponse(
 
         public static EquipmentRentalSpecResponse from(final RentalSpecWithName rentalSpecWithName) {
             return EquipmentRentalSpecResponse.builder()
-                .status(rentalSpecWithName.getStatus().isAbnormalReturned() ? "불량 반납" : "정상 반납")
-                .acceptDate(LocalDate.from(rentalSpecWithName.getAcceptDateTime()))
-                .returnDate(LocalDate.from(rentalSpecWithName.getReturnDateTime()))
-                .name(rentalSpecWithName.getName())
-                .reason(rentalSpecWithName.getStatus().name())
+                .status(rentalSpecWithName.status().isAbnormalReturned() ? "불량 반납" : "정상 반납")
+                .acceptDate(LocalDate.from(rentalSpecWithName.acceptDateTime()))
+                .returnDate(LocalDate.from(rentalSpecWithName.returnDateTime()))
+                .name(rentalSpecWithName.name())
+                .reason(rentalSpecWithName.status().name())
                 .build();
         }
     }

@@ -18,7 +18,7 @@ import com.girigiri.kwrental.item.exception.ItemNotAvailableException;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
@@ -85,12 +85,12 @@ class EquipmentRentValidatorTest {
 	}
 
 	private CreateEquipmentRentalRequest createEquipmentRentalRequest() {
-		final RentalSpecsRequest rentalSpecsRequest = RentalSpecsRequest.builder()
+		final EquipmentRentalSpecsRequest equipmentRentalSpecsRequest = EquipmentRentalSpecsRequest.builder()
 			.reservationSpecId(2L)
 			.propertyNumbers(List.of("12345678")).build();
 		return CreateEquipmentRentalRequest.builder()
 			.reservationId(1L)
-			.rentalSpecsRequests(List.of(rentalSpecsRequest))
+			.equipmentRentalSpecsRequests(List.of(equipmentRentalSpecsRequest))
 			.build();
 	}
 }

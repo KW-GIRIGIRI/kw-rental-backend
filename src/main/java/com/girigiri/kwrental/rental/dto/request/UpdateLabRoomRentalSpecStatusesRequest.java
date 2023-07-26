@@ -1,19 +1,18 @@
 package com.girigiri.kwrental.rental.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
-public class UpdateLabRoomRentalSpecStatusesRequest {
-    @NotEmpty
-    private List<UpdateLabRoomRentalSpecStatusRequest> reservations;
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 
-    private UpdateLabRoomRentalSpecStatusesRequest() {
-    }
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-    public UpdateLabRoomRentalSpecStatusesRequest(final List<UpdateLabRoomRentalSpecStatusRequest> reservations) {
-        this.reservations = reservations;
-    }
+public record UpdateLabRoomRentalSpecStatusesRequest(
+	@NotEmpty List<UpdateLabRoomRentalSpecStatusRequest> reservations) {
+
+	public record UpdateLabRoomRentalSpecStatusRequest(@NotNull Long reservationId,
+	                                                   @NotBlank RentalSpecStatus rentalSpecStatus) {
+	}
+
 }

@@ -60,7 +60,7 @@ public class AdminRentalController {
 	public ResponseEntity<?> rent(@RequestBody final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
 		rentalRentService.rentEquipment(createEquipmentRentalRequest);
 		return ResponseEntity
-			.created(URI.create("/api/rentals?reservationId=" + createEquipmentRentalRequest.getReservationId()))
+			.created(URI.create("/api/rentals?reservationId=" + createEquipmentRentalRequest.reservationId()))
 			.build();
 	}
 

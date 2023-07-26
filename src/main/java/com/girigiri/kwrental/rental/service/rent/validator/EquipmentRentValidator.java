@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.service.ReservationService;
@@ -40,9 +40,9 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 
 	private Map<Long, Integer> groupAmountByReservationSpecId(
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
-		return createEquipmentRentalRequest.getRentalSpecsRequests()
+		return createEquipmentRentalRequest.equipmentRentalSpecsRequests()
 			.stream()
-			.collect(toMap(RentalSpecsRequest::getReservationSpecId, it -> it.getPropertyNumbers().size()));
+			.collect(toMap(EquipmentRentalSpecsRequest::reservationSpecId, it -> it.propertyNumbers().size()));
 	}
 
 	private void validatePropertyNumbersAndAlreadyRented(
@@ -57,15 +57,15 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
 		final Map<Long, Set<String>> propertyNumbersByReservationSpecId = groupPropertyNumberByReservationSpecId(
 			createEquipmentRentalRequest);
-		final Long reservationId = createEquipmentRentalRequest.getReservationId();
+		final Long reservationId = createEquipmentRentalRequest.reservationId();
 		return reservationService.groupPropertyNumbersByEquipmentId(reservationId, propertyNumbersByReservationSpecId);
 	}
 
 	private Map<Long, Set<String>> groupPropertyNumberByReservationSpecId(
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
-		return createEquipmentRentalRequest.getRentalSpecsRequests()
+		return createEquipmentRentalRequest.equipmentRentalSpecsRequests()
 			.stream()
-			.collect(toMap(RentalSpecsRequest::getReservationSpecId, it -> Set.copyOf(it.getPropertyNumbers())));
+			.collect(toMap(EquipmentRentalSpecsRequest::reservationSpecId, it -> Set.copyOf(it.propertyNumbers())));
 	}
 
 	private void validateAlreadyRented(final Set<String> propertyNumbers) {
