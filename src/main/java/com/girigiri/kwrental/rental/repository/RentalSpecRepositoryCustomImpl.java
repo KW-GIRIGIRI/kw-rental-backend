@@ -24,12 +24,11 @@ import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
@@ -94,7 +93,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.transform(groupBy(reservationSpec.period).list(
 				Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate,
 					reservationSpec.period.rentalEndDate, GroupBy.set(
-						Projections.constructor(RentalSpecDto.class, abstractRentalSpec.id, equipment.name,
+						Projections.constructor(EquipmentRentalDto.EquipmentRentalSpecDto.class, abstractRentalSpec.id,
+							equipment.name,
 							abstractRentalSpec.status)))));
 	}
 

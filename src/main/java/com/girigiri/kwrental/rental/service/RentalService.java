@@ -28,6 +28,7 @@ import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusReq
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
@@ -38,8 +39,6 @@ import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueRese
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
@@ -58,7 +57,6 @@ public class RentalService {
 	private final ReservationService reservationService;
 	private final RentalSpecRepository rentalSpecRepository;
 	private final PenaltyService penaltyService;
-	private final RentalRentService rentalRentService;
 
 	@Transactional(readOnly = true)
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(

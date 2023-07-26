@@ -1,19 +1,21 @@
 package com.girigiri.kwrental.rental.dto.response;
 
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import lombok.Getter;
-
+import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-public class EquipmentRentalsDto {
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 
-    private Set<EquipmentRentalDto> rentals;
+public record EquipmentRentalsDto(
+	Set<EquipmentRentalDto> rentals) {
+	public record EquipmentRentalDto(
+		LocalDate startDate,
+		LocalDate endDate,
+		Set<EquipmentRentalSpecDto> rentalSpecs) {
+		public record EquipmentRentalSpecDto(
+			Long id,
+			String modelName,
+			RentalSpecStatus status) {
+		}
+	}
 
-    private EquipmentRentalsDto() {
-    }
-
-    public EquipmentRentalsDto(final Set<EquipmentRentalDto> rentals) {
-        this.rentals = rentals;
-    }
 }

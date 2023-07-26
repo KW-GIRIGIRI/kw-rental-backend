@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.service.RentedItemService;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveAssetException;
 import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveItemException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
 @Service
 public class RentedItemServiceImpl implements RentedItemService {

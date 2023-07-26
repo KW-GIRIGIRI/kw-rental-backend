@@ -1,9 +1,10 @@
-package com.girigiri.kwrental.rental.repository.dto;
-
-import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import lombok.Getter;
+package com.girigiri.kwrental.rental.dto.response;
 
 import java.util.List;
+
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+
+import lombok.Getter;
 
 @Getter
 public class RentalSpecStatuesPerPropertyNumber {

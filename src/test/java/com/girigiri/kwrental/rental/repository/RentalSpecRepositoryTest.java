@@ -24,12 +24,12 @@ import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -217,8 +217,9 @@ class RentalSpecRepositoryTest {
 		assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
-					Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
-						new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
+					Set.of(
+						new EquipmentRentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
+						new EquipmentRentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
 			);
 	}
 

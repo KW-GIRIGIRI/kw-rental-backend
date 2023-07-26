@@ -10,11 +10,11 @@ import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 public interface RentalSpecRepositoryCustom {

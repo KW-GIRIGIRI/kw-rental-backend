@@ -40,6 +40,8 @@ import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesR
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
@@ -50,8 +52,6 @@ import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueRese
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
@@ -396,10 +396,10 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(EquipmentRentalsDto.class);
 
 		// then
-		assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentals()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(new EquipmentRentalDto(reservation.getStartDate(), reservation.getEndDate(),
-				Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
-					new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
+				Set.of(new EquipmentRentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
+					new EquipmentRentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
 			);
 	}
 
@@ -754,8 +754,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		final Optional<Penalty> existsActual = penaltyRepository.findByRentalSpecId(rentalSpec1.getId());
 		final Optional<Penalty> notExistsActual = penaltyRepository.findById(penalty.getId());
-		assertThat(existsActual.isPresent()).isTrue();
-		assertThat(notExistsActual.isEmpty()).isTrue();
+		assertThat(existsActual).isPresent();
+		assertThat(notExistsActual).isEmpty();
 	}
 
 	@Test

@@ -20,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
