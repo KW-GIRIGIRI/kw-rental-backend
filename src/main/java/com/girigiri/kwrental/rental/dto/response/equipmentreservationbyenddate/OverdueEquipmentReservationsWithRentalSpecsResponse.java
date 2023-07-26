@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.rental.dto.response.overduereservations;
+package com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate;
 
 import static java.util.stream.Collectors.*;
 

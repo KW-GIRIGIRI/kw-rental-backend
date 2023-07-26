@@ -24,9 +24,9 @@ import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.ReservationSpecWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse.EquipmentReservationSpecWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
@@ -91,12 +91,13 @@ class RentalServiceTest {
 		final EquipmentReservationsWithRentalSpecsResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(
 			LocalDate.now());
 
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				EquipmentReservationWithRentalSpecsResponse.of(equipmentReservation, List.of(rentalSpec1)));
 		assertThat(
-			response.getReservations().get(0).getReservationSpecs()).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(ReservationSpecWithRentalSpecsResponse.of(reservationSpec1, List.of(rentalSpec1)));
+			response.reservations().get(0).reservationSpecs()).usingRecursiveFieldByFieldElementComparator()
+			.containsExactly(
+				EquipmentReservationSpecWithRentalSpecsResponse.of(reservationSpec1, List.of(rentalSpec1)));
 	}
 
 	@Test

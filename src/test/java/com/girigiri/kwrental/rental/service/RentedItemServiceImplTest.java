@@ -50,21 +50,28 @@ class RentedItemServiceImplTest {
     @Test
     @DisplayName("특정 기간에 자산 번호에 해당하는 대여 상태를 조회한다.")
     void getRentalCountsByPropertyNumbersBetweenDate() {
-        // given
-        final RentalSpecStatuesPerPropertyNumber statuses1 = new RentalSpecStatuesPerPropertyNumber("11111111", List.of(RentalSpecStatus.RETURNED, RentalSpecStatus.RETURNED, RentalSpecStatus.LOST));
-        final RentalSpecStatuesPerPropertyNumber statuses2 = new RentalSpecStatuesPerPropertyNumber("22222222", List.of(RentalSpecStatus.BROKEN, RentalSpecStatus.LOST));
-        given(rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(anySet(), any(), any()))
-                .willReturn(List.of(statuses1, statuses2));
+	    // given
+	    final RentalSpecStatuesPerPropertyNumber statuses1 = new RentalSpecStatuesPerPropertyNumber("11111111",
+		    List.of(RentalSpecStatus.RETURNED, RentalSpecStatus.RETURNED, RentalSpecStatus.LOST));
+	    final RentalSpecStatuesPerPropertyNumber statuses2 = new RentalSpecStatuesPerPropertyNumber("22222222",
+		    List.of(RentalSpecStatus.BROKEN, RentalSpecStatus.LOST));
+	    given(rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(anySet(), any(), any()))
+		    .willReturn(List.of(statuses1, statuses2));
 
-        // when
-        final LocalDate now = LocalDate.now();
-        final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers =
-                rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(Set.of(statuses1.getPropertyNumber(), statuses2.getPropertyNumber()), now.minusDays(1), now);
+	    // when
+	    final LocalDate now = LocalDate.now();
+	    final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers =
+		    rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(
+			    Set.of(statuses1.getPropertyNumber(), statuses2.getPropertyNumber()), now.minusDays(1), now);
 
-        // then
-        assertAll(
-                () -> assertThat(rentalCountsByPropertyNumbers.get(statuses1.getPropertyNumber())).usingRecursiveComparison().isEqualTo(new RentalCountsDto(statuses1.getPropertyNumber(), 2, 1)),
-                () -> assertThat(rentalCountsByPropertyNumbers.get(statuses2.getPropertyNumber())).usingRecursiveComparison().isEqualTo(new RentalCountsDto(statuses2.getPropertyNumber(), 0, 2))
-        );
+	    // then
+	    assertAll(
+		    () -> assertThat(
+			    rentalCountsByPropertyNumbers.get(statuses1.getPropertyNumber())).usingRecursiveComparison()
+			    .isEqualTo(new RentalCountsDto(statuses1.getPropertyNumber(), 2, 1)),
+		    () -> assertThat(
+			    rentalCountsByPropertyNumbers.get(statuses2.getPropertyNumber())).usingRecursiveComparison()
+			    .isEqualTo(new RentalCountsDto(statuses2.getPropertyNumber(), 0, 2))
+	    );
     }
 }

@@ -1,0 +1,6 @@
+package com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate;
+
+public record ReservationsWithRentalSpecsByEndDateResponse(
+	OverdueEquipmentReservationsWithRentalSpecsResponse overdueReservations,
+	EquipmentReservationsWithRentalSpecsResponse reservationsByEndDate) {
+}
