@@ -29,7 +29,6 @@ import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesR
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
@@ -162,7 +161,7 @@ public class RentalService {
 	@Transactional(readOnly = true)
 	public LabRoomRentalsDto getLabRoomRentalsBetweenDate(final Long memberId, final LocalDate from,
 		final LocalDate to) {
-		final List<LabRoomRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(
+		final List<LabRoomRentalsDto.LabRoomRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(
 			memberId, from, to);
 		return new LabRoomRentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
 	}

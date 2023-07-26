@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
+import static com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +43,6 @@ import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
-import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
@@ -686,7 +686,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomRentalsDto.class);
 
 		// then
-		assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentals()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(),
 					reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
