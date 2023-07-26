@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.acceptance;
 
 import static com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.*;
+import static com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueEquipmentReservationsWithRentalSpecsResponse.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,6 @@ import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
-import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -269,8 +269,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		assertAll(
 			() -> assertThat(
-				response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyInAnyOrder(OverdueReservationResponse.of(
+				response.getOverdueReservations().reservations()).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyInAnyOrder(OverdueEquipmentReservationResponse.of(
 					new EquipmentReservationWithMemberNumber(reservation2.getId(), reservation2.getName(),
 						member.getMemberNumber(), reservation2.getAcceptDateTime(), List.of(reservationSpec3)),
 					List.of(rentalSpec3))),

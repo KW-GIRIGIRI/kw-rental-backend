@@ -34,7 +34,7 @@ import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
 import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
-import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueEquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -79,21 +79,21 @@ public class RentalService {
 	@Transactional(readOnly = true)
 	public ReservationsWithRentalSpecsByEndDateResponse getReservationsWithRentalSpecsByEndDate(
 		final LocalDate endDate) {
-		final OverdueReservationsWithRentalSpecsResponse overdueReservations = getOverdueReservationsWithRentalSpecs(
+		final OverdueEquipmentReservationsWithRentalSpecsResponse overdueReservations = getOverdueReservationsWithRentalSpecs(
 			endDate);
 		final EquipmentReservationsWithRentalSpecsResponse equipmentReservations = getReservationWithRentalSpecsByEndDate(
 			endDate);
 		return new ReservationsWithRentalSpecsByEndDateResponse(overdueReservations, equipmentReservations);
 	}
 
-	private OverdueReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(
+	private OverdueEquipmentReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(
 		final LocalDate localDate) {
 		Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservations = reservationService.getOverdueReservationsWithMemberNumber(
 			localDate);
 		final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservations);
 		final List<EquipmentRentalSpec> overdueRentalSpecs = rentalSpecRepository.findByReservationSpecIds(
 			overdueReservationSpecsIds);
-		return OverdueReservationsWithRentalSpecsResponse.of(overdueEquipmentReservations, overdueRentalSpecs);
+		return OverdueEquipmentReservationsWithRentalSpecsResponse.of(overdueEquipmentReservations, overdueRentalSpecs);
 	}
 
 	private EquipmentReservationsWithRentalSpecsResponse getReservationWithRentalSpecsByEndDate(
