@@ -23,7 +23,7 @@ public class ReservationCancelService {
 	private final ReservationRepository reservationRepository;
 	private final ReservationSpecRepository reservationSpecRepository;
 
-	void cancelAll(final Long memberId) {
+	void cancelReserved(final Long memberId) {
 		Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
 		final List<ReservationSpec> specs = reservations.stream()
 			.filter(reservation -> !reservation.isAccepted())

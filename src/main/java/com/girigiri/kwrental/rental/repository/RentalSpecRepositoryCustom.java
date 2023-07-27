@@ -20,7 +20,7 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 public interface RentalSpecRepositoryCustom {
 	List<EquipmentRentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
 
-	List<EquipmentRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
+	List<AbstractRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 
 	Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(Long equipmentId, LocalDateTime date);
 

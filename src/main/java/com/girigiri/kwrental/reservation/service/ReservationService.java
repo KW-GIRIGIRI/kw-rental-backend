@@ -16,8 +16,6 @@ import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNu
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
 import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
-import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
@@ -80,10 +78,6 @@ public class ReservationService {
 		reservationValidateService.validateAmountIsSame(amountBySpecId);
 	}
 
-	@Transactional(propagation = Propagation.MANDATORY)
-	public List<Reservation> rentLabRoom(final CreateLabRoomRentalRequest createLabRoomRentalRequest) {
-		return reservationRentalService.rentLabRoom(createLabRoomRentalRequest);
-	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Set<EquipmentReservationWithMemberNumber> getOverdueReservationsWithMemberNumber(final LocalDate localDate) {
@@ -128,17 +122,12 @@ public class ReservationService {
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
-		reservationRentalService.rentReservation(id, rentedReservationSpecIds);
+		reservationRentalService.acceptReservation(id, rentedReservationSpecIds);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public List<Reservation> returnLabRoom(final ReturnLabRoomRequest returnLabRoomRequest) {
-		return reservationRentalService.returnLabRoom(returnLabRoomRequest);
-	}
-
-	@Transactional(propagation = Propagation.MANDATORY)
-	public void cancelAll(final Long memberId) {
-		reservationCancelService.cancelAll(memberId);
+	public void cancelReserved(final Long memberId) {
+		reservationCancelService.cancelReserved(memberId);
 	}
 
 	@Transactional(readOnly = true)
@@ -159,11 +148,6 @@ public class ReservationService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void cancelByAssetId(Long assetId) {
 		reservationCancelService.cancelByAssetId(assetId);
-	}
-
-	@Transactional(propagation = Propagation.MANDATORY)
-	public void validateLabRoomReservationForAccept(final String labRoomName, final List<Long> reservationSpecIds) {
-		reservationValidateService.validateLabRoomReservationForAccept(labRoomName, reservationSpecIds);
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)

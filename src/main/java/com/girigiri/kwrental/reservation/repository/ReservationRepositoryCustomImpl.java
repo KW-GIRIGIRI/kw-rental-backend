@@ -35,6 +35,14 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 	}
 
 	@Override
+	public List<Reservation> findByIdsWithSpecs(final List<Long> ids) {
+		return queryFactory.selectFrom(reservation)
+			.leftJoin(reservation.reservationSpecs).fetchJoin()
+			.where(reservation.id.in(ids))
+			.fetch();
+	}
+
+	@Override
 	public Set<Reservation> findNotTerminatedEquipmentReservationsByMemberId(final Long memberId) {
 		return Set.copyOf(selectFromReservationFetchJoinedSpecAndAsset()
 			.where(rentableAsset.instanceOf(Equipment.class), reservation.memberId.eq(memberId),

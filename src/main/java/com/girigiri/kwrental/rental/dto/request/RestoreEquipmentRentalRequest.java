@@ -9,7 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record ReturnRentalRequest(@NotNull Long reservationId, @NotEmpty List<ReturnRentalSpecRequest> rentalSpecs
+public record RestoreEquipmentRentalRequest(@NotNull Long reservationId,
+                                            @NotEmpty List<ReturnRentalSpecRequest> rentalSpecs
 ) {
 	@Builder
 	public record ReturnRentalSpecRequest(@NotNull Long id, @NotNull RentalSpecStatus status) {

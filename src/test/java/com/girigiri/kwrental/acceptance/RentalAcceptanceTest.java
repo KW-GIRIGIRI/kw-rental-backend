@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
-import static com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest.*;
+import static com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest.*;
 import static com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest.*;
 import static com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.*;
 import static com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.OverdueEquipmentReservationsWithRentalSpecsResponse.*;
@@ -37,7 +37,7 @@ import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse.EquipmentRentalSpecResponse;
@@ -59,7 +59,7 @@ import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
-import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.RestoreLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
@@ -325,7 +325,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.id(rentalSpec2.getId())
 			.status(RentalSpecStatus.LOST)
 			.build();
-		final ReturnRentalRequest returnRentalRequest = builder()
+		final RestoreEquipmentRentalRequest restoreEquipmentRentalRequest = builder()
 			.reservationId(reservation.getId())
 			.rentalSpecs(List.of(returnRentalSpecRequest1, returnRentalSpecRequest2))
 			.build();
@@ -333,7 +333,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// when
 		RestAssured.given(requestSpec)
 			.filter(document("admin_returnRentals"))
-			.body(returnRentalRequest)
+			.body(restoreEquipmentRentalRequest)
 			.contentType(ContentType.JSON)
 			.when().log().all().patch("/api/admin/rentals/returns")
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
@@ -573,7 +573,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.build();
 		rentalSpecRepository.saveAll(List.of(rentalSpec));
 
-		final ReturnLabRoomRequest requestBody = ReturnLabRoomRequest.builder()
+		final RestoreLabRoomRentalRequest requestBody = RestoreLabRoomRentalRequest.builder()
 			.reservationSpecIds(List.of(reservationSpec1.getId()))
 			.name(labRoom1.getName())
 			.build();
@@ -726,7 +726,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.build();
 		final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder()
 			.reservationSpecId(reservationSpec2.getId())
-			.reservationId(reservation1.getId())
+			.reservationId(reservation2.getId())
 			.status(RentalSpecStatus.BROKEN)
 			.build();
 		rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,12 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
-import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.exception.AlreadyReservedLabRoomException;
-import com.girigiri.kwrental.reservation.exception.LabRoomReservationException;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -113,75 +109,5 @@ class ReservationValidateServiceTest {
 		// when, then
 		assertThatThrownBy(() -> reservationValidateService.validateAlreadyReservedSamePeriod(reservationToValidate))
 			.isExactlyInstanceOf(AlreadyReservedLabRoomException.class);
-	}
-
-	@Test
-	@DisplayName("수령하려는 랩실 대여 예약들은 모두 같은 랩실이어야 한다.")
-	void validateLabRoomReservationForRent_notSameLabRoomName() {
-		// given
-		final LabRoom labRoom1 = LabRoomFixture.builder().id(1L).build();
-		final LabRoom labRoom2 = LabRoomFixture.builder().id(2L).build();
-		final ReservationSpec spec1 = ReservationSpecFixture.builder(labRoom1).id(1L).build();
-		final ReservationSpec spec2 = ReservationSpecFixture.builder(labRoom2).id(2L).build();
-		final Reservation reservation1 = ReservationFixture.create(List.of(spec1));
-		final Reservation reservation2 = ReservationFixture.create(List.of(spec2));
-		reservationRepository.saveAll(List.of(reservation1, reservation2));
-
-		final List<Long> ids = List.of(spec1.getId(), spec2.getId());
-		given(reservationRepository.findByReservationSpecIds(ids))
-			.willReturn(List.of(reservation1, reservation2));
-
-		// when, then
-		assertThatCode(() -> reservationValidateService.validateLabRoomReservationForAccept(labRoom1.getName(), ids))
-			.isExactlyInstanceOf(LabRoomReservationException.class);
-	}
-
-	@Test
-	@DisplayName("수령하려는 랩실 대여 예약들은 모두 현재 대여 가능한 상태여야 한다.")
-	void validateLabRoomReservationForRent_statusNotReserved() {
-		// given
-		final LabRoom labRoom1 = LabRoomFixture.builder().id(1L).build();
-		final ReservationSpec spec1 = ReservationSpecFixture.builder(labRoom1)
-			.id(1L)
-			.status(ReservationSpecStatus.RESERVED)
-			.build();
-		final ReservationSpec spec2 = ReservationSpecFixture.builder(labRoom1)
-			.id(2L)
-			.status(ReservationSpecStatus.CANCELED)
-			.build();
-		final Reservation reservation1 = ReservationFixture.create(List.of(spec1));
-		final Reservation reservation2 = ReservationFixture.create(List.of(spec2));
-		reservationRepository.saveAll(List.of(reservation1, reservation2));
-
-		final List<Long> ids = List.of(spec1.getId(), spec2.getId());
-		given(reservationRepository.findByReservationSpecIds(ids))
-			.willReturn(List.of(reservation1, reservation2));
-
-		// when, then
-		assertThatCode(() -> reservationValidateService.validateLabRoomReservationForAccept(labRoom1.getName(), ids))
-			.isExactlyInstanceOf(LabRoomReservationException.class);
-	}
-
-	@Test
-	@DisplayName("수령하려는 랩실 대여 예약들은 현재 날짜를 포함해야 한다.")
-	void validateLabRoomReservationForRent_periodNotContainsNow() {
-		// given
-		final LabRoom labRoom1 = LabRoomFixture.builder().id(1L).build();
-		final LocalDate now = LocalDate.now();
-		final ReservationSpec spec1 = ReservationSpecFixture.builder(labRoom1).id(1L)
-			.period(new RentalPeriod(now, now.plusDays(1))).build();
-		final ReservationSpec spec2 = ReservationSpecFixture.builder(labRoom1).id(2L)
-			.period(new RentalPeriod(now.minusDays(2), now.minusDays(1))).build();
-		final Reservation reservation1 = ReservationFixture.create(List.of(spec1));
-		final Reservation reservation2 = ReservationFixture.create(List.of(spec2));
-		reservationRepository.saveAll(List.of(reservation1, reservation2));
-
-		final List<Long> ids = List.of(spec1.getId(), spec2.getId());
-		given(reservationRepository.findByReservationSpecIds(ids))
-			.willReturn(List.of(reservation1, reservation2));
-
-		// when, then
-		assertThatCode(() -> reservationValidateService.validateLabRoomReservationForAccept(labRoom1.getName(), ids))
-			.isExactlyInstanceOf(LabRoomReservationException.class);
 	}
 }

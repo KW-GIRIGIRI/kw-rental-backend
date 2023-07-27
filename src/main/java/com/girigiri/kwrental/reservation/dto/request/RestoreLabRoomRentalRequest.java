@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 
 @Builder
-public record ReturnLabRoomRequest(
+public record RestoreLabRoomRentalRequest(
 	@NotEmpty
 	String name,
 	@NotEmpty

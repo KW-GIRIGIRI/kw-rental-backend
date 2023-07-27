@@ -54,9 +54,9 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	}
 
 	@Override
-	public List<EquipmentRentalSpec> findByReservationSpecIds(final Set<Long> reservationSpecIds) {
-		return queryFactory.selectFrom(equipmentRentalSpec)
-			.where(equipmentRentalSpec.reservationSpecId.in(reservationSpecIds))
+	public List<AbstractRentalSpec> findByReservationSpecIds(final Set<Long> reservationSpecIds) {
+		return queryFactory.selectFrom(abstractRentalSpec)
+			.where(abstractRentalSpec.reservationSpecId.in(reservationSpecIds))
 			.fetch();
 	}
 

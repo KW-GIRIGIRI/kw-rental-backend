@@ -62,6 +62,10 @@ public class ReservationRetrieveService {
 		return reservationRepository.findByIdWithSpecs(id).orElseThrow(ReservationNotFoundException::new);
 	}
 
+	public List<Reservation> getReservationsWithSpecsByIds(final List<Long> ids) {
+		return reservationRepository.findByIdsWithSpecs(ids);
+	}
+
 	UnterminatedEquipmentReservationsResponse getUnterminatedEquipmentReservations(final Long memberId) {
 		final Set<Reservation> reservations = reservationRepository.findNotTerminatedEquipmentReservationsByMemberId(
 			memberId);
@@ -122,5 +126,12 @@ public class ReservationRetrieveService {
 	private Reservation getReservationWithSpecs(final Long reservationId) {
 		return reservationRepository.findByIdWithSpecs(reservationId)
 			.orElseThrow(ReservationNotFoundException::new);
+	}
+
+	public List<LabRoomReservation> getLabRoomReservationBySpecIds(List<Long> reservationSpecIds) {
+		return reservationRepository.findByReservationSpecIds(reservationSpecIds)
+			.stream()
+			.map(LabRoomReservation::new)
+			.toList();
 	}
 }

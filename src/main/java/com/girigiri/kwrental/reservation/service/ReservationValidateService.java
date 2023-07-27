@@ -28,12 +28,9 @@ public class ReservationValidateService {
 	void validateReservationSpecIdContainsAll(final Long reservationId,
 		final Set<Long> reservationSpecIdsFromInput) {
 		final Reservation reservation = getReservationWithSpecs(reservationId);
-		final Set<Long> reservationSpecIdsFromReservation = reservation.getReservationSpecs().stream()
-			.filter(ReservationSpec::isReserved)
-			.map(ReservationSpec::getId)
-			.collect(Collectors.toSet());
-		if (reservationSpecIdsFromInput.containsAll(reservationSpecIdsFromReservation) &&
-			reservationSpecIdsFromReservation.containsAll(reservationSpecIdsFromInput))
+		final Set<Long> reservedSpecIds = getReservedSpecIds(reservation);
+		if (reservationSpecIdsFromInput.containsAll(reservedSpecIds) &&
+			reservedSpecIds.containsAll(reservationSpecIdsFromInput))
 			return;
 		throw new ReservationSpecException("신청한 대여 상세와 입력된 대여 상세가 일치하지 않습니다.");
 	}
@@ -41,6 +38,13 @@ public class ReservationValidateService {
 	private Reservation getReservationWithSpecs(final Long reservationId) {
 		return reservationRepository.findByIdWithSpecs(reservationId)
 			.orElseThrow(ReservationNotFoundException::new);
+	}
+
+	private Set<Long> getReservedSpecIds(final Reservation reservation) {
+		return reservation.getReservationSpecs().stream()
+			.filter(ReservationSpec::isReserved)
+			.map(ReservationSpec::getId)
+			.collect(Collectors.toSet());
 	}
 
 	void validateAmountIsSame(final Map<Long, Integer> amountByReservationSpecId) {
@@ -61,20 +65,5 @@ public class ReservationValidateService {
 		if (alreadyReserved) {
 			throw new AlreadyReservedLabRoomException();
 		}
-	}
-
-	void validateLabRoomReservationForAccept(final String labRoomName, final List<Long> reservationSpecIds) {
-		final List<LabRoomReservation> labRoomReservations = mapToLabRoomReservations(reservationSpecIds);
-		for (LabRoomReservation labRoomReservation : labRoomReservations) {
-			labRoomReservation.validateLabRoomName(labRoomName);
-			labRoomReservation.validateCanRentNow();
-		}
-	}
-
-	private List<LabRoomReservation> mapToLabRoomReservations(final List<Long> reservationSpecIds) {
-		return reservationRepository.findByReservationSpecIds(reservationSpecIds)
-			.stream()
-			.map(LabRoomReservation::new)
-			.toList();
 	}
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
@@ -29,8 +29,10 @@ import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.E
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.service.RentalService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
+import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
+import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
-import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.RestoreLabRoomRentalRequest;
 import com.girigiri.kwrental.util.EndPointUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,8 @@ public class AdminRentalController {
 
 	private final RentalService rentalService;
 	private final RentalRentService rentalRentService;
+	private final EquipmentRentalRestoreService equipmentRentalRestoreService;
+	private final LabRoomRentalRestoreService labRoomRentalRestoreService;
 
 	@GetMapping(params = "startDate")
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
@@ -57,7 +61,8 @@ public class AdminRentalController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> rent(@RequestBody final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
+	public ResponseEntity<?> rentEquipment(
+		@RequestBody final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
 		rentalRentService.rentEquipment(createEquipmentRentalRequest);
 		return ResponseEntity
 			.created(URI.create("/api/rentals?reservationId=" + createEquipmentRentalRequest.reservationId()))
@@ -65,8 +70,9 @@ public class AdminRentalController {
 	}
 
 	@PatchMapping("/returns")
-	public ResponseEntity<?> returnRental(@RequestBody final ReturnRentalRequest returnRentalRequest) {
-		rentalService.returnRental(returnRentalRequest);
+	public ResponseEntity<?> returnEquipment(
+		@RequestBody final RestoreEquipmentRentalRequest restoreEquipmentRentalRequest) {
+		equipmentRentalRestoreService.restore(restoreEquipmentRentalRequest);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -89,8 +95,9 @@ public class AdminRentalController {
 	}
 
 	@PatchMapping("/labRooms/returns")
-	public ResponseEntity<?> returnLabRoom(@Validated @RequestBody ReturnLabRoomRequest returnLabRoomRequest) {
-		rentalService.returnLabRoom(returnLabRoomRequest);
+	public ResponseEntity<?> returnLabRoom(
+		@Validated @RequestBody RestoreLabRoomRentalRequest restoreLabRoomRentalRequest) {
+		labRoomRentalRestoreService.normalRestoreAll(restoreLabRoomRentalRequest);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -112,7 +119,7 @@ public class AdminRentalController {
 	@PatchMapping("/labRooms/status")
 	public ResponseEntity<?> updateLabRoomRentalSpecStatuses(
 		@RequestBody @Validated UpdateLabRoomRentalSpecStatusesRequest updateLabRoomRentalSpecStatusesRequest) {
-		rentalService.updateLabRoomRentalSpecStatuses(updateLabRoomRentalSpecStatusesRequest);
+		labRoomRentalRestoreService.updateRentals(updateLabRoomRentalSpecStatusesRequest);
 		return ResponseEntity.noContent().build();
 	}
 }
