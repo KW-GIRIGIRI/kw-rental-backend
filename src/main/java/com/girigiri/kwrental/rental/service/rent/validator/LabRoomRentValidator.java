@@ -2,7 +2,7 @@ package com.girigiri.kwrental.rental.service.rent.validator;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
@@ -10,7 +10,7 @@ import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class LabRoomRentValidator implements RentValidator<CreateLabRoomRentalRequest> {
 	private final ReservationRetrieveService reservationRetrieveService;

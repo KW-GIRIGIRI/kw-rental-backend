@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
@@ -19,7 +19,7 @@ import com.girigiri.kwrental.reservation.service.ReservationValidator;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class EquipmentRentValidator implements RentValidator<CreateEquipmentRentalRequest> {
 

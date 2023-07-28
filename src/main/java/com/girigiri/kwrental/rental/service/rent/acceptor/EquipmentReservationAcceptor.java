@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.exception.ReservationIdNotSingleValueWhenEquipmentAcceptException;
@@ -12,7 +12,7 @@ import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class EquipmentReservationAcceptor implements
 	com.girigiri.kwrental.rental.service.rent.acceptor.ReservationAcceptor {

@@ -2,7 +2,7 @@ package com.girigiri.kwrental.rental.service.rent.creator;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
@@ -12,7 +12,7 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class EquipmentRentalSpecCreator implements RentalSpecCreator<CreateEquipmentRentalRequest> {
 

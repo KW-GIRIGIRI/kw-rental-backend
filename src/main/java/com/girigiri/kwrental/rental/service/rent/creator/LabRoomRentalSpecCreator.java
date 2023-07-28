@@ -3,7 +3,7 @@ package com.girigiri.kwrental.rental.service.rent.creator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
@@ -13,7 +13,7 @@ import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class LabRoomRentalSpecCreator implements RentalSpecCreator<CreateLabRoomRentalRequest> {
 	private final ReservationRetrieveService reservationRetrieveService;
