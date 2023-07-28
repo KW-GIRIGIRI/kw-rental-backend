@@ -26,6 +26,8 @@ import com.girigiri.kwrental.mail.EmailService;
 @Service
 public class AuthService {
 
+    public static final String UUID_DELIMITER = "-";
+    public static final int PASSWORD_MIN_LENGTH = 8;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
@@ -121,7 +123,7 @@ public class AuthService {
     }
 
     private String getRandomPassword() {
-        String randomUUID = UUID.randomUUID().toString().replaceAll("-", "");
-        return randomUUID.substring(0, 8);
+        String randomUUID = UUID.randomUUID().toString().replace(UUID_DELIMITER, "");
+        return randomUUID.substring(0, PASSWORD_MIN_LENGTH);
     }
 }
