@@ -159,16 +159,6 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	}
 
 	@Override
-	public void updateNormalReturnedByReservationIds(final List<Long> reservationIds,
-		final RentalDateTime returnDateTime) {
-		queryFactory.update(abstractRentalSpec)
-			.set(abstractRentalSpec.status, RentalSpecStatus.RETURNED)
-			.set(abstractRentalSpec.returnDateTime, returnDateTime)
-			.where(abstractRentalSpec.reservationId.in(reservationIds))
-			.execute();
-	}
-
-	@Override
 	public List<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(final String labRoomName,
 		final LocalDate startDate) {
 		return queryFactory.from(abstractRentalSpec)
@@ -231,17 +221,6 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 		return queryFactory.selectFrom(equipmentRentalSpec)
 			.where(equipmentRentalSpec.propertyNumber.eq(propertyNumber),
 				equipmentRentalSpec.status.eq(RentalSpecStatus.RENTED))
-			.fetch();
-	}
-
-	@Override
-	public List<AbstractRentalSpec> findNowRentedRentalSpecsByName(final String name) {
-		final LocalDate now = LocalDate.now();
-		return queryFactory.selectFrom(abstractRentalSpec)
-			.leftJoin(reservationSpec).on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-			.leftJoin(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id))
-			.where(rentableAsset.name.eq(name), reservationSpec.period.rentalStartDate.loe(now),
-				reservationSpec.period.rentalEndDate.after(now), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
 			.fetch();
 	}
 

@@ -35,8 +35,6 @@ public interface RentalSpecRepositoryCustom {
 
 	List<RentalSpecWithName> findTerminatedWithNameByPropertyNumber(String propertyNumber);
 
-	void updateNormalReturnedByReservationIds(List<Long> reservationIds, RentalDateTime returnDateTime);
-
 	List<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName, LocalDate date);
 
 	Page<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName,
@@ -50,6 +48,4 @@ public interface RentalSpecRepositoryCustom {
 
 	List<RentalSpecWithName> findTerminatedWithNameByPropertyAndInclusive(final String propertyNumber,
 		final RentalDateTime startDate, final RentalDateTime endDate);
-
-	List<AbstractRentalSpec> findNowRentedRentalSpecsByName(String name);
 }

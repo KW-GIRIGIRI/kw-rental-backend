@@ -319,29 +319,6 @@ class RentalSpecRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("대여 예약에 해당하는 대여 상세를 정상 반납으로 업데이트한다.")
-	void updateNormalReturnedByReservationIds() {
-		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
-		final Reservation reservation = reservationRepository.save(
-			ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
-		final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder()
-			.reservationId(reservation.getId())
-			.build();
-		rentalSpecRepository.saveAll(List.of(rentalSpec));
-		entityManager.clear();
-
-		// when
-		rentalSpecRepository.updateNormalReturnedByReservationIds(List.of(reservation.getId()), RentalDateTime.now());
-
-		//then
-		AbstractRentalSpec actual = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
-		assertThat(actual.getStatus()).isEqualTo(RentalSpecStatus.RETURNED);
-		assertThat(actual.getReturnDateTime()).isNotNull();
-	}
-
-	@Test
 	@DisplayName("특정 랩실 이름과 특정 날짜로 랩실 대여 예약을 대여 상세와 함께 조회한다.")
 	void getLabRoomReservationWithRentalSpec() {
 		// given
@@ -517,42 +494,5 @@ class RentalSpecRepositoryTest {
 		assertThat(actual).usingRecursiveFieldByFieldElementComparator().containsExactly(
 			new RentalSpecWithName(reservation1.getName(), rentalSpec1.getAcceptDateTime(),
 				rentalSpec1.getReturnDateTime(), rentalSpec1.getStatus()));
-	}
-
-	@Test
-	@DisplayName("랩실의 이름에 해당하는 대여 상세를 조회할 수 있다.")
-	void findNowRentedRentalSpecsByName() {
-		// given
-		final RentableAsset labRoom = assetRepository.save(LabRoomFixture.create());
-		final LocalDate now = LocalDate.now();
-		final ReservationSpec nowRent = ReservationSpecFixture.builder(labRoom)
-			.period(new RentalPeriod(now, now.plusDays(3))).build();
-		final ReservationSpec rentedBefore = ReservationSpecFixture.builder(labRoom)
-			.period(new RentalPeriod(now.minusDays(4), now.minusDays(3))).build();
-		final ReservationSpec notRentedYet = ReservationSpecFixture.builder(labRoom)
-			.period(new RentalPeriod(now.plusDays(1), now.plusDays(3))).build();
-
-		reservationSpecRepository.save(nowRent);
-		reservationSpecRepository.save(rentedBefore);
-		reservationSpecRepository.save(notRentedYet);
-		final LabRoomRentalSpec nowRentalSpec = LabRoomRentalSpecFixture.builder()
-			.reservationSpecId(nowRent.getId())
-			.build();
-		final LabRoomRentalSpec beforeRentalSpec = LabRoomRentalSpecFixture.builder()
-			.reservationSpecId(rentedBefore.getId())
-			.build();
-		final LabRoomRentalSpec afterRentalSpec = LabRoomRentalSpecFixture.builder()
-			.reservationSpecId(notRentedYet.getId())
-			.build();
-
-		rentalSpecRepository.saveAll(List.of(nowRentalSpec, beforeRentalSpec, afterRentalSpec));
-
-		// when
-		final List<AbstractRentalSpec> actual = rentalSpecRepository.findNowRentedRentalSpecsByName(
-			labRoom.getName());
-
-		// then
-		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
-			.containsExactly(nowRentalSpec);
 	}
 }
