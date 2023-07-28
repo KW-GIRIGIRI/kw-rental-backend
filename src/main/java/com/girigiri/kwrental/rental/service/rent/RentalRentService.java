@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.service.rent.acceptor.EquipmentReservationAcceptor;

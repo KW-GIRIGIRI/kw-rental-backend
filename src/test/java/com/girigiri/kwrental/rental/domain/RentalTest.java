@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
 import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;

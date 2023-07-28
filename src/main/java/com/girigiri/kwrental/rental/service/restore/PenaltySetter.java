@@ -2,7 +2,7 @@ package com.girigiri.kwrental.rental.service.restore;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.rental.domain.RentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 

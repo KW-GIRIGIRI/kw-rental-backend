@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
@@ -32,12 +32,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RentalService {
+@Transactional(readOnly = true)
+public class RentalViewService {
 
 	private final ReservationService reservationService;
 	private final RentalSpecRepository rentalSpecRepository;
 
-	@Transactional(readOnly = true)
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
 		final LocalDate localDate) {
 		final Set<EquipmentReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(
@@ -61,7 +61,6 @@ public class RentalService {
 			.collect(Collectors.toSet());
 	}
 
-	@Transactional(readOnly = true)
 	public ReservationsWithRentalSpecsByEndDateResponse getReservationsWithRentalSpecsByEndDate(
 		final LocalDate endDate) {
 		final OverdueEquipmentReservationsWithRentalSpecsResponse overdueReservations = getOverdueReservationsWithRentalSpecs(
@@ -90,7 +89,6 @@ public class RentalService {
 		return EquipmentReservationsWithRentalSpecsResponse.of(equipmentReservations, rentalSpecs);
 	}
 
-	@Transactional(readOnly = true)
 	public EquipmentRentalsDto getEquipmentRentalsBetweenDate(final Long memberId, final LocalDate from,
 		final LocalDate to) {
 		final List<EquipmentRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findEquipmentRentalDtosBetweenDate(
@@ -98,7 +96,6 @@ public class RentalService {
 		return new EquipmentRentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
 	}
 
-	@Transactional(readOnly = true)
 	public LabRoomRentalsDto getLabRoomRentalsBetweenDate(final Long memberId, final LocalDate from,
 		final LocalDate to) {
 		final List<LabRoomRentalsDto.LabRoomRentalDto> rentalDtosBetweenDate = rentalSpecRepository.findLabRoomRentalDtosBetweenDate(
@@ -106,7 +103,6 @@ public class RentalService {
 		return new LabRoomRentalsDto(new LinkedHashSet<>(rentalDtosBetweenDate));
 	}
 
-	@Transactional(readOnly = true)
 	public EquipmentRentalSpecsResponse getReturnedRentalSpecs(final String propertyNumber) {
 		final List<RentalSpecWithName> rentalSpecsWithName = rentalSpecRepository.findTerminatedWithNameByPropertyNumber(
 			propertyNumber);
@@ -114,20 +110,17 @@ public class RentalService {
 		return EquipmentRentalSpecsResponse.from(rentalSpecsWithName);
 	}
 
-	@Transactional(readOnly = true)
 	public LabRoomReservationsResponse getReturnedLabRoomReservation(final String labRoomName, final LocalDate date) {
 		final List<LabRoomReservationResponse> labRoomReservationWithRentalSpecs = rentalSpecRepository.getReturnedLabRoomReservationResponse(
 			labRoomName, date);
 		return new LabRoomReservationsResponse(labRoomReservationWithRentalSpecs);
 	}
 
-	@Transactional(readOnly = true)
 	public Page<LabRoomReservationResponse> getLabRoomHistory(final String labRoomName, final LocalDate startDate,
 		final LocalDate endDate, Pageable pageable) {
 		return rentalSpecRepository.getReturnedLabRoomReservationResponse(labRoomName, startDate, endDate, pageable);
 	}
 
-	@Transactional(readOnly = true)
 	public EquipmentRentalSpecsResponse getReturnedRentalSpecsInclusive(final String propertyNumber,
 		final LocalDate startDate, final LocalDate endDate) {
 		List<RentalSpecWithName> rentalSpecWithNames = rentalSpecRepository.findTerminatedWithNameByPropertyAndInclusive(

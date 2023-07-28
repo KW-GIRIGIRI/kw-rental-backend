@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomRentalSpecFixture;
 

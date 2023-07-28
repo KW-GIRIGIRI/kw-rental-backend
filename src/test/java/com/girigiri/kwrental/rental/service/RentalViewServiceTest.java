@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.item.service.ItemService;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse.EquipmentReservationSpecWithRentalSpecsResponse;
@@ -36,7 +36,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
-class RentalServiceTest {
+class RentalViewServiceTest {
 
 	private final ArgumentCaptor<List<EquipmentRentalSpec>> rentalSpecListArgumentCaptor = ArgumentCaptor.forClass(
 		List.class);
@@ -50,7 +50,7 @@ class RentalServiceTest {
 	@Mock
 	private PenaltyService penaltyService;
 	@InjectMocks
-	private RentalService rentalService;
+	private RentalViewService rentalViewService;
 
 	@Test
 	@DisplayName("특정 날짜가 대여 수령일인 대여 예약을 대여 수령 시간과 대여 상세를 함께 조회한다.")
@@ -81,7 +81,7 @@ class RentalServiceTest {
 			List.of(rentalSpec1));
 
 		// when
-		final EquipmentReservationsWithRentalSpecsResponse response = rentalService.getReservationsWithRentalSpecsByStartDate(
+		final EquipmentReservationsWithRentalSpecsResponse response = rentalViewService.getReservationsWithRentalSpecsByStartDate(
 			LocalDate.now());
 
 		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()

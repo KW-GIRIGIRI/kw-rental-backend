@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;

@@ -1,5 +1,6 @@
-package com.girigiri.kwrental.rental.domain;
+package com.girigiri.kwrental.rental.domain.entity;
 
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 
 import jakarta.persistence.DiscriminatorValue;

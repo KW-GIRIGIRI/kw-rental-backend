@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
 import lombok.RequiredArgsConstructor;

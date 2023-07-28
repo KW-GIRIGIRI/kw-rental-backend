@@ -2,7 +2,7 @@ package com.girigiri.kwrental.penalty.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
 import static com.girigiri.kwrental.penalty.domain.QPenalty.*;
-import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.*;
+import static com.girigiri.kwrental.rental.domain.entity.QAbstractRentalSpec.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 import static com.girigiri.kwrental.util.QueryDSLUtils.*;

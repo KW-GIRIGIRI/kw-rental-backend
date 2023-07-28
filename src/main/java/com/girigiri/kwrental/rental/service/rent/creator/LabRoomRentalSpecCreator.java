@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
-import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.service.ReservationService;

@@ -17,7 +17,7 @@ import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
-import com.girigiri.kwrental.rental.service.RentalService;
+import com.girigiri.kwrental.rental.service.RentalViewService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
 import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
@@ -46,7 +46,7 @@ public abstract class ControllerTest {
     protected AuthService authService;
 
     @MockBean
-    protected RentalService rentalService;
+    protected RentalViewService rentalViewService;
 
     @MockBean
     protected ReservationService reservationService;

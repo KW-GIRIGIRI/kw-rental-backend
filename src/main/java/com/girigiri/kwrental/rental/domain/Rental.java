@@ -3,12 +3,12 @@ package com.girigiri.kwrental.rental.domain;
 import static java.util.stream.Collectors.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.exception.RentalSpecNotFoundException;
 import com.girigiri.kwrental.rental.exception.RentedStatusForReturnException;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -28,23 +28,6 @@ public class Rental {
 			.collect(toMap(RentalSpec::getId, Function.identity()));
 		final ReservationFromRental reservationFromRental = ReservationFromRental.from(reservation);
 		return new Rental(rentalSpecMap, reservationFromRental);
-	}
-
-	private RentalSpec getRentalSpec(final Long id) {
-		final RentalSpec rentalSpec = rentalSpecMap.get(id);
-		if (rentalSpec == null)
-			throw new RentalSpecNotFoundException();
-		return rentalSpec;
-	}
-
-	public void setReservationStatusAfterModification() {
-		final Map<Long, List<RentalSpecStatus>> rentalStatusPerReservationSpecId = groupRentalStatusByReservationSpecId();
-		reservationFromRental.setStatusAfterReturn(rentalStatusPerReservationSpecId);
-	}
-
-	private Map<Long, List<RentalSpecStatus>> groupRentalStatusByReservationSpecId() {
-		return rentalSpecMap.values().stream()
-			.collect(groupingBy(RentalSpec::getReservationSpecId, mapping(RentalSpec::getStatus, toList())));
 	}
 
 	public void restore(final Map<Long, RentalSpecStatus> returnRequest, final PostEachModify... postEachModifies) {
@@ -72,28 +55,19 @@ public class Rental {
 	public void normalRestoreAll(final PostEachModify... postEachModifies) {
 		final Map<Long, RentalSpecStatus> normalRestoreRequest = rentalSpecMap.keySet().stream()
 			.collect(toMap(Function.identity(), it -> RentalSpecStatus.RETURNED));
-		final PostEachModify[] addedExecutors = addPostEachModify(postEachModifies, this::setStatusNormalReturned);
-		restore(normalRestoreRequest, addedExecutors);
+		modify(normalRestoreRequest, this::setStatusNormalReturned, postEachModifies);
 	}
 
-	private PostEachModify[] addPostEachModify(final PostEachModify[] postEachModifies,
-		final PostEachModify postEachModifyForAdd) {
-		final PostEachModify[] extendedPostEachModifies = Arrays.copyOf(postEachModifies,
-			postEachModifies.length + 1);
-		extendedPostEachModifies[extendedPostEachModifies.length - 1] = postEachModifyForAdd;
-		return extendedPostEachModifies;
-	}
-
-	private void setStatusNormalReturned(final RentalSpec rentalSpec, final Reservation reservation) {
+	private void setStatusNormalReturned(final RentalSpec rentalSpec, final RentalSpecStatus rentalSpecStatus) {
 		rentalSpec.setStatus(RentalSpecStatus.RETURNED);
 		rentalSpec.setReturnDateTimeIfAnyReturned(LocalDateTime.now());
 	}
 
 	public void update(final Map<Long, RentalSpecStatus> updateRequest, final PostEachModify... postEachModifies) {
-		modify(updateRequest, this::updateStatus, postEachModifies);
+		modify(updateRequest, this::setStatusForUpdate, postEachModifies);
 	}
 
-	private void updateStatus(final RentalSpec rentalSpec, final RentalSpecStatus status) {
+	private void setStatusForUpdate(final RentalSpec rentalSpec, final RentalSpecStatus status) {
 		if (status == RentalSpecStatus.RENTED)
 			throw new RentedStatusForReturnException();
 		rentalSpec.setStatus(status);
@@ -110,10 +84,27 @@ public class Rental {
 		setReservationStatusAfterModification();
 	}
 
+	private RentalSpec getRentalSpec(final Long id) {
+		final RentalSpec rentalSpec = rentalSpecMap.get(id);
+		if (rentalSpec == null)
+			throw new RentalSpecNotFoundException();
+		return rentalSpec;
+	}
+
 	private void executeAll(final PostEachModify[] postEachModifies, final RentalSpec rentalSpec) {
 		final Reservation reservation = reservationFromRental.getReservation();
 		for (PostEachModify executor : postEachModifies) {
 			executor.execute(rentalSpec, reservation);
 		}
+	}
+
+	private void setReservationStatusAfterModification() {
+		final Map<Long, List<RentalSpecStatus>> rentalStatusPerReservationSpecId = groupRentalStatusByReservationSpecId();
+		reservationFromRental.setStatusAfterReturn(rentalStatusPerReservationSpecId);
+	}
+
+	private Map<Long, List<RentalSpecStatus>> groupRentalStatusByReservationSpecId() {
+		return rentalSpecMap.values().stream()
+			.collect(groupingBy(RentalSpec::getReservationSpecId, mapping(RentalSpec::getStatus, toList())));
 	}
 }

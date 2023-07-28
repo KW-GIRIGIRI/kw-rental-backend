@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.item.service.ItemService;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.Rental;
-import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;

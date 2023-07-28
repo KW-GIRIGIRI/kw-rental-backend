@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.Rental;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;

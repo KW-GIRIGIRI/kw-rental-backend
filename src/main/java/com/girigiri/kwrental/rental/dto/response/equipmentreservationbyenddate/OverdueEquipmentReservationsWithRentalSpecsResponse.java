@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;

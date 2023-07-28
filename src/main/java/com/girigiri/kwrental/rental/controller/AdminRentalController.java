@@ -27,7 +27,7 @@ import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.ReservationsWithRentalSpecsByEndDateResponse;
-import com.girigiri.kwrental.rental.service.RentalService;
+import com.girigiri.kwrental.rental.service.RentalViewService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
 import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
@@ -43,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin/rentals")
 public class AdminRentalController {
 
-	private final RentalService rentalService;
+	private final RentalViewService rentalViewService;
 	private final RentalRentService rentalRentService;
 	private final EquipmentRentalRestoreService equipmentRentalRestoreService;
 	private final LabRoomRentalRestoreService labRoomRentalRestoreService;
@@ -51,13 +51,13 @@ public class AdminRentalController {
 	@GetMapping(params = "startDate")
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
 		final LocalDate startDate) {
-		return rentalService.getReservationsWithRentalSpecsByStartDate(startDate);
+		return rentalViewService.getReservationsWithRentalSpecsByStartDate(startDate);
 	}
 
 	@GetMapping(params = "endDate")
 	public ReservationsWithRentalSpecsByEndDateResponse getReservationWithRentalSpecsByEndDate(
 		final LocalDate endDate) {
-		return rentalService.getReservationsWithRentalSpecsByEndDate(endDate);
+		return rentalViewService.getReservationsWithRentalSpecsByEndDate(endDate);
 	}
 
 	@PostMapping
@@ -78,13 +78,13 @@ public class AdminRentalController {
 
 	@GetMapping(value = "/returns", params = "propertyNumber")
 	public EquipmentRentalSpecsResponse getReturnsByPropertyNumber(final String propertyNumber) {
-		return rentalService.getReturnedRentalSpecs(propertyNumber);
+		return rentalViewService.getReturnedRentalSpecs(propertyNumber);
 	}
 
 	@GetMapping(value = "/returns", params = {"startDate", "endDate", "propertyNumber"})
 	public EquipmentRentalSpecsResponse getReturnsByPropertyNumberInclusive(final String propertyNumber,
 		final LocalDate startDate, final LocalDate endDate) {
-		return rentalService.getReturnedRentalSpecsInclusive(propertyNumber, startDate, endDate);
+		return rentalViewService.getReturnedRentalSpecsInclusive(propertyNumber, startDate, endDate);
 	}
 
 	@PostMapping("/labRooms")
@@ -103,14 +103,14 @@ public class AdminRentalController {
 
 	@GetMapping(value = "/labRooms/{labRoomName}", params = "date")
 	public LabRoomReservationsResponse getLabRoomReservations(@PathVariable String labRoomName, final LocalDate date) {
-		return rentalService.getReturnedLabRoomReservation(labRoomName, date);
+		return rentalViewService.getReturnedLabRoomReservation(labRoomName, date);
 	}
 
 	@GetMapping(value = "/labRooms/{labRoomName}/history", params = {"startDate", "endDate"})
 	public LabRoomReservationPageResponse getLabRoomHistory(@PathVariable String labRoomName,
 		final LocalDate startDate, final LocalDate endDate,
 		@PageableDefault(sort = "id", direction = Sort.Direction.DESC) final Pageable pageable) {
-		Page<LabRoomReservationResponse> page = rentalService.getLabRoomHistory(labRoomName, startDate, endDate,
+		Page<LabRoomReservationResponse> page = rentalViewService.getLabRoomHistory(labRoomName, startDate, endDate,
 			pageable);
 		List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
 		return new LabRoomReservationPageResponse(page.getContent(), page.getNumber(), allPageEndPoints);
