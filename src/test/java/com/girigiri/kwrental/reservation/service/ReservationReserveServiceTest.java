@@ -30,7 +30,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 class ReservationReserveServiceTest {
 
 	@Mock
-	private PenaltyService penaltyService;
+	private PenaltyChecker penaltyChecker;
 	@Mock
 	private RemainQuantityValidator remainQuantityValidator;
 	@InjectMocks
@@ -40,7 +40,7 @@ class ReservationReserveServiceTest {
 	@DisplayName("이미 진행 중인 페널티가 있으면 대여 예약를 할 수 없다.")
 	void reserve_hasOngoingPenalty() {
 		// given
-		given(penaltyService.hasOngoingPenalty(1L)).willReturn(true);
+		given(penaltyChecker.hasOngoingPenalty(1L)).willReturn(true);
 
 		// when, then
 		assertThatThrownBy(() -> reservationReserveService.reserve(1L, Collections.emptyList(),

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.rental.domain.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
-import com.girigiri.kwrental.reservation.service.PenaltyService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
 
 import lombok.RequiredArgsConstructor;

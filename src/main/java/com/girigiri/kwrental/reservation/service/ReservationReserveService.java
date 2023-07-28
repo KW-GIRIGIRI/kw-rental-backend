@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class ReservationReserveService {
 
 	private final ReservationRepository reservationRepository;
-	private final PenaltyService penaltyService;
+	private final PenaltyChecker penaltyChecker;
 	private final RemainQuantityValidator remainQuantityValidator;
 
 	void reserve(final Long memberId, final List<Reservation> reservations, final ReserveValidator reserveValidator) {
@@ -33,7 +33,7 @@ public class ReservationReserveService {
 	}
 
 	private void validatePenalty(final Long memberId) {
-		if (penaltyService.hasOngoingPenalty(memberId)) {
+		if (penaltyChecker.hasOngoingPenalty(memberId)) {
 			throw new ReservationException("페널티에 적용되는 기간에는 대여 예약을 할 수 없습니다.");
 		}
 	}
