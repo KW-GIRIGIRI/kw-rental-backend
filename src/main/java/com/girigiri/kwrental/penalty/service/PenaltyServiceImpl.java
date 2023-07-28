@@ -20,10 +20,11 @@ import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.exception.PenaltyNotFoundException;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.reservation.service.PenaltyService;
+import com.girigiri.kwrental.rental.service.restore.PenaltyService;
+import com.girigiri.kwrental.reservation.service.reserve.template.PenaltyChecker;
 
 @Service
-public class PenaltyServiceImpl implements PenaltyService {
+public class PenaltyServiceImpl implements PenaltyService, PenaltyChecker {
 
 	private final PenaltyRepository penaltyRepository;
 

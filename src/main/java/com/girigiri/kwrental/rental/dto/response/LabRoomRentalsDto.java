@@ -1,18 +1,18 @@
 package com.girigiri.kwrental.rental.dto.response;
 
-import lombok.Getter;
-
+import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-public class LabRoomRentalsDto {
+import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 
-    private Set<LabRoomRentalDto> rentals;
+public record LabRoomRentalsDto(
+    Set<LabRoomRentalDto> rentals) {
+    public record LabRoomRentalDto(
+        LocalDate startDate,
+        LocalDate endDate,
+        String name,
+        Integer amount,
+        RentalSpecStatus rentalSpecStatus) {
 
-    private LabRoomRentalsDto() {
-    }
-
-    public LabRoomRentalsDto(final Set<LabRoomRentalDto> rentals) {
-        this.rentals = rentals;
     }
 }

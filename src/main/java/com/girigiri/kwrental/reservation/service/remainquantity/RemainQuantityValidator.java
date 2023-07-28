@@ -17,11 +17,11 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 public class RemainQuantityValidator {
 	private final AssetService assetService;
 	private final ReservationSpecRepository reservationSpecRepository;
 
-	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public void validateAmount(final Long assetId, final Integer amount, final RentalPeriod rentalPeriod) {
 		final Rentable rentable = assetService.getRentableById(assetId);
 		final List<ReservationSpec> overlappedReservationSpecs = reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(

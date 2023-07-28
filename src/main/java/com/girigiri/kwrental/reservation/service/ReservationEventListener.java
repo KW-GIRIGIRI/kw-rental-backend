@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationEventListener {
 
-	private final ReservationService reservationService;
+	private final ReservationCancelService reservationCancelService;
 
 	@EventListener
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void handleAssetDelete(final AssetDeleteEvent event) {
-		reservationService.cancelByAssetId(event.getAssetId());
+		reservationCancelService.cancelByAssetId(event.getAssetId());
 	}
 }

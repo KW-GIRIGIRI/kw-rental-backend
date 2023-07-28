@@ -17,7 +17,7 @@ import com.girigiri.kwrental.asset.equipment.service.EquipmentDeleteEvent;
 class ReservationEventListenerTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationCancelService reservationCancelService;
 
 	@InjectMocks
 	private ReservationEventListener reservationEventListener;
@@ -26,7 +26,7 @@ class ReservationEventListenerTest {
 	@DisplayName("자산 삭제됨에 따라 ")
 	void handleAssetDelete() {
 		// given
-		doNothing().when(reservationService).cancelByAssetId(anyLong());
+		doNothing().when(reservationCancelService).cancelByAssetId(anyLong());
 		final EquipmentDeleteEvent event = new EquipmentDeleteEvent(this, 1L);
 
 		// when, then

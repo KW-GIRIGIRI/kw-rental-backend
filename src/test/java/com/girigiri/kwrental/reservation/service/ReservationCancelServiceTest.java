@@ -55,7 +55,7 @@ class ReservationCancelServiceTest {
 			.willReturn(Optional.of(reservation2));
 
 		// when
-		assertThatCode(() -> reservationCancelService.cancelAll(memberId))
+		assertThatCode(() -> reservationCancelService.cancelReserved(memberId))
 			.doesNotThrowAnyException();
 		assertThat(reservation1.isTerminated()).isTrue();
 		assertThat(spec1.getStatus()).isEqualTo(ReservationSpecStatus.CANCELED);

@@ -3,8 +3,8 @@ package com.girigiri.kwrental.rental.repository;
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
 import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.asset.labroom.domain.QLabRoom.*;
-import static com.girigiri.kwrental.rental.domain.QAbstractRentalSpec.*;
-import static com.girigiri.kwrental.rental.domain.QEquipmentRentalSpec.*;
+import static com.girigiri.kwrental.rental.domain.entity.QAbstractRentalSpec.*;
+import static com.girigiri.kwrental.rental.domain.entity.QEquipmentRentalSpec.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 import static com.girigiri.kwrental.util.QueryDSLUtils.*;
@@ -21,15 +21,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.querydsl.core.group.GroupBy;
@@ -55,9 +54,9 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	}
 
 	@Override
-	public List<EquipmentRentalSpec> findByReservationSpecIds(final Set<Long> reservationSpecIds) {
-		return queryFactory.selectFrom(equipmentRentalSpec)
-			.where(equipmentRentalSpec.reservationSpecId.in(reservationSpecIds))
+	public List<AbstractRentalSpec> findByReservationSpecIds(final Set<Long> reservationSpecIds) {
+		return queryFactory.selectFrom(abstractRentalSpec)
+			.where(abstractRentalSpec.reservationSpecId.in(reservationSpecIds))
 			.fetch();
 	}
 
@@ -94,7 +93,8 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.transform(groupBy(reservationSpec.period).list(
 				Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate,
 					reservationSpec.period.rentalEndDate, GroupBy.set(
-						Projections.constructor(RentalSpecDto.class, abstractRentalSpec.id, equipment.name,
+						Projections.constructor(EquipmentRentalDto.EquipmentRentalSpecDto.class, abstractRentalSpec.id,
+							equipment.name,
 							abstractRentalSpec.status)))));
 	}
 
@@ -156,16 +156,6 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.on(reservation.id.eq(equipmentRentalSpec.reservationId), reservation.terminated.isTrue())
 			.where(predicates)
 			.fetch();
-	}
-
-	@Override
-	public void updateNormalReturnedByReservationIds(final List<Long> reservationIds,
-		final RentalDateTime returnDateTime) {
-		queryFactory.update(abstractRentalSpec)
-			.set(abstractRentalSpec.status, RentalSpecStatus.RETURNED)
-			.set(abstractRentalSpec.returnDateTime, returnDateTime)
-			.where(abstractRentalSpec.reservationId.in(reservationIds))
-			.execute();
 	}
 
 	@Override

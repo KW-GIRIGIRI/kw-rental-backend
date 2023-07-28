@@ -20,16 +20,16 @@ import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
-import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
+import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecWithName;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -217,8 +217,9 @@ class RentalSpecRepositoryTest {
 		assertThat(rentalDtos).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalDto(reservationSpec1.getStartDate(), reservationSpec1.getEndDate(),
-					Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
-						new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
+					Set.of(
+						new EquipmentRentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
+						new EquipmentRentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
 			);
 	}
 
@@ -315,29 +316,6 @@ class RentalSpecRepositoryTest {
 					reservation.getName(), rentalSpec.getAcceptDateTime(), rentalSpec.getReturnDateTime(),
 					rentalSpec.getStatus()))
 		);
-	}
-
-	@Test
-	@DisplayName("대여 예약에 해당하는 대여 상세를 정상 반납으로 업데이트한다.")
-	void updateNormalReturnedByReservationIds() {
-		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final ReservationSpec reservationSpec = ReservationSpecFixture.create(equipment);
-		final Reservation reservation = reservationRepository.save(
-			ReservationFixture.builder(List.of(reservationSpec)).terminated(true).build());
-		final LabRoomRentalSpec rentalSpec = LabRoomRentalSpecFixture.builder()
-			.reservationId(reservation.getId())
-			.build();
-		rentalSpecRepository.saveAll(List.of(rentalSpec));
-		entityManager.clear();
-
-		// when
-		rentalSpecRepository.updateNormalReturnedByReservationIds(List.of(reservation.getId()), RentalDateTime.now());
-
-		//then
-		AbstractRentalSpec actual = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
-		assertThat(actual.getStatus()).isEqualTo(RentalSpecStatus.RETURNED);
-		assertThat(actual.getReturnDateTime()).isNotNull();
 	}
 
 	@Test

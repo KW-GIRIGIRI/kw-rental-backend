@@ -17,8 +17,14 @@ import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
-import com.girigiri.kwrental.rental.service.RentalService;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.rental.service.RentalViewService;
+import com.girigiri.kwrental.rental.service.rent.RentalRentService;
+import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
+import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
+import com.girigiri.kwrental.reservation.service.ReservationCancelService;
+import com.girigiri.kwrental.reservation.service.ReservationViewService;
+import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
+import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
 
 @WebMvcTest
 @Import(LoginArgumentResolver.class)
@@ -43,10 +49,7 @@ public abstract class ControllerTest {
     protected AuthService authService;
 
     @MockBean
-    protected RentalService rentalService;
-
-    @MockBean
-    protected ReservationService reservationService;
+    protected RentalViewService rentalViewService;
 
     @MockBean
     protected MemberRepository memberRepository;
@@ -62,4 +65,25 @@ public abstract class ControllerTest {
 
     @MockBean
     protected PenaltyServiceImpl penaltyService;
+
+    @MockBean
+    protected RentalRentService rentalRentService;
+
+    @MockBean
+    protected EquipmentRentalRestoreService equipmentRentalRestoreService;
+
+    @MockBean
+    protected LabRoomRentalRestoreService labRoomRentalRestoreService;
+
+    @MockBean
+    protected LabRoomReserveService labRoomReserveService;
+
+    @MockBean
+    protected EquipmentReserveService equipmentReserveService;
+
+    @MockBean
+    protected ReservationViewService reservationViewService;
+
+    @MockBean
+    protected ReservationCancelService reservationCancelService;
 }

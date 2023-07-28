@@ -60,7 +60,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatCode(labRoomReservation::validateWhenRent)
+		assertThatCode(labRoomReservation::validateCanRentNow)
 			.doesNotThrowAnyException();
 	}
 
@@ -77,7 +77,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatThrownBy(labRoomReservation::validateWhenRent)
+		assertThatThrownBy(labRoomReservation::validateCanRentNow)
 			.isExactlyInstanceOf(LabRoomReservationException.class);
 	}
 
@@ -94,74 +94,7 @@ class LabRoomReservationTest {
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
 
 		// when, then
-		assertThatThrownBy(labRoomReservation::validateWhenRent)
-			.isExactlyInstanceOf(LabRoomReservationException.class);
-	}
-
-	@Test
-	@DisplayName("랩실 대여 예약이 반납이 가능한지 검증한다.")
-	void validateWhenReturn() {
-		// given
-		final LabRoom labRoom = LabRoomFixture.create();
-		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom)
-			.status(ReservationSpecStatus.RENTED)
-			.build();
-		final Reservation reservation = ReservationFixture.create(List.of(spec));
-		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-
-		// when, then
-		assertThatCode(labRoomReservation::validateWhenReturn)
-			.doesNotThrowAnyException();
-	}
-
-	@Test
-	@DisplayName("랩실 대여 예약이 대여 중이 아니면 반납이 불가능하다.")
-	void validateWhenReturn_notRented() {
-		// given
-		final LabRoom labRoom = LabRoomFixture.create();
-		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom)
-			.status(ReservationSpecStatus.RETURNED)
-			.build();
-		final Reservation reservation = ReservationFixture.create(List.of(spec));
-		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-
-		// when, then
-		assertThatThrownBy(labRoomReservation::validateWhenReturn)
-			.isExactlyInstanceOf(LabRoomReservationException.class);
-	}
-
-	@Test
-	@DisplayName("랩실 대여 예약을 모두 정상 반납 처리한다.")
-	void normalReturnAll() {
-		// given
-		final LabRoom labRoom = LabRoomFixture.create();
-		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom)
-			.status(ReservationSpecStatus.RENTED)
-			.build();
-		final Reservation reservation = ReservationFixture.create(List.of(spec));
-		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-
-		// when
-		labRoomReservation.normalReturnAll();
-
-		// then
-		assertThat(spec.getStatus()).isEqualTo(ReservationSpecStatus.RETURNED);
-		assertThat(reservation.isTerminated()).isTrue();
-	}
-
-	@Test
-	@DisplayName("랩실 대여 예약 상세가 대여 중이 아니면 정상 반납할 수 없다.")
-	void normalReturnAll_notRented() {
-		// given
-		final LabRoom labRoom = LabRoomFixture.create();
-		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom)
-			.status(ReservationSpecStatus.RETURNED)
-			.build();
-		final Reservation reservation = ReservationFixture.create(List.of(spec));
-		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);
-
-		// when, then
-		assertThatThrownBy(labRoomReservation::normalReturnAll)
+		assertThatThrownBy(labRoomReservation::validateCanRentNow)
 			.isExactlyInstanceOf(LabRoomReservationException.class);
 	}
 

@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.service.RentedItemService;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveAssetException;
 import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveItemException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecStatuesPerPropertyNumber;
 
 @Service
 public class RentedItemServiceImpl implements RentedItemService {
@@ -43,7 +43,7 @@ public class RentedItemServiceImpl implements RentedItemService {
 		return rentalSpecRepository.findStatusesByPropertyNumbersBetweenDate(propertyNumbers, from, to)
 			.stream()
 			.collect(
-				Collectors.toMap(RentalSpecStatuesPerPropertyNumber::getPropertyNumber, this::mapToRentalCountsDto));
+				Collectors.toMap(RentalSpecStatuesPerPropertyNumber::propertyNumber, this::mapToRentalCountsDto));
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class RentedItemServiceImpl implements RentedItemService {
 	}
 
 	private RentalCountsDto mapToRentalCountsDto(final RentalSpecStatuesPerPropertyNumber rentalSpecStatues) {
-		return new RentalCountsDto(rentalSpecStatues.getPropertyNumber(), rentalSpecStatues.getNormalReturnedCount(),
+		return new RentalCountsDto(rentalSpecStatues.propertyNumber(), rentalSpecStatues.getNormalReturnedCount(),
 			rentalSpecStatues.getAbnormalReturnedCount());
 	}
 }

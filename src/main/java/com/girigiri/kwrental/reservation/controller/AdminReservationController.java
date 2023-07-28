@@ -18,7 +18,8 @@ import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationCancelService;
+import com.girigiri.kwrental.reservation.service.ReservationViewService;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -30,18 +31,20 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin/reservations")
 public class AdminReservationController {
 
-	private final ReservationService reservationService;
+	private final ReservationViewService reservationViewService;
+	private final ReservationCancelService reservationCancelService;
 
 	@GetMapping
 	public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentPerYearMonth(final Long equipmentId,
 		final YearMonth yearMonth) {
-		return reservationService.getReservationsByEquipmentsPerYearMonth(equipmentId, yearMonth);
+		return reservationViewService.getReservationsByEquipmentsPerYearMonth(equipmentId, yearMonth);
 	}
 
 	@PatchMapping("/specs/{reservationSpecId}")
 	public ResponseEntity<?> cancelReservationSpec(@PathVariable Long reservationSpecId,
 		@Validated @RequestBody final CancelReservationSpecRequest body) {
-		final Long cancelReservationSpecId = reservationService.cancelReservationSpec(reservationSpecId, body.amount());
+		final Long cancelReservationSpecId = reservationCancelService.cancelReservationSpec(reservationSpecId,
+			body.amount());
 		return ResponseEntity.noContent()
 			.location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();
 	}
@@ -49,24 +52,24 @@ public class AdminReservationController {
 	@GetMapping(value = "/labRooms", params = "startDate")
 	public LabRoomReservationsWithMemberNumberResponse getLabRoomReservationsForAccept(final LocalDate startDate) {
 		return new LabRoomReservationsWithMemberNumberResponse(
-			reservationService.getLabRoomReservationForAccept(startDate));
+			reservationViewService.getLabRoomReservationForAccept(startDate));
 	}
 
 	@GetMapping(value = "/labRooms", params = "endDate")
 	public LabRoomReservationsWithMemberNumberResponse getLabRoomReservationsForReturn(final LocalDate endDate) {
 		return new LabRoomReservationsWithMemberNumberResponse(
-			reservationService.getLabRoomReservationForReturn(endDate));
+			reservationViewService.getLabRoomReservationForReturn(endDate));
 	}
 
 	@GetMapping(value = "/histories/stat", params = {"name", "startDate", "endDate"})
 	public HistoryStatResponse getHistoryStat(final @NotEmpty String name,
 		@NotNull final LocalDate startDate,
 		@NotNull final LocalDate endDate) {
-		return reservationService.getHistoryStat(name, startDate, endDate);
+		return reservationViewService.getHistoryStat(name, startDate, endDate);
 	}
 
 	@GetMapping("/{id}/purpose")
 	public ReservationPurposeResponse getPurpose(@PathVariable final Long id) {
-		return reservationService.getPurpose(id);
+		return reservationViewService.getPurpose(id);
 	}
 }

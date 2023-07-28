@@ -1,5 +1,9 @@
 package com.girigiri.kwrental.acceptance;
 
+import static com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest.*;
+import static com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest.*;
+import static com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.*;
+import static com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.OverdueEquipmentReservationsWithRentalSpecsResponse.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,39 +31,35 @@ import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
-import com.girigiri.kwrental.rental.domain.AbstractRentalSpec;
-import com.girigiri.kwrental.rental.domain.EquipmentRentalSpec;
-import com.girigiri.kwrental.rental.domain.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.dto.request.CreateRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.RentalSpecsRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalRequest;
-import com.girigiri.kwrental.rental.dto.request.ReturnRentalSpecRequest;
-import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusRequest;
+import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
+import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
-import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalSpecsResponse.EquipmentRentalSpecResponse;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto;
-import com.girigiri.kwrental.rental.dto.response.LabRoomRentalDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
+import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationPageResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationsResponse;
-import com.girigiri.kwrental.rental.dto.response.ReservationsWithRentalSpecsByEndDateResponse;
-import com.girigiri.kwrental.rental.dto.response.overduereservations.OverdueReservationResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationWithRentalSpecsResponse;
-import com.girigiri.kwrental.rental.dto.response.reservationsWithRentalSpecs.EquipmentReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse;
+import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.ReservationsWithRentalSpecsByEndDateResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.repository.dto.EquipmentRentalDto;
-import com.girigiri.kwrental.rental.repository.dto.RentalSpecDto;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.dto.request.RentLabRoomRequest;
-import com.girigiri.kwrental.reservation.dto.request.ReturnLabRoomRequest;
+import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
+import com.girigiri.kwrental.reservation.dto.request.RestoreLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
@@ -106,10 +106,10 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
 
-		CreateRentalRequest request = new CreateRentalRequest(
+		CreateEquipmentRentalRequest request = new CreateEquipmentRentalRequest(
 			reservation1.getId(),
 			List.of(
-				new RentalSpecsRequest(reservation1.getReservationSpecs().get(0).getId(),
+				new EquipmentRentalSpecsRequest(reservation1.getReservationSpecs().get(0).getId(),
 					List.of(item.getPropertyNumber()))
 			)
 		);
@@ -189,7 +189,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(EquipmentReservationsWithRentalSpecsResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(
 					new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
 						member.getMemberNumber(), reservation1.getAcceptDateTime(),
@@ -269,13 +269,13 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		assertAll(
 			() -> assertThat(
-				response.getOverdueReservations().getReservations()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyInAnyOrder(OverdueReservationResponse.of(
+				response.overdueReservations().reservations()).usingRecursiveFieldByFieldElementComparator()
+				.containsExactlyInAnyOrder(OverdueEquipmentReservationResponse.of(
 					new EquipmentReservationWithMemberNumber(reservation2.getId(), reservation2.getName(),
 						member.getMemberNumber(), reservation2.getAcceptDateTime(), List.of(reservationSpec3)),
 					List.of(rentalSpec3))),
 			() -> assertThat(
-				response.getReservationsByEndDate().getReservations()).usingRecursiveFieldByFieldElementComparator()
+				response.reservationsByEndDate().reservations()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactlyInAnyOrder(EquipmentReservationWithRentalSpecsResponse.of(
 					new EquipmentReservationWithMemberNumber(reservation1.getId(), reservation1.getName(),
 						member.getMemberNumber(), reservation1.getAcceptDateTime(), List.of(reservationSpec2)),
@@ -325,7 +325,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.id(rentalSpec2.getId())
 			.status(RentalSpecStatus.LOST)
 			.build();
-		final ReturnRentalRequest returnRentalRequest = ReturnRentalRequest.builder()
+		final RestoreEquipmentRentalRequest restoreEquipmentRentalRequest = builder()
 			.reservationId(reservation.getId())
 			.rentalSpecs(List.of(returnRentalSpecRequest1, returnRentalSpecRequest2))
 			.build();
@@ -333,7 +333,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// when
 		RestAssured.given(requestSpec)
 			.filter(document("admin_returnRentals"))
-			.body(returnRentalRequest)
+			.body(restoreEquipmentRentalRequest)
 			.contentType(ContentType.JSON)
 			.when().log().all().patch("/api/admin/rentals/returns")
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value());
@@ -396,10 +396,10 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(EquipmentRentalsDto.class);
 
 		// then
-		assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentals()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(new EquipmentRentalDto(reservation.getStartDate(), reservation.getEndDate(),
-				Set.of(new RentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
-					new RentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
+				Set.of(new EquipmentRentalSpecDto(rentalSpec1.getId(), equipment1.getName(), rentalSpec1.getStatus()),
+					new EquipmentRentalSpecDto(rentalSpec2.getId(), equipment2.getName(), rentalSpec2.getStatus())))
 			);
 	}
 
@@ -449,7 +449,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.as(EquipmentRentalSpecsResponse.class);
 
 		// then
-		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentalSpecs()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
 					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
@@ -508,7 +508,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.as(EquipmentRentalSpecsResponse.class);
 
 		// then
-		assertThat(response.getRentalSpecs()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentalSpecs()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new EquipmentRentalSpecResponse("불량 반납", rentalSpec2.getAcceptDateTime().toLocalDate(),
 					rentalSpec2.getReturnDateTime().toLocalDate(), reservation2.getName(),
@@ -532,7 +532,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.builder(List.of(reservationSpec1)).memberId(member.getId()).build());
 
-		final RentLabRoomRequest requestBody = RentLabRoomRequest.builder()
+		final CreateLabRoomRentalRequest requestBody = CreateLabRoomRentalRequest.builder()
 			.reservationSpecIds(List.of(reservationSpec1.getId()))
 			.name(labRoom1.getName())
 			.build();
@@ -573,7 +573,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.build();
 		rentalSpecRepository.saveAll(List.of(rentalSpec));
 
-		final ReturnLabRoomRequest requestBody = ReturnLabRoomRequest.builder()
+		final RestoreLabRoomRentalRequest requestBody = RestoreLabRoomRentalRequest.builder()
 			.reservationSpecIds(List.of(reservationSpec1.getId()))
 			.name(labRoom1.getName())
 			.build();
@@ -635,7 +635,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.as(LabRoomReservationsResponse.class);
 
 		// then
-		assertThat(response.getReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.reservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(new LabRoomReservationResponse(reservation1.getId(), reservationSpec1.getId(),
 				reservationSpec1.getStartDate(), reservationSpec1.getEndDate(), reservation1.getName(),
 				rentalSpec.getStatus()));
@@ -686,7 +686,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomRentalsDto.class);
 
 		// then
-		assertThat(response.getRentals()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.rentals()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(
 				new LabRoomRentalDto(reservation1.getStartDate(), reservation1.getEndDate(), labRoom1.getName(),
 					reservationSpec1.getAmount().getAmount(), rentalSpec1.getStatus()),
@@ -726,7 +726,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.build();
 		final LabRoomRentalSpec rentalSpec2 = LabRoomRentalSpecFixture.builder()
 			.reservationSpecId(reservationSpec2.getId())
-			.reservationId(reservation1.getId())
+			.reservationId(reservation2.getId())
 			.status(RentalSpecStatus.BROKEN)
 			.build();
 		rentalSpecRepository.saveAll(List.of(rentalSpec1, rentalSpec2));
@@ -754,8 +754,8 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		final Optional<Penalty> existsActual = penaltyRepository.findByRentalSpecId(rentalSpec1.getId());
 		final Optional<Penalty> notExistsActual = penaltyRepository.findById(penalty.getId());
-		assertThat(existsActual.isPresent()).isTrue();
-		assertThat(notExistsActual.isEmpty()).isTrue();
+		assertThat(existsActual).isPresent();
+		assertThat(notExistsActual).isEmpty();
 	}
 
 	@Test
@@ -804,13 +804,13 @@ class RentalAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomReservationPageResponse.class);
 
 		// then
-		assertThat(response.getPage()).isZero();
-		assertThat(response.getLabRoomReservations()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.page()).isZero();
+		assertThat(response.labRoomReservations()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new LabRoomReservationResponse(reservation2.getId(), reservationSpec2.getId(),
 					reservationSpec2.getStartDate(), reservationSpec2.getEndDate(),
 					reservation2.getName(), rentalSpec2.getStatus())
 			);
-		assertThat(response.getEndPoints()).hasSize(2);
+		assertThat(response.endPoints()).hasSize(2);
 	}
 }

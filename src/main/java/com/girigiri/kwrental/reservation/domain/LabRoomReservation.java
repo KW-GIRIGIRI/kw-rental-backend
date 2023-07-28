@@ -6,7 +6,6 @@ import java.util.List;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
-import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.exception.LabRoomReservationException;
 
 import lombok.Getter;
@@ -23,7 +22,7 @@ public class LabRoomReservation {
 		this.reservation = reservation;
 	}
 
-	public void validateWhenRent() {
+	public void validateCanRentNow() {
 		final List<ReservationSpec> specs = reservation.getReservationSpecs();
 		if (!specs.stream().allMatch(ReservationSpec::isReserved))
 			throw new LabRoomReservationException("랩실 대여를 하려는 예약 상세는 예약 상태여야 합니다.");
@@ -31,17 +30,10 @@ public class LabRoomReservation {
 			throw new LabRoomReservationException("대여 수령 날짜가 대여 신청 기간에 없습니다.");
 	}
 
-	public void validateWhenReturn() {
-		final List<ReservationSpec> specs = reservation.getReservationSpecs();
-		if (!specs.stream().allMatch(ReservationSpec::isRented))
-			throw new LabRoomReservationException("반납하려는 대여 예약 상세가 대여 중 상태가 아닙니다.");
-	}
-
-	public void normalReturnAll() {
-		validateWhenReturn();
-		final List<ReservationSpec> specs = reservation.getReservationSpecs();
-		specs.forEach(spec -> spec.setStatus(ReservationSpecStatus.RETURNED));
-		reservation.updateIfTerminated();
+	public void validateLabRoomName(final String labRoomName) {
+		final boolean onlyRentFor = this.reservation.isOnlyRentFor(labRoomName);
+		if (!onlyRentFor)
+			throw new LabRoomReservationException("랩실 대여 예약의 랩실 이름이 불일치 합니다.");
 	}
 
 	public boolean has(final RentalPeriod period) {
