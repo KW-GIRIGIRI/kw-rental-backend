@@ -9,18 +9,18 @@ import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class LabRoomRentalSpecCreator implements RentalSpecCreator<CreateLabRoomRentalRequest> {
-	private final ReservationService reservationService;
+	private final ReservationRetrieveService reservationRetrieveService;
 
 	@Override
 	public List<AbstractRentalSpec> create(final CreateLabRoomRentalRequest rentalSpecRequest) {
-		final Map<Long, Long> reservationIdByReservationSpecId = reservationService.getLabRoomReservationIdsByReservationSpecIds(
+		final Map<Long, Long> reservationIdByReservationSpecId = reservationRetrieveService.findLabRoomReservationIdsBySpecIds(
 			rentalSpecRequest.reservationSpecIds());
 		return mapToRentalSpecs(reservationIdByReservationSpecId);
 	}

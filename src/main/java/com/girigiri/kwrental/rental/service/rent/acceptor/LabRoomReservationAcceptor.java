@@ -5,18 +5,19 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LabRoomReservationAcceptor implements ReservationAcceptor {
-	private final ReservationService reservationService;
+public class LabRoomReservationAcceptor implements
+	com.girigiri.kwrental.rental.service.rent.acceptor.ReservationAcceptor {
+	private final ReservationAcceptor reservationAcceptor;
 
 	@Override
 	public void acceptReservationsBy(final List<AbstractRentalSpec> rentalSpecs) {
-		rentalSpecs.forEach(rentalSpec -> reservationService.acceptReservation(rentalSpec.getReservationId(),
+		rentalSpecs.forEach(rentalSpec -> reservationAcceptor.accept(rentalSpec.getReservationId(),
 			List.of(rentalSpec.getReservationSpecId())));
 	}
 }

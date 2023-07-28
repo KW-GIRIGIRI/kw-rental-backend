@@ -8,20 +8,21 @@ import org.springframework.stereotype.Service;
 
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.exception.ReservationIdNotSingleValueWhenEquipmentAcceptException;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EquipmentReservationAcceptor implements ReservationAcceptor {
-	private final ReservationService reservationService;
+public class EquipmentReservationAcceptor implements
+	com.girigiri.kwrental.rental.service.rent.acceptor.ReservationAcceptor {
+	private final ReservationAcceptor reservationAcceptor;
 
 	@Override
 	public void acceptReservationsBy(final List<AbstractRentalSpec> rentalSpecs) {
 		final Long reservationId = getReservationId(rentalSpecs);
 		final List<Long> reservationSpecIds = getReservationIds(rentalSpecs);
-		reservationService.acceptReservation(reservationId, reservationSpecIds);
+		reservationAcceptor.accept(reservationId, reservationSpecIds);
 	}
 
 	private Long getReservationId(final List<AbstractRentalSpec> rentalSpecs) {

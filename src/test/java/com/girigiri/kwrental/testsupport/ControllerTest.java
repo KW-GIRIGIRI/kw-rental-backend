@@ -21,7 +21,8 @@ import com.girigiri.kwrental.rental.service.RentalViewService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
 import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationCancelService;
+import com.girigiri.kwrental.reservation.service.ReservationViewService;
 import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
 import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
 
@@ -49,9 +50,6 @@ public abstract class ControllerTest {
 
     @MockBean
     protected RentalViewService rentalViewService;
-
-    @MockBean
-    protected ReservationService reservationService;
 
     @MockBean
     protected MemberRepository memberRepository;
@@ -82,4 +80,10 @@ public abstract class ControllerTest {
 
     @MockBean
     protected EquipmentReserveService equipmentReserveService;
+
+    @MockBean
+    protected ReservationViewService reservationViewService;
+
+    @MockBean
+    protected ReservationCancelService reservationCancelService;
 }

@@ -11,25 +11,22 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.EquipmentReservationsWithRentalSpecsResponse.EquipmentReservationWithRentalSpecsResponse.EquipmentReservationSpecWithRentalSpecsResponse;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.rental.service.restore.PenaltyService;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
@@ -38,17 +35,10 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 @ExtendWith(MockitoExtension.class)
 class RentalViewServiceTest {
 
-	private final ArgumentCaptor<List<EquipmentRentalSpec>> rentalSpecListArgumentCaptor = ArgumentCaptor.forClass(
-		List.class);
-
 	@Mock
-	private ItemService itemService;
-	@Mock
-	private ReservationService reservationService;
+	private ReservationRetrieveService reservationRetrieveService;
 	@Mock
 	private RentalSpecRepository rentalSpecRepository;
-	@Mock
-	private PenaltyService penaltyService;
 	@InjectMocks
 	private RentalViewService rentalViewService;
 
@@ -76,7 +66,7 @@ class RentalViewServiceTest {
 		final EquipmentReservationWithMemberNumber equipmentReservation =
 			new EquipmentReservationWithMemberNumber(reservation.getId(), reservation.getName(), "11111111",
 				reservation.getAcceptDateTime(), List.of(reservationSpec1));
-		given(reservationService.getReservationsByStartDate(any())).willReturn(Set.of(equipmentReservation));
+		given(reservationRetrieveService.getReservationsByStartDate(any())).willReturn(Set.of(equipmentReservation));
 		given(rentalSpecRepository.findByReservationSpecIds(Set.of(reservationSpec1.getId()))).willReturn(
 			List.of(rentalSpec1));
 

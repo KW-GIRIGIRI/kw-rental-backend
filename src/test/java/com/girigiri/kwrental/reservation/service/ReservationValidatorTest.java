@@ -31,13 +31,13 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
-class ReservationValidateServiceTest {
+class ReservationValidatorTest {
 	@Mock
 	private ReservationRepository reservationRepository;
 	@Mock
 	private ReservationSpecRepository reservationSpecRepository;
 	@InjectMocks
-	private ReservationValidateService reservationValidateService;
+	private ReservationValidator reservationValidator;
 
 	@Test
 	@DisplayName("대여 예약 상세에 해당하는 품목 자산 번호의 갯수가 적절한지 검증한다.")
@@ -52,7 +52,7 @@ class ReservationValidateServiceTest {
 		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
 		// when, then
-		assertThatCode(() -> reservationValidateService.validateReservationSpecIdContainsAll(
+		assertThatCode(() -> reservationValidator.validateReservationSpecIdContainsAll(
 			reservation.getId(), Set.of(2L)))
 			.doesNotThrowAnyException();
 	}
@@ -70,7 +70,7 @@ class ReservationValidateServiceTest {
 			List.of(reservationSpec));
 
 		// when, then
-		assertThatThrownBy(() -> reservationValidateService.validateAmountIsSame(Map.of(reservationSpec.getId(), 2)))
+		assertThatThrownBy(() -> reservationValidator.validateAmountIsSame(Map.of(reservationSpec.getId(), 2)))
 			.isExactlyInstanceOf(ReservationSpecException.class);
 	}
 
@@ -88,7 +88,7 @@ class ReservationValidateServiceTest {
 
 		// when, then
 		assertThatThrownBy(
-			() -> reservationValidateService.validateReservationSpecIdContainsAll(reservation.getId(), Set.of(4L, 2L)))
+			() -> reservationValidator.validateReservationSpecIdContainsAll(reservation.getId(), Set.of(4L, 2L)))
 			.isExactlyInstanceOf(ReservationSpecException.class);
 	}
 
@@ -107,7 +107,7 @@ class ReservationValidateServiceTest {
 			.willReturn(Set.of(reservation));
 
 		// when, then
-		assertThatThrownBy(() -> reservationValidateService.validateAlreadyReservedSamePeriod(reservationToValidate))
+		assertThatThrownBy(() -> reservationValidator.validateAlreadyReservedSamePeriod(reservationToValidate))
 			.isExactlyInstanceOf(AlreadyReservedLabRoomException.class);
 	}
 }

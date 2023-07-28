@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNu
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
-import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.exception.ReservationNotFoundException;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -38,30 +36,10 @@ class ReservationRetrieveServiceTest {
 	private ReservationSpecRepository reservationSpecRepository;
 	@Mock
 	private ReservationRepository reservationRepository;
+	@Mock
+	private ReservationValidator reservationValidator;
 	@InjectMocks
 	private ReservationRetrieveService reservationRetrieveService;
-
-	@Test
-	@DisplayName("특정 기간에 수령하는 특정 기자재의 대여 예약을 조회한다.")
-	void getReservationsByEquipmentsPerYearMonth() {
-		// given
-		final Equipment equipment = EquipmentFixture.create();
-		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment)
-			.amount(RentalAmount.ofPositive(2))
-			.build();
-		final Reservation reservation = ReservationFixture.create(List.of(reservationSpec));
-		given(reservationSpecRepository.findNotCanceldByStartDateBetween(any(), any(), any()))
-			.willReturn(List.of(reservationSpec));
-
-		// when
-		final ReservationsByEquipmentPerYearMonthResponse expect = reservationRetrieveService.getReservationsByEquipmentsPerYearMonth(
-			equipment.getId(), YearMonth.now());
-
-		// then
-		assertThat(
-			expect.reservations().get(reservationSpec.getStartDate().getDayOfMonth())).containsExactlyInAnyOrder(
-			reservation.getName(), reservation.getName());
-	}
 
 	@Test
 	@DisplayName("특정 날짜에 수령하는 대여 예약을 조회한다.")
@@ -110,7 +88,7 @@ class ReservationRetrieveServiceTest {
 		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
 		// when
-		final Map<Long, Set<String>> propertyNumbersByEquipmentId = reservationRetrieveService.groupPropertyNumbersCountByEquipmentId(
+		final Map<Long, Set<String>> propertyNumbersByEquipmentId = reservationRetrieveService.groupPropertyNumbersByEquipmentId(
 			reservation.getId(), Map.of(reservationSpec.getId(), Set.of("1111111", "222222222"))
 		);
 

@@ -13,14 +13,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class LabRoomReservationAcceptorTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationAcceptor reservationAcceptor;
 	@InjectMocks
 	private LabRoomReservationAcceptor labRoomReservationAcceptor;
 
@@ -37,11 +37,11 @@ class LabRoomReservationAcceptorTest {
 			.reservationSpecId(4L)
 			.build();
 
-		doNothing().when(reservationService).acceptReservation(any(), anyList());
+		doNothing().when(reservationAcceptor).accept(any(), anyList());
 
 		// when
 		assertThatCode(() -> labRoomReservationAcceptor.acceptReservationsBy(List.of(spec1, spec2)))
 			.doesNotThrowAnyException();
-		verify(reservationService, times(2)).acceptReservation(any(), anyList());
+		verify(reservationAcceptor, times(2)).accept(any(), anyList());
 	}
 }

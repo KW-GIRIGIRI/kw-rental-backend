@@ -26,7 +26,7 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
@@ -35,7 +35,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 class EquipmentRentalRestoreServiceTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationRetrieveService reservationRetrieveService;
 	@Mock
 	private PenaltySetter penaltySetter;
 	@Mock
@@ -66,7 +66,7 @@ class EquipmentRentalRestoreServiceTest {
 		final Reservation reservation = ReservationFixture.builder(List.of(reservationSpec1, reservationSpec2))
 			.id(reservationId)
 			.build();
-		given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+		given(reservationRetrieveService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
 
 		final EquipmentRentalSpec rentalSpec1 = EquipmentRentalSpecFixture.builder()
 			.reservationId(reservationId)
@@ -172,7 +172,7 @@ class EquipmentRentalRestoreServiceTest {
 			.propertyNumber("44444444")
 			.build();
 
-		given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+		given(reservationRetrieveService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
 		given(rentalSpecRepository.findByReservationId(reservationId)).willReturn(
 			List.of(rentalSpec1, rentalSpec2, rentalSpec3, rentalSpec4));
 
@@ -225,7 +225,7 @@ class EquipmentRentalRestoreServiceTest {
 			.build();
 		final Reservation reservation = ReservationFixture.builder(
 			List.of(reservationSpec1, reservationSpec2, reservationSpec3)).id(reservationId).build();
-		given(reservationService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
+		given(reservationRetrieveService.getReservationWithReservationSpecsById(reservationId)).willReturn(reservation);
 
 		final ReturnRentalSpecRequest rentalSpecRequest3 = ReturnRentalSpecRequest.builder()
 			.id(4L)

@@ -22,14 +22,17 @@ import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.Equ
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
+import com.girigiri.kwrental.reservation.service.ReservationValidator;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class EquipmentRentValidatorTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationValidator reservationValidator;
+	@Mock
+	private ReservationRetrieveService reservationRetrieveService;
 	@Mock
 	private ItemService itemService;
 	@Mock
@@ -43,8 +46,8 @@ class EquipmentRentValidatorTest {
 		// given
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest = createEquipmentRentalRequest();
 
-		doThrow(ReservationSpecException.class).when(reservationService)
-			.validateReservationSpecHasSameAmount(Map.of(2L, 1));
+		doThrow(ReservationSpecException.class).when(reservationValidator)
+			.validateAmountIsSame(Map.of(2L, 1));
 
 		// when, then
 		assertThatThrownBy(() -> equipmentRentValidator.validate(createEquipmentRentalRequest))
@@ -57,7 +60,7 @@ class EquipmentRentValidatorTest {
 		// given
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest = createEquipmentRentalRequest();
 
-		given(reservationService.groupPropertyNumbersByEquipmentId(1L, Map.of(2L, Set.of("12345678"))))
+		given(reservationRetrieveService.groupPropertyNumbersByEquipmentId(1L, Map.of(2L, Set.of("12345678"))))
 			.willReturn(Map.of(3L, Set.of("12345678")));
 		doThrow(ItemNotAvailableException.class).when(itemService)
 			.validatePropertyNumbers(Map.of(3L, Set.of("12345678")));
@@ -73,7 +76,7 @@ class EquipmentRentValidatorTest {
 		// given
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest = createEquipmentRentalRequest();
 
-		given(reservationService.groupPropertyNumbersByEquipmentId(1L, Map.of(2L, Set.of("12345678"))))
+		given(reservationRetrieveService.groupPropertyNumbersByEquipmentId(1L, Map.of(2L, Set.of("12345678"))))
 			.willReturn(Map.of(3L, Set.of("12345678")));
 		final EquipmentRentalSpec rentalSpec = EquipmentRentalSpecFixture.create();
 		given(rentalSpecRepository.findByPropertyNumbers(Set.of("12345678")))

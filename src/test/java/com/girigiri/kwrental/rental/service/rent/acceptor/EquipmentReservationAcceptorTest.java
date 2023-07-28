@@ -14,14 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.exception.ReservationIdNotSingleValueWhenEquipmentAcceptException;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class EquipmentReservationAcceptorTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationAcceptor reservationAcceptor;
 	@InjectMocks
 	private EquipmentReservationAcceptor equipmentReservationAcceptor;
 
@@ -38,7 +38,7 @@ class EquipmentReservationAcceptorTest {
 			.reservationSpecId(3L)
 			.build();
 
-		doNothing().when(reservationService).acceptReservation(1L, List.of(2L, 3L));
+		doNothing().when(reservationAcceptor).accept(1L, List.of(2L, 3L));
 
 		// when
 		assertThatCode(() -> equipmentReservationAcceptor.acceptReservationsBy(List.of(spec1, spec2)))

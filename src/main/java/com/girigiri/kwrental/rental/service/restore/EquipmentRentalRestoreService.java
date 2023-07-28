@@ -17,7 +17,7 @@ import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest.ReturnRentalSpecRequest;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class EquipmentRentalRestoreService {
-	private final ReservationService reservationService;
+	private final ReservationRetrieveService reservationRetrieveService;
 	private final ItemService itemService;
 	private final PenaltySetter penaltySetter;
 	private final RentalSpecRepository rentalSpecRepository;
@@ -38,7 +38,7 @@ public class EquipmentRentalRestoreService {
 	}
 
 	private Rental getRental(final Long reservationId) {
-		final Reservation reservation = reservationService.getReservationWithReservationSpecsById(
+		final Reservation reservation = reservationRetrieveService.getReservationWithReservationSpecsById(
 			reservationId);
 		final List<EquipmentRentalSpec> rentalSpecs = rentalSpecRepository.findByReservationId(reservationId);
 		return Rental.of(rentalSpecs, reservation);

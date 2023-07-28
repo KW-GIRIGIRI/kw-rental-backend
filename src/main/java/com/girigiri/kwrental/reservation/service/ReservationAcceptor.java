@@ -3,7 +3,9 @@ package com.girigiri.kwrental.reservation.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
@@ -13,13 +15,14 @@ import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class ReservationRentalService {
+@Transactional(propagation = Propagation.MANDATORY)
+public class ReservationAcceptor {
 	private final ReservationRepository reservationRepository;
 	private final ReservationSpecRepository reservationSpecRepository;
 
-	void acceptReservation(final Long id, final List<Long> rentedReservationSpecIds) {
+	public void accept(final Long id, final List<Long> rentedReservationSpecIds) {
 		final Reservation reservation = getReservationById(id);
 		reservation.acceptAt(LocalDateTime.now());
 		reservationSpecRepository.updateStatusByIds(rentedReservationSpecIds, ReservationSpecStatus.RENTED);
@@ -30,3 +33,4 @@ public class ReservationRentalService {
 			.orElseThrow(ReservationNotFoundException::new);
 	}
 }
+

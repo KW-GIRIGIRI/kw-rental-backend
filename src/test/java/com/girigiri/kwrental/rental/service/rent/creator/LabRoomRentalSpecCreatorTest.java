@@ -16,14 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomRentalSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
 class LabRoomRentalSpecCreatorTest {
 
 	@Mock
-	private ReservationService reservationService;
+	private ReservationRetrieveService reservationRetrieveService;
 	@InjectMocks
 	private LabRoomRentalSpecCreator labRoomRentalSpecCreator;
 
@@ -35,7 +35,7 @@ class LabRoomRentalSpecCreatorTest {
 			.name("labRoomName")
 			.reservationSpecIds(List.of(1L, 2L)).build();
 
-		given(reservationService.getLabRoomReservationIdsByReservationSpecIds(
+		given(reservationRetrieveService.findLabRoomReservationIdsBySpecIds(
 			createLabRoomRentalRequest.reservationSpecIds()))
 			.willReturn(Map.of(1L, 3L, 2L, 4L));
 

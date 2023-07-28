@@ -14,7 +14,8 @@ import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.rental.exception.DuplicateRentalException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
+import com.girigiri.kwrental.reservation.service.ReservationValidator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EquipmentRentValidator implements RentValidator<CreateEquipmentRentalRequest> {
 
-	private final ReservationService reservationService;
+	private final ReservationValidator reservationValidator;
+	private final ReservationRetrieveService reservationRetrieveService;
 	private final ItemService itemService;
 	private final RentalSpecRepository rentalSpecRepository;
 
@@ -35,7 +37,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 	private void validateEquipmentRentalAmount(final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
 		final Map<Long, Integer> amountPerReservationSpecId = groupAmountByReservationSpecId(
 			createEquipmentRentalRequest);
-		reservationService.validateReservationSpecHasSameAmount(amountPerReservationSpecId);
+		reservationValidator.validateAmountIsSame(amountPerReservationSpecId);
 	}
 
 	private Map<Long, Integer> groupAmountByReservationSpecId(
@@ -58,7 +60,8 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 		final Map<Long, Set<String>> propertyNumbersByReservationSpecId = groupPropertyNumberByReservationSpecId(
 			createEquipmentRentalRequest);
 		final Long reservationId = createEquipmentRentalRequest.reservationId();
-		return reservationService.groupPropertyNumbersByEquipmentId(reservationId, propertyNumbersByReservationSpecId);
+		return reservationRetrieveService.groupPropertyNumbersByEquipmentId(reservationId,
+			propertyNumbersByReservationSpecId);
 	}
 
 	private Map<Long, Set<String>> groupPropertyNumberByReservationSpecId(

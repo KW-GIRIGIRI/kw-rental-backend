@@ -26,7 +26,7 @@ import com.girigiri.kwrental.rental.dto.response.equipmentreservationbyenddate.R
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
-import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,12 +35,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class RentalViewService {
 
-	private final ReservationService reservationService;
+	private final ReservationRetrieveService reservationRetrieveService;
 	private final RentalSpecRepository rentalSpecRepository;
 
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
 		final LocalDate localDate) {
-		final Set<EquipmentReservationWithMemberNumber> reservations = reservationService.getReservationsByStartDate(
+		final Set<EquipmentReservationWithMemberNumber> reservations = reservationRetrieveService.getReservationsByStartDate(
 			localDate);
 		final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(reservations);
 		final List<EquipmentRentalSpec> rentalSpecs = getEquipmentRentalSpecsByReservationIds(reservationSpecIds);
@@ -72,7 +72,7 @@ public class RentalViewService {
 
 	private OverdueEquipmentReservationsWithRentalSpecsResponse getOverdueReservationsWithRentalSpecs(
 		final LocalDate localDate) {
-		Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservations = reservationService.getOverdueReservationsWithMemberNumber(
+		Set<EquipmentReservationWithMemberNumber> overdueEquipmentReservations = reservationRetrieveService.getOverdueReservationsWithMemberNumber(
 			localDate);
 		final Set<Long> overdueReservationSpecsIds = getAcceptedReservationSpecIds(overdueEquipmentReservations);
 		final List<EquipmentRentalSpec> overdueRentalSpecs = getEquipmentRentalSpecsByReservationIds(
@@ -82,7 +82,7 @@ public class RentalViewService {
 
 	private EquipmentReservationsWithRentalSpecsResponse getReservationWithRentalSpecsByEndDate(
 		final LocalDate localDate) {
-		Set<EquipmentReservationWithMemberNumber> equipmentReservations = reservationService.getReservationsWithMemberNumberByEndDate(
+		Set<EquipmentReservationWithMemberNumber> equipmentReservations = reservationRetrieveService.getReservationsWithMemberNumberByEndDate(
 			localDate);
 		final Set<Long> reservationSpecIds = getAcceptedReservationSpecIds(equipmentReservations);
 		final List<EquipmentRentalSpec> rentalSpecs = getEquipmentRentalSpecsByReservationIds(reservationSpecIds);

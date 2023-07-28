@@ -57,14 +57,18 @@ public class ReservationCancelService {
 	}
 
 	private void updateAndAdjustTerminated(final Long reservationId) {
-		final Reservation reservation = reservationRepository.findByIdWithSpecs(reservationId)
-			.orElseThrow(ReservationNotFoundException::new);
+		final Reservation reservation = getReservation(reservationId);
 		reservation.updateIfTerminated();
 		if (reservation.isTerminated())
 			reservationRepository.adjustTerminated(reservation);
 	}
 
-	void cancelByAssetId(Long assetId) {
+	private Reservation getReservation(final Long reservationId) {
+		return reservationRepository.findByIdWithSpecs(reservationId)
+			.orElseThrow(ReservationNotFoundException::new);
+	}
+
+	public void cancelByAssetId(final Long assetId) {
 		List<ReservationSpec> reservedOrRentedSpecs = reservationSpecRepository.findReservedOrRentedByAssetId(
 			assetId);
 		validateAllReserved(reservedOrRentedSpecs);
@@ -72,7 +76,7 @@ public class ReservationCancelService {
 			.forEach(spec -> cancelReservationSpec(spec.getId(), spec.getAmount().getAmount()));
 	}
 
-	private void validateAllReserved(List<ReservationSpec> reservedOrRentedSpecs) {
+	private void validateAllReserved(final List<ReservationSpec> reservedOrRentedSpecs) {
 		boolean anyRented = reservedOrRentedSpecs.stream()
 			.anyMatch(ReservationSpec::isRented);
 		if (anyRented)

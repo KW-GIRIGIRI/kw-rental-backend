@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
@@ -19,13 +21,14 @@ import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class ReservationValidateService {
+@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+public class ReservationValidator {
 	private final ReservationRepository reservationRepository;
 	private final ReservationSpecRepository reservationSpecRepository;
 
-	void validateReservationSpecIdContainsAll(final Long reservationId,
+	public void validateReservationSpecIdContainsAll(final Long reservationId,
 		final Set<Long> reservationSpecIdsFromInput) {
 		final Reservation reservation = getReservationWithSpecs(reservationId);
 		final Set<Long> reservedSpecIds = getReservedSpecIds(reservation);
@@ -47,7 +50,7 @@ public class ReservationValidateService {
 			.collect(Collectors.toSet());
 	}
 
-	void validateAmountIsSame(final Map<Long, Integer> amountByReservationSpecId) {
+	public void validateAmountIsSame(final Map<Long, Integer> amountByReservationSpecId) {
 		final List<ReservationSpec> specs = reservationSpecRepository.findByIdIn(amountByReservationSpecId.keySet());
 		for (ReservationSpec spec : specs) {
 			final Integer amount = amountByReservationSpecId.get(spec.getId());
