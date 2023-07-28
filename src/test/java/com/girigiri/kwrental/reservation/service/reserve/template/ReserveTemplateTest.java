@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.service;
+package com.girigiri.kwrental.reservation.service.reserve.template;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -27,14 +27,14 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
-class ReservationReserveServiceTest {
+class ReserveTemplateTest {
 
 	@Mock
 	private PenaltyChecker penaltyChecker;
 	@Mock
 	private RemainQuantityValidator remainQuantityValidator;
 	@InjectMocks
-	private ReservationReserveService reservationReserveService;
+	private ReserveTemplate reserveTemplate;
 
 	@Test
 	@DisplayName("이미 진행 중인 페널티가 있으면 대여 예약를 할 수 없다.")
@@ -43,7 +43,7 @@ class ReservationReserveServiceTest {
 		given(penaltyChecker.hasOngoingPenalty(1L)).willReturn(true);
 
 		// when, then
-		assertThatThrownBy(() -> reservationReserveService.reserve(1L, Collections.emptyList(),
+		assertThatThrownBy(() -> reserveTemplate.reserve(1L, Collections.emptyList(),
 			ReserveValidator.noExtraValidation())).isExactlyInstanceOf(ReservationException.class);
 	}
 
@@ -65,7 +65,7 @@ class ReservationReserveServiceTest {
 			.validateAmount(assetId, amount, rentalPeriod);
 
 		// when, then
-		assertThatThrownBy(() -> reservationReserveService.reserve(memberId, List.of(reservation),
+		assertThatThrownBy(() -> reserveTemplate.reserve(memberId, List.of(reservation),
 			ReserveValidator.noExtraValidation()))
 			.isExactlyInstanceOf(NotEnoughAmountException.class);
 	}

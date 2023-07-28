@@ -14,16 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.reservation.domain.EquipmentReservationWithMemberNumber;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
-import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequest;
-import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationRequest;
 import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
-import com.girigiri.kwrental.reservation.service.creator.EquipmentReservationCreator;
-import com.girigiri.kwrental.reservation.service.creator.LabRoomReservationCreator;
+import com.girigiri.kwrental.reservation.service.reserve.template.ReserveTemplate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,26 +29,10 @@ import lombok.RequiredArgsConstructor;
 public class ReservationService {
 
 	private final ReservationCancelService reservationCancelService;
-	private final ReservationReserveService reservationReserveService;
+	private final ReserveTemplate reserveTemplate;
 	private final ReservationRetrieveService reservationRetrieveService;
 	private final ReservationValidateService reservationValidateService;
 	private final ReservationRentalService reservationRentalService;
-	private final EquipmentReservationCreator equipmentReservationCreator;
-	private final LabRoomReservationCreator labRoomReservationCreator;
-
-	@Transactional
-	public void reserveEquipment(final Long memberId, final AddEquipmentReservationRequest addReservationRequest) {
-		final List<Reservation> reservations = equipmentReservationCreator.create(memberId, addReservationRequest);
-		reservationReserveService.reserve(memberId, reservations, ReserveValidator.noExtraValidation());
-	}
-
-	@Transactional
-	public Long reserveLabRoom(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
-		final Reservation reservation = labRoomReservationCreator.create(memberId, addLabRoomReservationRequest);
-		reservationReserveService.reserve(memberId, List.of(reservation),
-			reservationValidateService::validateAlreadyReservedSamePeriod);
-		return reservation.getId();
-	}
 
 	@Transactional(readOnly = true)
 	public ReservationsByEquipmentPerYearMonthResponse getReservationsByEquipmentsPerYearMonth(final Long equipmentId,
@@ -125,11 +106,6 @@ public class ReservationService {
 		reservationRentalService.acceptReservation(id, rentedReservationSpecIds);
 	}
 
-	@Transactional(propagation = Propagation.MANDATORY)
-	public void cancelReserved(final Long memberId) {
-		reservationCancelService.cancelReserved(memberId);
-	}
-
 	@Transactional(readOnly = true)
 	public RelatedReservationsInfoResponse getRelatedReservationsInfo(Long id) {
 		return reservationRetrieveService.getRelatedReservationsInfo(id);
@@ -152,6 +128,6 @@ public class ReservationService {
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<Long, Long> getLabRoomReservationIdsByReservationSpecIds(final List<Long> reservationSpecIds) {
-		return reservationReserveService.findLabRoomReservationIdsBySpecIds(reservationSpecIds);
+		return reservationRetrieveService.findLabRoomReservationIdsBySpecIds(reservationSpecIds);
 	}
 }

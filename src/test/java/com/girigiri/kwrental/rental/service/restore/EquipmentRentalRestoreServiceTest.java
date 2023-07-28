@@ -182,7 +182,6 @@ class EquipmentRentalRestoreServiceTest {
 		lenient().doNothing().when(penaltySetter).setPenalty(rentalSpec3, reservation);
 		lenient().doNothing().when(itemService).setAvailable(rentalSpec4.getPropertyNumber(), false);
 		lenient().doNothing().when(penaltySetter).setPenalty(rentalSpec4, reservation);
-		lenient().doNothing().when(reservationService).cancelReserved(any());
 
 		// when
 		assertThatCode(() -> equipmentRentalRestoreService.restore(returnReturnRequest))

@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.service.creator;
+package com.girigiri.kwrental.reservation.service.reserve.creator;
 
 import java.util.List;
 

@@ -21,12 +21,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 public class RemainingQuantityServiceImpl implements RemainingQuantityService {
 
 	private final ReservationSpecRepository reservationSpecRepository;
 
 	@Override
-	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<Long, Integer> getRemainingQuantityByAssetIdAndDate(final List<Long> rentableIds,
 		final LocalDate date) {
 		return reservationSpecRepository.findRentalAmountsByAssetIds(rentableIds, date)
@@ -35,7 +35,6 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<LocalDate, Integer> getReservedAmountInclusive(
 		final Long rentableId, final LocalDate from, final LocalDate to) {
 		final List<ReservationSpec> overlappedSpecs =
@@ -53,7 +52,6 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
 	public Map<LocalDate, Integer> getReservationCountInclusive(
 		final Long rentableId, final LocalDate from, final LocalDate to) {
 		List<ReservationSpec> overlappedSpecs = reservationSpecRepository.findOverlappedReservedOrRentedInclusive(

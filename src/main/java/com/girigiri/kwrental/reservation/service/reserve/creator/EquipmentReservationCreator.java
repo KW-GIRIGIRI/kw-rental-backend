@@ -1,11 +1,11 @@
-package com.girigiri.kwrental.reservation.service.creator;
+package com.girigiri.kwrental.reservation.service.reserve.creator;
 
 import static java.util.stream.Collectors.*;
 
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -14,7 +14,7 @@ import com.girigiri.kwrental.reservation.dto.request.AddEquipmentReservationRequ
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class EquipmentReservationCreator {
 	private final ReservationSpecMapper reservationSpecMapper;

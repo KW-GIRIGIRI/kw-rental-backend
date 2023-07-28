@@ -19,6 +19,8 @@ import com.girigiri.kwrental.reservation.dto.response.RelatedReservationsInfoRes
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
+import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,18 +30,20 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
 
 	private final ReservationService reservationService;
+	private final EquipmentReserveService equipmentReserveService;
+	private final LabRoomReserveService labRoomReserveService;
 
 	@PostMapping
 	public ResponseEntity<?> reserve(@Login final SessionMember sessionMember,
 		@RequestBody final AddEquipmentReservationRequest addReservationRequest) {
-		reservationService.reserveEquipment(sessionMember.getId(), addReservationRequest);
+		equipmentReserveService.reserveEquipment(sessionMember.getId(), addReservationRequest);
 		return ResponseEntity.created(URI.create("/api/reservations")).build();
 	}
 
 	@PostMapping("/labRooms")
 	public ResponseEntity<?> reserveLabRoom(@Login final SessionMember sessionMember,
 		@RequestBody final AddLabRoomReservationRequest addLabRoomReservationRequest) {
-		final Long id = reservationService.reserveLabRoom(sessionMember.getId(), addLabRoomReservationRequest);
+		final Long id = labRoomReserveService.reserveLabRoom(sessionMember.getId(), addLabRoomReservationRequest);
 		return ResponseEntity.created(URI.create("/api/reservations/" + id)).build();
 	}
 

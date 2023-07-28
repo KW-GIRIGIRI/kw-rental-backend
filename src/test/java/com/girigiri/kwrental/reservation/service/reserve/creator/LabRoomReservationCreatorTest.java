@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.service.creator;
+package com.girigiri.kwrental.reservation.service.reserve.creator;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;

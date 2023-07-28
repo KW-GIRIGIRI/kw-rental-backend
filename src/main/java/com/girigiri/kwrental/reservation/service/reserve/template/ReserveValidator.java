@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.service;
+package com.girigiri.kwrental.reservation.service.reserve.template;
 
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 

@@ -1,8 +1,8 @@
-package com.girigiri.kwrental.reservation.service.creator;
+package com.girigiri.kwrental.reservation.service.reserve.creator;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
@@ -16,7 +16,7 @@ import com.girigiri.kwrental.reservation.dto.request.AddLabRoomReservationReques
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class LabRoomReservationCreator {
 	private final LabRoomService labRoomService;

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
-import com.girigiri.kwrental.reservation.service.creator.ReservationSpecMapper;
+import com.girigiri.kwrental.reservation.service.reserve.creator.ReservationSpecMapper;
 
 import lombok.RequiredArgsConstructor;
 

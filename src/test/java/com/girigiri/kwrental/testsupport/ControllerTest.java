@@ -22,6 +22,8 @@ import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
 import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
 import com.girigiri.kwrental.reservation.service.ReservationService;
+import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
+import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
 
 @WebMvcTest
 @Import(LoginArgumentResolver.class)
@@ -74,4 +76,10 @@ public abstract class ControllerTest {
 
     @MockBean
     protected LabRoomRentalRestoreService labRoomRentalRestoreService;
+
+    @MockBean
+    protected LabRoomReserveService labRoomReserveService;
+
+    @MockBean
+    protected EquipmentReserveService equipmentReserveService;
 }

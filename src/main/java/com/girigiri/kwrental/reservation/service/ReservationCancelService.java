@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
@@ -17,13 +19,15 @@ import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ReservationCancelService {
 
 	private final ReservationRepository reservationRepository;
 	private final ReservationSpecRepository reservationSpecRepository;
 
-	void cancelReserved(final Long memberId) {
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void cancelReserved(final Long memberId) {
 		Set<Reservation> reservations = reservationRepository.findNotTerminatedReservationsByMemberId(memberId);
 		final List<ReservationSpec> specs = reservations.stream()
 			.filter(reservation -> !reservation.isAccepted())
@@ -34,7 +38,7 @@ public class ReservationCancelService {
 		specs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
 	}
 
-	Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
+	public Long cancelReservationSpec(final Long reservationSpecId, final Integer amount) {
 		final ReservationSpec reservationSpec = getReservationSpec(reservationSpecId);
 		cancelAndAdjust(reservationSpec, amount);
 		return reservationSpec.getId();

@@ -55,7 +55,7 @@ public class ReservationValidateService {
 		}
 	}
 
-	void validateAlreadyReservedSamePeriod(final Reservation reservation) {
+	public void validateAlreadyReservedSamePeriod(final Reservation reservation) {
 		final Long memberId = reservation.getMemberId();
 		final RentalPeriod period = reservation.getRentalPeriod();
 		boolean alreadyReserved = reservationRepository.findNotTerminatedLabRoomReservationsByMemberId(memberId)

@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.reservation.service;
 
+import static java.util.stream.Collectors.*;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -133,5 +135,12 @@ public class ReservationRetrieveService {
 			.stream()
 			.map(LabRoomReservation::new)
 			.toList();
+	}
+
+	public Map<Long, Long> findLabRoomReservationIdsBySpecIds(final List<Long> specIds) {
+		return reservationRepository.findByReservationSpecIds(specIds)
+			.stream()
+			.map(LabRoomReservation::new)
+			.collect(toMap(LabRoomReservation::getReservationSpecId, LabRoomReservation::getId));
 	}
 }
