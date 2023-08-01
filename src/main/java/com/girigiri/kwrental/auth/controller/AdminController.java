@@ -14,11 +14,11 @@ import com.girigiri.kwrental.auth.service.AuthService;
 
 @RestController
 @RequestMapping("/api/admin")
-public class AdminAuthController {
+public class AdminController {
 
 	private final AuthService authService;
 
-	public AdminAuthController(AuthService authService) {
+	public AdminController(AuthService authService) {
 		this.authService = authService;
 	}
 
