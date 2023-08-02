@@ -13,6 +13,7 @@ import com.girigiri.kwrental.auth.argumentresolver.LoginArgumentResolver;
 import com.girigiri.kwrental.auth.controller.SessionCookieSupport;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.auth.service.AuthService;
+import com.girigiri.kwrental.auth.service.MemberNumberRetrieveService;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
@@ -86,4 +87,7 @@ public abstract class ControllerTest {
 
     @MockBean
     protected ReservationCancelService reservationCancelService;
+
+    @MockBean
+    protected MemberNumberRetrieveService memberNumberRetrieveService;
 }

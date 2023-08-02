@@ -14,6 +14,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
+import com.girigiri.kwrental.auth.service.KwangwoonMemberService;
 import com.girigiri.kwrental.mail.EmailService;
 import com.girigiri.kwrental.testsupport.databasecleanup.CleanBeforeEach;
 
@@ -25,12 +26,14 @@ import io.restassured.specification.RequestSpecification;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(RestDocumentationExtension.class)
 @CleanBeforeEach
-public class AcceptanceTest {
+abstract class AcceptanceTest {
 
     @MockBean
     protected AmazonS3 amazonS3;
     @MockBean
     protected EmailService emailService;
+    @MockBean
+    protected KwangwoonMemberService kwangwoonMemberService;
     protected RequestSpecification requestSpec;
     @LocalServerPort
     private int port;

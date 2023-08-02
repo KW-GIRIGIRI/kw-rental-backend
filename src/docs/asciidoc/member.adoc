@@ -35,3 +35,7 @@ operation::updateAdmin[snippets='http-request,http-response']
 === 비밀번호 초기화
 
 operation::resetPassword[snippets='http-request,http-response']
+
+=== KLAS 학번 조회
+
+operation::retrieveMemberNumberFromKwangwoon[snippets='http-request,http-response']
