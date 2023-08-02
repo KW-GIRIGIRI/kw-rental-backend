@@ -20,6 +20,6 @@ public class AuthController {
 	@GetMapping(path = "/memberNumbers", params = {"name", "birthday"})
 	public MemberNumberResponse getMemberNumberFromKLAS(
 		final KwangwoonMemberRetrieveRequest kwangwoonMemberRetrieveRequest) {
-		return memberNumberRetrieveService.retrieve(kwangwoonMemberRetrieveRequest);
+		return memberNumberRetrieveService.retrieveMediaMemberNumber(kwangwoonMemberRetrieveRequest);
 	}
 }
