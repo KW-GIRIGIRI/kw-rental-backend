@@ -55,7 +55,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 		return queryFactory
 			.selectFrom(reservation)
 			.join(reservation.reservationSpecs, reservationSpec).fetchJoin()
-			.join(reservationSpec.rentable, rentableAsset).fetchJoin();
+			.join(reservationSpec.asset, rentableAsset).fetchJoin();
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 	public List<Reservation> findNotTerminatedRelatedReservation(LabRoomReservation from) {
 		return queryFactory.selectFrom(reservation)
 			.join(reservationSpec).on(reservationSpec.reservation.id.eq(reservation.id),
-				reservationSpec.rentable.id.eq(from.getLabRoomId()))
+				reservationSpec.asset.id.eq(from.getLabRoomId()))
 			.where(reservationSpec.period.eq(from.getPeriod()),
 				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED))
 			.fetch();
@@ -104,7 +104,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
 		return queryFactory
 			.selectFrom(reservation)
 			.leftJoin(reservation.reservationSpecs, reservationSpec).fetchJoin()
-			.leftJoin(reservationSpec.rentable, rentableAsset).fetchJoin()
+			.leftJoin(reservationSpec.asset, rentableAsset).fetchJoin()
 			.where(reservation.id.in(reservationIds))
 			.fetch();
 	}

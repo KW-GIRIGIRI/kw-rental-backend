@@ -69,7 +69,7 @@ public class ReservationRetrieveService {
 		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
 		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
 			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
-			final Long equipmentId = reservationSpec.getRentable().getId();
+			final Long equipmentId = reservationSpec.getAsset().getId();
 			collectedByEquipmentId.put(equipmentId, propertyNumbers);
 		}
 		return collectedByEquipmentId;

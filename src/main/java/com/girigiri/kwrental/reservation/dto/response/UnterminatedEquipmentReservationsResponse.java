@@ -36,7 +36,7 @@ public record UnterminatedEquipmentReservationsResponse(
         ) {
             public static UnterminatedEquipmentReservationResponse.UnterminatedEquipmentReservationSpecResponse from(
                 final ReservationSpec reservationSpec) {
-                final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
+                final Equipment equipment = reservationSpec.getAsset().as(Equipment.class);
                 return new UnterminatedEquipmentReservationResponse.UnterminatedEquipmentReservationSpecResponse(
                     reservationSpec.getId(), equipment.getCategory(), equipment.getName(), equipment.getImgUrl(),
                     reservationSpec.getAmount().getAmount(), reservationSpec.getStatus());

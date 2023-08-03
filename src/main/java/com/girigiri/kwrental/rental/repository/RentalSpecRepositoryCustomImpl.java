@@ -66,7 +66,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 		return Set.copyOf(queryFactory.selectFrom(equipmentRentalSpec)
 			.leftJoin(reservationSpec)
 			.on(equipmentRentalSpec.reservationSpecId.eq(reservationSpec.id))
-			.where(reservationSpec.rentable.id.eq(equipmentId)
+			.where(reservationSpec.asset.id.eq(equipmentId)
 				.and(equipmentRentalSpec.acceptDateTime.instant.loe(RentalDateTime.from(dateTime).getInstant())
 					.and(equipmentRentalSpec.returnDateTime.isNull())))
 			.fetch());
@@ -88,7 +88,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(reservation)
 			.on(abstractRentalSpec.reservationId.eq(reservation.id), reservation.memberId.eq(memberId))
 			.join(equipment)
-			.on(equipment.id.eq(reservationSpec.rentable.id))
+			.on(equipment.id.eq(reservationSpec.asset.id))
 			.where(reservationSpecBetweenDate(from, to))
 			.transform(groupBy(reservationSpec.period).list(
 				Projections.constructor(EquipmentRentalDto.class, reservationSpec.period.rentalStartDate,
@@ -107,7 +107,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(reservation)
 			.on(abstractRentalSpec.reservationId.eq(reservation.id), reservation.memberId.eq(memberId))
 			.join(labRoom)
-			.on(labRoom.id.eq(reservationSpec.rentable.id))
+			.on(labRoom.id.eq(reservationSpec.asset.id))
 			.where(reservationSpecBetweenDate(from, to))
 			.select(Projections.constructor(LabRoomRentalDto.class, reservationSpec.period.rentalStartDate,
 				reservationSpec.period.rentalEndDate, labRoom.name, reservationSpec.amount.amount,
@@ -167,7 +167,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.join(rentableAsset)
-			.on(rentableAsset.eq(reservationSpec.rentable))
+			.on(rentableAsset.eq(reservationSpec.asset))
 			.where(rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
 				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED),
 				reservationSpec.period.rentalStartDate.eq(startDate))
@@ -186,7 +186,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.join(rentableAsset)
-			.on(rentableAsset.eq(reservationSpec.rentable))
+			.on(rentableAsset.eq(reservationSpec.asset))
 			.where(rentableAsset.instanceOf(LabRoom.class), rentableAsset.name.eq(labRoomName),
 				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED),
 				reservationSpec.period.rentalStartDate.goe(startDate),
@@ -212,7 +212,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 		return queryFactory.selectFrom(abstractRentalSpec)
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
-			.where(reservationSpec.rentable.id.eq(assetId), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
+			.where(reservationSpec.asset.id.eq(assetId), abstractRentalSpec.status.eq(RentalSpecStatus.RENTED))
 			.fetch();
 	}
 
@@ -230,7 +230,7 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.join(reservationSpec)
 			.on(reservationSpec.id.eq(abstractRentalSpec.reservationSpecId))
 			.join(rentableAsset)
-			.on(rentableAsset.eq(reservationSpec.rentable))
+			.on(rentableAsset.eq(reservationSpec.asset))
 			.where(query.getMetadata().getWhere())
 			.fetchOne();
 		return count == null ? 0 : count;

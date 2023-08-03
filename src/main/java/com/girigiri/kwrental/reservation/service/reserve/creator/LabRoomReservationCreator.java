@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.exception.LabRoomNotAvailableException;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
@@ -37,12 +36,12 @@ public class LabRoomReservationCreator {
 			throw new LabRoomNotAvailableException();
 	}
 
-	private ReservationSpec mapToReservationSpec(final Rentable rentable, final RentalPeriod period,
+	private ReservationSpec mapToReservationSpec(final LabRoom labRoom, final RentalPeriod period,
 		final RentalAmount amount) {
 		return ReservationSpec.builder()
 			.period(period)
 			.amount(amount)
-			.rentable(rentable)
+			.asset(labRoom)
 			.build();
 	}
 

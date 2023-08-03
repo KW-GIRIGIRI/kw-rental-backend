@@ -46,7 +46,7 @@ public class PenaltyRepositoryCustomImpl implements PenaltyRepositoryCustom {
 		final List<UserPenaltyResponse> userPenaltyResponses = queryFactory
 			.from(penalty)
 			.join(reservationSpec).on(reservationSpec.id.eq(penalty.reservationSpecId))
-			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id))
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.asset.id))
 			.join(abstractRentalSpec).on(abstractRentalSpec.id.eq(penalty.rentalSpecId))
 			.where(penalty.memberId.eq(memberId))
 			.select(Projections.constructor(UserPenaltyResponse.class, penalty.id, abstractRentalSpec.acceptDateTime,
@@ -61,7 +61,7 @@ public class PenaltyRepositoryCustomImpl implements PenaltyRepositoryCustom {
 		final JPAQuery<PenaltyHistoryResponse> query = queryFactory
 			.from(penalty)
 			.join(reservationSpec).on(reservationSpec.id.eq(penalty.reservationSpecId))
-			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id))
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.asset.id))
 			.join(reservation).on(reservation.id.eq(penalty.reservationId))
 			.select(Projections.constructor(PenaltyHistoryResponse.class,
 				penalty.id, reservation.name, penalty.period, rentableAsset.name, penalty.reason));

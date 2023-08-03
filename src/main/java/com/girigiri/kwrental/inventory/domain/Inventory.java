@@ -2,7 +2,6 @@ package com.girigiri.kwrental.inventory.domain;
 
 import java.util.Objects;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
@@ -39,9 +38,9 @@ public class Inventory {
     @Embedded
     private RentalAmount rentalAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = RentableAsset.class)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "asset_id")
-    private Rentable rentable;
+    private RentableAsset asset;
 
     @Column(nullable = false)
     private Long memberId;

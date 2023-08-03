@@ -35,7 +35,7 @@ public class InventoryReservationSpecMapper implements ReservationSpecMapper {
 		return ReservationSpec.builder()
 			.period(inventory.getRentalPeriod())
 			.amount(inventory.getRentalAmount())
-			.rentable(inventory.getRentable())
+			.asset(inventory.getAsset())
 			.build();
 	}
 }

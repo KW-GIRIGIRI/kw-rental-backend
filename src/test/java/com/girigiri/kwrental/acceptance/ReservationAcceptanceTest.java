@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -79,7 +79,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable asset = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset asset = assetRepository.save(EquipmentFixture.create());
 		final Item item = itemRepository.save(ItemFixture.builder().assetId(asset.getId()).build());
 		final Inventory inventory = inventoryRepository.save(InventoryFixture.create(asset, member.getId()));
 
@@ -108,7 +108,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable asset = assetRepository.save(
+		final RentableAsset asset = assetRepository.save(
 			LabRoomFixture.builder().name("hanul").totalQuantity(16).rentableQuantity(16).build());
 
 		final AddLabRoomReservationRequest request = AddLabRoomReservationRequest.builder()
@@ -136,7 +136,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특정 기자재에 대여 예약된 이력을 조회한다.")
 	void getReservationsByEquipment() {
 		// given
-		final Rentable asset = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset asset = assetRepository.save(EquipmentFixture.create());
 		final Item item = itemRepository.save(ItemFixture.builder().assetId(asset.getId()).build());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(asset)
 			.period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
@@ -177,8 +177,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable asset1 = assetRepository.save(EquipmentFixture.builder().name("name1").build());
-		final Rentable asset2 = assetRepository.save(EquipmentFixture.builder().name("name2").build());
+		final RentableAsset asset1 = assetRepository.save(EquipmentFixture.builder().name("name1").build());
+		final RentableAsset asset2 = assetRepository.save(EquipmentFixture.builder().name("name2").build());
 		final Item item1 = itemRepository.save(
 			ItemFixture.builder().assetId(asset1.getId()).propertyNumber("11111111").build());
 		final Item item2 = itemRepository.save(
@@ -213,7 +213,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	void cancelReservationSpec() {
 		// given
 		final Long memberId = 1L;
-		final Rentable asset = assetRepository.save(EquipmentFixture.builder().name("name1").build());
+		final RentableAsset asset = assetRepository.save(EquipmentFixture.builder().name("name1").build());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(asset)
 			.amount(RentalAmount.ofPositive(2))
 			.build();
@@ -235,8 +235,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특절 날짜에 사용일인 랩실 대여 예약을 조회한다.")
 	void getLabRoomReservationsForAccept() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
@@ -299,8 +299,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특절 날짜에 사용일인 랩실 대여 예약을 조회한다.")
 	void getLabRoomReservationsForReturn() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 		final RentalPeriod period = new RentalPeriod(LocalDate.now().minusDays(1), LocalDate.now());
 
@@ -365,8 +365,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("saebit").build());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
 			.period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
 			.build();
@@ -395,7 +395,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("특정 랩실 대여와 동일한 기간동안 동일한 랩실을 대여 신청한 대여를 조회한다.")
 	void getRelatedReservationsInfo() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
 			.period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
 			.build();
@@ -423,7 +423,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("대여 히스토리 통계를 조회한다.")
 	void getLabRoomHistoryTotal() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
 		LocalDate now = LocalDate.now();
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
 			.period(new RentalPeriod(now, now.plusDays(1)))
@@ -458,7 +458,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("대여 목적을 조회한다.")
 	void getPurpose() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("hanul").build());
 		LocalDate now = LocalDate.now();
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
 			.period(new RentalPeriod(now, now.plusDays(1)))

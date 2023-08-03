@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -66,8 +66,8 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset labRoom = assetRepository.save(LabRoomFixture.create());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
@@ -134,7 +134,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
@@ -173,8 +173,8 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 	@DisplayName("패널티 히스토리를 조회한다.")
 	void getPenaltyHistoryPage() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset labRoom = assetRepository.save(LabRoomFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
@@ -228,7 +228,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 	@DisplayName("패널티의 기간을 수정한다.")
 	void updatePenaltyPeriod() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
@@ -269,7 +269,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 	@DisplayName("패널티를 삭제한다..")
 	void deletePenalty() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(

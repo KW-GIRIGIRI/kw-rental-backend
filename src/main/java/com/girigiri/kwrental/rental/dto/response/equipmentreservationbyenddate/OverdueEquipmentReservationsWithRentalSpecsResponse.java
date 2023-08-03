@@ -71,7 +71,7 @@ public record OverdueEquipmentReservationsWithRentalSpecsResponse(
 
 			public static OverdueEquipmentReservationSpecResponse of(final ReservationSpec reservationSpec,
 				final List<EquipmentRentalSpec> rentalSpecs) {
-				final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
+				final Equipment equipment = reservationSpec.getAsset().as(Equipment.class);
 				final List<OverdueEquipmentRentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(
 					rentalSpecs);
 				return OverdueEquipmentReservationSpecResponse.builder()

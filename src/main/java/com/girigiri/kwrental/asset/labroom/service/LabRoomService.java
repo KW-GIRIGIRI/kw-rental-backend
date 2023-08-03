@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
@@ -153,8 +152,8 @@ public class LabRoomService {
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-	public void validateDays(final Rentable rentable, final Set<LocalDate> rentalDays) {
-		List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomId(rentable.getId());
+	public void validateDays(final LabRoom labRoom, final Set<LocalDate> rentalDays) {
+		List<LabRoomDailyBan> bans = labRoomDailyBanRepository.findByLabRoomId(labRoom.getId());
 		boolean isBanned = bans.stream()
 			.anyMatch(ban -> ban.hasAny(rentalDays));
 		if (isBanned)

@@ -21,7 +21,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public List<Inventory> findAllWithEquipment(final Long memberId) {
         return jpaQueryFactory.selectFrom(inventory)
-                .join(inventory.rentable).fetchJoin()
+            .join(inventory.asset).fetchJoin()
                 .where(inventory.memberId.eq(memberId))
                 .fetch();
     }
@@ -36,8 +36,8 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public Optional<Inventory> findWithEquipmentById(final Long id) {
         return Optional.ofNullable(
-                jpaQueryFactory.selectFrom(inventory)
-                        .leftJoin(inventory.rentable).fetchJoin()
+            jpaQueryFactory.selectFrom(inventory)
+                .leftJoin(inventory.asset).fetchJoin()
                         .where(inventory.id.eq(id))
                         .fetchOne()
         );
@@ -46,8 +46,9 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public Optional<Inventory> findByPeriodAndEquipmentIdAndMemberId(final RentalPeriod rentalPeriod, final Long equipmentId, final Long memberId) {
         return Optional.ofNullable(
-                jpaQueryFactory.selectFrom(inventory)
-                        .where(inventory.memberId.eq(memberId), inventory.rentable.id.eq(equipmentId), inventory.rentalPeriod.eq(rentalPeriod))
+            jpaQueryFactory.selectFrom(inventory)
+                .where(inventory.memberId.eq(memberId), inventory.asset.id.eq(equipmentId),
+                    inventory.rentalPeriod.eq(rentalPeriod))
                         .fetchOne()
         );
     }
@@ -63,7 +64,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     @Override
     public void deleteByEquipmentId(Long assetId) {
         jpaQueryFactory.delete(inventory)
-            .where(inventory.rentable.id.eq(assetId))
+            .where(inventory.asset.id.eq(assetId))
             .execute();
     }
 }
