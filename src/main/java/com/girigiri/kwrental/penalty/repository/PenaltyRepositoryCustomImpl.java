@@ -2,7 +2,7 @@ package com.girigiri.kwrental.penalty.repository;
 
 import static com.girigiri.kwrental.asset.domain.QRentableAsset.*;
 import static com.girigiri.kwrental.penalty.domain.QPenalty.*;
-import static com.girigiri.kwrental.rental.domain.entity.QAbstractRentalSpec.*;
+import static com.girigiri.kwrental.rental.domain.entity.QRentalSpec.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservation.*;
 import static com.girigiri.kwrental.reservation.domain.entity.QReservationSpec.*;
 import static com.girigiri.kwrental.util.QueryDSLUtils.*;
@@ -47,10 +47,10 @@ public class PenaltyRepositoryCustomImpl implements PenaltyRepositoryCustom {
 			.from(penalty)
 			.join(reservationSpec).on(reservationSpec.id.eq(penalty.reservationSpecId))
 			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.asset.id))
-			.join(abstractRentalSpec).on(abstractRentalSpec.id.eq(penalty.rentalSpecId))
+			.join(rentalSpec).on(rentalSpec.id.eq(penalty.rentalSpecId))
 			.where(penalty.memberId.eq(memberId))
-			.select(Projections.constructor(UserPenaltyResponse.class, penalty.id, abstractRentalSpec.acceptDateTime,
-				abstractRentalSpec.returnDateTime, penalty.period, rentableAsset.name,
+			.select(Projections.constructor(UserPenaltyResponse.class, penalty.id, rentalSpec.acceptDateTime,
+				rentalSpec.returnDateTime, penalty.period, rentableAsset.name,
 				penalty.reason))
 			.fetch();
 		return new UserPenaltiesResponse(userPenaltyResponses);

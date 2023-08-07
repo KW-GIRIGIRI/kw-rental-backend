@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.repository.Repository;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 
-public interface RentalSpecRepository extends Repository<AbstractRentalSpec, Long>, RentalSpecRepositoryCustom {
-    <S extends AbstractRentalSpec> Iterable<S> saveAll(Iterable<S> entities);
+public interface RentalSpecRepository extends Repository<RentalSpec, Long>, RentalSpecRepositoryCustom {
+	<S extends RentalSpec> Iterable<S> saveAll(Iterable<S> entities);
 
-    Optional<AbstractRentalSpec> findById(Long id);
+	Optional<RentalSpec> findById(Long id);
 }

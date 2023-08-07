@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "asset")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class RentableAsset extends AbstractSuperEntity implements Rentable {
+public abstract class RentableAsset extends AbstractSuperEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,12 +69,10 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 		this(id, name, totalQuantity, rentableQuantity, maxRentalDays, null);
 	}
 
-	@Override
 	public boolean canRentDaysFor(final Integer rentalDays) {
 		return this.maxRentalDays.compareTo(rentalDays) >= 0;
 	}
 
-	@Override
 	public void validateAmountForRent(int amount) {
 		if (amount > rentableQuantity) {
 			throw new NotEnoughAmountException();
@@ -88,4 +86,6 @@ public abstract class RentableAsset extends AbstractSuperEntity implements Renta
 	public void delete() {
 		this.deletedAt = LocalDate.now();
 	}
+
+	public abstract Integer getRemainQuantity(int reservedCount);
 }

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
@@ -19,13 +19,13 @@ public class LabRoomRentalSpecCreator implements RentalSpecCreator<CreateLabRoom
 	private final ReservationRetrieveService reservationRetrieveService;
 
 	@Override
-	public List<AbstractRentalSpec> create(final CreateLabRoomRentalRequest rentalSpecRequest) {
+	public List<RentalSpec> create(final CreateLabRoomRentalRequest rentalSpecRequest) {
 		final Map<Long, Long> reservationIdByReservationSpecId = reservationRetrieveService.findLabRoomReservationIdsBySpecIds(
 			rentalSpecRequest.reservationSpecIds());
 		return mapToRentalSpecs(reservationIdByReservationSpecId);
 	}
 
-	private List<AbstractRentalSpec> mapToRentalSpecs(final Map<Long, Long> reservationIdByReservationSpecId) {
+	private List<RentalSpec> mapToRentalSpecs(final Map<Long, Long> reservationIdByReservationSpecId) {
 		return reservationIdByReservationSpecId.keySet()
 			.stream()
 			.map(reservationSpecId -> mapToRentalSpec(reservationIdByReservationSpecId.get(reservationSpecId),
@@ -33,7 +33,7 @@ public class LabRoomRentalSpecCreator implements RentalSpecCreator<CreateLabRoom
 			.toList();
 	}
 
-	private AbstractRentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId) {
+	private RentalSpec mapToRentalSpec(final Long reservationId, final Long reservationSpecId) {
 		return LabRoomRentalSpec.builder()
 			.reservationId(reservationId)
 			.reservationSpecId(reservationSpecId)

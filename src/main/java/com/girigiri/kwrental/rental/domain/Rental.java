@@ -18,7 +18,8 @@ public class Rental {
 	private final Map<Long, RentalSpec> rentalSpecMap;
 	private final ReservationFromRental reservationFromRental;
 
-	private Rental(final Map<Long, RentalSpec> rentalSpecMap, final ReservationFromRental reservationFromRental) {
+	private Rental(final Map<Long, RentalSpec> rentalSpecMap,
+		final ReservationFromRental reservationFromRental) {
 		this.rentalSpecMap = rentalSpecMap;
 		this.reservationFromRental = reservationFromRental;
 	}
@@ -105,6 +106,7 @@ public class Rental {
 
 	private Map<Long, List<RentalSpecStatus>> groupRentalStatusByReservationSpecId() {
 		return rentalSpecMap.values().stream()
-			.collect(groupingBy(RentalSpec::getReservationSpecId, mapping(RentalSpec::getStatus, toList())));
+			.collect(
+				groupingBy(RentalSpec::getReservationSpecId, mapping(RentalSpec::getStatus, toList())));
 	}
 }

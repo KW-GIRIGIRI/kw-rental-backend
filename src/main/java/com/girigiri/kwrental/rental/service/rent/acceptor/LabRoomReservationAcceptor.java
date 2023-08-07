@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class LabRoomReservationAcceptor implements
 	private final ReservationAcceptor reservationAcceptor;
 
 	@Override
-	public void acceptReservationsBy(final List<AbstractRentalSpec> rentalSpecs) {
+	public void acceptReservationsBy(final List<RentalSpec> rentalSpecs) {
 		rentalSpecs.forEach(rentalSpec -> reservationAcceptor.accept(rentalSpec.getReservationId(),
 			List.of(rentalSpec.getReservationSpecId())));
 	}

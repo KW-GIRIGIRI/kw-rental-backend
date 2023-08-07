@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
 import com.girigiri.kwrental.rental.service.rent.acceptor.EquipmentReservationAcceptor;
@@ -45,7 +45,7 @@ public class RentalRentService {
 	private <T> void rent(final T request, final RentValidator<T> rentValidator, final RentalSpecCreator<T> creator,
 		final ReservationAcceptor acceptor) {
 		rentValidator.validate(request);
-		final List<AbstractRentalSpec> rentalSpecs = creator.create(request);
+		final List<RentalSpec> rentalSpecs = creator.create(request);
 		rentalSpecRepository.saveAll(rentalSpecs);
 		acceptor.acceptReservationsBy(rentalSpecs);
 	}

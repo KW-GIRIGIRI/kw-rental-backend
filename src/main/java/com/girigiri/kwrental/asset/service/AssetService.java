@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.dto.response.RemainQuantityPerDateResponse;
 import com.girigiri.kwrental.asset.exception.AssetNotFoundException;
@@ -24,7 +24,8 @@ public class AssetService {
         this.assetRepository = assetRepository;
     }
 
-    public RemainQuantitiesPerDateResponse getReservableCountPerDate(final Map<LocalDate, Integer> reservedAmounts, final Rentable rentable) {
+    public RemainQuantitiesPerDateResponse getReservableCountPerDate(final Map<LocalDate, Integer> reservedAmounts,
+        final RentableAsset rentable) {
         final List<RemainQuantityPerDateResponse> remainQuantityPerDateResponses = reservedAmounts.keySet().stream()
             .map(date -> new RemainQuantityPerDateResponse(date, rentable.getRemainQuantity(reservedAmounts.get(date))))
             .sorted(Comparator.comparing(RemainQuantityPerDateResponse::getDate))
@@ -33,13 +34,7 @@ public class AssetService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Rentable getRentableByName(final String name) {
-        return assetRepository.findByName(name)
-            .orElseThrow(AssetNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public Rentable getRentableById(final Long id) {
+    public RentableAsset getAssetById(final Long id) {
         return assetRepository.findById(id)
             .orElseThrow(AssetNotFoundException::new);
     }

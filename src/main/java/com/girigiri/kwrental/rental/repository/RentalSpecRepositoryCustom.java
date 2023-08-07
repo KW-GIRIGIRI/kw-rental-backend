@@ -8,8 +8,8 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.LabRoomRentalDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomReservationResponse;
@@ -20,7 +20,7 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 public interface RentalSpecRepositoryCustom {
 	List<EquipmentRentalSpec> findByPropertyNumbers(Set<String> propertyNumbers);
 
-	List<AbstractRentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
+	List<RentalSpec> findByReservationSpecIds(Set<Long> reservationSpecIds);
 
 	Set<EquipmentRentalSpec> findRentedRentalSpecsByAssetId(Long equipmentId, LocalDateTime date);
 
@@ -42,7 +42,7 @@ public interface RentalSpecRepositoryCustom {
 
 	void updatePropertyNumber(String from, String to);
 
-	List<AbstractRentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
+	List<RentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
 
 	List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(String propertyNumber);
 

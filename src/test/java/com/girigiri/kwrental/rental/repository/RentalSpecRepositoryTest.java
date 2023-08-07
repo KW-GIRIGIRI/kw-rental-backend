@@ -20,9 +20,9 @@ import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto.EquipmentRentalSpecDto;
 import com.girigiri.kwrental.rental.dto.response.LabRoomRentalsDto.LabRoomRentalDto;
@@ -451,7 +451,7 @@ class RentalSpecRepositoryTest {
 		rentalSpecRepository.saveAll(List.of(spec1, spec2, spec3));
 
 		// when
-		List<AbstractRentalSpec> actual = rentalSpecRepository.findRentedRentalSpecsByAssetId(
+		List<RentalSpec> actual = rentalSpecRepository.findRentedRentalSpecsByAssetId(
 			asset1.getId());
 
 		// then

@@ -9,14 +9,14 @@ import lombok.Builder;
 
 @Entity
 @DiscriminatorValue("lab_room")
-public class LabRoomRentalSpec extends AbstractRentalSpec implements RentalSpec {
+public class LabRoomRentalSpec extends RentalSpec {
 
     protected LabRoomRentalSpec() {
     }
 
     @Builder
     private LabRoomRentalSpec(final Long id, final Long reservationSpecId, final Long reservationId,
-                              final RentalSpecStatus status, final RentalDateTime acceptDateTime, final RentalDateTime returnDateTime) {
+        final RentalSpecStatus status, final RentalDateTime acceptDateTime, final RentalDateTime returnDateTime) {
         super(id, reservationSpecId, reservationId, status, acceptDateTime, returnDateTime);
     }
 }

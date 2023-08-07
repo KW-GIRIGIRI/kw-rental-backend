@@ -32,9 +32,9 @@ import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.rental.dto.request.RestoreEquipmentRentalRequest;
@@ -589,7 +589,7 @@ class RentalAcceptanceTest extends AcceptanceTest {
 		// then
 		final Reservation actualReservation = reservationRepository.findByIdWithSpecs(reservation1.getId())
 			.orElseThrow();
-		final AbstractRentalSpec actualRentalSpec = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
+		final RentalSpec actualRentalSpec = rentalSpecRepository.findById(rentalSpec.getId()).orElseThrow();
 		assertAll(
 			() -> assertThat(actualReservation.getReservationSpecs().get(0).getStatus()).isEqualTo(
 				ReservationSpecStatus.RETURNED),
