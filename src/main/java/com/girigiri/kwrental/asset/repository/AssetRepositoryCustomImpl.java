@@ -6,13 +6,12 @@ import java.time.LocalDate;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class AssetRepositoryCustomImpl implements AssetRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-
-	public AssetRepositoryCustomImpl(JPAQueryFactory queryFactory) {
-		this.queryFactory = queryFactory;
-	}
 
 	@Override
 	public void deleteById(final Long id) {

@@ -52,7 +52,7 @@ class AdminEquipmentControllerTest extends ControllerTest {
         // given
         long size = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
+        given(equipmentViewService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
 
         // when, then
         mockMvc.perform(get(PREFIX + "?size=" + size))
@@ -66,7 +66,7 @@ class AdminEquipmentControllerTest extends ControllerTest {
         // given
         long page = -1;
         final PageRequest expectPageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
-        given(equipmentService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
+        given(equipmentViewService.findEquipments(eq(expectPageRequest), any())).willReturn(Page.empty());
 
         // when, then
         mockMvc.perform(get(PREFIX + "?page=" + page))
@@ -103,13 +103,13 @@ class AdminEquipmentControllerTest extends ControllerTest {
     void getEquipments_400_sortNotMatch() throws Exception {
         // given
         String sort = "notExistsSort";
-        given(equipmentService.findEquipments(any(), any())).willThrow(
-                TransientDataAccessResourceException.class);
+        given(equipmentViewService.findEquipments(any(), any())).willThrow(
+            TransientDataAccessResourceException.class);
 
         // when, then
         mockMvc.perform(get(PREFIX + "?sort=" + sort))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+            .andDo(print())
+            .andExpect(status().isBadRequest());
     }
 
     @Test

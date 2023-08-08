@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentViewService;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomRemainQuantityService;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
 import com.girigiri.kwrental.asset.service.AssetService;
@@ -93,4 +94,6 @@ public abstract class ControllerTest {
 	protected MemberNumberRetrieveService memberNumberRetrieveService;
 	@MockBean
 	protected LabRoomRemainQuantityService labRoomRemainQuantityService;
+	@MockBean
+	protected EquipmentViewService equipmentViewService;
 }

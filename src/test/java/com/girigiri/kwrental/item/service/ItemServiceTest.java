@@ -25,7 +25,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.equipment.domain.Category;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentAdjuster;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentValidator;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
@@ -43,16 +44,15 @@ import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 class ItemServiceTest {
 
 	@Mock
-	ItemRepository itemRepository;
-
+	private ItemRepository itemRepository;
 	@Mock
-	EquipmentService equipmentService;
-
+	private EquipmentValidator equipmentValidator;
 	@Mock
-	RentedItemService rentedItemService;
-
+	private EquipmentAdjuster equipmentAdjuster;
+	@Mock
+	private RentedItemService rentedItemService;
 	@InjectMocks
-	ItemService itemService;
+	private ItemService itemService;
 
 	@Test
 	@DisplayName("품목 조회")
@@ -125,7 +125,7 @@ class ItemServiceTest {
 		given(itemRepository.saveAll(any())).willReturn(1);
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem));
-		doNothing().when(equipmentService).adjustWhenItemSaved(1, equipmentId);
+		doNothing().when(equipmentAdjuster).adjustWhenItemSaved(1, equipmentId);
 
 		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
@@ -154,7 +154,7 @@ class ItemServiceTest {
 		given(itemRepository.saveAll(any())).willReturn(1);
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem, itemForDelete));
-		doNothing().when(equipmentService).adjustWhenItemSaved(1, equipmentId);
+		doNothing().when(equipmentAdjuster).adjustWhenItemSaved(1, equipmentId);
 
 		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
@@ -162,7 +162,7 @@ class ItemServiceTest {
 
 		given(itemRepository.deleteByPropertyNumbers(List.of(itemForDelete.getPropertyNumber()))).willReturn(1);
 		given(itemRepository.updateAvailable(List.of(itemForDelete.getId()), false)).willReturn(1);
-		doNothing().when(equipmentService).adjustWhenItemDeleted(1, -1, equipmentId);
+		doNothing().when(equipmentAdjuster).adjustWhenItemDeleted(1, -1, equipmentId);
 
 		// when
 		ItemsResponse itemsResponse = itemService.saveOrUpdate(equipmentId, updateItemsRequest);
@@ -200,7 +200,7 @@ class ItemServiceTest {
 	@DisplayName("대여 가능한 품목을 조회한다.")
 	void getRentalAvailableItems() {
 		// given
-		doNothing().when(equipmentService).validateExistsById(anyLong());
+		doNothing().when(equipmentValidator).validateExistsById(anyLong());
 		given(rentedItemService.getRentedPropertyNumbers(anyLong(), any())).willReturn(Set.of("11111111"));
 		final Item item1 = ItemFixture.builder().id(1L).propertyNumber("11111111").available(true).build();
 		final Item item2 = ItemFixture.builder().id(2L).propertyNumber("22222222").available(true).build();

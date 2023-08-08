@@ -4,13 +4,12 @@ import static com.girigiri.kwrental.asset.labroom.domain.QLabRoom.*;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class LabRoomRepositoryCustomImpl implements LabRoomRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
-    public LabRoomRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
 
     @Override
     public void updateNotice(Long id, String content) {

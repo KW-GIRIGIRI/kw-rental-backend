@@ -12,13 +12,12 @@ import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class EquipmentRepositoryCustomImpl implements EquipmentRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-
-	public EquipmentRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
-		this.queryFactory = queryFactory;
-	}
 
 	@Override
 	public Page<Equipment> findEquipmentBy(final Pageable pageable, final String keyword, final Category category) {

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentValidator;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InventoryService {
 
-    private final EquipmentService equipmentService;
+    private final EquipmentValidator equipmentValidator;
     private final RemainQuantityValidator remainQuantityValidator;
     private final InventoryRepository inventoryRepository;
 
@@ -37,7 +37,7 @@ public class InventoryService {
         final Long equipmentId = addInventoryRequest.getEquipmentId();
         final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(rentalPeriod, equipmentId, memberId);
         if (foundInventory.isEmpty()) {
-            final Equipment equipment = equipmentService.validateRentalDays(equipmentId,
+            final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
                 rentalPeriod.getRentalDayCount());
             remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
             final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));

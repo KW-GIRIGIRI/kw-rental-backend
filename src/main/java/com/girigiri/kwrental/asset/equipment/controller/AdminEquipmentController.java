@@ -33,79 +33,81 @@ import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentPageResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.asset.equipment.exception.EquipmentException;
 import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentViewService;
 import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.util.EndPointUtils;
 
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 
-@RestController
 @Validated
+@RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin/equipments")
 public class AdminEquipmentController {
 
-    private final EquipmentService equipmentService;
+	private final EquipmentService equipmentService;
+	private final MultiPartFileHandler multiPartFileHandler;
+	private final EquipmentViewService equipmentViewService;
 
-    private final MultiPartFileHandler multiPartFileHandler;
+	@GetMapping
+	public EquipmentPageResponse getEquipments(@Validated EquipmentSearchCondition searchCondition,
+		@PageableDefault(sort = {"id"}, direction = Direction.DESC)
+		Pageable pageable) {
+		final Page<SimpleEquipmentResponse> page = equipmentViewService.findEquipments(pageable, searchCondition);
 
-    public AdminEquipmentController(final EquipmentService equipmentService, MultiPartFileHandler multiPartFileHandler) {
-        this.equipmentService = equipmentService;
-        this.multiPartFileHandler = multiPartFileHandler;
-    }
+		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
 
-    @GetMapping
-    public EquipmentPageResponse getEquipments(@Validated EquipmentSearchCondition searchCondition,
-                                               @PageableDefault(sort = {"id"}, direction = Direction.DESC)
-                                               Pageable pageable) {
-        final Page<SimpleEquipmentResponse> page = equipmentService.findEquipments(pageable, searchCondition);
+		return EquipmentPageResponse.builder()
+			.endPoints(allPageEndPoints)
+			.page(pageable.getPageNumber())
+			.items(page.getContent())
+			.build();
+	}
 
-        final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+	@PostMapping
+	public ResponseEntity<?> saveEquipment(
+		@RequestBody @Validated final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+		validateTotalQuantity(addEquipmentWithItemsRequest);
+		final Long equipmentId = equipmentService.saveEquipment(addEquipmentWithItemsRequest);
+		return ResponseEntity.created(URI.create("/api/equipments/" + equipmentId)).build();
+	}
 
-        return EquipmentPageResponse.builder()
-                .endPoints(allPageEndPoints)
-                .page(pageable.getPageNumber())
-                .items(page.getContent())
-                .build();
-    }
+	private void validateTotalQuantity(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
+		if (addEquipmentWithItemsRequest.items().size() != addEquipmentWithItemsRequest.equipment()
+			.totalQuantity()) {
+			throw new EquipmentException("품목 갯수와 기자재의 총 갯수가 맞지 않습니다.");
+		}
+	}
 
-    @PostMapping
-    public ResponseEntity<?> saveEquipment(
-            @RequestBody @Validated final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
-        validateTotalQuantity(addEquipmentWithItemsRequest);
-        final Long equipmentId = equipmentService.saveEquipment(addEquipmentWithItemsRequest);
-        return ResponseEntity.created(URI.create("/api/equipments/" + equipmentId)).build();
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteEquipment(@PathVariable @Positive Long id) {
+		equipmentService.deleteEquipment(id);
+		return ResponseEntity.noContent().build();
+	}
 
-    private void validateTotalQuantity(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
-        if (addEquipmentWithItemsRequest.items().size() != addEquipmentWithItemsRequest.equipment()
-                .getTotalQuantity()) {
-            throw new EquipmentException("품목 갯수와 기자재의 총 갯수가 맞지 않습니다.");
-        }
-    }
+	@PostMapping("/images")
+	public ResponseEntity<?> uploadImage(@RequestPart("file") final MultipartFile multipartFile) throws
+		IOException,
+		URISyntaxException {
+		URL url = multiPartFileHandler.upload(multipartFile);
+		return ResponseEntity.noContent()
+			.location(url.toURI())
+			.build();
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEquipment(@PathVariable @Positive Long id) {
-        equipmentService.deleteEquipment(id);
-        return ResponseEntity.noContent().build();
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<?> update(@PathVariable final Long id,
+		@Validated @RequestBody final UpdateEquipmentRequest updateEquipmentRequest) {
+		EquipmentDetailResponse updatedResponse = equipmentService.update(id, updateEquipmentRequest);
+		return ResponseEntity.noContent()
+			.location(URI.create("/api/equipments/" + updatedResponse.id()))
+			.build();
+	}
 
-    @PostMapping("/images")
-    public ResponseEntity<?> uploadImage(@RequestPart("file") final MultipartFile multipartFile) throws IOException, URISyntaxException {
-        URL url = multiPartFileHandler.upload(multipartFile);
-        return ResponseEntity.noContent()
-                .location(url.toURI())
-                .build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable final Long id, @Validated @RequestBody final UpdateEquipmentRequest updateEquipmentRequest) {
-        EquipmentDetailResponse updatedResponse = equipmentService.update(id, updateEquipmentRequest);
-        return ResponseEntity.noContent()
-                .location(URI.create("/api/equipments/" + updatedResponse.id()))
-                .build();
-    }
-
-    @GetMapping("/{id}/remainQuantities")
-    public RemainQuantitiesPerDateResponse getRemainQuantitiesBetween(@PathVariable final Long id, final LocalDate from, final LocalDate to) {
-        return equipmentService.getRemainQuantitiesPerDate(id, from, to);
-    }
+	@GetMapping("/{id}/remainQuantities")
+	public RemainQuantitiesPerDateResponse getRemainQuantitiesBetween(@PathVariable final Long id, final LocalDate from,
+		final LocalDate to) {
+		return equipmentViewService.getRemainQuantitiesPerDate(id, from, to);
+	}
 }

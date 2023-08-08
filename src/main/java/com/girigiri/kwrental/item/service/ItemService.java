@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.equipment.domain.Category;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentAdjuster;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentValidator;
 import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.domain.ItemsPerEquipments;
@@ -30,23 +31,20 @@ import com.girigiri.kwrental.item.exception.ItemNotFoundException;
 import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ItemService {
 
 	private final ItemRepository itemRepository;
-	private final EquipmentService equipmentService;
+	private final EquipmentValidator equipmentValidator;
+	private final EquipmentAdjuster equipmentAdjuster;
 	private final RentedItemService rentedItemService;
-
-	public ItemService(final ItemRepository itemRepository, final EquipmentService equipmentService,
-		final RentedItemService rentedItemService) {
-		this.itemRepository = itemRepository;
-		this.equipmentService = equipmentService;
-		this.rentedItemService = rentedItemService;
-	}
 
 	@Transactional(readOnly = true)
 	public ItemsResponse getItems(final Long equipmentId) {
-		equipmentService.validateExistsById(equipmentId);
+		equipmentValidator.validateExistsById(equipmentId);
 		final List<Item> items = itemRepository.findByAssetId(equipmentId);
 		return ItemsResponse.of(items);
 	}
@@ -67,7 +65,7 @@ public class ItemService {
 	private void updateAvailableAndAdjustEquipment(final boolean available, final Item item) {
 		int operand = getOperandOfRentableQuantity(item, available);
 		item.setAvailable(available);
-		equipmentService.adjustRentableQuantity(item.getAssetId(), operand);
+		equipmentAdjuster.adjustRentableQuantity(item.getAssetId(), operand);
 	}
 
 	private int getOperandOfRentableQuantity(final Item item, final boolean rentalAvailable) {
@@ -93,8 +91,8 @@ public class ItemService {
 		Item item = itemRepository.findById(id).orElseThrow(ItemNotFoundException::new);
 		rentedItemService.validateNotRentedByPropertyNumber(item.getPropertyNumber());
 		int deletedCount = itemRepository.deleteById(id);
-		equipmentService.adjustWhenItemDeleted(deletedCount, getOperandOfRentableQuantity(item, false),
-			item.getAssetId());
+		final int operandOfRentableQuantity = getOperandOfRentableQuantity(item, false);
+		equipmentAdjuster.adjustWhenItemDeleted(deletedCount, operandOfRentableQuantity, item.getAssetId());
 		item.setAvailable(false);
 	}
 
@@ -115,7 +113,7 @@ public class ItemService {
 			return;
 		List<Item> itemsToSave = saveItemRequests.stream().map(it -> mapToItem(equipmentId, it)).toList();
 		itemRepository.saveAll(itemsToSave);
-		equipmentService.adjustWhenItemSaved(itemsToSave.size(), equipmentId);
+		equipmentAdjuster.adjustWhenItemSaved(itemsToSave.size(), equipmentId);
 	}
 
 	private EquipmentItems getEquipmentItems(final Long equipmentId) {
@@ -144,7 +142,7 @@ public class ItemService {
 			.mapToInt(item -> getOperandOfRentableQuantity(item, false))
 			.sum();
 		itemRepository.updateAvailable(itemToRemove.stream().map(Item::getId).toList(), false);
-		equipmentService.adjustWhenItemDeleted(deletedCount, operandSumOfRentableQuantity, equipmentId);
+		equipmentAdjuster.adjustWhenItemDeleted(deletedCount, operandSumOfRentableQuantity, equipmentId);
 		equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
 	}
 
@@ -179,14 +177,16 @@ public class ItemService {
 		final Set<Long> equipmentIds = propertyNumbersPerEquipmentId.keySet();
 		List<Item> itemsByEquipmentIds = itemRepository.findByEquipmentIds(equipmentIds);
 		ItemsPerEquipments items = ItemsPerEquipments.from(itemsByEquipmentIds);
-		for (Long equipmentId : propertyNumbersPerEquipmentId.keySet()) {
-			items.validatePropertyNumbersAvailable(equipmentId, propertyNumbersPerEquipmentId.get(equipmentId));
+		for (final Map.Entry<Long, Set<String>> propertyNumbersByEquipmentId : propertyNumbersPerEquipmentId.entrySet()) {
+			final Long equipmentId = propertyNumbersByEquipmentId.getKey();
+			final Set<String> propertyNumbers = propertyNumbersByEquipmentId.getValue();
+			items.validatePropertyNumbersAvailable(equipmentId, propertyNumbers);
 		}
 	}
 
 	@Transactional(readOnly = true)
 	public ItemsResponse getRentalAvailableItems(final Long equipmentId) {
-		equipmentService.validateExistsById(equipmentId);
+		equipmentValidator.validateExistsById(equipmentId);
 		final Set<String> rentedPropertyNumbers = rentedItemService.getRentedPropertyNumbers(equipmentId,
 			LocalDateTime.now());
 		final List<Item> items = itemRepository.findByAssetId(equipmentId);
@@ -238,7 +238,7 @@ public class ItemService {
 		rentedItemService.validateNotRentedByAssetId(assetId);
 		int updatedNotAvailableCount = setAvailableByAssetId(assetId, false);
 		int deletedCount = itemRepository.deleteByAssetId(assetId);
-		equipmentService.adjustWhenItemDeleted(deletedCount, -updatedNotAvailableCount, assetId);
+		equipmentAdjuster.adjustWhenItemDeleted(deletedCount, -updatedNotAvailableCount, assetId);
 	}
 
 	private int setAvailableByAssetId(Long assetId, boolean available) {

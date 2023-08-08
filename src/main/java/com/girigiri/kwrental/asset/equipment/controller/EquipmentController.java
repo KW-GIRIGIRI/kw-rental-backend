@@ -16,38 +16,37 @@ import com.girigiri.kwrental.asset.equipment.dto.request.EquipmentSearchConditio
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentsWithRentalQuantityPageResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
+import com.girigiri.kwrental.asset.equipment.service.EquipmentViewService;
 import com.girigiri.kwrental.util.EndPointUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/equipments")
 public class EquipmentController {
 
-    private final EquipmentService equipmentService;
+	private final EquipmentViewService equipmentViewService;
 
-    public EquipmentController(final EquipmentService equipmentService) {
-        this.equipmentService = equipmentService;
-    }
+	@GetMapping("/{id}")
+	public EquipmentDetailResponse getEquipment(@PathVariable final Long id) {
+		return equipmentViewService.findById(id);
+	}
 
-    @GetMapping("/{id}")
-    public EquipmentDetailResponse getEquipment(@PathVariable final Long id) {
-        return equipmentService.findById(id);
-    }
+	@GetMapping
+	public EquipmentsWithRentalQuantityPageResponse getEquipmentsPage(
+		@Validated EquipmentSearchCondition searchCondition,
+		@PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable) {
+		final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentViewService.findEquipmentsWithRentalQuantityBy(
+			pageable,
+			searchCondition);
 
-    @GetMapping
-    public EquipmentsWithRentalQuantityPageResponse getEquipmentsPage(
-            @Validated EquipmentSearchCondition searchCondition,
-            @PageableDefault(sort = {"id"}, direction = Direction.DESC) Pageable pageable) {
-        final Page<SimpleEquipmentWithRentalQuantityResponse> page = equipmentService.findEquipmentsWithRentalQuantityBy(
-                pageable,
-                searchCondition);
+		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
 
-        final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
-
-        return EquipmentsWithRentalQuantityPageResponse.builder()
-                .endPoints(allPageEndPoints)
-                .page(pageable.getPageNumber())
-                .items(page.getContent())
-                .build();
-    }
+		return EquipmentsWithRentalQuantityPageResponse.builder()
+			.endPoints(allPageEndPoints)
+			.page(pageable.getPageNumber())
+			.items(page.getContent())
+			.build();
+	}
 }

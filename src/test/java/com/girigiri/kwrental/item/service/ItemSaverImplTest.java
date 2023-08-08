@@ -16,26 +16,26 @@ import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 
 @ExtendWith(MockitoExtension.class)
-class SaveItemServiceImplTest {
+class ItemSaverImplTest {
 
-    @Mock
-    private ItemRepository itemRepository;
+	@Mock
+	private ItemRepository itemRepository;
 
-    @InjectMocks
-    private SaveItemServiceImpl saveItemService;
+	@InjectMocks
+	private ItemSaverImpl saveItemService;
 
-    @Test
-    @DisplayName("품목 Bulk Update")
-    void saveItems() {
-        // given
-        given(itemRepository.saveAll(any()))
-                .willReturn(1);
-        final AddItemRequest addItemRequest = new AddItemRequest("12345678");
+	@Test
+	@DisplayName("품목 Bulk Update")
+	void saveItems() {
+		// given
+		given(itemRepository.saveAll(any()))
+			.willReturn(1);
+		final AddItemRequest addItemRequest = new AddItemRequest("12345678");
 
-        // when
-        saveItemService.saveItems(1L, List.of(addItemRequest));
+		// when
+		saveItemService.saveItems(1L, List.of(addItemRequest));
 
-        // then
-        verify(itemRepository).saveAll(any());
-    }
+		// then
+		verify(itemRepository).saveAll(any());
+	}
 }
