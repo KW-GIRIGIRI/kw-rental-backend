@@ -33,24 +33,31 @@ public class InventoryService {
 
 	@Transactional
 	public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
+		final Optional<Inventory> alreadyExistsInventory = findAlreadyExistsInventory(memberId, addInventoryRequest);
+		if (alreadyExistsInventory.isEmpty()) {
+			return createAndSave(memberId, addInventoryRequest).getId();
+		}
+		final Inventory inventory = alreadyExistsInventory.get();
+		updateAmount(addInventoryRequest, inventory);
+		return inventory.getId();
+	}
+
+	private Optional<Inventory> findAlreadyExistsInventory(final Long memberId,
+		final AddInventoryRequest addInventoryRequest) {
 		final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.rentalStartDate(),
 			addInventoryRequest.rentalEndDate());
 		final Long equipmentId = addInventoryRequest.equipmentId();
-		final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(
-			rentalPeriod, equipmentId, memberId);
-		if (foundInventory.isEmpty()) {
-			final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
-				rentalPeriod.getRentalDayCount());
-			remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.amount(), rentalPeriod);
-			final Inventory inventory = inventoryRepository.save(
-				mapToInventory(memberId, equipment, addInventoryRequest));
-			return inventory.getId();
-		}
-		final Inventory inventory = foundInventory.get();
-		final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.amount();
-		remainQuantityValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
-		inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
-		return inventory.getId();
+		return inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(rentalPeriod, equipmentId, memberId);
+	}
+
+	private Inventory createAndSave(final Long memberId, final AddInventoryRequest addInventoryRequest) {
+		final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate());
+		final Long equipmentId = addInventoryRequest.equipmentId();
+		final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
+			rentalPeriod.getRentalDayCount());
+		remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.amount(), rentalPeriod);
+		return inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
 	}
 
 	private Inventory mapToInventory(final Long memberId, final Equipment equipment,
@@ -63,6 +70,13 @@ public class InventoryService {
 			.rentalAmount(RentalAmount.ofPositive(addInventoryRequest.amount()))
 			.memberId(memberId)
 			.build();
+	}
+
+	private void updateAmount(final AddInventoryRequest addInventoryRequest, final Inventory inventory) {
+		final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.amount();
+		remainQuantityValidator.validateAmount(addInventoryRequest.equipmentId(), updatedAmount,
+			inventory.getRentalPeriod());
+		inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
 	}
 
 	@Transactional(readOnly = true)

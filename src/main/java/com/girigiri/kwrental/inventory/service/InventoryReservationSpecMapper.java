@@ -13,12 +13,12 @@ import com.girigiri.kwrental.reservation.service.reserve.creator.ReservationSpec
 import lombok.RequiredArgsConstructor;
 
 @Component
+@Transactional(propagation = Propagation.MANDATORY)
 @RequiredArgsConstructor
 public class InventoryReservationSpecMapper implements ReservationSpecMapper {
 	private final InventoryService inventoryService;
 
 	@Override
-	@Transactional(propagation = Propagation.MANDATORY)
 	public List<ReservationSpec> map(final Long memberId) {
 		final List<Inventory> inventories = inventoryService.getInventoriesWithEquipment(memberId);
 		inventoryService.deleteAll(memberId);

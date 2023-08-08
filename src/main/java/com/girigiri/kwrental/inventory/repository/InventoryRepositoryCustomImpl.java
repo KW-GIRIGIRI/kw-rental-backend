@@ -10,27 +10,26 @@ import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    public InventoryRepositoryCustomImpl(final JPAQueryFactory jpaQueryFactory) {
-        this.jpaQueryFactory = jpaQueryFactory;
-    }
 
     @Override
     public List<Inventory> findAllWithEquipment(final Long memberId) {
         return jpaQueryFactory.selectFrom(inventory)
             .join(inventory.asset).fetchJoin()
-                .where(inventory.memberId.eq(memberId))
-                .fetch();
+            .where(inventory.memberId.eq(memberId))
+            .fetch();
     }
 
     @Override
     public int deleteAll(final Long memberId) {
-        return (int) jpaQueryFactory.delete(inventory)
-                .where(inventory.memberId.eq(memberId))
-                .execute();
+        return (int)jpaQueryFactory.delete(inventory)
+            .where(inventory.memberId.eq(memberId))
+            .execute();
     }
 
     @Override
@@ -38,8 +37,8 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
         return Optional.ofNullable(
             jpaQueryFactory.selectFrom(inventory)
                 .leftJoin(inventory.asset).fetchJoin()
-                        .where(inventory.id.eq(id))
-                        .fetchOne()
+                .where(inventory.id.eq(id))
+                .fetchOne()
         );
     }
 
@@ -49,7 +48,7 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
             jpaQueryFactory.selectFrom(inventory)
                 .where(inventory.memberId.eq(memberId), inventory.asset.id.eq(equipmentId),
                     inventory.rentalPeriod.eq(rentalPeriod))
-                        .fetchOne()
+                .fetchOne()
         );
     }
 
