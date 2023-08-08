@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.labroom.repository;
+package com.girigiri.kwrental.asset.labroom.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
-import com.girigiri.kwrental.asset.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomDailyBanFixture;
 

@@ -31,7 +31,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
-public class LabRoomAcceptanceTest extends AcceptanceTest {
+class LabRoomAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
 	private LabRoomRepository labRoomRepository;
@@ -161,7 +161,7 @@ public class LabRoomAcceptanceTest extends AcceptanceTest {
 			.extract().as(LabRoomNoticeResponse.class);
 
 		// then
-		assertThat(response.getNotice()).isEqualTo(hanul.getNotice());
+		assertThat(response.notice()).isEqualTo(hanul.getNotice());
 	}
 
 	@Test
