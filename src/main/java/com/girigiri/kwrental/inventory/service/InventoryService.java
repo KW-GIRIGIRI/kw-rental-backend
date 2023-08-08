@@ -13,7 +13,7 @@ import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
-import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse.InventoryResponse;
 import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
@@ -27,87 +27,92 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InventoryService {
 
-    private final EquipmentValidator equipmentValidator;
-    private final RemainQuantityValidator remainQuantityValidator;
-    private final InventoryRepository inventoryRepository;
+	private final EquipmentValidator equipmentValidator;
+	private final RemainQuantityValidator remainQuantityValidator;
+	private final InventoryRepository inventoryRepository;
 
-    @Transactional
-    public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
-        final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
-        final Long equipmentId = addInventoryRequest.getEquipmentId();
-        final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(rentalPeriod, equipmentId, memberId);
-        if (foundInventory.isEmpty()) {
-            final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
-                rentalPeriod.getRentalDayCount());
-            remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.getAmount(), rentalPeriod);
-            final Inventory inventory = inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
-            return inventory.getId();
-        }
-        final Inventory inventory = foundInventory.get();
-        final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.getAmount();
-        remainQuantityValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
-        inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
-        return inventory.getId();
-    }
+	@Transactional
+	public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
+		final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate());
+		final Long equipmentId = addInventoryRequest.equipmentId();
+		final Optional<Inventory> foundInventory = inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(
+			rentalPeriod, equipmentId, memberId);
+		if (foundInventory.isEmpty()) {
+			final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
+				rentalPeriod.getRentalDayCount());
+			remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.amount(), rentalPeriod);
+			final Inventory inventory = inventoryRepository.save(
+				mapToInventory(memberId, equipment, addInventoryRequest));
+			return inventory.getId();
+		}
+		final Inventory inventory = foundInventory.get();
+		final int updatedAmount = inventory.getRentalAmount().getAmount() + addInventoryRequest.amount();
+		remainQuantityValidator.validateAmount(equipmentId, updatedAmount, inventory.getRentalPeriod());
+		inventoryRepository.updateAmount(inventory.getId(), RentalAmount.ofPositive(updatedAmount));
+		return inventory.getId();
+	}
 
-    private Inventory mapToInventory(final Long memberId, final Equipment equipment, final AddInventoryRequest addInventoryRequest) {
-        final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.getRentalStartDate(), addInventoryRequest.getRentalEndDate());
-        return Inventory.builder()
-            .asset(equipment)
-                .rentalPeriod(rentalPeriod)
-                .rentalAmount(RentalAmount.ofPositive(addInventoryRequest.getAmount()))
-                .memberId(memberId)
-                .build();
-    }
+	private Inventory mapToInventory(final Long memberId, final Equipment equipment,
+		final AddInventoryRequest addInventoryRequest) {
+		final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate());
+		return Inventory.builder()
+			.asset(equipment)
+			.rentalPeriod(rentalPeriod)
+			.rentalAmount(RentalAmount.ofPositive(addInventoryRequest.amount()))
+			.memberId(memberId)
+			.build();
+	}
 
-    @Transactional(readOnly = true)
-    public InventoriesResponse getInventories(final Long memberId) {
-        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
-        return InventoriesResponse.from(inventories);
-    }
+	@Transactional(readOnly = true)
+	public InventoriesResponse getInventories(final Long memberId) {
+		final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
+		return InventoriesResponse.from(inventories);
+	}
 
-    @Transactional
-    public void deleteAll(final Long memberId) {
-        inventoryRepository.deleteAll(memberId);
-    }
+	@Transactional
+	public void deleteAll(final Long memberId) {
+		inventoryRepository.deleteAll(memberId);
+	}
 
-    @Transactional
-    public void deleteById(final Long memberId, final Long id) {
-        final Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(InventoryNotFoundException::new);
-        validateInventoryMemberId(memberId, inventory);
-        inventoryRepository.deleteById(id);
-    }
+	@Transactional
+	public void deleteById(final Long memberId, final Long id) {
+		final Inventory inventory = inventoryRepository.findById(id)
+			.orElseThrow(InventoryNotFoundException::new);
+		validateInventoryMemberId(memberId, inventory);
+		inventoryRepository.deleteById(id);
+	}
 
-    private void validateInventoryMemberId(final Long memberId, final Inventory inventory) {
-        if (!inventory.hasMemberId(memberId)) {
-            throw new InventoryInvalidAccessException();
-        }
-    }
+	private void validateInventoryMemberId(final Long memberId, final Inventory inventory) {
+		if (!inventory.hasMemberId(memberId)) {
+			throw new InventoryInvalidAccessException();
+		}
+	}
 
-    @Transactional
-    public InventoryResponse update(final Long memberId, final Long id, final UpdateInventoryRequest request) {
-        final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
-                .orElseThrow(InventoryNotFoundException::new);
-        validateInventoryMemberId(memberId, inventory);
-        remainQuantityValidator.validateAmount(inventory.getAsset().getId(), request.getAmount(),
-            new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
-        inventory.setRentalAmount(RentalAmount.ofPositive(request.getAmount()));
-        inventory.setRentalPeriod(new RentalPeriod(request.getRentalStartDate(), request.getRentalEndDate()));
-        return InventoryResponse.from(inventory);
-    }
+	@Transactional
+	public InventoryResponse update(final Long memberId, final Long id, final UpdateInventoryRequest request) {
+		final Inventory inventory = inventoryRepository.findWithEquipmentById(id)
+			.orElseThrow(InventoryNotFoundException::new);
+		validateInventoryMemberId(memberId, inventory);
+		remainQuantityValidator.validateAmount(inventory.getAsset().getId(), request.amount(),
+			new RentalPeriod(request.rentalStartDate(), request.rentalEndDate()));
+		inventory.setRentalAmount(RentalAmount.ofPositive(request.amount()));
+		inventory.setRentalPeriod(new RentalPeriod(request.rentalStartDate(), request.rentalEndDate()));
+		return InventoryResponse.from(inventory);
+	}
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-    public List<Inventory> getInventoriesWithEquipment(final Long memberId) {
-        final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
-        if (inventories.isEmpty()) {
-            throw new InventoryNotFoundException();
-        }
-        return inventories;
-    }
+	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+	public List<Inventory> getInventoriesWithEquipment(final Long memberId) {
+		final List<Inventory> inventories = inventoryRepository.findAllWithEquipment(memberId);
+		if (inventories.isEmpty()) {
+			throw new InventoryNotFoundException();
+		}
+		return inventories;
+	}
 
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void deleteByEquipmentId(Long equipmentId) {
-        inventoryRepository.deleteByEquipmentId(equipmentId);
-    }
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void deleteByEquipmentId(Long equipmentId) {
+		inventoryRepository.deleteByEquipmentId(equipmentId);
+	}
 }

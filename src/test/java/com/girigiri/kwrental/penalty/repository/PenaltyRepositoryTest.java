@@ -19,9 +19,9 @@ import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
-import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
-import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse.UserPenaltyResponse;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -119,7 +119,7 @@ class PenaltyRepositoryTest {
 		final UserPenaltiesResponse actual = penaltyRepository.findUserPenaltiesResponseByMemberId(memberId);
 
 		// then
-		assertThat(actual.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(actual.penalties()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new UserPenaltyResponse(penalty1.getId(), equipmentRentalSpec.getAcceptDateTime().toLocalDate(),
 					equipmentRentalSpec.getReturnDateTime().toLocalDate(), penalty1.getStatusMessage(),

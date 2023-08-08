@@ -212,24 +212,24 @@ public class ItemService {
 		final Page<EquipmentItemDto> itemDtosPage = itemRepository.findEquipmentItem(pageable, category);
 		final Set<String> propertyNumbers = itemDtosPage.getContent()
 			.stream()
-			.map(EquipmentItemDto::getPropertyNumber)
+			.map(EquipmentItemDto::propertyNumber)
 			.collect(Collectors.toSet());
 		final Map<String, RentalCountsDto> rentalCountsByPropertyNumbers = rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(
 			propertyNumbers, from, to);
-		return itemDtosPage.map(it -> mapToHistory(it, rentalCountsByPropertyNumbers.get(it.getPropertyNumber())));
+		return itemDtosPage.map(it -> mapToHistory(it, rentalCountsByPropertyNumbers.get(it.propertyNumber())));
 	}
 
 	private ItemHistory mapToHistory(final EquipmentItemDto equipmentItemDto, final RentalCountsDto rentalCountsDto) {
 		final ItemHistoryBuilder builder = ItemHistory.builder()
-			.modelName(equipmentItemDto.getModelName())
-			.category(equipmentItemDto.getCategory())
-			.propertyNumber(equipmentItemDto.getPropertyNumber());
+			.modelName(equipmentItemDto.modelName())
+			.category(equipmentItemDto.category())
+			.propertyNumber(equipmentItemDto.propertyNumber());
 
 		if (rentalCountsDto == null) {
 			return builder.normalRentalCount(0).abnormalRentalCount(0).build();
 		}
-		return builder.normalRentalCount(rentalCountsDto.getNormalRentalCount())
-			.abnormalRentalCount(rentalCountsDto.getAbnormalRentalCount())
+		return builder.normalRentalCount(rentalCountsDto.normalRentalCount())
+			.abnormalRentalCount(rentalCountsDto.abnormalRentalCount())
 			.build();
 	}
 

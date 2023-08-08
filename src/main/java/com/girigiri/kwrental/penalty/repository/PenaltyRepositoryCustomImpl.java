@@ -15,9 +15,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.penalty.domain.Penalty;
-import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
-import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse.UserPenaltyResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

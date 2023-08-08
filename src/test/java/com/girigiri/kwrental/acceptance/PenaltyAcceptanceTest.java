@@ -21,9 +21,9 @@ import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
 import com.girigiri.kwrental.penalty.dto.request.UpdatePeriodRequest;
 import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse;
-import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
-import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse.UserPenaltyResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
@@ -115,7 +115,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 			.extract().as(UserPenaltiesResponse.class);
 
 		// then
-		assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.penalties()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new UserPenaltyResponse(penalty1.getId(), RentalDateTime.now().calculateDay(-1).toLocalDate(),
 					RentalDateTime.now().toLocalDate(), penalty1.getStatusMessage(), equipment.getName(),
@@ -218,10 +218,10 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 			.extract().as(PenaltyHistoryPageResponse.class);
 
 		// then
-		assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.penalties()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(new PenaltyHistoryResponse(penalty2.getId(), reservation2.getName(), penalty2.getPeriod(),
 				labRoom.getName(), penalty2.getReason()));
-		assertThat(response.getEndPoints()).hasSize(2);
+		assertThat(response.endPoints()).hasSize(2);
 	}
 
 	@Test
@@ -299,6 +299,6 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 
 		// then
 		final Optional<Penalty> actual = penaltyRepository.findById(penalty1.getId());
-		assertThat(actual).isEqualTo(Optional.empty());
+		assertThat(actual).isEmpty();
 	}
 }

@@ -1,35 +1,13 @@
 package com.girigiri.kwrental.inventory.dto.request;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
-import lombok.Getter;
 
-import java.time.LocalDate;
-
-@Getter
 @Builder
-public class AddInventoryRequest {
+public record AddInventoryRequest(@NotNull Long equipmentId, @NotNull LocalDate rentalStartDate,
+                                  @NotNull LocalDate rentalEndDate, @Positive Integer amount) {
 
-    @NotNull
-    private Long equipmentId;
-
-    @NotNull
-    private LocalDate rentalStartDate;
-
-    @NotNull
-    private LocalDate rentalEndDate;
-
-    @Positive
-    private Integer amount;
-
-    private AddInventoryRequest() {
-    }
-
-    public AddInventoryRequest(Long equipmentId, LocalDate rentalStartDate, LocalDate rentalEndDate, Integer amount) {
-        this.equipmentId = equipmentId;
-        this.rentalStartDate = rentalStartDate;
-        this.rentalEndDate = rentalEndDate;
-        this.amount = amount;
-    }
 }

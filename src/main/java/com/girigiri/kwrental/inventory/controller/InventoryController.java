@@ -18,7 +18,7 @@ import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
-import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse.InventoryResponse;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 
 @RestController

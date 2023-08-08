@@ -12,15 +12,14 @@ import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.auth.dto.request.UpdateAdminRequest;
 import com.girigiri.kwrental.auth.service.AuthService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin")
 public class AdminController {
 
 	private final AuthService authService;
-
-	public AdminController(AuthService authService) {
-		this.authService = authService;
-	}
 
 	@PatchMapping
 	public ResponseEntity<?> update(@Login(Role.ADMIN) final SessionMember sessionMember,

@@ -21,7 +21,7 @@ import com.girigiri.kwrental.asset.equipment.service.EquipmentValidator;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
-import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
 import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
@@ -162,13 +162,13 @@ class InventoryServiceTest {
 		doNothing().when(remainQuantityValidator).validateAmount(any(), any(), any());
 
 		// when
-		final InventoryResponse response = inventoryService.update(1L, 1L, updateInventoryRequest);
+		final InventoriesResponse.InventoryResponse response = inventoryService.update(1L, 1L, updateInventoryRequest);
 
 		// then
 		assertAll(
-			() -> assertThat(response.getAmount()).isEqualTo(amount),
-			() -> assertThat(response.getRentalStartDate()).isEqualTo(rentalStartDate),
-			() -> assertThat(response.getRentalEndDate()).isEqualTo(rentalEndDate)
+			() -> assertThat(response.amount()).isEqualTo(amount),
+			() -> assertThat(response.rentalStartDate()).isEqualTo(rentalStartDate),
+			() -> assertThat(response.rentalEndDate()).isEqualTo(rentalEndDate)
 
 		);
 	}
