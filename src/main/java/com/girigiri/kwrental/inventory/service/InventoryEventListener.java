@@ -7,13 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.equipment.service.EquipmentDeleteEvent;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class InventoryEventListener {
 	private final InventoryService inventoryService;
-
-	public InventoryEventListener(InventoryService inventoryService) {
-		this.inventoryService = inventoryService;
-	}
 
 	@EventListener
 	@Transactional(propagation = Propagation.MANDATORY)

@@ -14,7 +14,7 @@ import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
-import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.exception.PenaltyNotFoundException;
@@ -23,14 +23,13 @@ import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.restore.PenaltyService;
 import com.girigiri.kwrental.reservation.service.reserve.template.PenaltyChecker;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PenaltyServiceImpl implements PenaltyService, PenaltyChecker {
 
 	private final PenaltyRepository penaltyRepository;
-
-	public PenaltyServiceImpl(final PenaltyRepository penaltyRepository) {
-		this.penaltyRepository = penaltyRepository;
-	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
@@ -71,7 +70,7 @@ public class PenaltyServiceImpl implements PenaltyService, PenaltyChecker {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public boolean hasOngoingPenalty(final Long memberId) {
 		final List<Penalty> ongoingPenalties = penaltyRepository.findByOngoingPenalties(memberId);
-		return ongoingPenalties.size() > 0;
+		return !ongoingPenalties.isEmpty();
 	}
 
 	@Override
@@ -93,7 +92,7 @@ public class PenaltyServiceImpl implements PenaltyService, PenaltyChecker {
 			.map(Penalty::getPeriod)
 			.max(Comparator.comparing(PenaltyPeriod::getEndDate));
 		return maxFarPeriod.map(period -> new UserPenaltyStatusResponse(false, period.getStatus(), period.getEndDate()))
-			.orElseGet(() -> new UserPenaltyStatusResponse(true, null, null));
+			.orElseGet(() -> new UserPenaltyStatusResponse(true, (String)null, null));
 	}
 
 	@Transactional(readOnly = true)

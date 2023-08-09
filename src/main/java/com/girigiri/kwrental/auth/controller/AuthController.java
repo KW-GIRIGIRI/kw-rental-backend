@@ -11,8 +11,8 @@ import com.girigiri.kwrental.auth.service.MemberNumberRetrieveService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@RequestMapping("/api/auth")
 public class AuthController {
 
 	private final MemberNumberRetrieveService memberNumberRetrieveService;

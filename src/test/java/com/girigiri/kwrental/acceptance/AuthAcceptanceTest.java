@@ -188,8 +188,8 @@ class AuthAcceptanceTest extends AcceptanceTest {
 
 		// then
 		final Member actual = memberRepository.findById(member.getId()).orElseThrow();
-		assertThat(actual.getEmail()).isEqualTo(requestBody.getEmail());
-		assertThat(actual.getPhoneNumber()).isEqualTo(requestBody.getPhoneNumber());
+		assertThat(actual.getEmail()).isEqualTo(requestBody.email());
+		assertThat(actual.getPhoneNumber()).isEqualTo(requestBody.phoneNumber());
 		boolean matches = new BCryptPasswordEncoder().matches(updatedPassword, actual.getPassword());
 		assertThat(matches).isTrue();
 	}
@@ -233,7 +233,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
 
 		final ResetPasswordRequest requestBody = new ResetPasswordRequest(member.getMemberNumber(),
 			email);
-		doNothing().when(emailService).sendRenewPassword(eq(requestBody.getEmail()), anyString());
+		doNothing().when(emailService).sendRenewPassword(eq(requestBody.email()), anyString());
 
 		// when
 		given(requestSpec)

@@ -117,7 +117,7 @@ class ItemAcceptanceTest extends AcceptanceTest {
 
 		// then
 		Equipment actual = equipmentRepository.findById(equipment.getId()).orElseThrow();
-		assertThat(actual.getRentableQuantity()).isEqualTo(0);
+		assertThat(actual.getRentableQuantity()).isZero();
 	}
 
 	@Test
@@ -278,11 +278,11 @@ class ItemAcceptanceTest extends AcceptanceTest {
 
 		// then
 		assertAll(
-			() -> assertThat(response.getHistories()).usingRecursiveFieldByFieldElementComparator()
+			() -> assertThat(response.histories()).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(new ItemHistory(Category.CAMERA, equipment.getName(), item2.getPropertyNumber(), 0, 1),
 					new ItemHistory(Category.CAMERA, equipment.getName(), item1.getPropertyNumber(), 1, 1)),
-			() -> assertThat(response.getPage()).isEqualTo(0),
-			() -> assertThat(response.getEndpoints()).hasSize(1)
+			() -> assertThat(response.page()).isZero(),
+			() -> assertThat(response.endpoints()).hasSize(1)
 				.containsExactly(
 					String.format("/api/admin/items/histories?from=%s&to=%s&size=2&page=0&sort=id,DESC", from, now))
 		);

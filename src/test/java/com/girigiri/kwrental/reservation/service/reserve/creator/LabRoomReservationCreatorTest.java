@@ -15,7 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.exception.LabRoomNotAvailableException;
-import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomRetriever;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomValidator;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -29,7 +30,9 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 class LabRoomReservationCreatorTest {
 
 	@Mock
-	private LabRoomService labRoomService;
+	private LabRoomValidator labRoomValidator;
+	@Mock
+	private LabRoomRetriever labRoomRetriever;
 	@InjectMocks
 	private LabRoomReservationCreator labRoomReservationCreator;
 
@@ -41,7 +44,7 @@ class LabRoomReservationCreatorTest {
 		final AddLabRoomReservationRequest addLabRoomReservationRequest = createRequest();
 		final LabRoom labRoom = LabRoomFixture.builder().name(addLabRoomReservationRequest.labRoomName()).build();
 
-		given(labRoomService.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
+		given(labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
 			.willReturn(labRoom);
 
 		final Reservation expect = mapToReservation(memberId, addLabRoomReservationRequest, labRoom);
@@ -64,8 +67,9 @@ class LabRoomReservationCreatorTest {
 			.isAvailable(false)
 			.build();
 
-		given(labRoomService.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
+		given(labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
 			.willReturn(labRoom);
+		doThrow(LabRoomNotAvailableException.class).when(labRoomValidator).validateAvailable(labRoom);
 
 		// when, then
 		assertThatThrownBy(() -> labRoomReservationCreator.create(memberId, addLabRoomReservationRequest))
@@ -82,9 +86,9 @@ class LabRoomReservationCreatorTest {
 			.name(addLabRoomReservationRequest.labRoomName())
 			.build();
 
-		given(labRoomService.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
+		given(labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
 			.willReturn(labRoom);
-		doThrow(LabRoomNotAvailableException.class).when(labRoomService).validateDays(eq(labRoom), anySet());
+		doThrow(LabRoomNotAvailableException.class).when(labRoomValidator).validateDays(eq(labRoom), anySet());
 
 		// when, then
 		assertThatThrownBy(() -> labRoomReservationCreator.create(memberId, addLabRoomReservationRequest))

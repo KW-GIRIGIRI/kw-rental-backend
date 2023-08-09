@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,11 +64,11 @@ public class RentedItemServiceImpl implements RentedItemService {
 
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-	public void validateNotRentedByPropertyNumber(final String propertyNumber) {
-		boolean anyRented = !rentalSpecRepository.findRentedRentalSpecsByPropertyNumber(propertyNumber).isEmpty();
-		if (anyRented) {
+	public void validateNotRentedByPropertyNumbers(final Collection<String> propertyNumbers) {
+		final boolean anyRented = !rentalSpecRepository.findRentedRentalSpecsByPropertyNumberIn(propertyNumbers)
+			.isEmpty();
+		if (anyRented)
 			throw new RentalSpecRentedWhenRemoveItemException();
-		}
 	}
 
 	private RentalCountsDto mapToRentalCountsDto(final RentalSpecStatuesPerPropertyNumber rentalSpecStatues) {

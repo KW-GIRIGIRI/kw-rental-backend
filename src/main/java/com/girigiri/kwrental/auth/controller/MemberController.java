@@ -28,18 +28,15 @@ import com.girigiri.kwrental.auth.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/members")
 public class MemberController {
 
 	private final AuthService authService;
 	private final SessionCookieSupport sessionCookieSupport;
-
-	public MemberController(final AuthService authService, final SessionCookieSupport sessionCookieSupport) {
-		this.authService = authService;
-		this.sessionCookieSupport = sessionCookieSupport;
-	}
 
 	@PostMapping
 	public ResponseEntity<?> register(@RequestBody @Validated final RegisterMemberRequest registerMemberRequest) {
@@ -91,7 +88,7 @@ public class MemberController {
 	@PostMapping("/password")
 	public ResponseEntity<?> checkPassword(@Login({Role.ADMIN, Role.USER}) final SessionMember sessionMember,
 		@RequestBody final PasswordCheckRequest passwordCheckRequest) {
-		authService.checkPassword(sessionMember.getId(), passwordCheckRequest.getPassword());
+		authService.checkPassword(sessionMember.getId(), passwordCheckRequest.password());
 		return ResponseEntity.noContent().build();
 	}
 

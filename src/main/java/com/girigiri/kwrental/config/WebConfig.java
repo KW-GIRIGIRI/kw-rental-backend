@@ -22,19 +22,17 @@ import com.girigiri.kwrental.common.ApiLogFilter;
 import com.girigiri.kwrental.common.CustomHandlerMethodArgumentResolver;
 import com.girigiri.kwrental.common.exception.KwangwoonServerException;
 
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
     private static final String FRONT_SERVER = "https://www.kwmedialab.com/";
     private static final String LOCAL = "http://localhost:3000";
 
     private final List<CustomHandlerMethodArgumentResolver> argumentResolvers;
-
-    public WebConfig(final List<CustomHandlerMethodArgumentResolver> argumentResolvers) {
-        this.argumentResolvers = argumentResolvers;
-    }
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {

@@ -8,13 +8,12 @@ import java.util.List;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class LabRoomDailyBanRepositoryCustomImpl implements LabRoomDailyBanRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-
-	public LabRoomDailyBanRepositoryCustomImpl(JPAQueryFactory queryFactory) {
-		this.queryFactory = queryFactory;
-	}
 
 	@Override
 	public List<LabRoomDailyBan> findByLabRoomIdAndInclusive(Long labRoomId, LocalDate from, LocalDate to) {

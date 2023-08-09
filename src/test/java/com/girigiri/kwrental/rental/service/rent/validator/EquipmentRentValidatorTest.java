@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.item.exception.ItemNotAvailableException;
-import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.item.service.ItemValidator;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
@@ -34,7 +34,7 @@ class EquipmentRentValidatorTest {
 	@Mock
 	private ReservationRetrieveService reservationRetrieveService;
 	@Mock
-	private ItemService itemService;
+	private ItemValidator itemValidator;
 	@Mock
 	private RentalSpecRepository rentalSpecRepository;
 	@InjectMocks
@@ -62,7 +62,7 @@ class EquipmentRentValidatorTest {
 
 		given(reservationRetrieveService.groupPropertyNumbersByEquipmentId(1L, Map.of(2L, Set.of("12345678"))))
 			.willReturn(Map.of(3L, Set.of("12345678")));
-		doThrow(ItemNotAvailableException.class).when(itemService)
+		doThrow(ItemNotAvailableException.class).when(itemValidator)
 			.validatePropertyNumbers(Map.of(3L, Set.of("12345678")));
 
 		// when

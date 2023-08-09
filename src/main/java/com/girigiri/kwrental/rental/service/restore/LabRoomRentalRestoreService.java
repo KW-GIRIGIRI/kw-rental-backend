@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.rental.domain.Rental;
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.UpdateLabRoomRentalSpecStatusesRequest;
 import com.girigiri.kwrental.rental.exception.LabRoomRentalSpecNotOneException;
 import com.girigiri.kwrental.rental.repository.RentalSpecRepository;
@@ -34,7 +34,7 @@ public class LabRoomRentalRestoreService {
 
 	public void normalRestoreAll(final RestoreLabRoomRentalRequest restoreLabRoomRentalRequest) {
 		final List<LabRoomReservation> labRoomReservations = getLabRoomReservations(restoreLabRoomRentalRequest);
-		final List<AbstractRentalSpec> rentalSpecs = getRentalSpecs(labRoomReservations);
+		final List<RentalSpec> rentalSpecs = getRentalSpecs(labRoomReservations);
 		final List<Rental> rentals = getRentals(labRoomReservations, rentalSpecs);
 		rentals.forEach(Rental::normalRestoreAll);
 	}
@@ -47,7 +47,7 @@ public class LabRoomRentalRestoreService {
 		return labRoomReservations;
 	}
 
-	private List<AbstractRentalSpec> getRentalSpecs(final Collection<LabRoomReservation> labRoomReservations) {
+	private List<RentalSpec> getRentalSpecs(final Collection<LabRoomReservation> labRoomReservations) {
 		final Set<Long> reservationSpecIds = labRoomReservations.stream()
 			.map(LabRoomReservation::getReservationSpecId)
 			.collect(Collectors.toSet());
@@ -55,17 +55,17 @@ public class LabRoomRentalRestoreService {
 	}
 
 	private List<Rental> getRentals(final List<LabRoomReservation> labRoomReservations,
-		final List<AbstractRentalSpec> rentalSpecs) {
-		final Map<Long, List<AbstractRentalSpec>> rentalSpecsByReservationId = rentalSpecs.stream()
-			.collect(Collectors.groupingBy(AbstractRentalSpec::getReservationId));
+		final List<RentalSpec> rentalSpecs) {
+		final Map<Long, List<RentalSpec>> rentalSpecsByReservationId = rentalSpecs.stream()
+			.collect(Collectors.groupingBy(RentalSpec::getReservationId));
 		return labRoomReservations.stream()
 			.map(labRoomReservation -> getRental(rentalSpecsByReservationId, labRoomReservation))
 			.toList();
 	}
 
-	private Rental getRental(final Map<Long, List<AbstractRentalSpec>> rentalSpecsByReservationId,
+	private Rental getRental(final Map<Long, List<RentalSpec>> rentalSpecsByReservationId,
 		final LabRoomReservation labRoomReservation) {
-		final List<AbstractRentalSpec> rentalSpecs = rentalSpecsByReservationId.get(labRoomReservation.getId());
+		final List<RentalSpec> rentalSpecs = rentalSpecsByReservationId.get(labRoomReservation.getId());
 		if (rentalSpecs.size() != 1) {
 			throw new LabRoomRentalSpecNotOneException();
 		}
@@ -76,23 +76,23 @@ public class LabRoomRentalRestoreService {
 	public void updateRentals(final UpdateLabRoomRentalSpecStatusesRequest updateLabRoomRentalSpecStatusesRequest) {
 		final Map<Long, LabRoomReservation> reservationMap = getLabRoomReservationMap(
 			updateLabRoomRentalSpecStatusesRequest);
-		final Map<Long, AbstractRentalSpec> rentalSpecsByReservationId = getGroupedRentalSpecsByReservationId(
+		final Map<Long, RentalSpec> rentalSpecsByReservationId = getGroupedRentalSpecsByReservationId(
 			reservationMap.values());
 		for (UpdateLabRoomRentalSpecStatusRequest updateLabRoomRentalSpecStatusRequest : updateLabRoomRentalSpecStatusesRequest.reservations()) {
 			final Long reservationId = updateLabRoomRentalSpecStatusRequest.reservationId();
 			final LabRoomReservation labRoomReservation = reservationMap.get(reservationId);
-			final AbstractRentalSpec rentalSpec = rentalSpecsByReservationId.get(labRoomReservation.getId());
+			final RentalSpec rentalSpec = rentalSpecsByReservationId.get(labRoomReservation.getId());
 			final Rental rental = Rental.of(List.of(rentalSpec), labRoomReservation.getReservation());
 			rental.update(Map.of(rentalSpec.getId(), updateLabRoomRentalSpecStatusRequest.rentalSpecStatus()),
 				penaltySetter::setPenalty);
 		}
 	}
 
-	private Map<Long, AbstractRentalSpec> getGroupedRentalSpecsByReservationId(
+	private Map<Long, RentalSpec> getGroupedRentalSpecsByReservationId(
 		final Collection<LabRoomReservation> reservations) {
 		return getRentalSpecs(reservations)
 			.stream()
-			.collect(Collectors.toMap(AbstractRentalSpec::getReservationId, Function.identity()));
+			.collect(Collectors.toMap(RentalSpec::getReservationId, Function.identity()));
 	}
 
 	private Map<Long, LabRoomReservation> getLabRoomReservationMap(

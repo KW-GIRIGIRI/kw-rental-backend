@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -65,7 +65,7 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 기간과 겹치는 대여 사항을 조회한다.")
 	void findOverlappedByPeriod() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 		final RentalPeriod notOverlappedLeft = new RentalPeriod(NOW, NOW.plusDays(1));
 		final RentalPeriod overlappedLeft = new RentalPeriod(NOW, NOW.plusDays(2));
 		final RentalPeriod overlappedMid = new RentalPeriod(NOW.plusDays(2), NOW.plusDays(3));
@@ -97,7 +97,7 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("주어진 두 날짜값에 겹치는 대여 예약 상세를 조회한다.")
 	void findOverlappedReservedOrRentedInclusive() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 		final RentalPeriod notOverlappedLeft = new RentalPeriod(NOW, NOW.plusDays(1));
 		final RentalPeriod overlappedLeft = new RentalPeriod(NOW, NOW.plusDays(2));
 		final RentalPeriod overlappedMid = new RentalPeriod(NOW.plusDays(2), NOW.plusDays(3));
@@ -128,11 +128,11 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("기자재들의 특정 날짜에 대여 예약된 갯수를 구한다.")
 	void findRentalAmountsByEquipmentIds() {
 		// given
-		final Rentable equipment1 = assetRepository.save(
+		final RentableAsset equipment1 = assetRepository.save(
 			EquipmentFixture.builder().name("모델이름1").totalQuantity(4).rentableQuantity(3).build());
-		final Rentable equipment2 = assetRepository.save(
+		final RentableAsset equipment2 = assetRepository.save(
 			EquipmentFixture.builder().name("모델이름2").totalQuantity(4).rentableQuantity(2).build());
-		final Rentable equipment3 = assetRepository.save(
+		final RentableAsset equipment3 = assetRepository.save(
 			EquipmentFixture.builder().name("모델이름3").totalQuantity(4).rentableQuantity(2).build());
 
 		final ReservationSpecBuilder rentalSpec1Builder = ReservationSpecFixture.builder(equipment1);
@@ -169,8 +169,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 기간에 대여 수령하는 취소되지 않은 대여 상세를 조회한다.")
 	void findNotCanceldByStartDateBetween() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
-		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("model2").build());
 		final YearMonth now = YearMonth.now();
 		final ReservationSpec reservationSpec1 = reservationSpecRepository.save(
 			ReservationSpecFixture.builder(equipment1)
@@ -203,7 +203,7 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("대여 예약 상세의 갯수와 상태를 변경한다.")
 	void adjustAmountAndStatus() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("model1").build());
 		final ReservationSpec reservationSpec = ReservationSpecFixture.builder(equipment1)
 			.amount(RentalAmount.ofPositive(1)).status(ReservationSpecStatus.RESERVED).build();
 		final Reservation reservation = reservationRepository.save(ReservationFixture.create(List.of(reservationSpec)));
@@ -224,9 +224,9 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 날짜가 수령일인 기자재 대여 예약 상세를 회원 번호화 함께 조회한다.")
 	void findEquipmentReservationForAccept() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
-		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
-		final Rentable equipment3 = assetRepository.save(EquipmentFixture.builder().name("test3").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final RentableAsset equipment3 = assetRepository.save(EquipmentFixture.builder().name("test3").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(equipment1)
@@ -285,8 +285,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("기자재 반납이 지연된 대여 예약 상세를 회웑 정보와 함께 조회")
 	void findOverdueEquipmentReservationWhenReturn() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
-		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 
 		final LocalDate now = LocalDate.now();
 		final LocalDate start = now.minusDays(2);
@@ -327,8 +327,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("기자재 반납이 예정된 예약 상세를 회웑 정보와 함께 조회")
 	void findEquipmentReservationWhenReturn() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
-		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 
 		final LocalDate now = LocalDate.now();
 		final LocalDate start = now.minusDays(1);
@@ -383,8 +383,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 날짜가 수령일인 랩실 대여 예약 상세를 회원 번호화 함께 조회한다.")
 	void findLabRoomReservationsWhenAccept() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(labRoom1)
@@ -427,8 +427,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 날짜가 반납일인 랩실 대여 예약 상세를 회원 번호화 함께 조회한다.")
 	void findLabRoomReservationWhenReturn() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 
 		final RentalPeriod period = new RentalPeriod(NOW.minusDays(1), NOW);
@@ -474,9 +474,9 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("대여 예약 상세 id로 대여 예약을 조회한다.")
 	void findByReservationSpecIds() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
-		final Rentable labRoom3 = assetRepository.save(LabRoomFixture.builder().name("test3").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom3 = assetRepository.save(LabRoomFixture.builder().name("test3").build());
 		final Member member = memberRepository.save(MemberFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(labRoom1);
@@ -502,7 +502,7 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("id에 해당하는 상세들을 특정 상태로 업데이트")
 	void updateStatusByIds() {
 		// given
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
 		final ReservationSpec reservationSpec1 = reservationSpecRepository.save(
 			ReservationSpecFixture.create(labRoom1));
 
@@ -520,8 +520,8 @@ class ReservationSpecRepositoryTest {
 		// given
 		LocalDate start = LocalDate.now().minusDays(10);
 		LocalDate end = LocalDate.now();
-		final Rentable labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
-		final Rentable labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
+		final RentableAsset labRoom1 = assetRepository.save(LabRoomFixture.builder().name("test1").build());
+		final RentableAsset labRoom2 = assetRepository.save(LabRoomFixture.builder().name("test2").build());
 		final ReservationSpec reservationSpec1 = reservationSpecRepository.save(
 			ReservationSpecFixture.builder(labRoom1)
 				.period(new RentalPeriod(start, end))
@@ -573,8 +573,8 @@ class ReservationSpecRepositoryTest {
 	@DisplayName("특정 기자재의 대여 예약 상세를 조회한다.")
 	void findByAssetId() {
 		// given
-		final Rentable equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
-		final Rentable equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
 		final ReservationSpec spec1 = ReservationSpecFixture.create(equipment1);
 		reservationRepository.save(ReservationFixture.create(List.of(spec1)));
 		final ReservationSpec spec2 = ReservationSpecFixture.create(equipment2);

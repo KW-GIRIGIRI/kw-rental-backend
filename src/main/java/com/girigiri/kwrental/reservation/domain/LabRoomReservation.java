@@ -54,7 +54,7 @@ public class LabRoomReservation {
 	}
 
 	public Long getLabRoomId() {
-		return getReservationSpec().getRentable().getId();
+		return getReservationSpec().getAsset().getId();
 	}
 
 	public RentalPeriod getPeriod() {

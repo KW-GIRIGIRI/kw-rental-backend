@@ -72,7 +72,7 @@ public record EquipmentReservationsWithRentalSpecsResponse(
 
 			public static EquipmentReservationSpecWithRentalSpecsResponse of(final ReservationSpec reservationSpec,
 				final List<EquipmentRentalSpec> rentalSpecs) {
-				final Equipment equipment = reservationSpec.getRentable().as(Equipment.class);
+				final Equipment equipment = reservationSpec.getAsset().as(Equipment.class);
 				final List<EquipmentRentalSpecResponse> rentalSpecByStartDateResponses = mapToRentalSpecDto(
 					rentalSpecs);
 				return EquipmentReservationSpecWithRentalSpecsResponse.builder()

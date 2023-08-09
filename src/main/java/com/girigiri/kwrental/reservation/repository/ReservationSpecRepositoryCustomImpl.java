@@ -48,13 +48,13 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 		final LocalDate start = rentalPeriod.getRentalStartDate();
 		final LocalDate end = rentalPeriod.getRentalEndDate();
 		final List<ReservationSpec> overlappedLeft = queryFactory.selectFrom(reservationSpec)
-			.where(reservationSpec.rentable.id.eq(rentableId),
+			.where(reservationSpec.asset.id.eq(rentableId),
 				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RETURNED),
 				reservationSpec.period.rentalStartDate.loe(start),
 				reservationSpec.period.rentalEndDate.after(start))
 			.fetch();
 		final List<ReservationSpec> overLappedRight = queryFactory.selectFrom(reservationSpec)
-			.where(reservationSpec.rentable.id.eq(rentableId),
+			.where(reservationSpec.asset.id.eq(rentableId),
 				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RETURNED),
 				reservationSpec.period.rentalStartDate.after(start),
 				reservationSpec.period.rentalStartDate.before(end))
@@ -69,7 +69,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.select(Projections.constructor(ReservedAmount.class, equipment.id, equipment.rentableQuantity,
 				reservationSpec.amount.amount.sum().coalesce(0)))
 			.from(reservationSpec)
-			.rightJoin(equipment).on(reservationSpec.rentable.id.eq(equipment.id).
+			.rightJoin(equipment).on(reservationSpec.asset.id.eq(equipment.id).
 				and(reservationSpec.period.rentalStartDate.loe(date))
 				.and(reservationSpec.period.rentalEndDate.after(date)))
 			.where(equipment.id.in(assetIds))
@@ -84,7 +84,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.selectFrom(reservationSpec)
 			.leftJoin(reservationSpec.reservation).fetchJoin()
 			.where(
-				reservationSpec.rentable.id.eq(equipmentId), reservationSpec.status.ne(ReservationSpecStatus.CANCELED)
+				reservationSpec.asset.id.eq(equipmentId), reservationSpec.status.ne(ReservationSpecStatus.CANCELED)
 					.and(reservationSpec.period.rentalStartDate.goe(start))
 					.and(reservationSpec.period.rentalStartDate.loe(end)))
 			.fetch();
@@ -105,7 +105,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenAccept(final LocalDate date) {
 		return findEquipmentReservationWhere(
-			reservationSpec.rentable.instanceOf(Equipment.class),
+			reservationSpec.asset.instanceOf(Equipment.class),
 			reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
 			reservationSpec.period.rentalStartDate.eq(date)
 		);
@@ -115,7 +115,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 		return Set.copyOf(queryFactory
 			.from(reservationSpec)
 			.leftJoin(reservation).on(reservationSpec.reservation.id.eq(reservation.id))
-			.leftJoin(reservationSpec.rentable).fetchJoin()
+			.leftJoin(reservationSpec.asset).fetchJoin()
 			.leftJoin(member).on(member.id.eq(reservation.memberId))
 			.where(predicates)
 			.transform(groupBy(reservation.id)
@@ -129,7 +129,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public Set<EquipmentReservationWithMemberNumber> findOverdueEquipmentReservationWhenReturn(final LocalDate date) {
 		return findEquipmentReservationWhere(
-			reservationSpec.rentable.instanceOf(Equipment.class),
+			reservationSpec.asset.instanceOf(Equipment.class),
 			reservationSpec.status.eq(ReservationSpecStatus.OVERDUE_RENTED),
 			reservationSpec.period.rentalEndDate.before(date)
 		);
@@ -138,7 +138,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public Set<EquipmentReservationWithMemberNumber> findEquipmentReservationWhenReturn(final LocalDate date) {
 		return findEquipmentReservationWhere(
-			reservationSpec.rentable.instanceOf(Equipment.class),
+			reservationSpec.asset.instanceOf(Equipment.class),
 			reservationSpec.status.eq(ReservationSpecStatus.RENTED),
 			reservationSpec.period.rentalEndDate.eq(date)
 		);
@@ -147,7 +147,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhenAccept(final LocalDate date) {
 		return findLabRoomReservationsWhere(
-			reservationSpec.rentable.instanceOf(LabRoom.class),
+			reservationSpec.asset.instanceOf(LabRoom.class),
 			reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
 			reservationSpec.period.rentalStartDate.eq(date));
 	}
@@ -155,7 +155,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	@Override
 	public Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationWhenReturn(final LocalDate date) {
 		return findLabRoomReservationsWhere(
-			reservationSpec.rentable.instanceOf(LabRoom.class),
+			reservationSpec.asset.instanceOf(LabRoom.class),
 			reservationSpec.status.in(ReservationSpecStatus.RENTED),
 			reservationSpec.period.rentalEndDate.eq(date));
 	}
@@ -172,7 +172,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	public HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate) {
 		int abnormalCount = Objects.requireNonNull(queryFactory.select(reservationSpec.count())
 			.from(reservationSpec)
-			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id), rentableAsset.name.eq(name))
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.asset.id), rentableAsset.name.eq(name))
 			.where(reservationSpec.period.rentalStartDate.goe(startDate),
 				reservationSpec.period.rentalEndDate.loe(endDate),
 				reservationSpec.status.eq(ReservationSpecStatus.ABNORMAL_RETURNED))
@@ -180,7 +180,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 
 		return queryFactory
 			.from(reservationSpec)
-			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.rentable.id), rentableAsset.name.eq(name))
+			.join(rentableAsset).on(rentableAsset.id.eq(reservationSpec.asset.id), rentableAsset.name.eq(name))
 			.where(reservationSpec.period.rentalStartDate.goe(startDate),
 				reservationSpec.period.rentalEndDate.loe(endDate),
 				reservationSpec.status.in(ReservationSpecStatus.RETURNED, ReservationSpecStatus.ABNORMAL_RETURNED))
@@ -196,7 +196,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 	public List<ReservationSpec> findReservedOrRentedByAssetId(Long assetId) {
 		return queryFactory.selectFrom(reservationSpec)
 			.join(reservation).fetchJoin()
-			.where(reservationSpec.rentable.id.eq(assetId),
+			.where(reservationSpec.asset.id.eq(assetId),
 				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED))
 			.fetch();
 	}
@@ -207,7 +207,7 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			queryFactory
 				.from(reservationSpec)
 				.leftJoin(reservation).on(reservationSpec.reservation.id.eq(reservation.id))
-				.leftJoin(rentableAsset).on(reservationSpec.rentable.id.eq(rentableAsset.id))
+				.leftJoin(rentableAsset).on(reservationSpec.asset.id.eq(rentableAsset.id))
 				.leftJoin(member).on(member.id.eq(reservation.memberId))
 				.where(predicates)
 				.transform(groupBy(rentableAsset.id)

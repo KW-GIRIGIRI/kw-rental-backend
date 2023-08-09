@@ -2,6 +2,7 @@ package com.girigiri.kwrental.item.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,5 +19,5 @@ public interface RentedItemService {
 
     void validateNotRentedByAssetId(Long assetId);
 
-    void validateNotRentedByPropertyNumber(String propertyNumber);
+    void validateNotRentedByPropertyNumbers(Collection<String> propertyNumbers);
 }

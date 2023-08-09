@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.exception.ReservationIdNotSingleValueWhenEquipmentAcceptException;
 import com.girigiri.kwrental.reservation.service.ReservationAcceptor;
 
@@ -19,15 +19,15 @@ public class EquipmentReservationAcceptor implements
 	private final ReservationAcceptor reservationAcceptor;
 
 	@Override
-	public void acceptReservationsBy(final List<AbstractRentalSpec> rentalSpecs) {
+	public void acceptReservationsBy(final List<RentalSpec> rentalSpecs) {
 		final Long reservationId = getReservationId(rentalSpecs);
 		final List<Long> reservationSpecIds = getReservationIds(rentalSpecs);
 		reservationAcceptor.accept(reservationId, reservationSpecIds);
 	}
 
-	private Long getReservationId(final List<AbstractRentalSpec> rentalSpecs) {
+	private Long getReservationId(final List<RentalSpec> rentalSpecs) {
 		final Set<Long> reservationIds = rentalSpecs.stream()
-			.map(AbstractRentalSpec::getReservationId)
+			.map(RentalSpec::getReservationId)
 			.collect(Collectors.toSet());
 		validateReservationIdIsSingleValue(reservationIds);
 		return reservationIds.iterator().next();
@@ -39,9 +39,9 @@ public class EquipmentReservationAcceptor implements
 		}
 	}
 
-	private List<Long> getReservationIds(final List<AbstractRentalSpec> rentalSpecs) {
+	private List<Long> getReservationIds(final List<RentalSpec> rentalSpecs) {
 		return rentalSpecs.stream()
-			.map(AbstractRentalSpec::getReservationSpecId)
+			.map(RentalSpec::getReservationSpecId)
 			.toList();
 	}
 }

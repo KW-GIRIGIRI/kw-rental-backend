@@ -1,22 +1,15 @@
 package com.girigiri.kwrental.penalty.dto.response;
 
-import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
-import lombok.Getter;
-
 import java.time.LocalDate;
 
-@Getter
-public class UserPenaltyStatusResponse {
-    private boolean canUse;
-    private String status;
-    private LocalDate endDate;
+import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
 
-    private UserPenaltyStatusResponse() {
-    }
+public record UserPenaltyStatusResponse(
+    boolean canUse,
+    String status,
+    LocalDate endDate) {
 
     public UserPenaltyStatusResponse(final boolean canUse, final PenaltyStatus status, final LocalDate endDate) {
-        this.canUse = canUse;
-        this.status = status == null ? null : status.getMessage();
-        this.endDate = endDate;
+        this(canUse, status == null ? null : status.getMessage(), endDate);
     }
 }

@@ -41,16 +41,16 @@ public class AuthService {
 
     @Transactional
     public Long register(final RegisterMemberRequest registerMemberRequest) {
-        if (memberRepository.findByMemberNumber(registerMemberRequest.getMemberNumber()).isPresent()) {
+        if (memberRepository.findByMemberNumber(registerMemberRequest.memberNumber()).isPresent()) {
             throw new MemberException("이미 존재하는 회원입니다.");
         }
         final Member member = Member.builder()
-            .name(registerMemberRequest.getName())
-            .birthDate(registerMemberRequest.getBirthDate())
-            .email(registerMemberRequest.getEmail())
-            .password(passwordEncoder.encode(registerMemberRequest.getPassword()))
-            .memberNumber(registerMemberRequest.getMemberNumber())
-            .phoneNumber(registerMemberRequest.getPhoneNumber())
+            .name(registerMemberRequest.name())
+            .birthDate(registerMemberRequest.birthDate())
+            .email(registerMemberRequest.email())
+            .password(passwordEncoder.encode(registerMemberRequest.password()))
+            .memberNumber(registerMemberRequest.memberNumber())
+            .phoneNumber(registerMemberRequest.phoneNumber())
             .role(Role.USER)
             .build();
         memberRepository.save(member);
@@ -59,8 +59,8 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public SessionMember login(final LoginRequest loginRequest) {
-        final Member member = getMemberByMemberNumber(loginRequest.getMemberNumber());
-        final boolean matches = passwordEncoder.matches(loginRequest.getPassword(), member.getPassword());
+        final Member member = getMemberByMemberNumber(loginRequest.memberNumber());
+        final boolean matches = passwordEncoder.matches(loginRequest.password(), member.getPassword());
         if (!matches)
             throw new PasswordNotMatchesException();
         return SessionMember.from(member);
@@ -85,10 +85,10 @@ public class AuthService {
     @Transactional
     public void updateMember(final Long id, final UpdateUserRequest updateUserRequest) {
         final Member member = getMember(id);
-        final String encodedPassword = passwordEncoder.encode(updateUserRequest.getPassword());
+        final String encodedPassword = passwordEncoder.encode(updateUserRequest.password());
         member.updatePassword(encodedPassword);
-        member.updateEmail(updateUserRequest.getEmail());
-        member.updatePhoneNumber(updateUserRequest.getPhoneNumber());
+        member.updateEmail(updateUserRequest.email());
+        member.updatePhoneNumber(updateUserRequest.phoneNumber());
     }
 
     @Transactional
@@ -97,7 +97,7 @@ public class AuthService {
         if (!admin.isAdmin()) {
             throw new ForbiddenException("관리자 정보 수정은 관리자만 가능합니다.");
         }
-        final String encodedPassword = passwordEncoder.encode(updateAdminRequest.getPassword());
+        final String encodedPassword = passwordEncoder.encode(updateAdminRequest.password());
         admin.updatePassword(encodedPassword);
     }
 
@@ -112,8 +112,8 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
-        final Member member = getMemberByMemberNumber(resetPasswordRequest.getMemberNumber());
-        if (!member.hasSameEmail(resetPasswordRequest.getEmail())) {
+        final Member member = getMemberByMemberNumber(resetPasswordRequest.memberNumber());
+        if (!member.hasSameEmail(resetPasswordRequest.email())) {
             throw new EmailNotMatchesException();
         }
         final String randomPassword = getRandomPassword();

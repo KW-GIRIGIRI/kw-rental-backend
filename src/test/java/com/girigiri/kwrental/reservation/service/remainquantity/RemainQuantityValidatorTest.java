@@ -48,7 +48,7 @@ class RemainQuantityValidatorTest {
 			.period(new RentalPeriod(now.plusDays(1), now.plusDays(2)))
 			.build();
 
-		given(assetService.getRentableById(any())).willReturn(equipment);
+		given(assetService.getAssetById(any())).willReturn(equipment);
 		given(reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(any(), any())).willReturn(
 			List.of(reservationSpec1, reservationSpec2));
 
@@ -72,7 +72,7 @@ class RemainQuantityValidatorTest {
 			.period(new RentalPeriod(now, now.plusDays(1)))
 			.build();
 
-		given(assetService.getRentableById(any())).willReturn(equipment);
+		given(assetService.getAssetById(any())).willReturn(equipment);
 		given(reservationSpecRepository.findOverlappedReservedOrRentedByPeriod(any(), any())).willReturn(
 			List.of(reservationSpec1, reservationSpec2));
 

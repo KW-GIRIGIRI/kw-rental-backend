@@ -2,7 +2,6 @@ package com.girigiri.kwrental.reservation.domain.entity;
 
 import java.time.LocalDate;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.reservation.exception.ReservationSpecException;
 
@@ -44,9 +43,9 @@ public class ReservationSpec {
     @Builder.Default
     private ReservationSpecStatus status = ReservationSpecStatus.RESERVED;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = RentableAsset.class)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "asset_id")
-    private Rentable rentable;
+    private RentableAsset asset;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
@@ -101,7 +100,7 @@ public class ReservationSpec {
     }
 
     public boolean isRentFor(final String rentableName) {
-        return this.rentable.getName().equals(rentableName);
+        return this.asset.getName().equals(rentableName);
     }
 
     public boolean isReserved() {

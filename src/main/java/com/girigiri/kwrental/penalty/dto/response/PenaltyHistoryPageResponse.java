@@ -1,21 +1,24 @@
 package com.girigiri.kwrental.penalty.dto.response;
 
-import lombok.Getter;
-
+import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-public class PenaltyHistoryPageResponse {
-    private List<String> endPoints;
-    private Integer page;
-    private List<PenaltyHistoryResponse> penalties;
+import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
+import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 
-    private PenaltyHistoryPageResponse() {
-    }
+public record PenaltyHistoryPageResponse(
+	List<String> endPoints,
+	Integer page,
+	List<PenaltyHistoryResponse> penalties) {
 
-    public PenaltyHistoryPageResponse(final List<String> endPoints, final Integer page, final List<PenaltyHistoryResponse> penalties) {
-        this.endPoints = endPoints;
-        this.page = page;
-        this.penalties = penalties;
-    }
+	public record PenaltyHistoryResponse(
+		Long id, String renterName, String status, LocalDate startDate, LocalDate endDate, String assetName,
+		PenaltyReason reason) {
+
+		public PenaltyHistoryResponse(final Long id, final String renterName, final PenaltyPeriod period,
+			final String assetName, final PenaltyReason reason) {
+			this(id, renterName, period.getStatus().getMessage(), period.getStartDate(), period.getEndDate(), assetName,
+				reason);
+		}
+	}
 }

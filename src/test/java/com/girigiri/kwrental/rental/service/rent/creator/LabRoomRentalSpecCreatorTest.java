@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 import com.girigiri.kwrental.reservation.service.ReservationRetrieveService;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomRentalSpecFixture;
@@ -49,7 +49,7 @@ class LabRoomRentalSpecCreatorTest {
 			.build();
 
 		// when
-		final List<AbstractRentalSpec> actual = labRoomRentalSpecCreator.create(createLabRoomRentalRequest);
+		final List<RentalSpec> actual = labRoomRentalSpecCreator.create(createLabRoomRentalRequest);
 
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparatorIgnoringFields("acceptDateTime")

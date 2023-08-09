@@ -1,24 +1,16 @@
 package com.girigiri.kwrental.item.dto.response;
 
-import lombok.Getter;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
 
-@Getter
-public class ItemHistoriesResponse {
+import org.springframework.data.domain.Page;
 
-    private final List<ItemHistory> histories;
-    private final Integer page;
-    private final List<String> endpoints;
+public record ItemHistoriesResponse(
 
-    private ItemHistoriesResponse(final List<ItemHistory> histories, final Integer page, final List<String> endpoints) {
-        this.histories = histories;
-        this.page = page;
-        this.endpoints = endpoints;
-    }
+	List<ItemHistory> histories,
+	Integer page,
+	List<String> endpoints) {
 
-    public static ItemHistoriesResponse of(final Page<ItemHistory> page, final List<String> allPageEndPoints) {
-        return new ItemHistoriesResponse(page.getContent(), page.getNumber(), allPageEndPoints);
-    }
+	public static ItemHistoriesResponse of(final Page<ItemHistory> page, final List<String> allPageEndPoints) {
+		return new ItemHistoriesResponse(page.getContent(), page.getNumber(), allPageEndPoints);
+	}
 }

@@ -10,8 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.girigiri.kwrental.rental.domain.entity.AbstractRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
+import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
@@ -40,7 +40,7 @@ class EquipmentRentalSpecCreatorTest {
 			.build();
 
 		// when
-		final List<AbstractRentalSpec> actual = equipmentRentalSpecCreator.create(
+		final List<RentalSpec> actual = equipmentRentalSpecCreator.create(
 			createEquipmentRentalRequest);
 
 		// then

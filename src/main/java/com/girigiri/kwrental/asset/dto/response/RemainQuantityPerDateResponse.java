@@ -2,22 +2,11 @@ package com.girigiri.kwrental.asset.dto.response;
 
 import java.time.LocalDate;
 
-import lombok.Getter;
+public record RemainQuantityPerDateResponse(
+	LocalDate date,
+	Integer remainQuantity) {
 
-@Getter
-public class RemainQuantityPerDateResponse {
-	private LocalDate date;
-	private Integer remainQuantity;
-
-	private RemainQuantityPerDateResponse() {
-	}
-
-	public RemainQuantityPerDateResponse(final LocalDate date, final Integer remainQuantity) {
-		this.date = date;
-		this.remainQuantity = remainQuantity;
-	}
-
-	public void setRemainQuantity(final int remainQuantity) {
-		this.remainQuantity = remainQuantity;
+	public RemainQuantityPerDateResponse createEmptyQuanittyWithSameDate() {
+		return new RemainQuantityPerDateResponse(this.date, 0);
 	}
 }

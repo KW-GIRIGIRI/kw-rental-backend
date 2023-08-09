@@ -36,7 +36,7 @@ class EquipmentReservationCreatorTest {
 		final Long memberId = 1L;
 		final Equipment equipment = EquipmentFixture.builder().id(1L).build();
 		final ReservationSpec spec = ReservationSpecFixture.builder(equipment)
-			.rentable(equipment)
+			.asset(equipment)
 			.build();
 		given(reservationSpecMapper.map(memberId)).willReturn(List.of(spec));
 

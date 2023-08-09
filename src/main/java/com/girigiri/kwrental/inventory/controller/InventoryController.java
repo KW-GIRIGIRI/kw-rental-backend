@@ -18,18 +18,17 @@ import com.girigiri.kwrental.auth.domain.SessionMember;
 import com.girigiri.kwrental.inventory.dto.request.AddInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.request.UpdateInventoryRequest;
 import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
-import com.girigiri.kwrental.inventory.dto.response.InventoryResponse;
+import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse.InventoryResponse;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/inventories")
 public class InventoryController {
 
     private final InventoryService inventoryService;
-
-    public InventoryController(final InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
-    }
 
     @PostMapping
     public ResponseEntity<?> save(@Login final SessionMember sessionMember,

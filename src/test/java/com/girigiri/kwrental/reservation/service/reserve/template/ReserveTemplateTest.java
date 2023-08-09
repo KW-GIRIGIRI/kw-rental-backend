@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -55,7 +55,7 @@ class ReserveTemplateTest {
 		final Integer amount = 1;
 		final RentalPeriod rentalPeriod = new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1));
 		final Long memberId = 2L;
-		final Rentable asset = LabRoomFixture.builder().id(assetId).build();
+		final RentableAsset asset = LabRoomFixture.builder().id(assetId).build();
 		final ReservationSpec spec = ReservationSpecFixture.builder(asset)
 			.amount(RentalAmount.ofPositive(amount))
 			.period(rentalPeriod)

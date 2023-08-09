@@ -11,17 +11,19 @@ import lombok.Getter;
 @Entity
 @Getter
 @DiscriminatorValue("equipment")
-public class EquipmentRentalSpec extends AbstractRentalSpec {
+public class EquipmentRentalSpec extends RentalSpec {
 
-    private String propertyNumber;
+	private String propertyNumber;
 
-    protected EquipmentRentalSpec() {
-    }
+	protected EquipmentRentalSpec() {
+	}
 
-    @Builder
-    private EquipmentRentalSpec(final Long id, final Long reservationSpecId, final Long reservationId, final String propertyNumber, final RentalSpecStatus status, final RentalDateTime acceptDateTime, final RentalDateTime returnDateTime) {
-        super(id, reservationSpecId, reservationId, status, acceptDateTime, returnDateTime);
-        validateNotNull(propertyNumber);
+	@Builder
+	private EquipmentRentalSpec(final Long id, final Long reservationSpecId, final Long reservationId,
+		final String propertyNumber, final RentalSpecStatus status, final RentalDateTime acceptDateTime,
+		final RentalDateTime returnDateTime) {
+		super(id, reservationSpecId, reservationId, status, acceptDateTime, returnDateTime);
+		validateNotNull(propertyNumber);
         this.propertyNumber = propertyNumber;
     }
 }

@@ -26,56 +26,58 @@ import com.girigiri.kwrental.item.dto.response.ItemHistoriesResponse;
 import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.item.service.ItemViewService;
 import com.girigiri.kwrental.util.EndPointUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin/items")
 public class AdminItemController {
 
-    private final ItemService itemService;
+	private final ItemService itemService;
+	private final ItemViewService itemViewService;
 
-    public AdminItemController(final ItemService itemService) {
-        this.itemService = itemService;
-    }
+	@PatchMapping("/{id}/rentalAvailable")
+	public ResponseEntity<?> updateRentalAvailable(@PathVariable final Long id,
+		@RequestBody ItemRentalAvailableRequest rentalAvailableRequest) {
+		itemService.updateAvailable(id, rentalAvailableRequest.rentalAvailable());
+		return ResponseEntity.noContent().build();
+	}
 
-    @PatchMapping("/{id}/rentalAvailable")
-    public ResponseEntity<?> updateRentalAvailable(@PathVariable final Long id,
-                                                   @RequestBody ItemRentalAvailableRequest rentalAvailableRequest) {
-        itemService.updateAvailable(id, rentalAvailableRequest.rentalAvailable());
-        return ResponseEntity.noContent().build();
-    }
+	@PatchMapping("/{id}/propertyNumber")
+	public ResponseEntity<?> updatePropertyNumber(@PathVariable final Long id,
+		@RequestBody ItemPropertyNumberRequest propertyNumberRequest) {
+		itemService.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
+		return ResponseEntity.noContent().build();
+	}
 
-    @PatchMapping("/{id}/propertyNumber")
-    public ResponseEntity<?> updatePropertyNumber(@PathVariable final Long id,
-                                                  @RequestBody ItemPropertyNumberRequest propertyNumberRequest) {
-        itemService.updatePropertyNumber(id, propertyNumberRequest.propertyNumber());
-        return ResponseEntity.noContent().build();
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable final Long id) {
+		itemService.delete(id);
+		return ResponseEntity.noContent().build();
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable final Long id) {
-        itemService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+	@PutMapping
+	public ResponseEntity<?> saveOrUpdate(final Long equipmentId,
+		@RequestBody @Validated SaveOrUpdateItemsRequest updateItemsRequest) {
+		itemService.saveOrUpdate(equipmentId, updateItemsRequest);
+		return ResponseEntity.noContent().location(URI.create("/api/items?equipmentId=" + equipmentId)).build();
+	}
 
-    @PutMapping
-    public ResponseEntity<?> saveOrUpdate(final Long equipmentId, @RequestBody @Validated SaveOrUpdateItemsRequest updateItemsRequest) {
-        itemService.saveOrUpdate(equipmentId, updateItemsRequest);
-        return ResponseEntity.noContent().location(URI.create("/api/items?equipmentId=" + equipmentId)).build();
-    }
+	@GetMapping("/rentalAvailability")
+	public ItemsResponse getRentalAvailable(final Long equipmentId) {
+		return itemViewService.getRentalAvailableItems(equipmentId);
+	}
 
-    @GetMapping("/rentalAvailability")
-    public ItemsResponse getRentalAvailable(final Long equipmentId) {
-        return itemService.getRentalAvailableItems(equipmentId);
-    }
-
-    @GetMapping("/histories")
-    public ItemHistoriesResponse getHistories(
-            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) final Pageable pageable,
-            @Validated final ItemHistoryRequest itemHistoryRequest) {
-        final Page<ItemHistory> page = itemService.getItemHistories(
-                pageable, itemHistoryRequest.category(), itemHistoryRequest.from(), itemHistoryRequest.to());
-        final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
-        return ItemHistoriesResponse.of(page, allPageEndPoints);
-    }
+	@GetMapping("/histories")
+	public ItemHistoriesResponse getHistories(
+		@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) final Pageable pageable,
+		@Validated final ItemHistoryRequest itemHistoryRequest) {
+		final Page<ItemHistory> page = itemViewService.getItemHistories(
+			pageable, itemHistoryRequest.category(), itemHistoryRequest.from(), itemHistoryRequest.to());
+		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+		return ItemHistoriesResponse.of(page, allPageEndPoints);
+	}
 }

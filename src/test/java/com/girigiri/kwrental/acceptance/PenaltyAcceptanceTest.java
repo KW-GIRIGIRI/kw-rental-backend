@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import com.girigiri.kwrental.asset.domain.Rentable;
+import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
@@ -21,9 +21,9 @@ import com.girigiri.kwrental.penalty.domain.PenaltyReason;
 import com.girigiri.kwrental.penalty.domain.PenaltyStatus;
 import com.girigiri.kwrental.penalty.dto.request.UpdatePeriodRequest;
 import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse;
-import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryResponse;
+import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.PenaltyHistoryResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse;
-import com.girigiri.kwrental.penalty.dto.response.UserPenaltyResponse;
+import com.girigiri.kwrental.penalty.dto.response.UserPenaltiesResponse.UserPenaltyResponse;
 import com.girigiri.kwrental.penalty.dto.response.UserPenaltyStatusResponse;
 import com.girigiri.kwrental.penalty.repository.PenaltyRepository;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
@@ -66,8 +66,8 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset labRoom = assetRepository.save(LabRoomFixture.create());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
@@ -115,7 +115,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 			.extract().as(UserPenaltiesResponse.class);
 
 		// then
-		assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.penalties()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(
 				new UserPenaltyResponse(penalty1.getId(), RentalDateTime.now().calculateDay(-1).toLocalDate(),
 					RentalDateTime.now().toLocalDate(), penalty1.getStatusMessage(), equipment.getName(),
@@ -134,7 +134,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 		final Member member = memberRepository.save(MemberFixture.create(password));
 		final String sessionId = getSessionId(member.getMemberNumber(), password);
 
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
 			ReservationFixture.create(List.of(reservationSpec1)));
@@ -173,8 +173,8 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 	@DisplayName("패널티 히스토리를 조회한다.")
 	void getPenaltyHistoryPage() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
-		final Rentable labRoom = assetRepository.save(LabRoomFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset labRoom = assetRepository.save(LabRoomFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
@@ -218,17 +218,17 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 			.extract().as(PenaltyHistoryPageResponse.class);
 
 		// then
-		assertThat(response.getPenalties()).usingRecursiveFieldByFieldElementComparator()
+		assertThat(response.penalties()).usingRecursiveFieldByFieldElementComparator()
 			.containsExactly(new PenaltyHistoryResponse(penalty2.getId(), reservation2.getName(), penalty2.getPeriod(),
 				labRoom.getName(), penalty2.getReason()));
-		assertThat(response.getEndPoints()).hasSize(2);
+		assertThat(response.endPoints()).hasSize(2);
 	}
 
 	@Test
 	@DisplayName("패널티의 기간을 수정한다.")
 	void updatePenaltyPeriod() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
@@ -269,7 +269,7 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 	@DisplayName("패널티를 삭제한다..")
 	void deletePenalty() {
 		// given
-		final Rentable equipment = assetRepository.save(EquipmentFixture.create());
+		final RentableAsset equipment = assetRepository.save(EquipmentFixture.create());
 
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.create(equipment);
 		final Reservation reservation1 = reservationRepository.save(
@@ -299,6 +299,6 @@ class PenaltyAcceptanceTest extends AcceptanceTest {
 
 		// then
 		final Optional<Penalty> actual = penaltyRepository.findById(penalty1.getId());
-		assertThat(actual).isEqualTo(Optional.empty());
+		assertThat(actual).isEmpty();
 	}
 }

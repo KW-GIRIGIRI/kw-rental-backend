@@ -30,7 +30,7 @@ public record UnterminatedLabRoomReservationsResponse(
 		public static UnterminatedLabRoomReservationResponse from(final Reservation reservation) {
 			final ReservationSpec spec = reservation.getReservationSpecs().iterator().next();
 			return new UnterminatedLabRoomReservationResponse(reservation.getId(), spec.getId(), spec.getStartDate(),
-				spec.getEndDate(), spec.getRentable().getName(), spec.getAmount().getAmount(), spec.getStatus());
+				spec.getEndDate(), spec.getAsset().getName(), spec.getAmount().getAmount(), spec.getStatus());
 		}
 	}
 }

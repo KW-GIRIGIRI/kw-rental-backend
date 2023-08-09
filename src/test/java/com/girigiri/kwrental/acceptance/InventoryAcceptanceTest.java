@@ -99,7 +99,7 @@ class InventoryAcceptanceTest extends AcceptanceTest {
                 .extract().as(InventoriesResponse.class);
 
         // then
-        assertThat(response.getInventories()).usingRecursiveFieldByFieldElementComparator()
+        assertThat(response.inventories()).usingRecursiveFieldByFieldElementComparator()
                 .extracting("modelName")
                 .containsExactlyInAnyOrder(equipment1.getName(), equipment2.getName());
     }

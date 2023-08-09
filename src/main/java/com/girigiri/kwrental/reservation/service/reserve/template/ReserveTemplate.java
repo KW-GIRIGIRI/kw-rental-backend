@@ -43,7 +43,7 @@ public class ReserveTemplate {
 
 	private void validateAvailableCount(final Reservation reservation) {
 		reservation.getReservationSpecs()
-			.forEach(spec -> remainQuantityValidator.validateAmount(spec.getRentable().getId(),
+			.forEach(spec -> remainQuantityValidator.validateAmount(spec.getAsset().getId(),
 				spec.getAmount().getAmount(), spec.getPeriod()));
 	}
 }
