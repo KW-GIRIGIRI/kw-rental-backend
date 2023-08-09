@@ -23,14 +23,13 @@ import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.service.restore.PenaltyService;
 import com.girigiri.kwrental.reservation.service.reserve.template.PenaltyChecker;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PenaltyServiceImpl implements PenaltyService, PenaltyChecker {
 
 	private final PenaltyRepository penaltyRepository;
-
-	public PenaltyServiceImpl(final PenaltyRepository penaltyRepository) {
-		this.penaltyRepository = penaltyRepository;
-	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)

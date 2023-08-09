@@ -22,13 +22,12 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class PenaltyRepositoryCustomImpl implements PenaltyRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-
-	public PenaltyRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
-		this.queryFactory = queryFactory;
-	}
 
 	@Override
 	public List<Penalty> findByOngoingPenalties(final Long memberId) {
