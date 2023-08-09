@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment.service;
+package com.girigiri.kwrental.asset.equipment.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -22,10 +22,6 @@ import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.asset.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentDeleteEvent;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentRetriever;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentService;
-import com.girigiri.kwrental.asset.equipment.service.ItemSaver;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment.controller;
+package com.girigiri.kwrental.asset.equipment.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;

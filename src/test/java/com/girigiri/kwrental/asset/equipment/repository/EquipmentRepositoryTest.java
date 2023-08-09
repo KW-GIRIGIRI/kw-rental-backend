@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.equipment.repository;
+package com.girigiri.kwrental.asset.equipment.repository;
 
 import static com.girigiri.kwrental.asset.equipment.domain.Category.*;
 import static org.assertj.core.api.Assertions.*;
@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
