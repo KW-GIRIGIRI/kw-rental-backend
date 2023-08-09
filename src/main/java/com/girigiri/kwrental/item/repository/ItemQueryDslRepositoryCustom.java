@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.item.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public interface ItemQueryDslRepositoryCustom {
 
     int updateAvailable(List<Long> ids, boolean available);
 
-    int deleteByAssetId(Long assetId);
+    int deleteByIdIn(Collection<Long> ids);
 
     int deleteById(Long id);
 

@@ -19,7 +19,7 @@ class ItemControllerTest extends ControllerTest {
     @DisplayName("존재하지 않는 기자재 품목 목록 조회 예외 처리")
     void getItems_notFound() throws Exception {
         long notExistsId = 1L;
-        given(itemService.getItems(notExistsId)).willThrow(EquipmentNotFoundException.class);
+        given(itemViewService.getItems(notExistsId)).willThrow(EquipmentNotFoundException.class);
 
         // when, then
         mockMvc.perform(get(PREFIX + "?equipmentId=" + notExistsId))
@@ -31,7 +31,7 @@ class ItemControllerTest extends ControllerTest {
     void getItem_notFound() throws Exception {
         // given
         long notExistsId = 1L;
-        given(itemService.getItem(notExistsId)).willThrow(ItemNotFoundException.class);
+        given(itemViewService.getItem(notExistsId)).willThrow(ItemNotFoundException.class);
 
         // when, then
         mockMvc.perform(get(PREFIX + "/" + notExistsId))

@@ -1,17 +1,17 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.item.domain.Item;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.util.List;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.girigiri.kwrental.item.domain.Item;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class ItemJdbcRepositoryCustomImpl implements ItemJdbcRepositoryCustom {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public ItemJdbcRepositoryCustomImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public int saveAll(final List<Item> items) {

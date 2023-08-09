@@ -2,6 +2,7 @@ package com.girigiri.kwrental.rental.repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -48,4 +49,6 @@ public interface RentalSpecRepositoryCustom {
 
 	List<RentalSpecWithName> findTerminatedWithNameByPropertyAndInclusive(final String propertyNumber,
 		final RentalDateTime startDate, final RentalDateTime endDate);
+
+	List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumberIn(Collection<String> propertyNumbers);
 }

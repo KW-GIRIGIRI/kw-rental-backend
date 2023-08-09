@@ -12,6 +12,7 @@ import static com.querydsl.core.group.GroupBy.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -220,6 +221,14 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	public List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(final String propertyNumber) {
 		return queryFactory.selectFrom(equipmentRentalSpec)
 			.where(equipmentRentalSpec.propertyNumber.eq(propertyNumber),
+				equipmentRentalSpec.status.eq(RentalSpecStatus.RENTED))
+			.fetch();
+	}
+
+	@Override
+	public List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumberIn(final Collection<String> propertyNumbers) {
+		return queryFactory.selectFrom(equipmentRentalSpec)
+			.where(equipmentRentalSpec.propertyNumber.in(propertyNumbers),
 				equipmentRentalSpec.status.eq(RentalSpecStatus.RENTED))
 			.fetch();
 	}

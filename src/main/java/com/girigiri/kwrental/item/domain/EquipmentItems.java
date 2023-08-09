@@ -62,14 +62,6 @@ public class EquipmentItems {
 		}
 	}
 
-	public void updatePropertyNumberById(Long id, String propertyNumber) {
-		Item item = items.get(id);
-		if (item == null) {
-			throw new ItemNotFoundException();
-		}
-		item.updatePropertyNumber(propertyNumber);
-	}
-
 	public List<String> getPropertyNumbers() {
 		return this.items.values()
 			.stream()

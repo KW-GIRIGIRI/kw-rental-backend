@@ -5,6 +5,7 @@ import static com.girigiri.kwrental.item.domain.QItem.*;
 import static com.girigiri.kwrental.util.QueryDSLUtils.*;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -20,13 +21,12 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryCustom {
 
 	private final JPAQueryFactory queryFactory;
-
-	public ItemQueryDslRepositoryCustomImpl(final JPAQueryFactory queryFactory) {
-		this.queryFactory = queryFactory;
-	}
 
 	@Override
 	public int countAvailable(final Long equipmentId) {
@@ -80,10 +80,10 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 	}
 
 	@Override
-	public int deleteByAssetId(final Long assetId) {
+	public int deleteByIdIn(final Collection<Long> ids) {
 		return (int)queryFactory.update(item)
 			.set(item.deletedAt, LocalDate.now())
-			.where(item.assetId.eq(assetId), item.deletedAt.isNull())
+			.where(item.id.in(ids), item.deletedAt.isNull())
 			.execute();
 	}
 

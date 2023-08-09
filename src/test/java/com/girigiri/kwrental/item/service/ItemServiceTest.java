@@ -1,17 +1,10 @@
 package com.girigiri.kwrental.item.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,24 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
-import com.girigiri.kwrental.asset.equipment.domain.Category;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentAdjuster;
-import com.girigiri.kwrental.asset.equipment.service.EquipmentValidator;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
-import com.girigiri.kwrental.item.dto.response.ItemHistory;
-import com.girigiri.kwrental.item.dto.response.ItemResponse;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
-import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
-import com.girigiri.kwrental.item.exception.ItemNotFoundException;
-import com.girigiri.kwrental.item.exception.NotEnoughAvailableItemException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
@@ -44,70 +24,19 @@ import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 class ItemServiceTest {
 
 	@Mock
+	private ItemRetriever itemRetriever;
+	@Mock
+	private ItemAvailableSetter itemAvailableSetter;
+	@Mock
 	private ItemRepository itemRepository;
 	@Mock
-	private EquipmentValidator equipmentValidator;
-	@Mock
-	private EquipmentAdjuster equipmentAdjuster;
+	private ItemSaverImpl itemSaver;
 	@Mock
 	private RentedItemService rentedItemService;
+	@Mock
+	private ItemDeleter itemDeleter;
 	@InjectMocks
 	private ItemService itemService;
-
-	@Test
-	@DisplayName("품목 조회")
-	void getItem() {
-		// given
-		given(itemRepository.findById(any())).willReturn(Optional.empty());
-
-		// when, then
-		assertThatThrownBy(() -> itemService.getItem(1L))
-			.isExactlyInstanceOf(ItemNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("존재하지 않는 품목 조회 예외")
-	void getItem_notFound() {
-		// given
-		given(itemRepository.findById(any())).willReturn(Optional.empty());
-
-		// when, then
-		assertThatThrownBy(() -> itemService.getItem(1L))
-			.isExactlyInstanceOf(ItemNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("존재하지 않는 품목의 자산 번호 수정하려면 예외")
-	void updatePropertyNumber_Notfound() {
-		// given
-		given(itemRepository.findById(any())).willReturn(Optional.empty());
-
-		// when, then
-		assertThatThrownBy(() -> itemService.updatePropertyNumber(1L, "12345678"))
-			.isInstanceOf(ItemNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("존재하지 않는 품목의 대여 가능 상태를 수정하려면 예외")
-	void updateRentalAvailable_Notfound() {
-		// given
-		given(itemRepository.findById(any())).willReturn(Optional.empty());
-
-		// when, then
-		assertThatThrownBy(() -> itemService.updateAvailable(1L, false))
-			.isInstanceOf(ItemNotFoundException.class);
-	}
-
-	@Test
-	@DisplayName("삭제할 품목이 존재하지 않으면 예외")
-	void delete_notFound() {
-		// given
-		given(itemRepository.findById(any())).willReturn(Optional.empty());
-
-		// when, then
-		assertThatThrownBy(() -> itemService.delete(1L))
-			.isInstanceOf(ItemNotFoundException.class);
-	}
 
 	@Test
 	@DisplayName("기자재에 해당하는 품목들 없으면 추가, 있으면 수정")
@@ -122,12 +51,11 @@ class ItemServiceTest {
 			List.of(updateItemRequest1, updateItemRequest2));
 		long equipmentId = 1L;
 
-		given(itemRepository.saveAll(any())).willReturn(1);
+		doNothing().when(itemSaver).saveItemsWhenUpdate(equipmentId, List.of(updateItemRequest1));
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem));
-		doNothing().when(equipmentAdjuster).adjustWhenItemSaved(1, equipmentId);
 
-		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
+		given(itemRetriever.getById(1L)).willReturn(itemForUpdate);
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
 			updateItemRequest2.propertyNumber());
 
@@ -151,95 +79,20 @@ class ItemServiceTest {
 			List.of(updateItemRequest1, updateItemRequest2));
 		long equipmentId = 1L;
 
-		given(itemRepository.saveAll(any())).willReturn(1);
+		doNothing().when(itemSaver).saveItemsWhenUpdate(equipmentId, List.of(updateItemRequest1));
 		given(itemRepository.findByAssetId(any()))
 			.willReturn(List.of(itemForUpdate, savedItem, itemForDelete));
-		doNothing().when(equipmentAdjuster).adjustWhenItemSaved(1, equipmentId);
 
-		given(itemRepository.findById(1L)).willReturn(Optional.of(itemForUpdate));
+		given(itemRetriever.getById(1L)).willReturn(itemForUpdate);
 		doNothing().when(rentedItemService).updatePropertyNumber(itemForUpdate.getPropertyNumber(),
 			updateItemRequest2.propertyNumber());
 
-		given(itemRepository.deleteByPropertyNumbers(List.of(itemForDelete.getPropertyNumber()))).willReturn(1);
-		given(itemRepository.updateAvailable(List.of(itemForDelete.getId()), false)).willReturn(1);
-		doNothing().when(equipmentAdjuster).adjustWhenItemDeleted(1, -1, equipmentId);
+		given(itemDeleter.batchDelete(List.of(itemForDelete))).willReturn(1);
 
 		// when
 		ItemsResponse itemsResponse = itemService.saveOrUpdate(equipmentId, updateItemsRequest);
 
 		// then
 		assertThat(itemsResponse.items()).hasSize(2);
-	}
-
-	@Test
-	@DisplayName("운영 중인 품목 갯수를 검증한다.")
-	void validateAvailableCount() {
-		// given
-		given(itemRepository.countAvailable(any())).willReturn(10);
-
-		// when
-		assertThatThrownBy(() -> itemService.validateAvailableCount(1L, 11))
-			.isExactlyInstanceOf(NotEnoughAvailableItemException.class);
-	}
-
-	@Test
-	@DisplayName("기자재 ID들과 그에 해당하는 자산번호를 검증한다.")
-	void validatePropertyNumbers() {
-		// given
-		final Item item = ItemFixture.builder().assetId(1L).propertyNumber("11111111").build();
-		given(itemRepository.findByEquipmentIds(any()))
-			.willReturn(List.of(item));
-
-		// when, then
-		assertThatCode(
-			() -> itemService.validatePropertyNumbers(Map.of(item.getAssetId(), Set.of(item.getPropertyNumber()))))
-			.doesNotThrowAnyException();
-	}
-
-	@Test
-	@DisplayName("대여 가능한 품목을 조회한다.")
-	void getRentalAvailableItems() {
-		// given
-		doNothing().when(equipmentValidator).validateExistsById(anyLong());
-		given(rentedItemService.getRentedPropertyNumbers(anyLong(), any())).willReturn(Set.of("11111111"));
-		final Item item1 = ItemFixture.builder().id(1L).propertyNumber("11111111").available(true).build();
-		final Item item2 = ItemFixture.builder().id(2L).propertyNumber("22222222").available(true).build();
-		final Item item3 = ItemFixture.builder().id(3L).propertyNumber("33333333").available(false).build();
-		given(itemRepository.findByAssetId(any())).willReturn(List.of(item1, item2, item3));
-
-		// when
-		final ItemsResponse itemsResponse = itemService.getRentalAvailableItems(1L);
-
-		// then
-		assertThat(itemsResponse.items()).usingRecursiveFieldByFieldElementComparator()
-			.containsOnly(ItemResponse.from(item2));
-	}
-
-	@Test
-	@DisplayName("품목 히스토리를 페이징해서 조회")
-	void getItemHistories() {
-		// given
-		final String propertyNumber1 = "11111111";
-		final String propertyNumber2 = "22222222";
-		given(itemRepository.findEquipmentItem(any(Pageable.class), any(Category.class)))
-			.willReturn(new PageImpl<>(List.of(new EquipmentItemDto("model1", Category.CAMERA, propertyNumber1),
-				new EquipmentItemDto("model2", Category.CAMERA, propertyNumber2))));
-		given(
-			rentedItemService.getRentalCountsByPropertyNumbersBetweenDate(eq(Set.of(propertyNumber1, propertyNumber2)),
-				any(LocalDate.class), any(LocalDate.class)))
-			.willReturn(Map.of(propertyNumber1, new RentalCountsDto(propertyNumber1, 1, 1)));
-
-		// when
-		final LocalDate now = LocalDate.now();
-		final Page<ItemHistory> itemHistories = itemService.getItemHistories(PageRequest.of(0, 2), Category.CAMERA,
-			now.minusDays(1), now);
-
-		// then
-		assertAll(
-			() -> assertThat(itemHistories.getTotalElements()).isEqualTo(2L),
-			() -> assertThat(itemHistories.getContent()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactly(new ItemHistory(Category.CAMERA, "model1", propertyNumber1, 1, 1),
-					new ItemHistory(Category.CAMERA, "model2", propertyNumber2, 0, 0))
-		);
 	}
 }

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.girigiri.kwrental.item.service.ItemService;
+import com.girigiri.kwrental.item.service.ItemValidator;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest;
 import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
@@ -25,7 +25,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 
 	private final ReservationValidator reservationValidator;
 	private final ReservationRetrieveService reservationRetrieveService;
-	private final ItemService itemService;
+	private final ItemValidator itemValidator;
 	private final RentalSpecRepository rentalSpecRepository;
 
 	@Override
@@ -51,7 +51,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
 		Map<Long, Set<String>> propertyNumbersByEquipmentId = groupPropertyNumbersByEquipmentId(
 			createEquipmentRentalRequest);
-		itemService.validatePropertyNumbers(propertyNumbersByEquipmentId);
+		itemValidator.validatePropertyNumbers(propertyNumbersByEquipmentId);
 		validateAlreadyRented(collectPropertyNumbers(propertyNumbersByEquipmentId));
 	}
 
