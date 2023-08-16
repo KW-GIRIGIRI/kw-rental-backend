@@ -52,6 +52,9 @@ class LabRoomDailyBan(BaseModel):
     ban_date = DateField()
     lab_room_id = BigIntegerField()
 
+    class Meta:
+        db_table = 'lab_room_daily_ban'
+
 
 class Inventory(BaseModel):
     member_id = BigIntegerField()
@@ -89,6 +92,8 @@ class ReservationSpec(BaseModel):
     asset_id = BigIntegerField()
     reservation_id = BigIntegerField()
 
+    class Meta:
+        db_table = 'reservation_spec'
 
 class RentalSpec(BaseModel):
     accept_date_time = TimestampField()
@@ -98,3 +103,6 @@ class RentalSpec(BaseModel):
     return_date_time = TimestampField()
     status = CharField()
     dtype = CharField()
+
+    class Meta:
+        db_table = 'rental_spec'
