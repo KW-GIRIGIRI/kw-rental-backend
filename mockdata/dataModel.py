@@ -38,7 +38,7 @@ class Asset(BaseModel):
     is_available = BooleanField()
     reservation_count_per_day = IntegerField()
     notice = TextField()
-    deletedAt = DateField()
+    deleted_at = DateField()
 
 
 class Item(BaseModel):
