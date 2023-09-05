@@ -44,11 +44,6 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         this.rentalEndDate = rentalEndDate;
     }
 
-    public static boolean isNotSupportedDayOfWeek(final LocalDate date) {
-        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
-            || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
-    }
-
     public Integer getRentalDayCount() {
         int rentalDays = 0;
         for (LocalDate date = rentalStartDate; date.isBefore(rentalEndDate); date = date.plusDays(1)) {
@@ -58,6 +53,11 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
             rentalDays++;
         }
         return rentalDays;
+    }
+
+    private boolean isNotSupportedDayOfWeek(final LocalDate date) {
+        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
+            || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
     }
 
     public Set<LocalDate> getRentalDays() {
