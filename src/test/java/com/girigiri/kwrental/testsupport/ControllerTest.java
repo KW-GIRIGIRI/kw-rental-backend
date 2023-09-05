@@ -30,6 +30,7 @@ import com.girigiri.kwrental.reservation.service.ReservationViewService;
 import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelService;
 import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
 import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
+import com.girigiri.kwrental.util.EndPointUtils;
 
 @WebMvcTest
 @Import(LoginArgumentResolver.class)
@@ -102,4 +103,6 @@ public abstract class ControllerTest {
 	protected ItemViewService itemViewService;
 	@MockBean
 	protected LabRoomAvailableService labRoomAvailableService;
+	@MockBean
+	protected EndPointUtils endPointUtils;
 }

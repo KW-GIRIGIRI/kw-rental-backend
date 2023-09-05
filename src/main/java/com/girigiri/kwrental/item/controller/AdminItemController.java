@@ -38,6 +38,7 @@ public class AdminItemController {
 
 	private final ItemService itemService;
 	private final ItemViewService itemViewService;
+	private final EndPointUtils endPointUtils;
 
 	@PatchMapping("/{id}/rentalAvailable")
 	public ResponseEntity<?> updateRentalAvailable(@PathVariable final Long id,
@@ -77,7 +78,7 @@ public class AdminItemController {
 		@Validated final ItemHistoryRequest itemHistoryRequest) {
 		final Page<ItemHistory> page = itemViewService.getItemHistories(
 			pageable, itemHistoryRequest.category(), itemHistoryRequest.from(), itemHistoryRequest.to());
-		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+		final List<String> allPageEndPoints = endPointUtils.createAllPageEndPoints(page);
 		return ItemHistoriesResponse.of(page, allPageEndPoints);
 	}
 }

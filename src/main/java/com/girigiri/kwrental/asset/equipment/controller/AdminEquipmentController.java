@@ -49,6 +49,7 @@ public class AdminEquipmentController {
 	private final EquipmentService equipmentService;
 	private final MultiPartFileHandler multiPartFileHandler;
 	private final EquipmentViewService equipmentViewService;
+	private final EndPointUtils endPointUtils;
 
 	@GetMapping
 	public EquipmentPageResponse getEquipments(@Validated EquipmentSearchCondition searchCondition,
@@ -56,7 +57,7 @@ public class AdminEquipmentController {
 		Pageable pageable) {
 		final Page<SimpleEquipmentResponse> page = equipmentViewService.findEquipments(pageable, searchCondition);
 
-		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+		final List<String> allPageEndPoints = endPointUtils.createAllPageEndPoints(page);
 
 		return EquipmentPageResponse.builder()
 			.endPoints(allPageEndPoints)
