@@ -1,0 +1,5 @@
+== 랩실 운영 관리 API
+
+=== 랩실 운영 시간 설정 API
+
+operation::putSchedules[snippets='http-request,http-response']
