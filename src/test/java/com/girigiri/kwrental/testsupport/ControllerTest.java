@@ -25,8 +25,8 @@ import com.girigiri.kwrental.rental.service.RentalViewService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
 import com.girigiri.kwrental.rental.service.restore.EquipmentRentalRestoreService;
 import com.girigiri.kwrental.rental.service.restore.LabRoomRentalRestoreService;
-import com.girigiri.kwrental.reservation.service.ReservationCancelService;
 import com.girigiri.kwrental.reservation.service.ReservationViewService;
+import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelService;
 import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
 import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
 

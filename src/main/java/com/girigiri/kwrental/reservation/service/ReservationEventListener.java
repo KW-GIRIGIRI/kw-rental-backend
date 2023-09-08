@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.service.AssetDeleteEvent;
+import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelTrigger;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,11 +14,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationEventListener {
 
-	private final ReservationCancelService reservationCancelService;
+	private final ReservationCancelTrigger reservationCancelTrigger;
 
 	@EventListener
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void handleAssetDelete(final AssetDeleteEvent event) {
-		reservationCancelService.cancelByAssetId(event.getAssetId());
+		reservationCancelTrigger.triggerByAssetDelete(event.getAssetId());
 	}
 }

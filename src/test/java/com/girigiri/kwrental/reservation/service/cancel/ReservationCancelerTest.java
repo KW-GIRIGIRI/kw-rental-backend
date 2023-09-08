@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.reservation.service;
+package com.girigiri.kwrental.reservation.service.cancel;
 
 import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.*;
 import static org.assertj.core.api.Assertions.*;
@@ -27,7 +27,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
-class ReservationCancelServiceTest {
+class ReservationCancelerTest {
 
 	@Mock
 	private ReservationRepository reservationRepository;
@@ -36,11 +36,11 @@ class ReservationCancelServiceTest {
 	private ReservationSpecRepository reservationSpecRepository;
 
 	@InjectMocks
-	private ReservationCancelService reservationCancelService;
+	private ReservationCanceler reservationCanceler;
 
 	@Test
 	@DisplayName("특정 회원의 모든 대여 예약을 취소한다.")
-	void cancelAll() {
+	void cancelByMemberId() {
 		// given
 		final ReservationSpec spec1 = ReservationSpecFixture.builder(null).id(1L).build();
 		final ReservationSpec spec2 = ReservationSpecFixture.builder(null).id(2L).build();
@@ -49,13 +49,9 @@ class ReservationCancelServiceTest {
 		final Reservation reservation2 = ReservationFixture.builder(List.of(spec2)).id(2L).memberId(memberId).build();
 		given(reservationRepository.findNotTerminatedReservationsByMemberId(memberId))
 			.willReturn(Set.of(reservation1, reservation2));
-		given(reservationRepository.findByIdWithSpecs(reservation1.getId()))
-			.willReturn(Optional.of(reservation1));
-		given(reservationRepository.findByIdWithSpecs(reservation2.getId()))
-			.willReturn(Optional.of(reservation2));
 
-		// when
-		assertThatCode(() -> reservationCancelService.cancelReserved(memberId))
+		// when, then
+		assertThatCode(() -> reservationCanceler.cancelByMemberId(memberId, CancelAlerter.doNothing()))
 			.doesNotThrowAnyException();
 		assertThat(reservation1.isTerminated()).isTrue();
 		assertThat(spec1.getStatus()).isEqualTo(ReservationSpecStatus.CANCELED);
@@ -89,10 +85,9 @@ class ReservationCancelServiceTest {
 
 		given(reservationSpecRepository.findById(any())).willReturn(Optional.of(reservationSpec1));
 		doNothing().when(reservationSpecRepository).adjustAmountAndStatus(deepRefEq(afterCanceledSpec, "reservation"));
-		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 
 		// when
-		final Long actual = reservationCancelService.cancelReservationSpec(any(), 2);
+		final Long actual = reservationCanceler.cancelReservationSpec(any(), 2, CancelAlerter.doNothing());
 
 		// then
 		assertAll(
@@ -123,11 +118,10 @@ class ReservationCancelServiceTest {
 
 		given(reservationSpecRepository.findById(any())).willReturn(Optional.of(reservationSpec));
 		doNothing().when(reservationSpecRepository).adjustAmountAndStatus(deepRefEq(afterCanceledSpec, "reservation"));
-		given(reservationRepository.findByIdWithSpecs(any())).willReturn(Optional.of(reservation));
 		doNothing().when(reservationRepository).adjustTerminated(deepRefEq(afterCanceledReservation));
 
 		// when
-		final Long actual = reservationCancelService.cancelReservationSpec(any(), 2);
+		final Long actual = reservationCanceler.cancelReservationSpec(any(), 2, CancelAlerter.doNothing());
 
 		// then
 		assertAll(
