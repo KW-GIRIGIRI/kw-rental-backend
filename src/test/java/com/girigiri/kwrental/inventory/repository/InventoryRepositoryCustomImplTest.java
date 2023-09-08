@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;

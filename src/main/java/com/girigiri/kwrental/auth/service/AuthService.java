@@ -2,6 +2,7 @@ package com.girigiri.kwrental.auth.service;
 
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,23 +22,18 @@ import com.girigiri.kwrental.auth.exception.MemberException;
 import com.girigiri.kwrental.auth.exception.MemberNotFoundException;
 import com.girigiri.kwrental.auth.exception.PasswordNotMatchesException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
-import com.girigiri.kwrental.mail.EmailService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     public static final String UUID_DELIMITER = "-";
     public static final int PASSWORD_MIN_LENGTH = 8;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
-
-    public AuthService(final MemberRepository memberRepository, final PasswordEncoder passwordEncoder,
-        EmailService emailService) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
-    }
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long register(final RegisterMemberRequest registerMemberRequest) {
@@ -53,8 +49,7 @@ public class AuthService {
             .phoneNumber(registerMemberRequest.phoneNumber())
             .role(Role.USER)
             .build();
-        memberRepository.save(member);
-        return member.getId();
+        return memberRepository.save(member).getId();
     }
 
     @Transactional(readOnly = true)
@@ -119,7 +114,9 @@ public class AuthService {
         final String randomPassword = getRandomPassword();
         final String encodedPassword = passwordEncoder.encode(randomPassword);
         member.updatePassword(encodedPassword);
-        emailService.sendRenewPassword(member.getEmail(), randomPassword);
+        final RenewPasswordAlertEvent renewPasswordAlertEvent = new RenewPasswordAlertEvent(randomPassword,
+            member.getEmail(), this);
+        eventPublisher.publishEvent(renewPasswordAlertEvent);
     }
 
     private String getRandomPassword() {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.mail.MailEvent;
+import com.girigiri.kwrental.common.mail.MailEvent;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.service.cancel.event.CancelByAdminEvent;

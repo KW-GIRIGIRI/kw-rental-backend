@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.mail;
+package com.girigiri.kwrental.common.mail;
 
 import org.springframework.context.ApplicationEvent;
 

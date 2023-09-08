@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.reservation.domain.LabRoomReservation;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;

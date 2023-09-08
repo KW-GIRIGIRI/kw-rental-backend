@@ -15,7 +15,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import com.amazonaws.services.s3.AmazonS3;
 import com.girigiri.kwrental.auth.dto.request.LoginRequest;
 import com.girigiri.kwrental.auth.service.KwangwoonMemberService;
-import com.girigiri.kwrental.mail.EmailService;
+import com.girigiri.kwrental.common.mail.EmailEventListener;
 import com.girigiri.kwrental.testsupport.databasecleanup.CleanBeforeEach;
 
 import io.restassured.RestAssured;
@@ -31,7 +31,7 @@ abstract class AcceptanceTest {
     @MockBean
     protected AmazonS3 amazonS3;
     @MockBean
-    protected EmailService emailService;
+    protected EmailEventListener emailEventListener;
     @MockBean
     protected KwangwoonMemberService kwangwoonMemberService;
     protected RequestSpecification requestSpec;

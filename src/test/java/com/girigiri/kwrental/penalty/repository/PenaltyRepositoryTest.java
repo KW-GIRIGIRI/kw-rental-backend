@@ -15,7 +15,7 @@ import org.springframework.data.domain.PageRequest;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.penalty.domain.Penalty;
 import com.girigiri.kwrental.penalty.domain.PenaltyPeriod;
 import com.girigiri.kwrental.penalty.domain.PenaltyReason;

@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.reservation.service.cancel.event;
 
-import com.girigiri.kwrental.mail.MailEvent;
+import com.girigiri.kwrental.common.mail.MailEvent;
 
 public class CancelByPenaltyEvent extends MailEvent {
 	public CancelByPenaltyEvent(final String email, final Object source) {
