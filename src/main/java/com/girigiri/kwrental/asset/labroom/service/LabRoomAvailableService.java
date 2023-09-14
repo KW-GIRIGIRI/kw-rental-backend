@@ -2,41 +2,35 @@ package com.girigiri.kwrental.asset.labroom.service;
 
 import java.time.LocalDate;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
-import com.girigiri.kwrental.asset.labroom.dto.request.LabRoomNoticeRequest;
 import com.girigiri.kwrental.asset.labroom.dto.response.LabRoomAvailableResponse;
-import com.girigiri.kwrental.asset.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.asset.labroom.exception.LabRoomAvailableDateFailureException;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomRepository;
+import com.girigiri.kwrental.asset.labroom.service.event.LabRoomDailyUnavailableEvent;
+import com.girigiri.kwrental.asset.labroom.service.event.LabRoomUnavailableEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
+
 @Transactional
 @RequiredArgsConstructor
-public class LabRoomService {
-	private final LabRoomRepository labRoomRepository;
+public class LabRoomAvailableService {
 	private final LabRoomRetriever labRoomRetriever;
+	private final LabRoomRepository labRoomRepository;
 	private final LabRoomDailyBanRepository labRoomDailyBanRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
-	public void setNotice(String name, LabRoomNoticeRequest labRoomNoticeRequest) {
+	public void setAvailableForEntirePeriod(final String name, boolean available) {
 		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(name);
-		labRoomRepository.updateNotice(labRoom.getId(), labRoomNoticeRequest.getNotice());
-	}
-
-	@Transactional(readOnly = true)
-	public LabRoomNoticeResponse getNotice(String name) {
-		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(name);
-		return new LabRoomNoticeResponse(labRoom.getNotice());
-	}
-
-	public void setAvailableForEntirePeriod(String name, boolean available) {
-		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(name);
+		if (!available)
+			eventPublisher.publishEvent(new LabRoomUnavailableEvent(this, labRoom));
 		labRoomRepository.updateAvailable(labRoom.getId(), available);
 	}
 
@@ -47,7 +41,7 @@ public class LabRoomService {
 				() -> makeUnavailable(labRoom, available, date));
 	}
 
-	private void makeAvailable(LabRoom labRoom, final LabRoomDailyBan labRoomDailyBan, final boolean available) {
+	private void makeAvailable(final LabRoom labRoom, final LabRoomDailyBan labRoomDailyBan, final boolean available) {
 		if (!labRoom.isAvailable()) {
 			throw new LabRoomAvailableDateFailureException();
 		}
@@ -59,6 +53,7 @@ public class LabRoomService {
 	private void makeUnavailable(final LabRoom labRoom, final boolean available, final LocalDate date) {
 		if (!available) {
 			labRoomDailyBanRepository.save(LabRoomDailyBan.builder().labRoomId(labRoom.getId()).banDate(date).build());
+			eventPublisher.publishEvent(new LabRoomDailyUnavailableEvent(this, labRoom, date));
 		}
 	}
 

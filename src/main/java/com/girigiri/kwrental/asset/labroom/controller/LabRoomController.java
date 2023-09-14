@@ -8,23 +8,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.girigiri.kwrental.asset.labroom.dto.response.LabRoomAvailableResponse;
-import com.girigiri.kwrental.asset.labroom.service.LabRoomService;
+import com.girigiri.kwrental.asset.labroom.service.LabRoomAvailableService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/labRooms")
 public class LabRoomController {
 
-	private final LabRoomService labRoomService;
+	private final LabRoomAvailableService labRoomAvailableService;
 
-	public LabRoomController(final LabRoomService labRoomService) {
-		this.labRoomService = labRoomService;
-	}
 
 	@GetMapping("/{name}/available")
 	public LabRoomAvailableResponse getLabRoomAvailableByDate(@PathVariable final String name, final LocalDate date) {
 		if (date == null) {
-			return labRoomService.getAvailable(name);
+			return labRoomAvailableService.getAvailable(name);
 		}
-		return labRoomService.getAvailableByDate(name, date);
+		return labRoomAvailableService.getAvailableByDate(name, date);
 	}
 }
