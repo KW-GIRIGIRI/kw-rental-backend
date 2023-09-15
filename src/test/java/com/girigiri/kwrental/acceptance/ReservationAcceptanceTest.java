@@ -2,6 +2,8 @@ package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
 
 import java.time.LocalDate;
@@ -43,6 +45,7 @@ import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReser
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedEquipmentReservationsResponse.UnterminatedEquipmentReservationResponse;
 import com.girigiri.kwrental.reservation.dto.response.UnterminatedLabRoomReservationsResponse;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
+import com.girigiri.kwrental.reservation.service.cancel.event.CancelByAdminEvent;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
@@ -212,6 +215,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 	@DisplayName("대여 예약 상세를 취소한다.")
 	void cancelReservationSpec() {
 		// given
+		doNothing().when(emailEventListener).handleMailEvent(any(CancelByAdminEvent.class));
 		final Long memberId = 1L;
 		final RentableAsset asset = assetRepository.save(EquipmentFixture.builder().name("name1").build());
 		final ReservationSpec reservationSpec1 = ReservationSpecFixture.builder(asset)
@@ -229,6 +233,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 			.when().log().all().patch("/api/admin/reservations/specs/{id}", reservationSpec1.getId())
 			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
 			.header(HttpHeaders.LOCATION, containsString("/api/reservations/specs/" + reservationSpec1.getId()));
+		verify(emailEventListener).handleMailEvent(any(CancelByAdminEvent.class));
 	}
 
 	@Test

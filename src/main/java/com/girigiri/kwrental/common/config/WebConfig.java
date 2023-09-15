@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.config;
+package com.girigiri.kwrental.common.config;
 
 import static org.springframework.http.HttpMethod.*;
 

@@ -13,58 +13,32 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
-import com.girigiri.kwrental.asset.labroom.dto.request.LabRoomNoticeRequest;
 import com.girigiri.kwrental.asset.labroom.dto.response.LabRoomAvailableResponse;
-import com.girigiri.kwrental.asset.labroom.dto.response.LabRoomNoticeResponse;
 import com.girigiri.kwrental.asset.labroom.exception.LabRoomAvailableDateFailureException;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomDailyBanRepository;
 import com.girigiri.kwrental.asset.labroom.repository.LabRoomRepository;
+import com.girigiri.kwrental.asset.labroom.service.event.LabRoomDailyUnavailableEvent;
+import com.girigiri.kwrental.asset.labroom.service.event.LabRoomUnavailableEvent;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomDailyBanFixture;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 
 @ExtendWith(MockitoExtension.class)
-class LabRoomServiceTest {
+class LabRoomAvailableServiceTest {
 
-	@Mock
-	private LabRoomRepository labRoomRepository;
 	@Mock
 	private LabRoomRetriever labRoomRetriever;
 	@Mock
+	private LabRoomRepository labRoomRepository;
+	@Mock
 	private LabRoomDailyBanRepository labRoomDailyBanRepository;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
 	@InjectMocks
-	private LabRoomService labRoomService;
-
-	@Test
-	@DisplayName("안내사항을 등록한다.")
-	void setNotice() {
-		// given
-		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).build();
-		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
-		doNothing().when(labRoomRepository).updateNotice(hwado.getId(), "updated notice");
-
-		// when
-		labRoomService.setNotice("hwado", new LabRoomNoticeRequest("updated notice"));
-
-		// then
-		verify(labRoomRepository).updateNotice(hwado.getId(), "updated notice");
-	}
-
-	@Test
-	@DisplayName("안내사항을 조회한다.")
-	void getNotice() {
-		// given
-		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).build();
-		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
-
-		// when
-		final LabRoomNoticeResponse actual = labRoomService.getNotice("hwado");
-
-		// then
-		assertThat(actual).isEqualTo(new LabRoomNoticeResponse(hwado.getNotice()));
-	}
+	private LabRoomAvailableService labRoomAvailableService;
 
 	@Test
 	@DisplayName("랩실 전체기간 운영 여부를 설정한다.")
@@ -73,9 +47,10 @@ class LabRoomServiceTest {
 		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).build();
 		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
 		doNothing().when(labRoomRepository).updateAvailable(hwado.getId(), false);
+		doNothing().when(eventPublisher).publishEvent(any(LabRoomUnavailableEvent.class));
 
 		// when
-		labRoomService.setAvailableForEntirePeriod("hwado", false);
+		labRoomAvailableService.setAvailableForEntirePeriod("hwado", false);
 
 		// then
 		verify(labRoomRepository).updateAvailable(hwado.getId(), false);
@@ -97,7 +72,7 @@ class LabRoomServiceTest {
 		doNothing().when(labRoomDailyBanRepository).deleteById(dailyBan.getId());
 
 		// when
-		labRoomService.setAvailable("hwado", LocalDate.now(), true);
+		labRoomAvailableService.setAvailable("hwado", LocalDate.now(), true);
 
 		// then
 		verify(labRoomDailyBanRepository).deleteById(dailyBan.getId());
@@ -119,7 +94,7 @@ class LabRoomServiceTest {
 			Optional.of(dailyBan));
 
 		// when, then
-		assertThatThrownBy(() -> labRoomService.setAvailable("hwado", now, true))
+		assertThatThrownBy(() -> labRoomAvailableService.setAvailable("hwado", now, true))
 			.isExactlyInstanceOf(LabRoomAvailableDateFailureException.class);
 	}
 
@@ -136,9 +111,10 @@ class LabRoomServiceTest {
 			.banDate(LocalDate.now())
 			.build();
 		given(labRoomDailyBanRepository.save(deepRefEq(dailyBan))).willReturn(dailyBan);
+		doNothing().when(eventPublisher).publishEvent(any(LabRoomDailyUnavailableEvent.class));
 
 		// when
-		labRoomService.setAvailable("hwado", LocalDate.now(), false);
+		labRoomAvailableService.setAvailable("hwado", LocalDate.now(), false);
 
 		// then
 		verify(labRoomDailyBanRepository).save(deepRefEq(dailyBan));
@@ -154,7 +130,7 @@ class LabRoomServiceTest {
 			.willReturn(Optional.empty());
 
 		// when
-		final LabRoomAvailableResponse actual = labRoomService.getAvailableByDate("hwado", LocalDate.now());
+		final LabRoomAvailableResponse actual = labRoomAvailableService.getAvailableByDate("hwado", LocalDate.now());
 
 		// then
 		assertThat(actual).isEqualTo(new LabRoomAvailableResponse(hwado.getId(), true, LocalDate.now()));
@@ -168,7 +144,7 @@ class LabRoomServiceTest {
 		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
 
 		// when
-		final LabRoomAvailableResponse actual = labRoomService.getAvailable("hwado");
+		final LabRoomAvailableResponse actual = labRoomAvailableService.getAvailable("hwado");
 
 		// then
 		assertThat(actual).isEqualTo(new LabRoomAvailableResponse(hwado.getId(), true, null));

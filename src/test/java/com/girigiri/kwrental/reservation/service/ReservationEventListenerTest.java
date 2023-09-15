@@ -12,21 +12,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.equipment.service.EquipmentDeleteEvent;
+import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelTrigger;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationEventListenerTest {
 
 	@Mock
-	private ReservationCancelService reservationCancelService;
+	private ReservationCancelTrigger reservationCancelTrigger;
 
 	@InjectMocks
 	private ReservationEventListener reservationEventListener;
 
 	@Test
-	@DisplayName("자산 삭제됨에 따라 ")
+	@DisplayName("자산 삭제됨에 따라 이벤트를 핸들링한다.")
 	void handleAssetDelete() {
 		// given
-		doNothing().when(reservationCancelService).cancelByAssetId(anyLong());
+		doNothing().when(reservationCancelTrigger).triggerByAssetDelete(anyLong());
 		final EquipmentDeleteEvent event = new EquipmentDeleteEvent(this, 1L);
 
 		// when, then

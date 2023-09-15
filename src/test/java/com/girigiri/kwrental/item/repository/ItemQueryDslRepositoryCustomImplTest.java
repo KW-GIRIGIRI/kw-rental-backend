@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;

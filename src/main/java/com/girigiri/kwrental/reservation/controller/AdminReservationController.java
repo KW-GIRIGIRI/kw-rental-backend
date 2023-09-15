@@ -18,8 +18,8 @@ import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationPurposeResponse;
 import com.girigiri.kwrental.reservation.dto.response.ReservationsByEquipmentPerYearMonthResponse;
-import com.girigiri.kwrental.reservation.service.ReservationCancelService;
 import com.girigiri.kwrental.reservation.service.ReservationViewService;
+import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelService;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -43,7 +43,7 @@ public class AdminReservationController {
 	@PatchMapping("/specs/{reservationSpecId}")
 	public ResponseEntity<?> cancelReservationSpec(@PathVariable Long reservationSpecId,
 		@Validated @RequestBody final CancelReservationSpecRequest body) {
-		final Long cancelReservationSpecId = reservationCancelService.cancelReservationSpec(reservationSpecId,
+		final Long cancelReservationSpecId = reservationCancelService.cancelReservationSpecByAdmin(reservationSpecId,
 			body.amount());
 		return ResponseEntity.noContent()
 			.location(URI.create("/api/reservations/specs/" + cancelReservationSpecId)).build();

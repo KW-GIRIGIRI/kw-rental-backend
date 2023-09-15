@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.auth.service;
 
+import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.girigiri.kwrental.auth.domain.Member;
@@ -20,7 +22,6 @@ import com.girigiri.kwrental.auth.dto.request.ResetPasswordRequest;
 import com.girigiri.kwrental.auth.exception.EmailNotMatchesException;
 import com.girigiri.kwrental.auth.exception.MemberException;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
-import com.girigiri.kwrental.mail.EmailService;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,12 +29,10 @@ class AuthServiceTest {
 
 	@Mock
 	private MemberRepository memberRepository;
-
 	@Mock
 	private PasswordEncoder passwordEncoder;
-
 	@Mock
-	private EmailService emailService;
+	private ApplicationEventPublisher eventPublisher;
 
 	@InjectMocks
 	private AuthService authService;
@@ -64,7 +63,8 @@ class AuthServiceTest {
 		final Member member = MemberFixture.create();
 		given(memberRepository.findByMemberNumber(any())).willReturn(Optional.of(member));
 		given(passwordEncoder.encode(any())).willReturn("password");
-		doNothing().when(emailService).sendRenewPassword(anyString(), anyString());
+		doNothing().when(eventPublisher).publishEvent(deepRefEq(new RenewPasswordAlertEvent("password",
+			member.getEmail(), this), "source", "timestamp", "body"));
 		final ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest("2016317016", member.getEmail());
 
 		// when

@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 import jakarta.persistence.EntityManager;

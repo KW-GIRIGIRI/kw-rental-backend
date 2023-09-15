@@ -15,7 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @DataJpaTest

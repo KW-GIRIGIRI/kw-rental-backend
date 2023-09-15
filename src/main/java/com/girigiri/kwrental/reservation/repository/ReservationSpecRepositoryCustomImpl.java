@@ -201,6 +201,16 @@ public class ReservationSpecRepositoryCustomImpl implements ReservationSpecRepos
 			.fetch();
 	}
 
+	@Override
+	public List<ReservationSpec> findReservedOrRentedByAssetIdAndDate(final Long assetId, final LocalDate date) {
+		return queryFactory.selectFrom(reservationSpec)
+			.join(reservation).fetchJoin()
+			.where(reservationSpec.asset.id.eq(assetId),
+				reservationSpec.status.in(ReservationSpecStatus.RESERVED, ReservationSpecStatus.RENTED),
+				reservationSpec.period.rentalStartDate.loe(date), reservationSpec.period.rentalEndDate.after(date))
+			.fetch();
+	}
+
 	private Set<LabRoomReservationWithMemberNumberResponse> findLabRoomReservationsWhere(
 		final Predicate... predicates) {
 		return Set.copyOf(

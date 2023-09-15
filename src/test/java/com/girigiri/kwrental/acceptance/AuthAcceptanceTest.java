@@ -3,6 +3,7 @@ package com.girigiri.kwrental.acceptance;
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
 
@@ -30,6 +31,7 @@ import com.girigiri.kwrental.auth.dto.request.UpdateUserRequest;
 import com.girigiri.kwrental.auth.dto.response.KwangwoonMemberResponse;
 import com.girigiri.kwrental.auth.dto.response.MemberResponse;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
+import com.girigiri.kwrental.auth.service.RenewPasswordAlertEvent;
 import com.girigiri.kwrental.testsupport.fixture.MemberFixture;
 
 import io.restassured.http.ContentType;
@@ -233,7 +235,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
 
 		final ResetPasswordRequest requestBody = new ResetPasswordRequest(member.getMemberNumber(),
 			email);
-		doNothing().when(emailService).sendRenewPassword(eq(requestBody.email()), anyString());
+		doNothing().when(emailEventListener).handleMailEvent(any(RenewPasswordAlertEvent.class));
 
 		// when
 		given(requestSpec)
@@ -249,6 +251,7 @@ class AuthAcceptanceTest extends AcceptanceTest {
 		final Member actual = memberRepository.findById(member.getId()).orElseThrow();
 		boolean matches = new BCryptPasswordEncoder().matches(password, actual.getPassword());
 		assertThat(matches).isFalse();
+		verify(emailEventListener).handleMailEvent(any(RenewPasswordAlertEvent.class));
 	}
 
 	@Test

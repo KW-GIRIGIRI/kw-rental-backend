@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
-import com.girigiri.kwrental.config.JpaConfig;
+import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomDailyBanFixture;
 
 @Import(JpaConfig.class)
