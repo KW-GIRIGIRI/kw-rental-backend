@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.operation.domain;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,4 +26,8 @@ public class Schedule {
 
 	@Column(nullable = false, unique = true)
 	private DayOfWeek dayOfWeek;
+
+	public boolean canOperatesAt(final LocalDate date) {
+		return this.dayOfWeek.equals(date.getDayOfWeek());
+	}
 }
