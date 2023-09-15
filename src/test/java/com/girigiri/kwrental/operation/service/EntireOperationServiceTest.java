@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.schedule.service;
+package com.girigiri.kwrental.operation.service;
 
 import static com.girigiri.kwrental.testsupport.DeepReflectionEqMatcher.*;
 import static org.mockito.Mockito.*;
@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.girigiri.kwrental.schedule.domain.EntireOperation;
-import com.girigiri.kwrental.schedule.repository.EntireOperationRepository;
+import com.girigiri.kwrental.operation.domain.EntireOperation;
+import com.girigiri.kwrental.operation.repository.EntireOperationRepository;
 import com.girigiri.kwrental.testsupport.fixture.EntireOperationFixture;
 
 @ExtendWith(MockitoExtension.class)

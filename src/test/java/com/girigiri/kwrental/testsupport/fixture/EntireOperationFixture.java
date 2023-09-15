@@ -1,6 +1,6 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
-import com.girigiri.kwrental.schedule.domain.EntireOperation;
+import com.girigiri.kwrental.operation.domain.EntireOperation;
 
 public class EntireOperationFixture {
 	public static EntireOperation create(final boolean isRunning) {

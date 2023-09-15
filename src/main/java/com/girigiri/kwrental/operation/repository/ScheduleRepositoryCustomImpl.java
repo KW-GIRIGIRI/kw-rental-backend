@@ -1,6 +1,6 @@
-package com.girigiri.kwrental.schedule.repository;
+package com.girigiri.kwrental.operation.repository;
 
-import static com.girigiri.kwrental.schedule.domain.QSchedule.*;
+import static com.girigiri.kwrental.operation.domain.QSchedule.*;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

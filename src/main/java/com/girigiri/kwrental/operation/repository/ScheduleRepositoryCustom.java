@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.schedule.repository;
+package com.girigiri.kwrental.operation.repository;
 
 public interface ScheduleRepositoryCustom {
 	long deleteAllSchedules();

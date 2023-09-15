@@ -1,9 +1,8 @@
 package com.girigiri.kwrental.testsupport.fixture;
 
 import java.time.DayOfWeek;
-import java.time.LocalTime;
 
-import com.girigiri.kwrental.schedule.domain.Schedule;
+import com.girigiri.kwrental.operation.domain.Schedule;
 
 public class ScheduleFixture {
 
@@ -13,8 +12,6 @@ public class ScheduleFixture {
 
 	public static Schedule.ScheduleBuilder builder(final DayOfWeek dayOfWeek) {
 		return Schedule.builder()
-			.dayOfWeek(dayOfWeek)
-			.startAt(LocalTime.MIN)
-			.endAt(LocalTime.MAX);
+			.dayOfWeek(dayOfWeek);
 	}
 }

@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.schedule.repository;
+package com.girigiri.kwrental.operation.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import com.girigiri.kwrental.config.JpaConfig;
-import com.girigiri.kwrental.schedule.domain.Schedule;
+import com.girigiri.kwrental.common.config.JpaConfig;
+import com.girigiri.kwrental.operation.domain.Schedule;
 import com.girigiri.kwrental.testsupport.fixture.ScheduleFixture;
 
 @DataJpaTest

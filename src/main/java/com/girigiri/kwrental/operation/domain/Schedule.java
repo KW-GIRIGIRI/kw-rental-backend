@@ -1,4 +1,6 @@
-package com.girigiri.kwrental.schedule.domain;
+package com.girigiri.kwrental.operation.domain;
+
+import java.time.DayOfWeek;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,12 +16,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class EntireOperation {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Schedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(nullable = false)
-	private boolean isRunning;
+
+	@Column(nullable = false, unique = true)
+	private DayOfWeek dayOfWeek;
 }
