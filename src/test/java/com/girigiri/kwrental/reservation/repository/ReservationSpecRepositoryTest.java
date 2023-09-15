@@ -570,8 +570,8 @@ class ReservationSpecRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("특정 기자재의 대여 예약 상세를 조회한다.")
-	void findByAssetId() {
+	@DisplayName("특정 자산의 예약 중이거나 대여된 대여 예약 상세를 조회한다.")
+	void findReservedOrRentedByAssetId() {
 		// given
 		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
 		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
@@ -583,6 +583,29 @@ class ReservationSpecRepositoryTest {
 		// when
 		final List<ReservationSpec> actual = reservationSpecRepository.findReservedOrRentedByAssetId(
 			equipment1.getId());
+
+		// then
+		assertThat(actual).usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyInAnyOrder(spec1);
+	}
+
+	@Test
+	@DisplayName("특정 자산의 예약 중이거나 대여 중이고 특정 날짜가 대여 기간에 포함된 대여 예약 상세를 조회한다.")
+	void findReservedOrRentedByAssetIdAndDate() {
+		// given
+		final LocalDate now = LocalDate.now();
+		final RentableAsset equipment1 = assetRepository.save(EquipmentFixture.builder().name("test1").build());
+		final RentableAsset equipment2 = assetRepository.save(EquipmentFixture.builder().name("test2").build());
+		final ReservationSpec spec1 = ReservationSpecFixture.builder(equipment1)
+			.period(new RentalPeriod(now, now.plusDays(1))).build();
+		reservationRepository.save(ReservationFixture.create(List.of(spec1)));
+		final ReservationSpec spec2 = ReservationSpecFixture.builder(equipment2)
+			.period(new RentalPeriod(now.plusDays(1), now.plusDays(2))).build();
+		reservationRepository.save(ReservationFixture.create(List.of(spec2)));
+
+		// when
+		final List<ReservationSpec> actual = reservationSpecRepository.findReservedOrRentedByAssetIdAndDate(
+			equipment1.getId(), now);
 
 		// then
 		assertThat(actual).usingRecursiveFieldByFieldElementComparator()

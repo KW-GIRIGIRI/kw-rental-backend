@@ -13,9 +13,9 @@ import com.girigiri.kwrental.reservation.dto.response.HistoryStatResponse;
 import com.girigiri.kwrental.reservation.dto.response.LabRoomReservationsWithMemberNumberResponse.LabRoomReservationWithMemberNumberResponse;
 
 public interface ReservationSpecRepositoryCustom {
-    List<ReservationSpec> findOverlappedReservedOrRentedByPeriod(Long equipmentId, RentalPeriod rentalPeriod);
+    List<ReservationSpec> findOverlappedReservedOrRentedByPeriod(Long assetId, RentalPeriod rentalPeriod);
 
-    List<ReservationSpec> findOverlappedReservedOrRentedInclusive(Long equipmentId, LocalDate start, LocalDate end);
+    List<ReservationSpec> findOverlappedReservedOrRentedInclusive(Long assetId, LocalDate start, LocalDate end);
 
     List<ReservedAmount> findRentalAmountsByAssetIds(List<Long> assetIds, LocalDate date);
 
@@ -38,4 +38,6 @@ public interface ReservationSpecRepositoryCustom {
     HistoryStatResponse findHistoryStat(String name, LocalDate startDate, LocalDate endDate);
 
     List<ReservationSpec> findReservedOrRentedByAssetId(Long assetId);
+
+    List<ReservationSpec> findReservedOrRentedByAssetIdAndDate(Long assetId, LocalDate date);
 }

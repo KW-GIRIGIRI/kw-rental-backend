@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.reservation.service.cancel;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -69,16 +70,10 @@ class ReservationCanceler {
 
 	void cancelByAssetId(final Long assetId,
 		final CancelAlerter<List<ReservationSpec>> alarmExecutor) {
-		final List<ReservationSpec> reservedSpecs = getReservedSpecsByAssetId(assetId);
+		List<ReservationSpec> reservedSpecs = reservationSpecRepository.findReservedOrRentedByAssetId(assetId);
+		validateAllReserved(reservedSpecs);
 		reservedSpecs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
 		alarmExecutor.alert(reservedSpecs);
-	}
-
-	private List<ReservationSpec> getReservedSpecsByAssetId(final Long assetId) {
-		List<ReservationSpec> reservedOrRentedSpecs = reservationSpecRepository.findReservedOrRentedByAssetId(
-			assetId);
-		validateAllReserved(reservedOrRentedSpecs);
-		return reservedOrRentedSpecs;
 	}
 
 	private void validateAllReserved(final List<ReservationSpec> reservedOrRentedSpecs) {
@@ -86,5 +81,14 @@ class ReservationCanceler {
 			.anyMatch(ReservationSpec::isRented);
 		if (anyRented)
 			throw new ReservationSpecException("대여 중인 대여 예약 상세는 취소할 수 없습니다.");
+	}
+
+	void cancelByAssetIdAndDate(final Long labRoomId, final LocalDate date,
+		final CancelAlerter<List<ReservationSpec>> cancelAlerter) {
+		final List<ReservationSpec> reservedSpecs = reservationSpecRepository.findReservedOrRentedByAssetIdAndDate(
+			labRoomId, date);
+		validateAllReserved(reservedSpecs);
+		reservedSpecs.forEach(spec -> cancelAndAdjust(spec, spec.getAmount().getAmount()));
+		cancelAlerter.alert(reservedSpecs);
 	}
 }

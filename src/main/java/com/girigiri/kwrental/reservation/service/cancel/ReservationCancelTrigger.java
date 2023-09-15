@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.reservation.service.cancel;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
@@ -13,6 +14,7 @@ import com.girigiri.kwrental.reservation.domain.entity.Reservation;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.service.cancel.event.CancelByAdminEvent;
 import com.girigiri.kwrental.reservation.service.cancel.event.CancelByAssetDeleteEvent;
+import com.girigiri.kwrental.reservation.service.cancel.event.CancelByAssetUnavailableEvent;
 import com.girigiri.kwrental.reservation.service.cancel.event.CancelByPenaltyEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,16 @@ public class ReservationCancelTrigger {
 	public Long triggerByAdminCancelReservationSpec(final Long reservationSpecId, final Integer amount) {
 		return reservationCanceler.cancelReservationSpec(reservationSpecId, amount,
 			spec -> publishEvent(List.of(spec), email -> new CancelByAdminEvent(email, this)));
+	}
+
+	public void triggerByLabRoomUnavailable(final Long labRoomId, final String labRoomName) {
+		reservationCanceler.cancelByAssetId(labRoomId,
+			specs -> publishEvent(specs, email -> new CancelByAssetUnavailableEvent(labRoomName, email, this)));
+	}
+
+	public void triggerByLabRoomDailyUnavailable(final Long labRoomId, final String labRoomName, final LocalDate date) {
+		reservationCanceler.cancelByAssetIdAndDate(labRoomId, date,
+			specs -> publishEvent(specs, email -> new CancelByAssetUnavailableEvent(labRoomName, email, this)));
 	}
 
 	private void publishEvent(final List<ReservationSpec> specs,

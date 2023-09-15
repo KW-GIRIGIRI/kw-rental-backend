@@ -24,7 +24,7 @@ class ReservationEventListenerTest {
 	private ReservationEventListener reservationEventListener;
 
 	@Test
-	@DisplayName("자산 삭제됨에 따라 ")
+	@DisplayName("자산 삭제됨에 따라 이벤트를 핸들링한다.")
 	void handleAssetDelete() {
 		// given
 		doNothing().when(reservationCancelTrigger).triggerByAssetDelete(anyLong());
