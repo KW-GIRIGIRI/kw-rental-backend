@@ -17,6 +17,8 @@ import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse.Inventor
 import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
+import com.girigiri.kwrental.operation.exception.LabRoomNotOperateException;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
@@ -30,6 +32,7 @@ public class InventoryService {
 	private final EquipmentValidator equipmentValidator;
 	private final RemainQuantityValidator remainQuantityValidator;
 	private final InventoryRepository inventoryRepository;
+	private final OperationChecker operationChecker;
 
 	@Transactional
 	public Long save(final Long memberId, final AddInventoryRequest addInventoryRequest) {
@@ -51,13 +54,22 @@ public class InventoryService {
 	}
 
 	private Inventory createAndSave(final Long memberId, final AddInventoryRequest addInventoryRequest) {
+		validateOperate(addInventoryRequest);
 		final RentalPeriod rentalPeriod = new RentalPeriod(addInventoryRequest.rentalStartDate(),
 			addInventoryRequest.rentalEndDate());
 		final Long equipmentId = addInventoryRequest.equipmentId();
-		final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId,
-			rentalPeriod.getRentalDayCount());
+		final int rentalDatesCount = operationChecker.getOperateDates(rentalPeriod.getRentalStartDate(),
+			rentalPeriod.getRentalEndDate()).size() - 1;
+		final Equipment equipment = equipmentValidator.validateRentalDays(equipmentId, rentalDatesCount);
 		remainQuantityValidator.validateAmount(equipmentId, addInventoryRequest.amount(), rentalPeriod);
 		return inventoryRepository.save(mapToInventory(memberId, equipment, addInventoryRequest));
+	}
+
+	private void validateOperate(final AddInventoryRequest addInventoryRequest) {
+		final boolean canOperate = operationChecker.canOperate(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate());
+		if (!canOperate)
+			throw new LabRoomNotOperateException();
 	}
 
 	private Inventory mapToInventory(final Long memberId, final Equipment equipment,

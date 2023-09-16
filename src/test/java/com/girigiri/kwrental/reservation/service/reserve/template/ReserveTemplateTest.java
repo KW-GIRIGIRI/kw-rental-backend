@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -33,6 +34,8 @@ class ReserveTemplateTest {
 	private PenaltyChecker penaltyChecker;
 	@Mock
 	private RemainQuantityValidator remainQuantityValidator;
+	@Mock
+	private OperationChecker operationChecker;
 	@InjectMocks
 	private ReserveTemplate reserveTemplate;
 
@@ -41,6 +44,7 @@ class ReserveTemplateTest {
 	void reserve_hasOngoingPenalty() {
 		// given
 		given(penaltyChecker.hasOngoingPenalty(1L)).willReturn(true);
+		given(operationChecker.canOperate(anyCollection())).willReturn(true);
 
 		// when, then
 		assertThatThrownBy(() -> reserveTemplate.reserve(1L, Collections.emptyList(),
@@ -63,6 +67,7 @@ class ReserveTemplateTest {
 		final Reservation reservation = ReservationFixture.builder(List.of(spec)).build();
 		doThrow(NotEnoughAmountException.class).when(remainQuantityValidator)
 			.validateAmount(assetId, amount, rentalPeriod);
+		given(operationChecker.canOperate(anyCollection())).willReturn(true);
 
 		// when, then
 		assertThatThrownBy(() -> reserveTemplate.reserve(memberId, List.of(reservation),

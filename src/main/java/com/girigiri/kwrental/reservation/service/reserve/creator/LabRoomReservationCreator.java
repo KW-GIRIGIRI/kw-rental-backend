@@ -1,12 +1,15 @@
 package com.girigiri.kwrental.reservation.service.reserve.creator;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomRetriever;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomValidator;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class LabRoomReservationCreator {
 	private final LabRoomRetriever labRoomRetriever;
 	private final LabRoomValidator labRoomValidator;
+	private final OperationChecker operationChecker;
 
 	public Reservation create(final Long memberId, final AddLabRoomReservationRequest addLabRoomReservationRequest) {
 		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName());
@@ -32,7 +36,9 @@ public class LabRoomReservationCreator {
 	}
 
 	private void validateLabRoomForReserve(final LabRoom labRoom, RentalPeriod period) {
-		labRoomValidator.validateDays(labRoom, period.getRentalDays());
+		final Set<LocalDate> rentalDates = operationChecker.getOperateDates(period.getRentalStartDate(),
+			period.getRentalEndDate());
+		labRoomValidator.validateDays(labRoom, rentalDates);
 		labRoomValidator.validateAvailable(labRoom);
 	}
 

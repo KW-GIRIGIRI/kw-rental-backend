@@ -25,6 +25,8 @@ import com.girigiri.kwrental.inventory.dto.response.InventoriesResponse;
 import com.girigiri.kwrental.inventory.exception.InventoryInvalidAccessException;
 import com.girigiri.kwrental.inventory.exception.InventoryNotFoundException;
 import com.girigiri.kwrental.inventory.repository.InventoryRepository;
+import com.girigiri.kwrental.operation.exception.LabRoomNotOperateException;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.service.remainquantity.RemainQuantityValidator;
@@ -36,13 +38,12 @@ class InventoryServiceTest {
 
 	@Mock
 	private InventoryRepository inventoryRepository;
-
 	@Mock
 	private RemainQuantityValidator remainQuantityValidator;
-
 	@Mock
 	private EquipmentValidator equipmentValidator;
-
+	@Mock
+	private OperationChecker operationChecker;
 	@InjectMocks
 	private InventoryService inventoryService;
 
@@ -62,12 +63,34 @@ class InventoryServiceTest {
 			.rentalStartDate(LocalDate.now().plusDays(1))
 			.rentalEndDate(LocalDate.now().plusDays(2))
 			.build();
+		given(operationChecker.canOperate(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate())).willReturn(true);
 
 		// when
 		Long id = inventoryService.save(1L, addInventoryRequest);
 
 		// then
 		assertThat(id).isNotNull();
+	}
+
+	@Test
+	@DisplayName("운영 불가능한 담은 기자재를 저장하려고 하면 예외가 발생한다.")
+	void saveInventory_notOperate() {
+		// given
+		given(inventoryRepository.findByPeriodAndEquipmentIdAndMemberId(any(), any(), any()))
+			.willReturn(Optional.empty());
+		final AddInventoryRequest addInventoryRequest = AddInventoryRequest.builder()
+			.equipmentId(1L)
+			.amount(1)
+			.rentalStartDate(LocalDate.now().plusDays(1))
+			.rentalEndDate(LocalDate.now().plusDays(2))
+			.build();
+		given(operationChecker.canOperate(addInventoryRequest.rentalStartDate(),
+			addInventoryRequest.rentalEndDate())).willReturn(false);
+
+		// when, then
+		assertThatCode(() -> inventoryService.save(1L, addInventoryRequest))
+			.isInstanceOf(LabRoomNotOperateException.class);
 	}
 
 	@Test

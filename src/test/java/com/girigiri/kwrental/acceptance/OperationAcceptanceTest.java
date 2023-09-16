@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
 
 import java.time.DayOfWeek;
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import com.girigiri.kwrental.operation.dto.response.SchedulesResponse;
 import com.girigiri.kwrental.operation.repository.EntireOperationRepository;
 import com.girigiri.kwrental.operation.repository.ScheduleRepository;
 import com.girigiri.kwrental.testsupport.fixture.EntireOperationFixture;
-import com.girigiri.kwrental.testsupport.fixture.ScheduleFixture;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -50,11 +48,7 @@ class OperationAcceptanceTest extends AcceptanceTest {
 	@Test
 	@DisplayName("랩실 운영 요일을 조회한다.")
 	void getSchedules() {
-		// given
-		scheduleRepository.saveAll(
-			List.of(ScheduleFixture.create(DayOfWeek.MONDAY), ScheduleFixture.create(DayOfWeek.FRIDAY)));
-
-		// when
+		// given, when
 		final SchedulesResponse response = RestAssured.given(requestSpec)
 			.filter(document("getSchedules"))
 			.when().log().all().get("/api/admin/operations/schedules")
@@ -62,7 +56,8 @@ class OperationAcceptanceTest extends AcceptanceTest {
 			.extract().as(SchedulesResponse.class);
 
 		// then
-		assertThat(response.schedules()).containsExactlyInAnyOrder(DayOfWeek.MONDAY, DayOfWeek.FRIDAY);
+		assertThat(response.schedules()).containsExactlyInAnyOrder(DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
+			DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY);
 	}
 
 	@Test

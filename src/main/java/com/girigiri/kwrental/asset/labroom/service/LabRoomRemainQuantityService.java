@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountPe
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class LabRoomRemainQuantityService {
 	private final LabRoomDailyBanRetriever labRoomDailyBanRetriever;
 	private final LabRoomRetriever labRoomRetriever;
 	private final RemainingQuantityService remainingQuantityService;
+	private final OperationChecker operationChecker;
 	private final AssetService assetService;
 
 	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
@@ -74,17 +77,18 @@ public class LabRoomRemainQuantityService {
 	private List<RemainReservationCountPerDateResponse> getRemainReservationCountPerDateResponses(
 		final LabRoom labRoom, final Map<LocalDate, Integer> reservationCounts,
 		final Map<LocalDate, LabRoomDailyBan> bans) {
+		final Set<LocalDate> operateDates = operationChecker.getOperateDates(reservationCounts.keySet());
 		return reservationCounts.keySet()
 			.stream()
 			.map(date -> createRemainReservationCountPerDateResponse(date, labRoom.getRemainReservationCount(
-				reservationCounts.get(date)), bans.get(date)))
+				reservationCounts.get(date)), bans.get(date), operateDates))
 			.sorted(Comparator.comparing(RemainReservationCountPerDateResponse::getDate))
 			.toList();
 	}
 
 	private RemainReservationCountPerDateResponse createRemainReservationCountPerDateResponse(final LocalDate date,
-		final Integer remainReservationCount, final LabRoomDailyBan ban) {
-		if (ban != null) {
+		final Integer remainReservationCount, final LabRoomDailyBan ban, final Set<LocalDate> operateDates) {
+		if (ban != null || !operateDates.contains(date)) {
 			return new RemainReservationCountPerDateResponse(date, 0);
 		}
 		return new RemainReservationCountPerDateResponse(date, remainReservationCount);

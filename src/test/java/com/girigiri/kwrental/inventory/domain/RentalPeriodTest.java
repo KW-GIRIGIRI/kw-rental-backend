@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,21 +28,6 @@ class RentalPeriodTest {
         // when, then
         assertThatThrownBy(() -> new RentalPeriod(start, end))
                 .isExactlyInstanceOf(RentalDateException.class);
-    }
-
-    @Test
-    @DisplayName("대여 가능한 일 수를 계산한다")
-    void getRentalDays() {
-        // given
-        final LocalDate thursday = LocalDate.of(2023, 5, 18);
-        final LocalDate monday = LocalDate.of(2023, 5, 22);
-        final RentalPeriod rentalPeriod = new RentalPeriod(thursday, monday);
-
-        // when
-        final Integer expect = rentalPeriod.getRentalDayCount();
-
-        // then
-        assertThat(expect).isOne();
     }
 
     @Test
@@ -115,4 +101,17 @@ class RentalPeriodTest {
         assertThat(actual).isEqualTo(expect);
     }
 
+    @Test
+    @DisplayName("대여 기간에 있는 일자들을 모두 조회한다.")
+    void getDates() {
+        // given
+        final LocalDate now = LocalDate.now();
+        final RentalPeriod rentalPeriod = new RentalPeriod(now, now.plusDays(3));
+
+        // when
+        final Set<LocalDate> actual = rentalPeriod.getDates();
+
+        // then
+        assertThat(actual).containsExactlyInAnyOrder(now, now.plusDays(1), now.plusDays(2));
+    }
 }

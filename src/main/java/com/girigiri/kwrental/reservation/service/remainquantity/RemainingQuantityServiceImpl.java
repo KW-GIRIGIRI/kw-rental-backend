@@ -2,17 +2,18 @@ package com.girigiri.kwrental.reservation.service.remainquantity;
 
 import static java.util.stream.Collectors.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.service.RemainingQuantityService;
-import com.girigiri.kwrental.reservation.domain.OperatingPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -39,9 +40,13 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService {
 		final Long rentableId, final LocalDate from, final LocalDate to) {
 		final List<ReservationSpec> overlappedSpecs =
 			reservationSpecRepository.findOverlappedReservedOrRentedInclusive(rentableId, from, to);
-		final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
-		return operatingPeriod.getRentalAvailableDates().stream()
+		return getWeekDayStream(from, to)
 			.collect(toMap(Function.identity(), date -> getReservedAmountsByDate(overlappedSpecs, date)));
+	}
+
+	private Stream<LocalDate> getWeekDayStream(final LocalDate from, final LocalDate to) {
+		return Stream.iterate(from, it -> it.isBefore(to) || it.equals(to), it -> it.plusDays(1))
+			.filter(it -> it.getDayOfWeek() != DayOfWeek.SATURDAY && it.getDayOfWeek() != DayOfWeek.SUNDAY);
 	}
 
 	private int getReservedAmountsByDate(final List<ReservationSpec> reservationSpecs, final LocalDate date) {
@@ -56,8 +61,7 @@ public class RemainingQuantityServiceImpl implements RemainingQuantityService {
 		final Long rentableId, final LocalDate from, final LocalDate to) {
 		List<ReservationSpec> overlappedSpecs = reservationSpecRepository.findOverlappedReservedOrRentedInclusive(
 			rentableId, from, to);
-		final OperatingPeriod operatingPeriod = new OperatingPeriod(from, to);
-		return operatingPeriod.getRentalAvailableDates().stream()
+		return getWeekDayStream(from, to)
 			.collect(toMap(Function.identity(), date -> getSpecCount(overlappedSpecs, date)));
 	}
 

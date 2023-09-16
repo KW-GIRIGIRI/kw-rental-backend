@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,5 +71,21 @@ class OperationCheckerTest {
 
 		// then
 		assertThat(actual).isTrue();
+	}
+
+	@Test
+	@DisplayName("시작일과 끝잀 사이의 운영되는 날짜를 조회한다.")
+	void getOperateDates() {
+		// given
+		given(entireOperationRepository.findAll()).willReturn(List.of(EntireOperationFixture.create(true)));
+		given(scheduleRepository.findAll()).willReturn(List.of(ScheduleFixture.create(DayOfWeek.MONDAY)));
+		final LocalDate start = LocalDate.of(2023, 9, 15);
+		final LocalDate end = LocalDate.of(2023, 9, 22);
+
+		// when
+		final Set<LocalDate> actual = operationChecker.getOperateDates(start, end);
+
+		// then
+		assertThat(actual).containsExactlyInAnyOrder(LocalDate.of(2023, 9, 18));
 	}
 }
