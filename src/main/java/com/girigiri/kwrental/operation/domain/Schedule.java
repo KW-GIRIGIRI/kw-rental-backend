@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +27,7 @@ public class Schedule {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
+	@Enumerated(EnumType.STRING)
 	private DayOfWeek dayOfWeek;
 
 	public boolean canOperatesAt(final LocalDate date) {
