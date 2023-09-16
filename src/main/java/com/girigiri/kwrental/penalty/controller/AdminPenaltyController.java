@@ -22,21 +22,22 @@ import com.girigiri.kwrental.penalty.dto.response.PenaltyHistoryPageResponse.Pen
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
 import com.girigiri.kwrental.util.EndPointUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin/penalties")
 public class AdminPenaltyController {
 
 	private final PenaltyServiceImpl penaltyService;
+	private final EndPointUtils endPointUtils;
 
-	public AdminPenaltyController(final PenaltyServiceImpl penaltyService) {
-		this.penaltyService = penaltyService;
-	}
 
 	@GetMapping("/histories")
 	public final PenaltyHistoryPageResponse getPenaltyHistoryPage(
 		@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
 		final Page<PenaltyHistoryResponse> penaltyHistoryPage = penaltyService.getPenaltyHistoryPage(pageable);
-		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(penaltyHistoryPage);
+		final List<String> allPageEndPoints = endPointUtils.createAllPageEndPoints(penaltyHistoryPage);
 		return new PenaltyHistoryPageResponse(allPageEndPoints, pageable.getPageNumber(),
 			penaltyHistoryPage.getContent());
 	}

@@ -1,8 +1,9 @@
 package com.girigiri.kwrental.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +27,7 @@ class EndPointUtilsTest {
                 PageRequest.of(0, 3, Sort.by("value").descending()), 10);
 
         // when
-        final List<String> links = EndPointUtils.createAllPageEndPoints(page);
+        final List<String> links = new EndPointUtils().createAllPageEndPoints(page);
 
         // then
         assertThat(links).hasSize(4)

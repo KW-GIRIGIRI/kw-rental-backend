@@ -47,6 +47,7 @@ public class AdminRentalController {
 	private final RentalRentService rentalRentService;
 	private final EquipmentRentalRestoreService equipmentRentalRestoreService;
 	private final LabRoomRentalRestoreService labRoomRentalRestoreService;
+	private final EndPointUtils endPointUtils;
 
 	@GetMapping(params = "startDate")
 	public EquipmentReservationsWithRentalSpecsResponse getReservationsWithRentalSpecsByStartDate(
@@ -112,7 +113,7 @@ public class AdminRentalController {
 		@PageableDefault(sort = "id", direction = Sort.Direction.DESC) final Pageable pageable) {
 		Page<LabRoomReservationResponse> page = rentalViewService.getLabRoomHistory(labRoomName, startDate, endDate,
 			pageable);
-		List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+		List<String> allPageEndPoints = endPointUtils.createAllPageEndPoints(page);
 		return new LabRoomReservationPageResponse(page.getContent(), page.getNumber(), allPageEndPoints);
 	}
 

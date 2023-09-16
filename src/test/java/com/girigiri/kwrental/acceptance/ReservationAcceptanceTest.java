@@ -84,7 +84,11 @@ class ReservationAcceptanceTest extends AcceptanceTest {
 
 		final RentableAsset asset = assetRepository.save(EquipmentFixture.create());
 		final Item item = itemRepository.save(ItemFixture.builder().assetId(asset.getId()).build());
-		final Inventory inventory = inventoryRepository.save(InventoryFixture.create(asset, member.getId()));
+		final LocalDate monday = LocalDate.of(2023, 9, 11);
+		final Inventory inventory = inventoryRepository.save(InventoryFixture.builder(asset)
+			.memberId(member.getId())
+			.rentalPeriod(new RentalPeriod(monday, monday.plusDays(1)))
+			.build());
 
 		final AddEquipmentReservationRequest request = AddEquipmentReservationRequest.builder()
 			.renterName("대여자")

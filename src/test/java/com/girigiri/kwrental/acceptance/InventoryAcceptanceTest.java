@@ -56,12 +56,13 @@ class InventoryAcceptanceTest extends AcceptanceTest {
         Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
         itemRepository.save(ItemFixture.builder().assetId(equipment.getId()).build());
 
+        final LocalDate monday = LocalDate.of(2023, 9, 11);
         AddInventoryRequest request = AddInventoryRequest.builder()
-                .equipmentId(equipment.getId())
-                .rentalStartDate(LocalDate.now().plusDays(1))
-                .rentalEndDate(LocalDate.now().plusDays(2))
-                .amount(1)
-                .build();
+            .equipmentId(equipment.getId())
+            .rentalStartDate(monday)
+            .rentalEndDate(monday.plusDays(1))
+            .amount(1)
+            .build();
 
         // when
         RestAssured.given(requestSpec)

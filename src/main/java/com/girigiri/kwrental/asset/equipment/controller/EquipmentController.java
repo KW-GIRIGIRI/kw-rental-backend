@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class EquipmentController {
 
 	private final EquipmentViewService equipmentViewService;
+	private final EndPointUtils endPointUtils;
 
 	@GetMapping("/{id}")
 	public EquipmentDetailResponse getEquipment(@PathVariable final Long id) {
@@ -41,7 +42,7 @@ public class EquipmentController {
 			pageable,
 			searchCondition);
 
-		final List<String> allPageEndPoints = EndPointUtils.createAllPageEndPoints(page);
+		final List<String> allPageEndPoints = endPointUtils.createAllPageEndPoints(page);
 
 		return EquipmentsWithRentalQuantityPageResponse.builder()
 			.endPoints(allPageEndPoints)

@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
 import com.girigiri.kwrental.asset.labroom.exception.LabRoomNotAvailableException;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomRetriever;
 import com.girigiri.kwrental.asset.labroom.service.LabRoomValidator;
+import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.reservation.domain.entity.Reservation;
@@ -33,6 +35,8 @@ class LabRoomReservationCreatorTest {
 	private LabRoomValidator labRoomValidator;
 	@Mock
 	private LabRoomRetriever labRoomRetriever;
+	@Mock
+	private OperationChecker operationChecker;
 	@InjectMocks
 	private LabRoomReservationCreator labRoomReservationCreator;
 
@@ -46,6 +50,10 @@ class LabRoomReservationCreatorTest {
 
 		given(labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
 			.willReturn(labRoom);
+		given(operationChecker.getOperateDates(addLabRoomReservationRequest.startDate(),
+			addLabRoomReservationRequest.endDate()))
+			.willReturn(Set.of(addLabRoomReservationRequest.startDate()));
+		doNothing().when(labRoomValidator).validateDays(labRoom, Set.of(addLabRoomReservationRequest.startDate()));
 
 		final Reservation expect = mapToReservation(memberId, addLabRoomReservationRequest, labRoom);
 
@@ -88,7 +96,10 @@ class LabRoomReservationCreatorTest {
 
 		given(labRoomRetriever.getLabRoomByName(addLabRoomReservationRequest.labRoomName()))
 			.willReturn(labRoom);
-		doThrow(LabRoomNotAvailableException.class).when(labRoomValidator).validateDays(eq(labRoom), anySet());
+		given(operationChecker.getOperateDates(any(), any())).willReturn(
+			Set.of(addLabRoomReservationRequest.startDate()));
+		doThrow(LabRoomNotAvailableException.class).when(labRoomValidator)
+			.validateDays(eq(labRoom), eq(Set.of(addLabRoomReservationRequest.startDate())));
 
 		// when, then
 		assertThatThrownBy(() -> labRoomReservationCreator.create(memberId, addLabRoomReservationRequest))

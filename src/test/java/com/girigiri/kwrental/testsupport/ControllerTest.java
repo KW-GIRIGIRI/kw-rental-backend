@@ -21,6 +21,8 @@ import com.girigiri.kwrental.common.MultiPartFileHandler;
 import com.girigiri.kwrental.inventory.service.InventoryService;
 import com.girigiri.kwrental.item.service.ItemService;
 import com.girigiri.kwrental.item.service.ItemViewService;
+import com.girigiri.kwrental.operation.service.EntireOperationService;
+import com.girigiri.kwrental.operation.service.ScheduleService;
 import com.girigiri.kwrental.penalty.service.PenaltyServiceImpl;
 import com.girigiri.kwrental.rental.service.RentalViewService;
 import com.girigiri.kwrental.rental.service.rent.RentalRentService;
@@ -30,6 +32,7 @@ import com.girigiri.kwrental.reservation.service.ReservationViewService;
 import com.girigiri.kwrental.reservation.service.cancel.ReservationCancelService;
 import com.girigiri.kwrental.reservation.service.reserve.EquipmentReserveService;
 import com.girigiri.kwrental.reservation.service.reserve.LabRoomReserveService;
+import com.girigiri.kwrental.util.EndPointUtils;
 
 @WebMvcTest
 @Import(LoginArgumentResolver.class)
@@ -102,4 +105,10 @@ public abstract class ControllerTest {
 	protected ItemViewService itemViewService;
 	@MockBean
 	protected LabRoomAvailableService labRoomAvailableService;
+	@MockBean
+	protected ScheduleService scheduleService;
+	@MockBean
+	protected EntireOperationService entireOperationService;
+	@MockBean
+	protected EndPointUtils endPointUtils;
 }

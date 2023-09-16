@@ -48,10 +48,8 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 
 	@Autowired
 	private EquipmentRepository equipmentRepository;
-
 	@Autowired
 	private ItemRepository itemRepository;
-
 	@Autowired
 	private ReservationSpecRepository reservationSpecRepository;
 

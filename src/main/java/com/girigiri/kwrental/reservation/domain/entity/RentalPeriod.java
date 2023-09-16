@@ -1,9 +1,9 @@
 package com.girigiri.kwrental.reservation.domain.entity;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
 
@@ -44,32 +44,6 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         this.rentalEndDate = rentalEndDate;
     }
 
-    public static boolean isNotSupportedDayOfWeek(final LocalDate date) {
-        return date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SATURDAY)
-            || date.getDayOfWeek().equals(DayOfWeek.SUNDAY);
-    }
-
-    public Integer getRentalDayCount() {
-        int rentalDays = 0;
-        for (LocalDate date = rentalStartDate; date.isBefore(rentalEndDate); date = date.plusDays(1)) {
-            if (isNotSupportedDayOfWeek(date)) {
-                continue;
-            }
-            rentalDays++;
-        }
-        return rentalDays;
-    }
-
-    public Set<LocalDate> getRentalDays() {
-        Set<LocalDate> rentalDays = new HashSet<>();
-        for (LocalDate date = rentalStartDate; !date.isEqual(rentalEndDate); date = date.plusDays(1)) {
-            if (isNotSupportedDayOfWeek(date))
-                continue;
-            rentalDays.add(date);
-        }
-        return rentalDays;
-    }
-
     public boolean contains(final LocalDate date) {
         if (date == null)
             return false;
@@ -81,9 +55,15 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         return this.contains(date) || rentalEndDate.isEqual(date);
     }
 
+    public Set<LocalDate> getDates() {
+        return Stream.iterate(rentalStartDate, it -> it.isBefore(rentalEndDate), it -> it.plusDays(1))
+            .collect(Collectors.toSet());
+    }
+
     @Override
     public int compareTo(final RentalPeriod o) {
-        if (o == null) return 1;
+        if (o == null)
+            return 1;
         if (this.rentalStartDate.isBefore(o.rentalStartDate)) {
             return -1;
         }
