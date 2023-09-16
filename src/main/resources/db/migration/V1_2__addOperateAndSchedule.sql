@@ -1,7 +1,7 @@
 CREATE TABLE if not exists schedule
 (
-    `id`          bigint   NOT NULL AUTO_INCREMENT,
-    `day_of_week` smallint NOT NULL,
+    `id`          bigint      NOT NULL AUTO_INCREMENT,
+    `day_of_week` varchar(20) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `UK_DAY_OF_WEEK` (`day_of_week`)
 ) ENGINE = InnoDB
@@ -10,8 +10,8 @@ CREATE TABLE if not exists schedule
 
 CREATE TABLE if not exists entire_operation
 (
-    `id`         bigint      NOT NULL AUTO_INCREMENT,
-    `is_running` varchar(10) NOT NULL,
+    `id`         bigint     NOT NULL AUTO_INCREMENT,
+    `is_running` tinyint(1) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 33
