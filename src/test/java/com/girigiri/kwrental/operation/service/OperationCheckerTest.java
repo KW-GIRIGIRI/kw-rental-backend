@@ -44,7 +44,7 @@ class OperationCheckerTest {
 	}
 
 	@Test
-	@DisplayName("랩실 운영 요잉렝 해당하지 않으면 운영 불가 처리한다.")
+	@DisplayName("랩실 운영 요일에 해당하지 않으면 운영 불가 처리한다.")
 	void canOperate_scheduleNotMatch() {
 		// given
 		given(entireOperationRepository.findAll()).willReturn(List.of(EntireOperationFixture.create(true)));
@@ -63,11 +63,13 @@ class OperationCheckerTest {
 	void canOperate() {
 		// given
 		given(entireOperationRepository.findAll()).willReturn(List.of(EntireOperationFixture.create(true)));
-		given(scheduleRepository.findAll()).willReturn(List.of(ScheduleFixture.create(DayOfWeek.FRIDAY)));
+		given(scheduleRepository.findAll()).willReturn(
+			List.of(ScheduleFixture.create(DayOfWeek.TUESDAY), ScheduleFixture.create(DayOfWeek.FRIDAY)));
 
 		// when
+		final LocalDate tuesday = LocalDate.of(2023, 9, 12);
 		final LocalDate friday = LocalDate.of(2023, 9, 15);
-		final boolean actual = operationChecker.canOperate(friday, friday.plusDays(1));
+		final boolean actual = operationChecker.canOperate(friday, tuesday);
 
 		// then
 		assertThat(actual).isTrue();

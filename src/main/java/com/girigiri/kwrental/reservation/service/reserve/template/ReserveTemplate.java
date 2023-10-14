@@ -40,7 +40,7 @@ public class ReserveTemplate {
 		final Set<LocalDate> dates = reservations.stream()
 			.map(Reservation::getReservationSpecs)
 			.flatMap(List::stream)
-			.map(spec -> spec.getPeriod().getDates())
+			.map(spec -> spec.getPeriod().getStartAndEndDate())
 			.flatMap(Set::stream).collect(Collectors.toSet());
 		final boolean canOperate = operationChecker.canOperate(dates);
 		if (!canOperate)

@@ -2,8 +2,6 @@ package com.girigiri.kwrental.reservation.domain.entity;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.girigiri.kwrental.inventory.exception.RentalDateException;
 
@@ -55,9 +53,8 @@ public class RentalPeriod implements Comparable<RentalPeriod> {
         return this.contains(date) || rentalEndDate.isEqual(date);
     }
 
-    public Set<LocalDate> getDates() {
-        return Stream.iterate(rentalStartDate, it -> it.isBefore(rentalEndDate), it -> it.plusDays(1))
-            .collect(Collectors.toSet());
+    public Set<LocalDate> getStartAndEndDate() {
+        return Set.of(rentalStartDate, rentalEndDate);
     }
 
     @Override

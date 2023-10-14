@@ -102,16 +102,16 @@ class RentalPeriodTest {
     }
 
     @Test
-    @DisplayName("대여 기간에 있는 일자들을 모두 조회한다.")
-    void getDates() {
+    @DisplayName("대여 기간의 대여일과 반납일을 조회한다..")
+    void getStartAndEndDate() {
         // given
         final LocalDate now = LocalDate.now();
         final RentalPeriod rentalPeriod = new RentalPeriod(now, now.plusDays(3));
 
         // when
-        final Set<LocalDate> actual = rentalPeriod.getDates();
+        final Set<LocalDate> actual = rentalPeriod.getStartAndEndDate();
 
         // then
-        assertThat(actual).containsExactlyInAnyOrder(now, now.plusDays(1), now.plusDays(2));
+        assertThat(actual).containsExactlyInAnyOrder(now, now.plusDays(3));
     }
 }

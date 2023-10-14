@@ -1,6 +1,7 @@
 package com.girigiri.kwrental.operation.service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +27,8 @@ public class OperationChecker {
 	private final EntireOperationRepository entireOperationRepository;
 	private final ScheduleRepository scheduleRepository;
 
-	public boolean canOperate(final LocalDate startInclusive, final LocalDate endExclusive) {
-		return canOperate(Stream.iterate(startInclusive, it -> it.isBefore(endExclusive), it -> it.plusDays(1)));
+	public boolean canOperate(final LocalDate... dates) {
+		return canOperate(Arrays.stream(dates));
 	}
 
 	public boolean canOperate(final Collection<LocalDate> dates) {
