@@ -28,7 +28,7 @@ public class LabRoomReservation {
 			throw new LabRoomReservationException("랩실 대여를 하려는 예약 상세는 예약 상태여야 합니다.");
 		final LocalDate now = LocalDate.now();
 		if (!specs.stream().allMatch(spec -> spec.containsDate(now)))
-			throw new LabRoomReservationException(String.format("대여 신청 기간(&s)에 %s는 없습니다.", now));
+			throw new LabRoomReservationException(String.format("대여 신청 기간에 %s는 없습니다.", now));
 	}
 
 	public void validateLabRoomName(final String labRoomName) {
