@@ -2,6 +2,7 @@ package com.girigiri.kwrental.reservation.domain;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +55,7 @@ class LabRoomReservationTest {
 		final LabRoom labRoom = LabRoomFixture.create();
 		final ReservationSpec spec = ReservationSpecFixture.builder(labRoom)
 			.status(ReservationSpecStatus.RESERVED)
-			.period(new RentalPeriod(RentalDateTime.now(), RentalDateTime.now().calculateDay(1)))
+			.period(new RentalPeriod(LocalDate.now(), LocalDate.now().plusDays(1)))
 			.build();
 		final Reservation reservation = ReservationFixture.create(List.of(spec));
 		final LabRoomReservation labRoomReservation = new LabRoomReservation(reservation);

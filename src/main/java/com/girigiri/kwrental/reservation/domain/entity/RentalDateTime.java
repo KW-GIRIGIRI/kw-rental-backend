@@ -35,7 +35,7 @@ public class RentalDateTime {
 	}
 
 	public static RentalDateTime from(final LocalDate localDate) {
-		LocalDateTime localDateTime = localDate.atStartOfDay();
+		LocalDateTime localDateTime = localDate.atStartOfDay(SEOUL_ZONE_ID).toLocalDateTime();
 		return RentalDateTime.from(localDateTime);
 	}
 
