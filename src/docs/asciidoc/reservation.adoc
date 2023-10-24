@@ -1,0 +1,54 @@
+== 대여 예약 관련 API
+
+=== 기자재 대여 예약 API
+
+operation::addReservations[snippets='http-request,http-response']
+
+=== 랩실 대여 예약 API
+
+operation::addLabRoomReservations[snippets='http-request,http-response']
+
+=== 특정 일이 사용일인 랩실 대여 조회 API
+
+operation::admin_getLabRoomReservationsWhenAccept[snippets='http-request,http-response']
+
+=== 특정 일이 퇴실일인 랩실 대여 조회 API
+
+operation::admin_getLabRoomReservationsWhenReturn[snippets='http-request,http-response']
+
+=== 관리자 특정 기자재 품목 대여 현황 API
+
+operation::admin_getReservationByEquipment[snippets='http-request,http-response']
+
+=== 현재 내 기자재 대여 예약 조회 API
+
+각 대여 예약 상세의 상태에 대한 해석
+
+- `RESERVED` : 대여 신청
+- `RENTED` : 대여 중
+- `RETURNED` : 반납됨
+- `ABNORMAL_RETURNED` : 비정상 반납(파손, 분실, 연체 반납)
+- `OVERDUE_RENTED` : 연체 중
+- `CANCELED` : 대여 취소
+
+operation::getUnterminatedReservations[snippets='http-request,http-response']
+
+=== 현재 내 랩실 대여 예약 조회 API
+
+operation::getUnterminatedLabRoomReservations[snippets='http-request,http-response']
+
+=== 대여 취소하기
+
+operation::admin_cancelReservationSpec[snippets='http-request,http-response']
+
+=== 같은 날짜에 같은 랩실 대여하는 다른 대여 정보 조회
+
+operation::getRelatedReservationsInfo[snippets='http-request,http-response']
+
+=== 대여 히스토리 통계 조회
+
+operation::getHistoryStat[snippets='http-request,http-response']
+
+=== 대여 목적 조회
+
+operation::getPurpose[snippets='http-request,http-response']

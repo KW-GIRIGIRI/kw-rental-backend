@@ -1,0 +1,6 @@
+spring:
+  config:
+    import: security/security-release.yaml
+  jpa:
+    hibernate:
+      ddl-auto: none

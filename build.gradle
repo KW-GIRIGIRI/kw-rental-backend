@@ -24,6 +24,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.springframework.security:spring-security-crypto:6.0.3'
+
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.3.1'
+    testImplementation 'io.findify:s3mock_2.13:0.2.6'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -31,6 +38,11 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.flywaydb:flyway-core'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured'
 
@@ -45,16 +57,9 @@ dependencies {
 
 def querydslDir = "$buildDir/generated/querydsl"
 
-sourceSets {
-    main.java.srcDirs += [querydslDir]
-}
-
 tasks.withType(JavaCompile).configureEach {
-    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
-}
-
-compileJava.doFirst {
     file(querydslDir).deleteDir()
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
 }
 
 sourceSets {
@@ -89,5 +94,12 @@ bootJar {
     dependsOn asciidoctor
     from("${asciidoctor.outputDir}/") {
         into 'static/docs'
+    }
+}
+
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
     }
 }

@@ -7,3 +7,37 @@ operation::getEquipment[snippets='http-request,http-response']
 === 기자재 목록 페이지 조회
 
 operation::getEquipmentsPage[snippets='http-request,http-response']
+
+=== 기자재 목록 페이지 모델명으로 필터링해서 조회
+
+operation::getEquipmentsPageWithSearch[snippets='http-request,http-response']
+
+=== 기자재 목록 페이지 모델명과 카테고리로 필터링해서 조회
+
+operation::admin_getEquipmentPageWithSearchAndCategory[snippets='http-request,http-response']
+
+=== 기자재 추가
+
+operation::admin_addEquipment[snippets='http-request,http-response']
+
+=== 기자재 삭제
+
+==== 기자재와 관련된 품목, 대여가 삭제된다.
+
+operation::admin_deleteEquipment[snippets='http-request,http-response']
+
+=== 이미지 등록 API
+
+==== Location 헤더에 접근 가능한 URL이 담긴다.
+
+operation::admin_uploadImage[snippets='http-request,http-response']
+
+=== 기자재 정보 수정
+
+==== Location 헤더에 수정된 기자재 정보로 접근할 수 있다.
+
+operation::admin_updateEquipment[snippets='http-request,http-response']
+
+=== 기자재 날짜 별 대여 가능 갯수 조회 API
+
+operation::admin_getEquipmentRemainQuantities[snippets='http-request,http-response']

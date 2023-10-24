@@ -1,9 +1,6 @@
 package com.girigiri.kwrental.util;
 
 
-import static com.querydsl.core.types.Order.ASC;
-import static com.querydsl.core.types.Order.DESC;
-
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
@@ -16,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 
+import static com.querydsl.core.types.Order.ASC;
+import static com.querydsl.core.types.Order.DESC;
+
 public class QueryDSLUtils {
 
     public static Predicate isContains(final String input, StringPath path) {
@@ -26,8 +26,8 @@ public class QueryDSLUtils {
         return t == null ? null : expression.eq(t);
     }
 
-    public static <T> JPAQuery<T> setPageable(final JPAQuery<T> query, final Path<?> path, final Pageable pageable) {
-        return query
+    public static <T> void setPageable(final JPAQuery<T> query, final Path<?> path, final Pageable pageable) {
+        query
                 .orderBy(getOrderSpecFrom(pageable.getSort(), path))
                 .limit(pageable.getPageSize())
                 .offset(getOffsetFrom(pageable));

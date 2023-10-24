@@ -1,0 +1,17 @@
+== 랩실 운영 관리 API
+
+=== 랩실 운영 요일 설정 API
+
+operation::putSchedules[snippets='http-request,http-response']
+
+=== 랩실 운영 요일 조회 API
+
+operation::getSchedules[snippets='http-request,http-response']
+
+=== 랩실 전체 운영 설정 API
+
+operation::putEntireOperation[snippets='http-request,http-response']
+
+=== 랩실 전체 운영 조회 API
+
+operation::getEntireOperation[snippets='http-request,http-response']

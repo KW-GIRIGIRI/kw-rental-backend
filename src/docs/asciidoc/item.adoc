@@ -1,0 +1,37 @@
+== 품목 관련 API
+
+=== 기자재의 품목 조회 API
+
+operation::getItemsByEquipment[snippets='http-request,http-response']
+
+=== 기자재 단일 조회 API
+
+operation::getItem[snippets='http-request,http-response']
+
+=== 관리자 품목 대여 가능 상태 변경 API
+
+operation::admin_updateRentalAvailable[snippets='http-request,http-response']
+
+=== 관리자 품목 자산 번호 변경 API
+
+operation::admin_updatePropertyNumber[snippets='http-request,http-response']
+
+=== 관리자 기자재 품목들 수정 API
+
+==== `id` 값이 null이면 품목이 추가된다. `id` 값이 null이 아니면 전달받은 값으로 수정한다.
+
+operation::admin_updateItemsByEquipment[snippets='http-request,http-response']
+
+=== 관리자 기자재 품목 삭제 API
+
+operation::admin_deleteItem[snippets='http-request,http-response']
+
+=== 현 시점 수령 가능한 품목 조회 API
+
+operation::admin_getAcceptableItems[snippets='http-request,http-response']
+
+=== 관리자 품목 히스토리 페이지 조회 API (기자재 히스토리)
+
+`size` 는 한 페이지에 담길 데이터 갯수
+
+operation::admin_getItemHistories[snippets='http-request,http-response']
