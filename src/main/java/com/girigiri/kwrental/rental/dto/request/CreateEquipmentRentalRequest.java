@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record CreateEquipmentRentalRequest(@NotNull Long reservationId,
-                                           @NotEmpty List<EquipmentRentalSpecsRequest> equipmentRentalSpecsRequests) {
+                                           @NotEmpty List<EquipmentRentalSpecsRequest> rentalSpecsRequests) {
 
     @Builder
     public record EquipmentRentalSpecsRequest(@NotNull Long reservationSpecId, @NotEmpty List<String> propertyNumbers) {

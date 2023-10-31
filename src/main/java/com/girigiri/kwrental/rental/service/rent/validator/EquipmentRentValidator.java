@@ -42,7 +42,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 
 	private Map<Long, Integer> groupAmountByReservationSpecId(
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
-		return createEquipmentRentalRequest.equipmentRentalSpecsRequests()
+		return createEquipmentRentalRequest.rentalSpecsRequests()
 			.stream()
 			.collect(toMap(EquipmentRentalSpecsRequest::reservationSpecId, it -> it.propertyNumbers().size()));
 	}
@@ -66,7 +66,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
 
 	private Map<Long, Set<String>> groupPropertyNumberByReservationSpecId(
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
-		return createEquipmentRentalRequest.equipmentRentalSpecsRequests()
+		return createEquipmentRentalRequest.rentalSpecsRequests()
 			.stream()
 			.collect(toMap(EquipmentRentalSpecsRequest::reservationSpecId, it -> Set.copyOf(it.propertyNumbers())));
 	}

@@ -31,7 +31,7 @@ class EquipmentRentalSpecCreatorTest {
 			.propertyNumbers(List.of("12345678")).build();
 		final CreateEquipmentRentalRequest createEquipmentRentalRequest = CreateEquipmentRentalRequest.builder()
 			.reservationId(1L)
-			.equipmentRentalSpecsRequests(List.of(equipmentRentalSpecsRequest))
+			.rentalSpecsRequests(List.of(equipmentRentalSpecsRequest))
 			.build();
 		final EquipmentRentalSpec expect = EquipmentRentalSpecFixture.builder()
 			.reservationId(createEquipmentRentalRequest.reservationId())
