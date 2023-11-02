@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -158,5 +159,25 @@ class ReservationTest {
 
 		// then
 		assertThat(actual).isEqualTo(spec.getEndDate());
+	}
+
+	@Test
+	@DisplayName("대여 예약 중 대여 예약 상태인 대여 예약 상세를 조회한다.")
+	void getReservedReservationSpecs() {
+		// given
+		final LabRoom labRoom = LabRoomFixture.builder().name("labRoom").build();
+		final ReservationSpec spec1 = ReservationSpecFixture.builder(labRoom)
+				.status(ReservationSpecStatus.RESERVED)
+				.build();
+		final ReservationSpec spec2 = ReservationSpecFixture.builder(labRoom)
+				.status(ReservationSpecStatus.CANCELED)
+				.build();
+		final Reservation reservation = ReservationFixture.create(List.of(spec1, spec2));
+
+		// when
+		List<ReservationSpec> reservedReservationSpecs = reservation.getReservedReservationSpecs();
+
+		// then
+		assertThat(reservedReservationSpecs).containsExactly(spec1);
 	}
 }

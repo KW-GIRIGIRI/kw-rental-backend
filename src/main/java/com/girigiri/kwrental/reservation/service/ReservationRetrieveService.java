@@ -68,10 +68,10 @@ public class ReservationRetrieveService {
 		final Reservation reservation) {
 		propertyNumbersByReservationSpecId.forEach((key, value) -> log.info("[DEBUGGER] reservation spec : {}, propertyNumbers : {}", key, String.join(", ", value)));
 		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
-		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+		for (ReservationSpec reservationSpec : reservation.getReservedReservationSpecs()) {
 			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
 			final Long equipmentId = reservationSpec.getAsset().getId();
-			log.info("[DEBUGGING] reservation id : {}", reservation.getId());
+			log.info("[DEBUGGER] reservation id : {}", reservation.getId());
 			log.info("[DEBUGGER] reservation spec id : {}", reservationSpec.getId());
 			log.info("[DEBUGGER] equipment id : {}", equipmentId);
 			log.info("[DEBUGGER] property number is null? {}", Objects.isNull(propertyNumbers));

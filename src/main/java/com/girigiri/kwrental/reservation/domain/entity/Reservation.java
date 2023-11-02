@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.girigiri.kwrental.reservation.exception.ReservationException;
 
@@ -110,6 +111,12 @@ public class Reservation {
 		if (reservationSpecs.size() == 0)
 			throw new ReservationException("대여 예약 상세가 없어서 대여 예약의 종료일을 알 수 없습니다.");
 		return this.reservationSpecs.get(0).getEndDate();
+	}
+
+	public List<ReservationSpec> getReservedReservationSpecs() {
+		return this.reservationSpecs.stream()
+				.filter(ReservationSpec::isReserved)
+				.toList();
 	}
 
 	public boolean isOnlyRentFor(final String rentableName) {
