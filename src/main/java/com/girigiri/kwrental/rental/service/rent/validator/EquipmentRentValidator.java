@@ -63,6 +63,7 @@ public class EquipmentRentValidator implements RentValidator<CreateEquipmentRent
             final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
         final Map<Long, Set<String>> propertyNumbersByReservationSpecId = groupPropertyNumberByReservationSpecId(
                 createEquipmentRentalRequest);
+        propertyNumbersByReservationSpecId.forEach((key, value)-> log.info("[DEBUGGING] reservation spec id and property numbers : {}, {}", key, String.join(", ", value)));
         final Long reservationId = createEquipmentRentalRequest.reservationId();
         return reservationRetrieveService.groupPropertyNumbersByEquipmentId(reservationId,
                 propertyNumbersByReservationSpecId);

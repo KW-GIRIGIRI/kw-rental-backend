@@ -3,11 +3,9 @@ package com.girigiri.kwrental.reservation.service;
 import static java.util.stream.Collectors.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +20,7 @@ import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -70,6 +69,7 @@ public class ReservationRetrieveService {
 		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
 			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
 			final Long equipmentId = reservationSpec.getAsset().getId();
+			log.info("[DEBUGGING] reservation id : {} \n[DEBUGGER] reservation spec id : {}\n[DEBUGGER] property number is null? {}\n[DEBUGGER] property numbers are {}", reservation.getId(), reservationSpec.getId(), Objects.isNull(propertyNumbers), String.join(", ", propertyNumbers));
 			collectedByEquipmentId.put(equipmentId, propertyNumbers);
 		}
 		return collectedByEquipmentId;
