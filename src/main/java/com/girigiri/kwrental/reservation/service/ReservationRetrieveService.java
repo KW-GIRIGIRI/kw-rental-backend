@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import java.time.LocalDate;
 import java.util.*;
 
+import ch.qos.logback.core.boolex.EvaluationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -65,11 +66,16 @@ public class ReservationRetrieveService {
 
 	private Map<Long, Set<String>> groupByEquipmentId(final Map<Long, Set<String>> propertyNumbersByReservationSpecId,
 		final Reservation reservation) {
+		propertyNumbersByReservationSpecId.forEach((key, value) -> log.info("[DEBUGGER] reservation spec : {}, propertyNumbers : {}", key, String.join(", ", value)));
 		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
 		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
 			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
 			final Long equipmentId = reservationSpec.getAsset().getId();
-			log.info("[DEBUGGING] reservation id : {} \n[DEBUGGER] reservation spec id : {}\n[DEBUGGER] property number is null? {}\n[DEBUGGER] property numbers are {}", reservation.getId(), reservationSpec.getId(), Objects.isNull(propertyNumbers), String.join(", ", propertyNumbers));
+			log.info("[DEBUGGING] reservation id : {}", reservation.getId());
+			log.info("[DEBUGGER] reservation spec id : {}", reservationSpec.getId());
+			log.info("[DEBUGGER] equipment id : {}", equipmentId);
+			log.info("[DEBUGGER] property number is null? {}", Objects.isNull(propertyNumbers));
+			log.info("[DEBUGGER] property numbers are {}", String.join(", ", propertyNumbers));
 			collectedByEquipmentId.put(equipmentId, propertyNumbers);
 		}
 		return collectedByEquipmentId;
