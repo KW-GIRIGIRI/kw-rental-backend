@@ -1,9 +1,10 @@
 package com.girigiri.kwrental.inventory.repository;
 
-import com.girigiri.kwrental.inventory.domain.Inventory;
+import java.util.Optional;
+
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
+import com.girigiri.kwrental.inventory.domain.Inventory;
 
 public interface InventoryRepository extends Repository<Inventory, Long>, InventoryRepositoryCustom {
 
