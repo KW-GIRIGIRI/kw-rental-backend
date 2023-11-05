@@ -2,6 +2,7 @@ package com.girigiri.kwrental.inventory.repository;
 
 import static com.girigiri.kwrental.inventory.domain.QInventory.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,13 @@ public class InventoryRepositoryCustomImpl implements InventoryRepositoryCustom 
     public void deleteByEquipmentId(Long assetId) {
         jpaQueryFactory.delete(inventory)
             .where(inventory.asset.id.eq(assetId))
+            .execute();
+    }
+
+    @Override
+    public long deleteRentalStartDateBeforeThan(final LocalDate date) {
+        return jpaQueryFactory.delete(inventory)
+            .where(inventory.rentalPeriod.rentalStartDate.before(date))
             .execute();
     }
 }

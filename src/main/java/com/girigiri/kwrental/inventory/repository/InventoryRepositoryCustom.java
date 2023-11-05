@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.inventory.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,6 @@ public interface InventoryRepositoryCustom {
     void updateAmount(Long id, RentalAmount amount);
 
     void deleteByEquipmentId(Long assetId);
+
+    long deleteRentalStartDateBeforeThan(LocalDate date);
 }
