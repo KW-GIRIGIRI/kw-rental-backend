@@ -11,4 +11,6 @@ public interface EquipmentRepository extends Repository<Equipment, Long>, Equipm
 	Equipment save(Equipment equipment);
 
 	Optional<Equipment> findById(Long id);
+
+	Optional<Equipment> findByName(String name);
 }
