@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.asset.equipment.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +30,12 @@ public class EquipmentValidator {
 	}
 
 	public void validateNotExistsByName(final String name) {
-		equipmentRepository.findByName(name)
-			.ifPresent(found -> {
-				if (!found.isDeleted())
-					throw new DuplicateAssetNameException(name);
-			});
+		final List<Equipment> equipments = equipmentRepository.findByName(name);
+		if (equipments.isEmpty())
+			return;
+		final boolean allDeleted = equipments.stream().allMatch(Equipment::isDeleted);
+		if (!allDeleted)
+			throw new DuplicateAssetNameException(name);
 	}
 
 	public Equipment validateRentalDays(final Long id, final Integer rentalDays) {

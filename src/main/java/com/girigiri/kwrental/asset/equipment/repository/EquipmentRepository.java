@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.asset.equipment.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.repository.Repository;
@@ -12,5 +13,6 @@ public interface EquipmentRepository extends Repository<Equipment, Long>, Equipm
 
 	Optional<Equipment> findById(Long id);
 
-	Optional<Equipment> findByName(String name);
+	List<Equipment> findByName(String name);
+
 }

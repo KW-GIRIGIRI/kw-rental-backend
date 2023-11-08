@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class EquipmentValidatorTest {
 	void validateNotExistsByName() {
 		// give
 		final Equipment equipment = EquipmentFixture.create();
-		given(equipmentRepository.findByName("name")).willReturn(Optional.of(equipment));
+		given(equipmentRepository.findByName("name")).willReturn(List.of(equipment));
 
 		// when, then
 		assertThatThrownBy(() -> equipmentValidator.validateNotExistsByName("name"))
@@ -71,7 +72,7 @@ class EquipmentValidatorTest {
 		// given
 		final Equipment equipment = EquipmentFixture.create();
 		equipment.delete();
-		given(equipmentRepository.findByName("name")).willReturn(Optional.of(equipment));
+		given(equipmentRepository.findByName("name")).willReturn(List.of(equipment));
 
 		// when
 		assertThatCode(() -> equipmentValidator.validateNotExistsByName("name"))
@@ -82,7 +83,7 @@ class EquipmentValidatorTest {
 	@DisplayName("해당 이름으로 기자재가 존재하지 않으면 통과")
 	void validateNotExistsByName_notExists() {
 		// given
-		given(equipmentRepository.findByName("name")).willReturn(Optional.empty());
+		given(equipmentRepository.findByName("name")).willReturn(Collections.emptyList());
 
 		// when
 		assertThatCode(() -> equipmentValidator.validateNotExistsByName("name"))
