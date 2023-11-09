@@ -3,11 +3,10 @@ package com.girigiri.kwrental.reservation.service;
 import static java.util.stream.Collectors.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import ch.qos.logback.core.boolex.EvaluationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +21,7 @@ import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -66,10 +66,16 @@ public class ReservationRetrieveService {
 
 	private Map<Long, Set<String>> groupByEquipmentId(final Map<Long, Set<String>> propertyNumbersByReservationSpecId,
 		final Reservation reservation) {
+		propertyNumbersByReservationSpecId.forEach((key, value) -> log.info("[DEBUGGER] reservation spec : {}, propertyNumbers : {}", key, String.join(", ", value)));
 		Map<Long, Set<String>> collectedByEquipmentId = new HashMap<>();
-		for (ReservationSpec reservationSpec : reservation.getReservationSpecs()) {
+		for (ReservationSpec reservationSpec : reservation.getReservedReservationSpecs()) {
 			final Set<String> propertyNumbers = propertyNumbersByReservationSpecId.get(reservationSpec.getId());
 			final Long equipmentId = reservationSpec.getAsset().getId();
+			log.info("[DEBUGGER] reservation id : {}", reservation.getId());
+			log.info("[DEBUGGER] reservation spec id : {}", reservationSpec.getId());
+			log.info("[DEBUGGER] equipment id : {}", equipmentId);
+			log.info("[DEBUGGER] property number is null? {}", Objects.isNull(propertyNumbers));
+			log.info("[DEBUGGER] property numbers are {}", String.join(", ", propertyNumbers));
 			collectedByEquipmentId.put(equipmentId, propertyNumbers);
 		}
 		return collectedByEquipmentId;

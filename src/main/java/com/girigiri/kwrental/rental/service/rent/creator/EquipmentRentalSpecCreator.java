@@ -18,7 +18,7 @@ public class EquipmentRentalSpecCreator implements RentalSpecCreator<CreateEquip
 
 	@Override
 	public List<RentalSpec> create(final CreateEquipmentRentalRequest rentalSpecRequest) {
-		return rentalSpecRequest.equipmentRentalSpecsRequests().stream()
+		return rentalSpecRequest.rentalSpecsRequests().stream()
 			.map(it -> mapToRentalSpecPerReservationSpec(rentalSpecRequest.reservationId(), it))
 			.flatMap(List::stream)
 			.toList();

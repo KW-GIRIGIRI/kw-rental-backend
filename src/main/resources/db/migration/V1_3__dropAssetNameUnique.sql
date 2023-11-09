@@ -1,0 +1,2 @@
+ALTER TABLE `asset`
+    DROP INDEX `UK_ASSET_NAME`;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import com.girigiri.kwrental.item.repository.ItemRepository;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
@@ -32,6 +34,7 @@ public class ItemValidator {
 	public void validatePropertyNumbers(final Map<Long, Set<String>> propertyNumbersPerEquipmentId) {
 		final Set<Long> equipmentIds = propertyNumbersPerEquipmentId.keySet();
 		List<Item> itemsByEquipmentIds = itemRepository.findByEquipmentIds(equipmentIds);
+		log.info("founded items : {}", String.join(", ", itemsByEquipmentIds.stream().map(Item::getPropertyNumber).toList()));
 		ItemsPerEquipments items = ItemsPerEquipments.from(itemsByEquipmentIds);
 		for (final Map.Entry<Long, Set<String>> propertyNumbersByEquipmentId : propertyNumbersPerEquipmentId.entrySet()) {
 			final Long equipmentId = propertyNumbersByEquipmentId.getKey();

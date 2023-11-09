@@ -1,7 +1,10 @@
 package com.girigiri.kwrental.rental.service.rent;
 
 import java.util.List;
+import java.util.Objects;
 
+import com.girigiri.kwrental.rental.dto.request.CreateEquipmentRentalRequest.EquipmentRentalSpecsRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import com.girigiri.kwrental.reservation.dto.request.CreateLabRoomRentalRequest;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,6 +38,8 @@ public class RentalRentService {
 	private final LabRoomReservationAcceptor labRoomReservationAcceptor;
 
 	public void rentEquipment(final CreateEquipmentRentalRequest createEquipmentRentalRequest) {
+		List<EquipmentRentalSpecsRequest> rentalSpecRequests = createEquipmentRentalRequest.rentalSpecsRequests();
+		rentalSpecRequests.forEach(it -> log.info("[DEBUGGING] RentalSpecRequest is {}", it.toString()));
 		rent(createEquipmentRentalRequest, equipmentRentValidator, equipmentRentalSpecCreator,
 			equipmentReservationAcceptor);
 	}

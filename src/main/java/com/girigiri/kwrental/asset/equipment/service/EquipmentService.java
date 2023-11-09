@@ -23,9 +23,11 @@ public class EquipmentService {
 	private final EquipmentRetriever equipmentRetriever;
 	private final EquipmentRepository equipmentRepository;
 	private final ApplicationEventPublisher eventPublisher;
+	private final EquipmentValidator equipmentValidator;
 
 	public Long saveEquipment(final AddEquipmentWithItemsRequest addEquipmentWithItemsRequest) {
 		final AddEquipmentRequest addEquipmentRequest = addEquipmentWithItemsRequest.equipment();
+		equipmentValidator.validateNotExistsByName(addEquipmentRequest.modelName());
 		final Equipment equipment = equipmentRepository.save(mapToEquipment(addEquipmentRequest));
 		itemSaver.saveItems(equipment.getId(), addEquipmentWithItemsRequest.items());
 		return equipment.getId();

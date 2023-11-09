@@ -93,7 +93,7 @@ class EquipmentRentValidatorTest {
 			.propertyNumbers(List.of("12345678")).build();
 		return CreateEquipmentRentalRequest.builder()
 			.reservationId(1L)
-			.equipmentRentalSpecsRequests(List.of(equipmentRentalSpecsRequest))
+			.rentalSpecsRequests(List.of(equipmentRentalSpecsRequest))
 			.build();
 	}
 }
