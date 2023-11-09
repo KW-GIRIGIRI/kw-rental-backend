@@ -75,7 +75,7 @@
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
-    <springProfile name="production">
+    <springProfile name="main">
         <root level="INFO">
             <appender-ref ref="INFO-FILE"/>
             <appender-ref ref="WARN-FILE"/>
