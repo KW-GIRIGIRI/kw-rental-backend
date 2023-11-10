@@ -89,10 +89,10 @@ public class ItemService {
 	private List<String> getNotRequestedPropertyNumbers(EquipmentItems equipmentItems,
 		List<UpdateItemRequest> updateItemRequests) {
 		final List<String> propertyNumbers = equipmentItems.getPropertyNumbers();
-		final Set<String> requestedIds = updateItemRequests.stream()
+		final Set<String> requestedPropertyNumbers = updateItemRequests.stream()
 			.map(UpdateItemRequest::propertyNumber)
 			.collect(Collectors.toSet());
-		return propertyNumbers.stream().filter(id -> !requestedIds.contains(id)).toList();
+		return propertyNumbers.stream().filter(id -> !requestedPropertyNumbers.contains(id)).toList();
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)

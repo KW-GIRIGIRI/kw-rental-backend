@@ -3,6 +3,7 @@ package com.girigiri.kwrental.item.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -57,5 +58,15 @@ class ItemDeleterTest {
 
 		// then
 		assertThat(actual).isOne();
+	}
+
+	@Test
+	@DisplayName("여러 품목 삭제를 하려고하는데 빈 리스트를 전달 시 그냥 종료.")
+	void batchDelete_empty() {
+		// when
+		final int actual = itemDeleter.batchDelete(Collections.emptyList());
+
+		// then
+		assertThat(actual).isZero();
 	}
 }

@@ -46,12 +46,13 @@ public class ItemAvailableSetter {
 		equipmentAdjuster.adjustWhenItemDeleted(SINGLE_ITEM_COUNT, operandOfRentableQuantity, item.getAssetId());
 	}
 
-	public void batchUpdateAvailableWhenItemsDeleted(final Collection<Item> items) {
-		final List<Long> availableItemIds = items.stream()
+	public void batchUpdateAvailableWhenItemsDeleted(final Collection<Item> deletedItems) {
+		if (deletedItems == null || deletedItems.isEmpty()) return;
+		final List<Long> availableItemIds = deletedItems.stream()
 			.filter(Item::isAvailable)
 			.map(Item::getId)
 			.toList();
 		final int updatedCounts = itemRepository.updateAvailable(availableItemIds, false);
-		equipmentAdjuster.adjustWhenItemDeleted(items.size(), -updatedCounts, items.iterator().next().getAssetId());
+		equipmentAdjuster.adjustWhenItemDeleted(deletedItems.size(), -updatedCounts, deletedItems.iterator().next().getAssetId());
 	}
 }
