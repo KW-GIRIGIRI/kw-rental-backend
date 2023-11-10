@@ -20,6 +20,7 @@ import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentWithItemsRe
 import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.asset.equipment.exception.DuplicateAssetNameException;
 import com.girigiri.kwrental.asset.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
@@ -35,6 +36,8 @@ class EquipmentServiceTest {
 	private ItemSaver itemSaver;
 	@Mock
 	private ApplicationEventPublisher eventPublisher;
+	@Mock
+	private EquipmentValidator equipmentValidator;
 	@InjectMocks
 	private EquipmentService equipmentService;
 
@@ -74,6 +77,25 @@ class EquipmentServiceTest {
 		// when, then
 		assertThatThrownBy(() -> equipmentService.saveEquipment(request))
 			.isExactlyInstanceOf(InvalidCategoryException.class);
+	}
+
+	@Test
+	@DisplayName("이미 같은 이름의 이름가진 기자재가 존재하면 예외")
+	void saveEquipment_existsName() {
+		// given
+		AddEquipmentRequest addEquipmentRequest = new AddEquipmentRequest(
+			"rentalPlace", "modelName", "invalidCategory",
+			"maker", "imgUrl", "component",
+			"purpose", "description", 1, 1);
+		final AddItemRequest addItemRequest = new AddItemRequest("propertyNumber");
+		final AddEquipmentWithItemsRequest request = new AddEquipmentWithItemsRequest(addEquipmentRequest,
+			List.of(addItemRequest));
+		doThrow(DuplicateAssetNameException.class).when(equipmentValidator)
+			.validateNotExistsByName(addEquipmentRequest.modelName());
+
+		// when, then
+		assertThatThrownBy(() -> equipmentService.saveEquipment(request))
+			.isExactlyInstanceOf(DuplicateAssetNameException.class);
 	}
 
 	@Test

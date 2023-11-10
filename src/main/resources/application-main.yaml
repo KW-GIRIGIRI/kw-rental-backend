@@ -1,0 +1,8 @@
+spring:
+  config:
+    import: security/security-main.yml
+  jpa:
+    hibernate:
+      ddl-auto: none
+cors:
+  allow-origins: http://localhost:3000,https://www.kwmedialab.com/

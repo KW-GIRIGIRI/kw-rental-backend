@@ -4,11 +4,13 @@ import static org.springframework.http.HttpMethod.*;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,22 +28,23 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Configuration
+@EnableScheduling
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private static final String FRONT_SERVER = "https://www.kwmedialab.com/";
-    private static final String LOCAL = "http://localhost:3000";
-
     private final List<CustomHandlerMethodArgumentResolver> argumentResolvers;
+
+    @Value("${cors.allow-origins}")
+    private final String[] allowOrigins;
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedMethods(GET.name(), OPTIONS.name(), POST.name(), DELETE.name(),
-                        PUT.name(), HEAD.name(), PATCH.name(), TRACE.name())
-                .allowCredentials(true)
-                .exposedHeaders(HttpHeaders.LOCATION, HttpHeaders.AUTHORIZATION, HttpHeaders.SET_COOKIE)
-                .allowedOrigins(LOCAL, FRONT_SERVER);
+            .allowedMethods(GET.name(), OPTIONS.name(), POST.name(), DELETE.name(),
+                PUT.name(), HEAD.name(), PATCH.name(), TRACE.name())
+            .allowCredentials(true)
+            .exposedHeaders(HttpHeaders.LOCATION, HttpHeaders.AUTHORIZATION, HttpHeaders.SET_COOKIE)
+            .allowedOrigins(allowOrigins);
     }
 
     @Override

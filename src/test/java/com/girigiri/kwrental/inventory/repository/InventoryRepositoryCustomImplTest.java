@@ -3,6 +3,7 @@ package com.girigiri.kwrental.inventory.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.inventory.domain.Inventory;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
+import com.girigiri.kwrental.reservation.domain.entity.RentalDateTime;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.InventoryFixture;
@@ -94,5 +96,27 @@ class InventoryRepositoryCustomImplTest {
 		entityManager.clear();
 		final boolean actual = inventoryRepository.findById(inventory.getId()).isEmpty();
 		assertThat(actual).isTrue();
+	}
+
+	@Test
+	@DisplayName("담은 기자재의 대여 시작날짜가 특정 날짜보다 이전이면 삭제한다.")
+	void deleteRentalStartDateBefore() {
+		// given
+		final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+		final RentalDateTime now = RentalDateTime.now();
+		final RentalPeriod rentalPeriod = new RentalPeriod(now, now.calculateDay(1));
+		final RentalPeriod pastRentalPeriod = new RentalPeriod(now.calculateDay(-1), now.calculateDay(1));
+		final Inventory inventory = inventoryRepository.save(
+			InventoryFixture.builder(equipment).rentalPeriod(rentalPeriod).build());
+		final Inventory pastInventory = inventoryRepository.save(
+			InventoryFixture.builder(equipment).rentalPeriod(pastRentalPeriod).build());
+
+		// when
+		final long actual = inventoryRepository.deleteRentalStartDateBeforeThan(now.toLocalDate());
+
+		// then
+		assertThat(actual).isOne();
+		final List<Inventory> allWithEquipment = inventoryRepository.findAllWithEquipment(inventory.getMemberId());
+		assertThat(allWithEquipment).usingRecursiveFieldByFieldElementComparator().containsExactlyInAnyOrder(inventory);
 	}
 }
