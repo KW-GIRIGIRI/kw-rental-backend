@@ -101,4 +101,11 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 			.where(item.assetId.eq(assetId), item.deletedAt.isNull())
 			.fetch();
 	}
+
+	@Override
+	public List<Item> findByPropertyNumbers(List<String> propertyNumbers) {
+		return queryFactory.selectFrom(item)
+				.where(item.deletedAt.isNull(), item.propertyNumber.in(propertyNumbers))
+				.fetch();
+	}
 }

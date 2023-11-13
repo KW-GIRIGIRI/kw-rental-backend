@@ -28,4 +28,6 @@ public interface ItemQueryDslRepositoryCustom {
     int deleteById(Long id);
 
     List<Item> findByAssetId(Long assetId);
+
+    List<Item> findByPropertyNumbers(List<String> propertyNumbers);
 }
