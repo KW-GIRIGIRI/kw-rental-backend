@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.girigiri.kwrental.asset.labroom.domain.LabRoom;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
@@ -201,14 +202,6 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	}
 
 	@Override
-	public void updatePropertyNumber(String from, String to) {
-		queryFactory.update(equipmentRentalSpec)
-			.set(equipmentRentalSpec.propertyNumber, to)
-			.where(equipmentRentalSpec.propertyNumber.eq(from))
-			.execute();
-	}
-
-	@Override
 	public List<RentalSpec> findRentedRentalSpecsByAssetId(Long assetId) {
 		return queryFactory.selectFrom(rentalSpec)
 			.join(reservationSpec)
@@ -231,6 +224,22 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 			.where(equipmentRentalSpec.propertyNumber.in(propertyNumbers),
 				equipmentRentalSpec.status.eq(RentalSpecStatus.RENTED))
 			.fetch();
+	}
+
+	@Override
+	public int updatePropertyNumbers(final List<ToBeUpdatedItem> toBeUpdatedItems) {
+		int affectedCount = 0;
+		for (final ToBeUpdatedItem toBeUpdatedItem : toBeUpdatedItems) {
+			affectedCount += updatePropertyNumber(toBeUpdatedItem.asIsPropertyNumber(), toBeUpdatedItem.toBePropertyNumber());
+		}
+		return affectedCount;
+	}
+
+	public int updatePropertyNumber(String from, String to) {
+		return (int) queryFactory.update(equipmentRentalSpec)
+			.set(equipmentRentalSpec.propertyNumber, to)
+			.where(equipmentRentalSpec.propertyNumber.eq(from))
+			.execute();
 	}
 
 	private long countBy(final JPAQuery<?> query) {

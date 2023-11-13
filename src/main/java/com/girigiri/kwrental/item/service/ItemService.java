@@ -15,6 +15,7 @@ import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.item.service.save.ItemSaverPerEquipmentImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +27,7 @@ public class ItemService {
 	private final ItemRetriever itemRetriever;
 	private final ItemAvailableSetter itemAvailableSetter;
 	private final ItemRepository itemRepository;
-	private final ItemSaverImpl itemSaver;
+	private final ItemSaverPerEquipmentImpl itemSaver;
 	private final ItemDeleter itemDeleter;
 	private final RentedItemService rentedItemService;
 

@@ -18,6 +18,7 @@ import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.item.service.save.ItemSaverPerEquipmentImpl;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,7 +31,7 @@ class ItemServiceTest {
 	@Mock
 	private ItemRepository itemRepository;
 	@Mock
-	private ItemSaverImpl itemSaver;
+	private ItemSaverPerEquipmentImpl itemSaver;
 	@Mock
 	private RentedItemService rentedItemService;
 	@Mock

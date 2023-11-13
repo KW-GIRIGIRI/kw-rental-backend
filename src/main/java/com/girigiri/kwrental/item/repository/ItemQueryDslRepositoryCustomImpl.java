@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -107,5 +108,21 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 		return queryFactory.selectFrom(item)
 				.where(item.deletedAt.isNull(), item.propertyNumber.in(propertyNumbers))
 				.fetch();
+	}
+
+	@Override
+	public int updatePropertyNumbers(final List<ToBeUpdatedItem> toBeUpdatedItems) {
+		int affectedCount = 0;
+		for (final ToBeUpdatedItem toBeUpdatedItem : toBeUpdatedItems) {
+			affectedCount += updatePropertyNumber(toBeUpdatedItem);
+		}
+		return affectedCount
+	}
+
+	private int updatePropertyNumber(final ToBeUpdatedItem toBeUpdatedItem) {
+		return (int) queryFactory.update(item)
+			.set(item.propertyNumber, toBeUpdatedItem.toBePropertyNumber())
+			.where(item.id.eq(toBeUpdatedItem.id()))
+			.execute();
 	}
 }

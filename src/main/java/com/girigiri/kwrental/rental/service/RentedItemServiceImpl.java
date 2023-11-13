@@ -3,6 +3,7 @@ package com.girigiri.kwrental.rental.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.item.dto.response.RentalCountsDto;
 import com.girigiri.kwrental.item.service.RentedItemService;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.dto.response.RentalSpecStatuesPerPropertyNumber;
 import com.girigiri.kwrental.rental.exception.RentalSpecRentedWhenRemoveAssetException;
@@ -51,6 +53,12 @@ public class RentedItemServiceImpl implements RentedItemService {
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void updatePropertyNumber(String propertyNumberBefore, String updatedPropertyNumber) {
 		rentalSpecRepository.updatePropertyNumber(propertyNumberBefore, updatedPropertyNumber);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public int updatePropertyNumbers(final List<ToBeUpdatedItem> toBeUpdatedItems) {
+		return rentalSpecRepository.updatePropertyNumbers(toBeUpdatedItems);
 	}
 
 	@Override

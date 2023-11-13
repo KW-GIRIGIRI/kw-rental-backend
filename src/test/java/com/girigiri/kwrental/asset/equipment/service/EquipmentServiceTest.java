@@ -33,7 +33,7 @@ class EquipmentServiceTest {
 	@Mock
 	private EquipmentRetriever equipmentRetriever;
 	@Mock
-	private ItemSaver itemSaver;
+	private ItemSaverPerEquipment itemSaverPerEquipment;
 	@Mock
 	private ApplicationEventPublisher eventPublisher;
 	@Mock
@@ -59,7 +59,7 @@ class EquipmentServiceTest {
 		// then
 		assertThat(id).isOne();
 		verify(equipmentRepository).save(any());
-		verify(itemSaver).saveItems(any(), any());
+		verify(itemSaverPerEquipment).execute(List.of(new ToBeSavedItem(addItemRequest.propertyNumber(), equipment.getId())));
 	}
 
 	@Test

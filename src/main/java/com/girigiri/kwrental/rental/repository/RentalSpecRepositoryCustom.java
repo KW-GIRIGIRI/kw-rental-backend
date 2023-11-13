@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.RentalSpec;
 import com.girigiri.kwrental.rental.dto.response.EquipmentRentalsDto.EquipmentRentalDto;
@@ -51,4 +52,6 @@ public interface RentalSpecRepositoryCustom {
 		final RentalDateTime startDate, final RentalDateTime endDate);
 
 	List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumberIn(Collection<String> propertyNumbers);
+
+	int updatePropertyNumbers(List<ToBeUpdatedItem> toBeUpdatedItems);
 }
