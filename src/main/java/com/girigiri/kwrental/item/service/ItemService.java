@@ -37,6 +37,10 @@ public class ItemService {
 
 	public void updatePropertyNumber(final Long id, final String propertyNumber) {
 		Item item = itemRetriever.getById(id);
+		updateSingleItemPropertyNumber(item, propertyNumber);
+	}
+
+	private void updateSingleItemPropertyNumber(final Item item, final String propertyNumber) {
 		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumber);
 		item.setPropertyNumber(propertyNumber);
 	}
@@ -79,20 +83,20 @@ public class ItemService {
 		final List<UpdateItemRequest> updateItemRequests) {
 		if (updateItemRequests == null)
 			return;
-		final List<String> notRequestedPropertyNumbers = getNotRequestedPropertyNumbers(equipmentItems,
-			updateItemRequests);
-		List<Item> itemsToDelete = equipmentItems.getItemsByPropertyNumbers(notRequestedPropertyNumbers);
+		List<Long> notRequestedIds = getNotRequestedIds(equipmentItems, updateItemRequests);
+		final List<Item> itemsToDelete = notRequestedIds
+				.stream().map(equipmentItems::getItem).toList();
 		itemDeleter.batchDelete(itemsToDelete);
-		equipmentItems.deleteByPropertyNumbers(notRequestedPropertyNumbers);
+		equipmentItems.deleteByIds(notRequestedIds);
 	}
 
-	private List<String> getNotRequestedPropertyNumbers(EquipmentItems equipmentItems,
-		List<UpdateItemRequest> updateItemRequests) {
-		final List<String> propertyNumbers = equipmentItems.getPropertyNumbers();
-		final Set<String> requestedPropertyNumbers = updateItemRequests.stream()
-			.map(UpdateItemRequest::propertyNumber)
+	private List<Long> getNotRequestedIds(EquipmentItems equipmentItems,
+										  List<UpdateItemRequest> updateItemRequests) {
+		final List<Long> ids = equipmentItems.getIds();
+		final Set<Long> requestedIds = updateItemRequests.stream()
+			.map(UpdateItemRequest::id)
 			.collect(Collectors.toSet());
-		return propertyNumbers.stream().filter(id -> !requestedPropertyNumbers.contains(id)).toList();
+		return ids.stream().filter(id -> !requestedIds.contains(id)).toList();
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)

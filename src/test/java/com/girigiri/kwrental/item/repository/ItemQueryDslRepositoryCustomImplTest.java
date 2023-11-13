@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ItemQueryDslRepositoryCustomImplTest {
 
     @Autowired

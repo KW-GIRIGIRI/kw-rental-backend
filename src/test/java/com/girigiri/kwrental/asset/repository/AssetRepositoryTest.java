@@ -2,6 +2,7 @@ package com.girigiri.kwrental.asset.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class AssetRepositoryTest {
 
 	@Autowired

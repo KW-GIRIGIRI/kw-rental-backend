@@ -4,6 +4,7 @@ import static com.girigiri.kwrental.asset.equipment.domain.Category.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,7 @@ import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class EquipmentRepositoryTest {
 
     @Autowired

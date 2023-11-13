@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ItemJdbcRepositoryCustomImpl implements ItemJdbcRepositoryCustom {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override

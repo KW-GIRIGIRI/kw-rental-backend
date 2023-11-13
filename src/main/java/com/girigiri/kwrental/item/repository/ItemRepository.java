@@ -6,10 +6,6 @@ import org.springframework.data.repository.Repository;
 
 import com.girigiri.kwrental.item.domain.Item;
 
-public interface ItemRepository extends Repository<Item, Long>, ItemQueryDslRepositoryCustom, ItemJdbcRepositoryCustom {
-    Optional<Item> findById(Long id);
+public interface ItemRepository extends ItemJpaRepository {
 
-    Item save(Item item);
-
-    Optional<Item> findByPropertyNumber(String propertyNumber);
 }

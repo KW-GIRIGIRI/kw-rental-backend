@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
+import com.girigiri.kwrental.testsupport.RepositoryTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +19,7 @@ import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ItemJdbcRepositoryCustomImplTest {
 
     @Autowired

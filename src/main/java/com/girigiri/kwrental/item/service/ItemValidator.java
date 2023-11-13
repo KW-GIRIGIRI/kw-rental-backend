@@ -3,7 +3,9 @@ package com.girigiri.kwrental.item.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import com.girigiri.kwrental.item.exception.PropertyNumberNotUniqueException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -40,6 +42,15 @@ public class ItemValidator {
 			final Long equipmentId = propertyNumbersByEquipmentId.getKey();
 			final Set<String> propertyNumbers = propertyNumbersByEquipmentId.getValue();
 			items.validatePropertyNumbersAvailable(equipmentId, propertyNumbers);
+		}
+	}
+
+	public void validateItemsNotExistsByPropertyNumbers(final List<String> propertyNumbers) {
+		if (propertyNumbers == null || propertyNumbers.isEmpty()) return;
+		final List<Item> foundItems = itemRepository.findByPropertyNumbers(propertyNumbers);
+		if (!foundItems.isEmpty()) {
+			final List<String> duplicatedPropertyNumbers = foundItems.stream().map(Item::getPropertyNumber).toList();
+			throw new PropertyNumberNotUniqueException(duplicatedPropertyNumbers);
 		}
 	}
 }
