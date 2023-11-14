@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.item.exception.ToBeSavedItemsAreNotSameEquipmentException;
@@ -14,7 +15,7 @@ import com.girigiri.kwrental.item.service.RentedItemService;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Transactional
+@Transactional(propagation = Propagation.MANDATORY)
 @RequiredArgsConstructor
 public class ItemPropertyNumberUpdaterPerEquipment {
 

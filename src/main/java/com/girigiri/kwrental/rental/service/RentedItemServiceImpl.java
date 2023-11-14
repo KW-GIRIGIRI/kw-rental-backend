@@ -51,12 +51,6 @@ public class RentedItemServiceImpl implements RentedItemService {
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public void updatePropertyNumber(String propertyNumberBefore, String updatedPropertyNumber) {
-		rentalSpecRepository.updatePropertyNumber(propertyNumberBefore, updatedPropertyNumber);
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.MANDATORY)
 	public int updatePropertyNumbers(final List<ToBeUpdatedItem> toBeUpdatedItems) {
 		return rentalSpecRepository.updatePropertyNumbers(toBeUpdatedItems);
 	}

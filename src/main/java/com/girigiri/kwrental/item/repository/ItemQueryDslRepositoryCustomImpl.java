@@ -116,13 +116,20 @@ public class ItemQueryDslRepositoryCustomImpl implements ItemQueryDslRepositoryC
 		for (final ToBeUpdatedItem toBeUpdatedItem : toBeUpdatedItems) {
 			affectedCount += updatePropertyNumber(toBeUpdatedItem);
 		}
-		return affectedCount
+		return affectedCount;
 	}
 
 	private int updatePropertyNumber(final ToBeUpdatedItem toBeUpdatedItem) {
-		return (int) queryFactory.update(item)
+		return (int)queryFactory.update(item)
 			.set(item.propertyNumber, toBeUpdatedItem.toBePropertyNumber())
 			.where(item.id.eq(toBeUpdatedItem.id()))
 			.execute();
+	}
+
+	@Override
+	public List<Item> findByIds(final Collection<Long> ids) {
+		return queryFactory.selectFrom(item)
+			.where(item.id.in(ids))
+			.fetch();
 	}
 }

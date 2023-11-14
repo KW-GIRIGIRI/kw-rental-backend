@@ -15,6 +15,8 @@ import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.repository.ItemRepository;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ItemPropertyNumberUpdaterPerEquipment;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.item.service.save.ItemSaverPerEquipmentImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,7 @@ public class ItemService {
 	private final ItemRepository itemRepository;
 	private final ItemSaverPerEquipmentImpl itemSaver;
 	private final ItemDeleter itemDeleter;
-	private final RentedItemService rentedItemService;
+	private final ItemPropertyNumberUpdaterPerEquipment itemPropertyNumberUpdaterPerEquipment;
 
 	public void updateAvailable(final Long id, final boolean rentalAvailable) {
 		final Item item = itemRetriever.getById(id);
@@ -38,12 +40,9 @@ public class ItemService {
 
 	public void updatePropertyNumber(final Long id, final String propertyNumber) {
 		Item item = itemRetriever.getById(id);
-		updateSingleItemPropertyNumber(item, propertyNumber);
-	}
-
-	private void updateSingleItemPropertyNumber(final Item item, final String propertyNumber) {
-		rentedItemService.updatePropertyNumber(item.getPropertyNumber(), propertyNumber);
-		item.setPropertyNumber(propertyNumber);
+		final ToBeUpdatedItem toBeUpdatedItem = new ToBeUpdatedItem(item.getId(), item.getAssetId(),
+			item.getPropertyNumber(), propertyNumber);
+		itemPropertyNumberUpdaterPerEquipment.execute(List.of(toBeUpdatedItem));
 	}
 
 	public void delete(final Long id) {

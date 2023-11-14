@@ -1,9 +1,10 @@
 package com.girigiri.kwrental.item.repository;
 
-import com.girigiri.kwrental.item.domain.Item;
+import java.util.Optional;
+
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
+import com.girigiri.kwrental.item.domain.Item;
 
 public interface ItemJpaRepository extends Repository<Item, Long>, ItemQueryDslRepositoryCustom, ItemJdbcRepositoryCustom {
     Optional<Item> findById(Long id);

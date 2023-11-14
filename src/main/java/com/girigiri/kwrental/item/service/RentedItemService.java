@@ -20,8 +20,6 @@ public interface RentedItemService {
     Map<String, RentalCountsDto> getRentalCountsByPropertyNumbersBetweenDate(Set<String> propertyNumbers,
         LocalDate from, LocalDate to);
 
-    void updatePropertyNumber(final String propertyNumberBefore, final String updatedPropetyNumber);
-
 	@Transactional(propagation = Propagation.MANDATORY)
 	int updatePropertyNumbers(List<ToBeUpdatedItem> toBeUpdatedItems);
 

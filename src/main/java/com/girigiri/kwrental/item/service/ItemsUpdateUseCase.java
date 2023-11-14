@@ -16,6 +16,7 @@ import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
 import com.girigiri.kwrental.item.service.propertynumberupdate.ItemPropertyNumberUpdaterPerEquipment;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,11 +26,14 @@ import lombok.RequiredArgsConstructor;
 public class ItemsUpdateUseCase {
 	private final ItemSaverPerEquipment itemSaverPerEquipment;
 	private final ItemPropertyNumberUpdaterPerEquipment itemPropertyNumberUpdaterPerEquipment;
+	private final ItemRetriever itemRetriever;
 
 	public ItemsResponse saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
 		Map<Boolean, List<UpdateItemRequest>> itemRequestsGroup = groupByIdNull(saveOrUpdateItemsRequest);
 		final List<ToBeSavedItem> toBeSavedItems = mapToToBeSavedItems(equipmentId, saveOrUpdateItemsRequest);
 		itemSaverPerEquipment.execute(toBeSavedItems);
+
+		final List<ToBeUpdatedItem> toBeUpdatedItems = mapToTOBeUpdatedItems(equipmentId, saveOrUpdateItemsRequest);
 		final EquipmentItems equipmentItems = getEquipmentItems(equipmentId);
 		List<UpdateItemRequest> updateItemRequests = itemRequestsGroup.get(false);
 		update(equipmentItems, updateItemRequests);
@@ -39,10 +43,20 @@ public class ItemsUpdateUseCase {
 
 	private List<ToBeSavedItem> mapToToBeSavedItems(final Long equipmentId,
 		final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		final List<UpdateItemRequest> itemRequestsForSave = saveOrUpdateItemsRequest.items().stream()
+		final List<UpdateItemRequest> saveItemRequests = saveOrUpdateItemsRequest.items().stream()
 			.filter(it -> it.id() == null).toList();
-		return itemRequestsForSave.stream()
+		return saveItemRequests.stream()
 			.map(it -> new ToBeSavedItem(it.propertyNumber(), equipmentId)).toList();
+	}
+
+	private List<ToBeUpdatedItem> mapToTOBeUpdatedItems(final Long equipmentId,
+		final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
+		final List<UpdateItemRequest> updateItemRequests = saveOrUpdateItemsRequest.items().stream()
+			.filter(it -> it.id() != null).toList();
+		final List<Long> ids = updateItemRequests.stream().map(UpdateItemRequest::id).toList();
+		final List<Item> items = itemRetriever.getByIds(ids);
+		updateItemRequests.stream()
+			.map(it -> new ToBeUpdatedItem(it.id(), equipmentId, ))
 	}
 
 	private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(SaveOrUpdateItemsRequest updateItemsRequest) {

@@ -42,8 +42,6 @@ public interface RentalSpecRepositoryCustom {
 	Page<LabRoomReservationResponse> getReturnedLabRoomReservationResponse(String labRoomName,
 		LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-	void updatePropertyNumber(String from, String to);
-
 	List<RentalSpec> findRentedRentalSpecsByAssetId(Long assetId);
 
 	List<EquipmentRentalSpec> findRentedRentalSpecsByPropertyNumber(String propertyNumber);

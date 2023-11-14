@@ -230,13 +230,14 @@ public class RentalSpecRepositoryCustomImpl implements RentalSpecRepositoryCusto
 	public int updatePropertyNumbers(final List<ToBeUpdatedItem> toBeUpdatedItems) {
 		int affectedCount = 0;
 		for (final ToBeUpdatedItem toBeUpdatedItem : toBeUpdatedItems) {
-			affectedCount += updatePropertyNumber(toBeUpdatedItem.asIsPropertyNumber(), toBeUpdatedItem.toBePropertyNumber());
+			affectedCount += updatePropertyNumber(toBeUpdatedItem.asIsPropertyNumber(),
+				toBeUpdatedItem.toBePropertyNumber());
 		}
 		return affectedCount;
 	}
 
-	public int updatePropertyNumber(String from, String to) {
-		return (int) queryFactory.update(equipmentRentalSpec)
+	private int updatePropertyNumber(String from, String to) {
+		return (int)queryFactory.update(equipmentRentalSpec)
 			.set(equipmentRentalSpec.propertyNumber, to)
 			.where(equipmentRentalSpec.propertyNumber.eq(from))
 			.execute();

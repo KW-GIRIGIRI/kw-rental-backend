@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.item.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,5 +27,9 @@ public class ItemRetriever {
 	public Item getByPropertyNumber(final String propertyNumber) {
 		return itemRepository.findByPropertyNumber(propertyNumber)
 			.orElseThrow(ItemNotFoundException::new);
+	}
+
+	public List<Item> getByIds(final List<Long> ids) {
+		return itemRepository.findByIds(ids);
 	}
 }

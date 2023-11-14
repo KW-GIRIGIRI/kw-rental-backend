@@ -33,4 +33,6 @@ public interface ItemQueryDslRepositoryCustom {
     List<Item> findByPropertyNumbers(List<String> propertyNumbers);
 
     int updatePropertyNumbers(List<ToBeUpdatedItem> toBeUpdatedItems);
+
+    List<Item> findByIds(Collection<Long> ids);
 }
