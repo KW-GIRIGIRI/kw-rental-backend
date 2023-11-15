@@ -1,5 +1,8 @@
 package com.girigiri.kwrental.asset.equipment.service;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +11,7 @@ import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentWithItemsRequest;
+import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
@@ -19,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EquipmentService {
 
-	private final ItemSaver itemSaver;
+	private final ItemSaverPerEquipment itemSaverPerEquipment;
 	private final EquipmentRetriever equipmentRetriever;
 	private final EquipmentRepository equipmentRepository;
 	private final ApplicationEventPublisher eventPublisher;
@@ -29,7 +33,8 @@ public class EquipmentService {
 		final AddEquipmentRequest addEquipmentRequest = addEquipmentWithItemsRequest.equipment();
 		equipmentValidator.validateNotExistsByName(addEquipmentRequest.modelName());
 		final Equipment equipment = equipmentRepository.save(mapToEquipment(addEquipmentRequest));
-		itemSaver.saveItems(equipment.getId(), addEquipmentWithItemsRequest.items());
+		final List<ToBeSavedItem> toBeSavedItems = mapToToBeSavedItems(equipment.getId(), addEquipmentWithItemsRequest.items());
+		itemSaverPerEquipment.execute(toBeSavedItems);
 		return equipment.getId();
 	}
 
@@ -43,10 +48,18 @@ public class EquipmentService {
 			.description(addEquipmentRequest.description())
 			.components(addEquipmentRequest.components())
 			.rentalPlace(addEquipmentRequest.rentalPlace())
-			.totalQuantity(addEquipmentRequest.totalQuantity())
-			.rentableQuantity(addEquipmentRequest.totalQuantity())
+			// .totalQuantity(addEquipmentRequest.totalQuantity())
+			// .rentableQuantity(addEquipmentRequest.totalQuantity())
+			.totalQuantity(0).rentableQuantity(0)
 			.maxRentalDays(addEquipmentRequest.maxRentalDays())
 			.build();
+	}
+
+	private List<ToBeSavedItem> mapToToBeSavedItems(final Long equipmentId, final List<AddItemRequest> requests) {
+		if (requests == null || requests.isEmpty()) return Collections.emptyList();
+		return requests.stream()
+			.map(it -> new ToBeSavedItem(it.propertyNumber(), equipmentId))
+			.toList();
 	}
 
 	public void deleteEquipment(final Long id) {

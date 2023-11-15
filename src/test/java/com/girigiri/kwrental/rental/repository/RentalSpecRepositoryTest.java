@@ -11,14 +11,12 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
 import com.girigiri.kwrental.asset.domain.RentableAsset;
 import com.girigiri.kwrental.asset.repository.AssetRepository;
 import com.girigiri.kwrental.auth.domain.Member;
 import com.girigiri.kwrental.auth.repository.MemberRepository;
-import com.girigiri.kwrental.common.config.JpaConfig;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.rental.domain.RentalSpecStatus;
 import com.girigiri.kwrental.rental.domain.entity.EquipmentRentalSpec;
 import com.girigiri.kwrental.rental.domain.entity.LabRoomRentalSpec;
@@ -36,6 +34,7 @@ import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpecStatus;
 import com.girigiri.kwrental.reservation.repository.ReservationRepository;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentRentalSpecFixture;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
@@ -47,8 +46,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class RentalSpecRepositoryTest {
 
 	@Autowired
@@ -409,15 +407,16 @@ class RentalSpecRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("자산번호를 업데이트 한다.")
-	void updatePropertyNumber() {
+	@DisplayName("자산번호들을 업데이트 한다.")
+	void updatePropertyNumbers() {
 		// given
 		final EquipmentRentalSpec spec = EquipmentRentalSpecFixture.builder().propertyNumber("11111111").build();
 		rentalSpecRepository.saveAll(List.of(spec));
 
 		// when
 		final String updatedPropertyNumber = "22222222";
-		rentalSpecRepository.updatePropertyNumber(spec.getPropertyNumber(), updatedPropertyNumber);
+		final ToBeUpdatedItem toBeUpdatedItem = new ToBeUpdatedItem(1L, 2L, spec.getPropertyNumber(), updatedPropertyNumber);
+		rentalSpecRepository.updatePropertyNumbers(List.of(toBeUpdatedItem));
 
 		// then
 		entityManager.refresh(spec);

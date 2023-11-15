@@ -3,8 +3,10 @@ package com.girigiri.kwrental.item.repository;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,7 @@ import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ItemQueryDslRepositoryCustomImplTest {
 
     @Autowired
@@ -121,5 +122,20 @@ class ItemQueryDslRepositoryCustomImplTest {
 
         // then
         assertThat(actual).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("자산번호로 삭제되지 않은 품목을 조회한다.")
+    void findByPropertyNumbers() {
+        // given
+        Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").build());
+        Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").build());
+        Item deletedItem = itemRepository.save(ItemFixture.builder().propertyNumber("33333333").deletedAt(LocalDate.now()).build());
+
+        // when
+        final List<Item> actual = itemRepository.findByPropertyNumbers(List.of(item1.getPropertyNumber(), item2.getPropertyNumber(), deletedItem.getPropertyNumber()));
+
+        // then
+        assertThat(actual).containsExactlyInAnyOrder(item1, item2);
     }
 }

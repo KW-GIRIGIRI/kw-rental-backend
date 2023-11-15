@@ -4,21 +4,19 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
+import com.girigiri.kwrental.item.repository.jpa.ItemJdbcRepositoryCustomImpl;
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ItemJdbcRepositoryCustomImplTest {
 
     @Autowired

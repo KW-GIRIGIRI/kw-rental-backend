@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.asset.labroom.repository;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,7 @@ import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class LabRoomRepositoryTest {
 
 	@Autowired

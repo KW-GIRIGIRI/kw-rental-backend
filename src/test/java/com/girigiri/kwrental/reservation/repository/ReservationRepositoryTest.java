@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,7 @@ import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ReservationRepositoryTest {
 
 	@Autowired
