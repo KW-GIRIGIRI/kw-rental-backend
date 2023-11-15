@@ -1,58 +1,26 @@
 package com.girigiri.kwrental.item.domain;
 
-import com.girigiri.kwrental.item.exception.ItemException;
-import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
 class ItemTest {
 
-    @Test
-    @DisplayName("자산번호를 다르게 수정")
-    void updatePropertyNumber() {
+    @ParameterizedTest
+    @CsvSource({"12345678,false", "87654321,true", ",false"})
+    @DisplayName("입력받은 값으로 자산번호으로 변경 가능한 값인지 판단한다.")
+    void updatePropertyNumber(String propertyNumber, boolean expect) {
         // given
-        Item item = ItemFixture.builder().propertyNumber("1234567").build();
+        Item item = ItemFixture.builder().propertyNumber("12345678").build();
 
         // when
-        item.updatePropertyNumber("7654321");
+        final boolean actual = item.canUpdatePropertyNumberTo(propertyNumber);
 
         // then
-        assertThat(item.getPropertyNumber()).isEqualTo("7654321");
-    }
-
-    @Test
-    @DisplayName("자산번호를 null로 수정 시 예외")
-    void updatePropertyNumber_Null() {
-        // given
-        Item item = ItemFixture.builder().propertyNumber("1234567").build();
-
-        // when, then
-        assertThatThrownBy(() -> item.updatePropertyNumber(null))
-                .isInstanceOf(ItemException.class);
-    }
-
-    @Test
-    @DisplayName("자산번호를 빈 값으로 수정 시 예외")
-    void updatePropertyNumber_empty() {
-        // given
-        Item item = ItemFixture.builder().propertyNumber("1234567").build();
-
-        // when, then
-        assertThatThrownBy(() -> item.updatePropertyNumber(""))
-                .isInstanceOf(ItemException.class);
-    }
-
-    @Test
-    @DisplayName("자산번호를 공백으로 수정 시 예외")
-    void updatePropertyNumber_blank() {
-        // given
-        Item item = ItemFixture.builder().propertyNumber("1234567").build();
-
-        // when, then
-        assertThatThrownBy(() -> item.updatePropertyNumber("     "))
-                .isInstanceOf(ItemException.class);
+        assertThat(actual).isEqualTo(expect);
     }
 }
