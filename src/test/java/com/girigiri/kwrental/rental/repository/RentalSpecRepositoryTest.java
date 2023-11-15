@@ -415,8 +415,8 @@ class RentalSpecRepositoryTest {
 
 		// when
 		final String updatedPropertyNumber = "22222222";
-		final ToBeUpdatedItem toBeUpdatedItem = new ToBeUpdatedItem(1L, 2L, updatedPropertyNumber);
-		rentalSpecRepository.updatePropertyNumber(spec.getPropertyNumber(), updatedPropertyNumber);
+		final ToBeUpdatedItem toBeUpdatedItem = new ToBeUpdatedItem(1L, 2L, spec.getPropertyNumber(), updatedPropertyNumber);
+		rentalSpecRepository.updatePropertyNumbers(List.of(toBeUpdatedItem));
 
 		// then
 		entityManager.refresh(spec);

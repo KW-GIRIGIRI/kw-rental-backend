@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.item.repository;
+package com.girigiri.kwrental.item.repository.jpa;
 
 import java.util.List;
 

@@ -2,8 +2,7 @@ package com.girigiri.kwrental.testsupport;
 
 import com.girigiri.kwrental.item.repository.ItemConstraintPolicy;
 import com.girigiri.kwrental.item.repository.ItemConstraintPolicyImpl;
-import com.girigiri.kwrental.item.repository.ItemJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.girigiri.kwrental.item.repository.jpa.ItemJpaRepository;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 

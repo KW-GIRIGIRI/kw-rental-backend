@@ -1,5 +1,6 @@
 package com.girigiri.kwrental.item.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -29,7 +30,11 @@ public class ItemRetriever {
 			.orElseThrow(ItemNotFoundException::new);
 	}
 
-	public List<Item> getByIds(final List<Long> ids) {
+	public List<Item> getByIds(final Collection<Long> ids) {
 		return itemRepository.findByIds(ids);
+	}
+
+	public List<Item> getByAssetId(final Long assetId) {
+		return itemRepository.findByAssetId(assetId);
 	}
 }

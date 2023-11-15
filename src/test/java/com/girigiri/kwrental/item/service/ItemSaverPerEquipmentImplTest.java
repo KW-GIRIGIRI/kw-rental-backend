@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.girigiri.kwrental.asset.equipment.service.EquipmentAdjuster;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
 import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.exception.ToBeSavedItemsAreNotSameEquipmentException;
+import com.girigiri.kwrental.item.exception.ItemsNotSameEquipmentException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.item.service.save.ItemSaverPerEquipmentImpl;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
@@ -57,6 +57,6 @@ class ItemSaverPerEquipmentImplTest {
 
 		// when, then
 		assertThatThrownBy(() -> saveItemService.execute(List.of(toBeSavedItem1, toBeSavedItem2)))
-			.isExactlyInstanceOf(ToBeSavedItemsAreNotSameEquipmentException.class);
+			.isExactlyInstanceOf(ItemsNotSameEquipmentException.class);
 	}
 }

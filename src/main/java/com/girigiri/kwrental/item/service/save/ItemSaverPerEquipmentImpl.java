@@ -13,7 +13,7 @@ import com.girigiri.kwrental.asset.equipment.service.ItemSaverPerEquipment;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
-import com.girigiri.kwrental.item.exception.ToBeSavedItemsAreNotSameEquipmentException;
+import com.girigiri.kwrental.item.exception.ItemsNotSameEquipmentException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,19 +25,6 @@ public class ItemSaverPerEquipmentImpl implements ItemSaverPerEquipment {
 
 	private final ItemRepository itemRepository;
 	private final EquipmentAdjuster equipmentAdjuster;
-
-	public void saveItemsWhenUpdate(final Long equipmentId, final List<UpdateItemRequest> saveItemRequests) {
-		if (saveItemRequests == null)
-			return;
-		List<Item> itemsToSave = saveItemRequests.stream().map(it -> mapToItem(equipmentId, it)).toList();
-		itemRepository.saveAll(itemsToSave);
-		equipmentAdjuster.adjustWhenItemSaved(itemsToSave.size(), equipmentId);
-	}
-
-	private Item mapToItem(final Long equipmentId, final UpdateItemRequest updateItemRequest) {
-		return Item.builder().propertyNumber(updateItemRequest.propertyNumber()).available(true)
-			.assetId(equipmentId).build();
-	}
 
 	@Override
 	public int execute(final List<ToBeSavedItem> toBeSavedItems) {
@@ -54,7 +41,7 @@ public class ItemSaverPerEquipmentImpl implements ItemSaverPerEquipment {
 		final Set<Long> equipmentIds = toBeSavedItems.stream()
 			.map(ToBeSavedItem::assetId)
 			.collect(Collectors.toSet());
-		if (equipmentIds.size() != 1) throw new ToBeSavedItemsAreNotSameEquipmentException();
+		if (equipmentIds.size() != 1) throw new ItemsNotSameEquipmentException();
 	}
 
 	private Long getAssetId(final List<Item> itemEntities) {

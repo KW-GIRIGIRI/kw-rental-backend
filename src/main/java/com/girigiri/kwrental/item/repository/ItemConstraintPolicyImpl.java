@@ -2,9 +2,8 @@ package com.girigiri.kwrental.item.repository;
 
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.exception.PropertyNumberNotUniqueException;
+import com.girigiri.kwrental.item.repository.jpa.ItemJpaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;

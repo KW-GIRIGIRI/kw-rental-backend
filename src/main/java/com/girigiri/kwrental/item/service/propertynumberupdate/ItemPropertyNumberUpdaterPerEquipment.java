@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.item.exception.ToBeSavedItemsAreNotSameEquipmentException;
+import com.girigiri.kwrental.item.exception.ItemsNotSameEquipmentException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.item.service.RentedItemService;
 
@@ -34,6 +34,6 @@ public class ItemPropertyNumberUpdaterPerEquipment {
 		final Set<Long> equipmentIds = toBeUpdatedItems.stream()
 			.map(ToBeUpdatedItem::assetId)
 			.collect(Collectors.toSet());
-		if (equipmentIds.size() != 1) throw new ToBeSavedItemsAreNotSameEquipmentException();
+		if (equipmentIds.size() != 1) throw new ItemsNotSameEquipmentException();
 	}
 }

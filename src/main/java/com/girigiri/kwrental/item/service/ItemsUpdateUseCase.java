@@ -1,16 +1,18 @@
 package com.girigiri.kwrental.item.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.girigiri.kwrental.asset.equipment.service.ItemSaverPerEquipment;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
-import com.girigiri.kwrental.item.domain.EquipmentItems;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
@@ -20,25 +22,34 @@ import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 
 import lombok.RequiredArgsConstructor;
 
+
 @Component
-@Transactional
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.MANDATORY)
 public class ItemsUpdateUseCase {
 	private final ItemSaverPerEquipment itemSaverPerEquipment;
 	private final ItemPropertyNumberUpdaterPerEquipment itemPropertyNumberUpdaterPerEquipment;
 	private final ItemRetriever itemRetriever;
+	private final ItemDeleter itemDeleter;
 
-	public ItemsResponse saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		Map<Boolean, List<UpdateItemRequest>> itemRequestsGroup = groupByIdNull(saveOrUpdateItemsRequest);
+	public void saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
+		if (saveOrUpdateItemsRequest == null || saveOrUpdateItemsRequest.items() == null) return;
+		final List<Item> toBeDeletedItems = mapToToBeDeletedItems(equipmentId, saveOrUpdateItemsRequest.items());
+		itemDeleter.batchDelete(toBeDeletedItems);
+
 		final List<ToBeSavedItem> toBeSavedItems = mapToToBeSavedItems(equipmentId, saveOrUpdateItemsRequest);
 		itemSaverPerEquipment.execute(toBeSavedItems);
 
-		final List<ToBeUpdatedItem> toBeUpdatedItems = mapToTOBeUpdatedItems(equipmentId, saveOrUpdateItemsRequest);
-		final EquipmentItems equipmentItems = getEquipmentItems(equipmentId);
-		List<UpdateItemRequest> updateItemRequests = itemRequestsGroup.get(false);
-		update(equipmentItems, updateItemRequests);
-		deleteNotRequested(equipmentItems, saveOrUpdateItemsRequest.items());
-		return ItemsResponse.of(equipmentItems.getItems());
+		final List<ToBeUpdatedItem> toBeUpdatedItems = mapToToBeUpdatedItems(saveOrUpdateItemsRequest);
+		itemPropertyNumberUpdaterPerEquipment.execute(toBeUpdatedItems);
+	}
+
+	private List<Item> mapToToBeDeletedItems(final Long equipmentId, final List<UpdateItemRequest> updateItemRequests) {
+		final Set<Long> requestedIds = updateItemRequests.stream().map(UpdateItemRequest::id).collect(Collectors.toSet());
+		final List<Item> itemsPerEquipment = itemRetriever.getByAssetId(equipmentId);
+		return itemsPerEquipment.stream()
+				.filter(it -> !requestedIds.contains(it.getId()))
+				.toList();
 	}
 
 	private List<ToBeSavedItem> mapToToBeSavedItems(final Long equipmentId,
@@ -49,51 +60,13 @@ public class ItemsUpdateUseCase {
 			.map(it -> new ToBeSavedItem(it.propertyNumber(), equipmentId)).toList();
 	}
 
-	private List<ToBeUpdatedItem> mapToTOBeUpdatedItems(final Long equipmentId,
-		final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
+	private List<ToBeUpdatedItem> mapToToBeUpdatedItems(final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
 		final List<UpdateItemRequest> updateItemRequests = saveOrUpdateItemsRequest.items().stream()
 			.filter(it -> it.id() != null).toList();
-		final List<Long> ids = updateItemRequests.stream().map(UpdateItemRequest::id).toList();
-		final List<Item> items = itemRetriever.getByIds(ids);
-		updateItemRequests.stream()
-			.map(it -> new ToBeUpdatedItem(it.id(), equipmentId, ))
-	}
-
-	private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(SaveOrUpdateItemsRequest updateItemsRequest) {
-		return updateItemsRequest.items().stream().collect(Collectors.groupingBy(it -> it.id() == null));
-	}
-
-	private EquipmentItems getEquipmentItems(final Long equipmentId) {
-		List<Item> items = itemRepository.findByAssetId(equipmentId);
-		return EquipmentItems.from(items);
-	}
-
-	private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
-		if (updateItemRequests == null)
-			return;
-		for (UpdateItemRequest request : updateItemRequests) {
-			final Item item = equipmentItems.getItem(request.id());
-			updatePropertyNumber(item.getId(), request.propertyNumber());
-		}
-	}
-
-	private void deleteNotRequested(final EquipmentItems equipmentItems,
-		final List<UpdateItemRequest> updateItemRequests) {
-		if (updateItemRequests == null)
-			return;
-		List<Long> notRequestedIds = getNotRequestedIds(equipmentItems, updateItemRequests);
-		final List<Item> itemsToDelete = notRequestedIds
-			.stream().map(equipmentItems::getItem).toList();
-		itemDeleter.batchDelete(itemsToDelete);
-		equipmentItems.deleteByIds(notRequestedIds);
-	}
-
-	private List<Long> getNotRequestedIds(EquipmentItems equipmentItems,
-		List<UpdateItemRequest> updateItemRequests) {
-		final List<Long> ids = equipmentItems.getIds();
-		final Set<Long> requestedIds = updateItemRequests.stream()
-			.map(UpdateItemRequest::id)
-			.collect(Collectors.toSet());
-		return ids.stream().filter(id -> !requestedIds.contains(id)).toList();
+		final Map<Long, UpdateItemRequest> updateItemRequestGroupById = updateItemRequests.stream().collect(Collectors.toMap(UpdateItemRequest::id, Function.identity()));
+		final List<Item> items = itemRetriever.getByIds(updateItemRequestGroupById.keySet());
+		return items.stream()
+				.map(it -> new ToBeUpdatedItem(it.getId(), it.getAssetId(), it.getPropertyNumber(), updateItemRequestGroupById.get(it.getId()).propertyNumber()))
+				.toList();
 	}
 }

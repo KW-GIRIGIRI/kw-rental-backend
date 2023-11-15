@@ -1,10 +1,6 @@
 package com.girigiri.kwrental.item.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.repository.Repository;
-
-import com.girigiri.kwrental.item.domain.Item;
+import com.girigiri.kwrental.item.repository.jpa.ItemJpaRepository;
 
 public interface ItemRepository extends ItemJpaRepository {
 

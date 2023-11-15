@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.item.repository;
+package com.girigiri.kwrental.item.repository.jpa;
 
 import static com.girigiri.kwrental.asset.equipment.domain.QEquipment.*;
 import static com.girigiri.kwrental.item.domain.QItem.*;

@@ -29,9 +29,9 @@ public class ItemService {
 	private final ItemRetriever itemRetriever;
 	private final ItemAvailableSetter itemAvailableSetter;
 	private final ItemRepository itemRepository;
-	private final ItemSaverPerEquipmentImpl itemSaver;
 	private final ItemDeleter itemDeleter;
 	private final ItemPropertyNumberUpdaterPerEquipment itemPropertyNumberUpdaterPerEquipment;
+	private final ItemsUpdateUseCase itemsUpdateUseCase;
 
 	public void updateAvailable(final Long id, final boolean rentalAvailable) {
 		final Item item = itemRetriever.getById(id);
@@ -50,53 +50,8 @@ public class ItemService {
 		itemDeleter.delete(item);
 	}
 
-	public ItemsResponse saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		Map<Boolean, List<UpdateItemRequest>> itemRequestsGroup = groupByIdNull(saveOrUpdateItemsRequest);
-		List<UpdateItemRequest> saveItemRequests = itemRequestsGroup.get(true);
-		itemSaver.saveItemsWhenUpdate(equipmentId, saveItemRequests);
-		final EquipmentItems equipmentItems = getEquipmentItems(equipmentId);
-		List<UpdateItemRequest> updateItemRequests = itemRequestsGroup.get(false);
-		update(equipmentItems, updateItemRequests);
-		deleteNotRequested(equipmentItems, saveOrUpdateItemsRequest.items());
-		return ItemsResponse.of(equipmentItems.getItems());
-	}
-
-	private Map<Boolean, List<UpdateItemRequest>> groupByIdNull(SaveOrUpdateItemsRequest updateItemsRequest) {
-		return updateItemsRequest.items().stream().collect(Collectors.groupingBy(it -> it.id() == null));
-	}
-
-	private EquipmentItems getEquipmentItems(final Long equipmentId) {
-		List<Item> items = itemRepository.findByAssetId(equipmentId);
-		return EquipmentItems.from(items);
-	}
-
-	private void update(EquipmentItems equipmentItems, List<UpdateItemRequest> updateItemRequests) {
-		if (updateItemRequests == null)
-			return;
-		for (UpdateItemRequest request : updateItemRequests) {
-			final Item item = equipmentItems.getItem(request.id());
-			updatePropertyNumber(item.getId(), request.propertyNumber());
-		}
-	}
-
-	private void deleteNotRequested(final EquipmentItems equipmentItems,
-		final List<UpdateItemRequest> updateItemRequests) {
-		if (updateItemRequests == null)
-			return;
-		List<Long> notRequestedIds = getNotRequestedIds(equipmentItems, updateItemRequests);
-		final List<Item> itemsToDelete = notRequestedIds
-				.stream().map(equipmentItems::getItem).toList();
-		itemDeleter.batchDelete(itemsToDelete);
-		equipmentItems.deleteByIds(notRequestedIds);
-	}
-
-	private List<Long> getNotRequestedIds(EquipmentItems equipmentItems,
-										  List<UpdateItemRequest> updateItemRequests) {
-		final List<Long> ids = equipmentItems.getIds();
-		final Set<Long> requestedIds = updateItemRequests.stream()
-			.map(UpdateItemRequest::id)
-			.collect(Collectors.toSet());
-		return ids.stream().filter(id -> !requestedIds.contains(id)).toList();
+	public void saveOrUpdate(final Long equipment, final SaveOrUpdateItemsRequest request) {
+		itemsUpdateUseCase.saveOrUpdate(equipment, request);
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
