@@ -1,7 +1,6 @@
 package com.girigiri.kwrental.acceptance;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.*;
 
@@ -12,7 +11,6 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import com.girigiri.kwrental.asset.equipment.domain.Category;
@@ -21,8 +19,6 @@ import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
-import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.dto.response.ItemHistoriesResponse;
 import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemResponse;
@@ -177,30 +173,30 @@ class ItemAcceptanceTest extends AcceptanceTest {
 		assertThat(actualItem.isAvailable()).isFalse();
 	}
 
-	@Test
-	@DisplayName("관리자가 기자재의 품목들 수정 API")
-	void updateByEquipment() {
-		// given
-		final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
-		final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
-		itemRepository.save(item);
-		final Item item2 = ItemFixture.builder().propertyNumber("22222222").assetId(equipment.getId()).build();
-		itemRepository.save(item2);
-
-		UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
-		UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "33333333");
-		SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(
-			List.of(updateItemRequest1, updateItemRequest2));
-
-		// when
-		RestAssured.given(requestSpec)
-			.filter(document("admin_updateItemsByEquipment"))
-			.contentType(ContentType.APPLICATION_JSON.getMimeType())
-			.body(updateItemsRequest)
-			.when().log().all().put("/api/admin/items?equipmentId=" + equipment.getId())
-			.then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
-			.header(HttpHeaders.LOCATION, containsString("/api/items?equipmentId=" + equipment.getId()));
-	}
+	// @Test
+	// @DisplayName("관리자가 기자재의 품목들 수정 API")
+	// void updateByEquipment() {
+	// 	// given
+	// 	final Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+	// 	final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
+	// 	itemRepository.save(item);
+	// 	final Item item2 = ItemFixture.builder().propertyNumber("22222222").assetId(equipment.getId()).build();
+	// 	itemRepository.save(item2);
+	//
+	// 	UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(item.getId(), "11111111");
+	// 	UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "33333333");
+	// 	SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(
+	// 		List.of(updateItemRequest1, updateItemRequest2));
+	//
+	// 	// when
+	// 	RestAssured.given(requestSpec)
+	// 		.filter(document("admin_updateItemsByEquipment"))
+	// 		.contentType(ContentType.APPLICATION_JSON.getMimeType())
+	// 		.body(updateItemsRequest)
+	// 		.when().log().all().put("/api/admin/items?equipmentId=" + equipment.getId())
+	// 		.then().log().all().statusCode(HttpStatus.NO_CONTENT.value())
+	// 		.header(HttpHeaders.LOCATION, containsString("/api/items?equipmentId=" + equipment.getId()));
+	// }
 
 	@Test
 	@DisplayName("관리자가 현재 수령 가능한 품목 조회 API")

@@ -28,7 +28,6 @@ import com.girigiri.kwrental.asset.dto.response.RemainQuantitiesPerDateResponse;
 import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.EquipmentSearchCondition;
 import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentPageResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.asset.equipment.exception.EquipmentException;
@@ -100,10 +99,8 @@ public class AdminEquipmentController {
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable final Long id,
 		@Validated @RequestBody final UpdateEquipmentRequest updateEquipmentRequest) {
-		EquipmentDetailResponse updatedResponse = equipmentService.update(id, updateEquipmentRequest);
-		return ResponseEntity.noContent()
-			.location(URI.create("/api/equipments/" + updatedResponse.id()))
-			.build();
+		equipmentService.update(id, updateEquipmentRequest);
+		return ResponseEntity.noContent().location(URI.create("/api/equipments/" + id)).build();
 	}
 
 	@GetMapping("/{id}/remainQuantities")

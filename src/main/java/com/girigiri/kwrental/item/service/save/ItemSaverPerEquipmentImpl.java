@@ -12,7 +12,6 @@ import com.girigiri.kwrental.asset.equipment.service.EquipmentAdjuster;
 import com.girigiri.kwrental.asset.equipment.service.ItemSaverPerEquipment;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
 import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.exception.ItemsNotSameEquipmentException;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 

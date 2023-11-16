@@ -1,5 +1,7 @@
 package com.girigiri.kwrental.item.service;
 
+import static com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.girigiri.kwrental.asset.equipment.service.ItemSaverPerEquipment;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
 import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.service.propertynumberupdate.ItemPropertyNumberUpdaterPerEquipment;
 import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 
@@ -29,16 +29,16 @@ public class ItemsUpdateUseCase {
 	private final ItemRetriever itemRetriever;
 	private final ItemDeleter itemDeleter;
 
-	public void saveOrUpdate(final Long equipmentId, final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		if (saveOrUpdateItemsRequest == null || saveOrUpdateItemsRequest.items() == null)
+	public void saveOrUpdate(final Long equipmentId, final List<UpdateItemRequest> requests) {
+		if (requests == null)
 			return;
-		final List<Item> toBeDeletedItems = mapToToBeDeletedItems(equipmentId, saveOrUpdateItemsRequest.items());
+		final List<Item> toBeDeletedItems = mapToToBeDeletedItems(equipmentId, requests);
 		itemDeleter.batchDelete(toBeDeletedItems);
 
-		final List<ToBeSavedItem> toBeSavedItems = mapToToBeSavedItems(equipmentId, saveOrUpdateItemsRequest);
+		final List<ToBeSavedItem> toBeSavedItems = mapToToBeSavedItems(equipmentId, requests);
 		itemSaverPerEquipment.execute(toBeSavedItems);
 
-		final List<ToBeUpdatedItem> toBeUpdatedItems = mapToToBeUpdatedItems(saveOrUpdateItemsRequest);
+		final List<ToBeUpdatedItem> toBeUpdatedItems = mapToToBeUpdatedItems(requests);
 		itemPropertyNumberUpdaterPerEquipment.execute(toBeUpdatedItems);
 	}
 
@@ -53,15 +53,15 @@ public class ItemsUpdateUseCase {
 	}
 
 	private List<ToBeSavedItem> mapToToBeSavedItems(final Long equipmentId,
-		final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		final List<UpdateItemRequest> saveItemRequests = saveOrUpdateItemsRequest.items().stream()
+		final List<UpdateItemRequest> saveOrUpdateItemsRequest) {
+		final List<UpdateItemRequest> saveItemRequests = saveOrUpdateItemsRequest.stream()
 			.filter(it -> it.id() == null).toList();
 		return saveItemRequests.stream()
 			.map(it -> new ToBeSavedItem(it.propertyNumber(), equipmentId)).toList();
 	}
 
-	private List<ToBeUpdatedItem> mapToToBeUpdatedItems(final SaveOrUpdateItemsRequest saveOrUpdateItemsRequest) {
-		final List<UpdateItemRequest> updateItemRequests = saveOrUpdateItemsRequest.items().stream()
+	private List<ToBeUpdatedItem> mapToToBeUpdatedItems(final List<UpdateItemRequest> saveOrUpdateItemsRequest) {
+		final List<UpdateItemRequest> updateItemRequests = saveOrUpdateItemsRequest.stream()
 			.filter(it -> it.id() != null).toList();
 		final Map<Long, UpdateItemRequest> updateItemRequestGroupById = updateItemRequests.stream()
 			.collect(Collectors.toMap(UpdateItemRequest::id, Function.identity()));

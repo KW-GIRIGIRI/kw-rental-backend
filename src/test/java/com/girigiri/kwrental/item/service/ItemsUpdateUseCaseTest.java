@@ -13,11 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest.UpdateItemRequest;
 import com.girigiri.kwrental.asset.equipment.service.ItemSaverPerEquipment;
 import com.girigiri.kwrental.asset.equipment.service.ToBeSavedItem;
 import com.girigiri.kwrental.item.domain.Item;
-import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
-import com.girigiri.kwrental.item.dto.request.UpdateItemRequest;
 import com.girigiri.kwrental.item.service.propertynumberupdate.ItemPropertyNumberUpdaterPerEquipment;
 import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
@@ -49,8 +48,6 @@ class ItemsUpdateUseCaseTest {
         UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(null, "1234567");
         UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(1L, "7654321");
         UpdateItemRequest updateItemRequest3 = new UpdateItemRequest(4L, "44444444");
-        SaveOrUpdateItemsRequest updateItemsRequest = new SaveOrUpdateItemsRequest(
-            List.of(updateItemRequest1, updateItemRequest2, updateItemRequest3));
 
         given(itemRetriever.getByAssetId(2L)).willReturn(List.of(itemForUpdate, itemForDelete));
         given(itemDeleter.batchDelete(List.of(itemForDelete))).willReturn(1);
@@ -64,7 +61,8 @@ class ItemsUpdateUseCaseTest {
             .willReturn(1);
 
         // when, then
-        assertThatCode(() -> itemsUpdateUseCase.saveOrUpdate(2L, updateItemsRequest))
+        assertThatCode(() -> itemsUpdateUseCase.saveOrUpdate(2L,
+            List.of(updateItemRequest1, updateItemRequest2, updateItemRequest3)))
             .doesNotThrowAnyException();
     }
 }
