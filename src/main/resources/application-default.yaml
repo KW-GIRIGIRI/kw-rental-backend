@@ -9,3 +9,6 @@ spring:
       ddl-auto: create
 cors:
   allow-origins: http://localhost:3000
+
+emergency:
+  email: ~

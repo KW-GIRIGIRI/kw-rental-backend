@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.common;
+package com.girigiri.kwrental.common.log;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -57,7 +57,6 @@ public class ApiLogFilter extends OncePerRequestFilter {
             log.warn("[Failed Request Body] : {}", requestBody);
             getJsonResponseBody(response)
                     .ifPresent(body -> log.warn("[Response Body] : {}", body));
-            log.warn("[Response Body] : {}", response);
         }
         if (httpStatus.is2xxSuccessful() && !requestBody.isBlank()) {
             log.info("[Request Body] : {}", requestBody);
