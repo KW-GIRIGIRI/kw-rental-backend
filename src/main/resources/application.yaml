@@ -16,3 +16,5 @@ decorator:
     datasource:
         p6spy:
             enable-logging: true
+emergency:
+    email: djwhy5510@naver.com
