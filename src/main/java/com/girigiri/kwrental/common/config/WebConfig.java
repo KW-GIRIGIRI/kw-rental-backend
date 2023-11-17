@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.girigiri.kwrental.auth.service.KwangwoonMemberService;
-import com.girigiri.kwrental.common.ApiLogFilter;
+import com.girigiri.kwrental.common.log.ApiLogFilter;
 import com.girigiri.kwrental.common.CustomHandlerMethodArgumentResolver;
 import com.girigiri.kwrental.common.exception.KwangwoonServerException;
 

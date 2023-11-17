@@ -6,3 +6,8 @@ spring:
       ddl-auto: none
 cors:
   allow-origins: http://localhost:3000,https://www.kwmedialab.com/
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
