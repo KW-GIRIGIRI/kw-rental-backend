@@ -42,6 +42,25 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="DEBUG-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/debug/logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/warn/warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+            <cleanHistoryOnStart>${LOG_FILE_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+    </appender>
+
     <appender name="ERROR-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
@@ -61,17 +80,39 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="SQL-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>${LOG_PATH}/sql/logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+            <cleanHistoryOnStart>${LOG_FILE_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+
+    </appender>
+
     <!-- Spring Profiles -->
     <springProfile name="default">
+        <logger name="p6spy" level="info" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
         <root level="info">
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
     <springProfile name="release">
+        <logger name="p6spy" level="info" additivity="false">
+            <appender-ref ref="SQL-FILE" />
+        </logger>
         <root level="INFO">
             <appender-ref ref="INFO-FILE"/>
             <appender-ref ref="WARN-FILE"/>
             <appender-ref ref="ERROR-FILE"/>
+            <appender-ref ref="DEBUG-FILE"/>
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
@@ -80,6 +121,7 @@
             <appender-ref ref="INFO-FILE"/>
             <appender-ref ref="WARN-FILE"/>
             <appender-ref ref="ERROR-FILE"/>
+            <appender-ref ref="DEBUG-FILE"/>
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
