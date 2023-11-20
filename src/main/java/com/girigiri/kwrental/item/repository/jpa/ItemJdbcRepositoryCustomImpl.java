@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.item.repository;
+package com.girigiri.kwrental.item.repository.jpa;
 
 import java.util.List;
 
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ItemJdbcRepositoryCustomImpl implements ItemJdbcRepositoryCustom {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override

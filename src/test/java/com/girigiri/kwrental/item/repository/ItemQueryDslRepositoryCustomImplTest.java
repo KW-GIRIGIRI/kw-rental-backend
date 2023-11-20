@@ -3,30 +3,27 @@ package com.girigiri.kwrental.item.repository;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.asset.equipment.domain.Equipment;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
-import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ItemFixture;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class ItemQueryDslRepositoryCustomImplTest {
 
     @Autowired
@@ -36,22 +33,6 @@ class ItemQueryDslRepositoryCustomImplTest {
     private EntityManager entityManager;
     @Autowired
     private EquipmentRepository equipmentRepository;
-
-    @Test
-    @DisplayName("중복된 자산 번호로 더티체킹 될 경우 예외")
-    void updatePropertyNumber_dirtyCheck() {
-        // given
-        String propertyNumber = "87654321";
-        Item item = ItemFixture.builder().propertyNumber("12345678").build();
-        Item item2 = ItemFixture.builder().propertyNumber(propertyNumber).build();
-        itemRepository.save(item);
-        itemRepository.save(item2);
-
-        // when
-        item.updatePropertyNumber(propertyNumber);
-        assertThatThrownBy(() -> entityManager.flush())
-                .isExactlyInstanceOf(PersistenceException.class);
-    }
 
     @Test
     @DisplayName("대여 가능 갯수를 구한다")
@@ -121,5 +102,20 @@ class ItemQueryDslRepositoryCustomImplTest {
 
         // then
         assertThat(actual).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("자산번호로 삭제되지 않은 품목을 조회한다.")
+    void findByPropertyNumbers() {
+        // given
+        Item item1 = itemRepository.save(ItemFixture.builder().propertyNumber("11111111").build());
+        Item item2 = itemRepository.save(ItemFixture.builder().propertyNumber("22222222").build());
+        Item deletedItem = itemRepository.save(ItemFixture.builder().propertyNumber("33333333").deletedAt(LocalDate.now()).build());
+
+        // when
+        final List<Item> actual = itemRepository.findByPropertyNumbers(List.of(item1.getPropertyNumber(), item2.getPropertyNumber(), deletedItem.getPropertyNumber()));
+
+        // then
+        assertThat(actual).containsExactlyInAnyOrder(item1, item2);
     }
 }

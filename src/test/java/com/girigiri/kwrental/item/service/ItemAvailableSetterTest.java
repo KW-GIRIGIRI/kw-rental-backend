@@ -1,8 +1,11 @@
 package com.girigiri.kwrental.item.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -61,16 +64,25 @@ class ItemAvailableSetterTest {
 	}
 
 	@Test
+	@DisplayName("여러 품목이 삭제됐을 때 운영 불가능 배치 처리한다.")
 	void batchUpdateAvailableWhenItemsDeleted() {
 		// given
 		final Item item = ItemFixture.builder().id(1L).assetId(1L).available(true).build();
 		doNothing().when(equipmentAdjuster).adjustWhenItemDeleted(1, -1, 1L);
-		BDDMockito.given(itemRepository.updateAvailable(List.of(item.getId()), false)).willReturn(1);
+		given(itemRepository.updateAvailable(List.of(item.getId()), false)).willReturn(1);
 
 		// when
 		itemAvailableSetter.batchUpdateAvailableWhenItemsDeleted(List.of(item));
 
 		// then
 		verify(equipmentAdjuster).adjustWhenItemDeleted(1, -1, 1L);
+	}
+
+	@Test
+	@DisplayName("여러 품목이 삭제됐을 때 운영 불가능 배치 처리하는데 빈 리스트를 전달하면 그냥 종료한다.")
+	void batchUpdateAvailableWhenItemsDeleted_emptyList() {
+		// when
+		assertThatCode(() -> itemAvailableSetter.batchUpdateAvailableWhenItemsDeleted(Collections.emptyList()))
+				.doesNotThrowAnyException();
 	}
 }

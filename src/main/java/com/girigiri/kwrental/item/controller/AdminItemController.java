@@ -1,6 +1,5 @@
 package com.girigiri.kwrental.item.controller;
 
-import java.net.URI;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.girigiri.kwrental.item.dto.request.ItemHistoryRequest;
 import com.girigiri.kwrental.item.dto.request.ItemPropertyNumberRequest;
 import com.girigiri.kwrental.item.dto.request.ItemRentalAvailableRequest;
-import com.girigiri.kwrental.item.dto.request.SaveOrUpdateItemsRequest;
 import com.girigiri.kwrental.item.dto.response.ItemHistoriesResponse;
 import com.girigiri.kwrental.item.dto.response.ItemHistory;
 import com.girigiri.kwrental.item.dto.response.ItemsResponse;
@@ -60,12 +57,12 @@ public class AdminItemController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PutMapping
-	public ResponseEntity<?> saveOrUpdate(final Long equipmentId,
-		@RequestBody @Validated SaveOrUpdateItemsRequest updateItemsRequest) {
-		itemService.saveOrUpdate(equipmentId, updateItemsRequest);
-		return ResponseEntity.noContent().location(URI.create("/api/items?equipmentId=" + equipmentId)).build();
-	}
+	// @PutMapping
+	// public ResponseEntity<?> saveOrUpdate(final Long equipmentId,
+	// 	@RequestBody @Validated SaveOrUpdateItemsRequest updateItemsRequest) {
+	// 	itemService.saveOrUpdate(equipmentId, updateItemsRequest);
+	// 	return ResponseEntity.noContent().location(URI.create("/api/items?equipmentId=" + equipmentId)).build();
+	// }
 
 	@GetMapping("/rentalAvailability")
 	public ItemsResponse getRentalAvailable(final Long equipmentId) {

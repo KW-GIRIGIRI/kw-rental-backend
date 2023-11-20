@@ -1,4 +1,4 @@
-package com.girigiri.kwrental.item.repository;
+package com.girigiri.kwrental.item.repository.jpa;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import com.girigiri.kwrental.asset.equipment.domain.Category;
 import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.dto.response.EquipmentItemDto;
+import com.girigiri.kwrental.item.service.propertynumberupdate.ToBeUpdatedItem;
 
 public interface ItemQueryDslRepositoryCustom {
 
@@ -28,4 +29,10 @@ public interface ItemQueryDslRepositoryCustom {
     int deleteById(Long id);
 
     List<Item> findByAssetId(Long assetId);
+
+    List<Item> findByPropertyNumbers(List<String> propertyNumbers);
+
+    int updatePropertyNumbers(List<ToBeUpdatedItem> toBeUpdatedItems);
+
+    List<Item> findByIds(Collection<Long> ids);
 }

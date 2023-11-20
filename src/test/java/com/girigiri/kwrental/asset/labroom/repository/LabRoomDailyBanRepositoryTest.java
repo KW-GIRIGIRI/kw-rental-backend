@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.common.config.JpaConfig;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomDailyBanFixture;
 
-@Import(JpaConfig.class)
-@DataJpaTest
+@RepositoryTest
 class LabRoomDailyBanRepositoryTest {
 
 	@Autowired

@@ -33,6 +33,7 @@ import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentsWithRentalQu
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentResponse;
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.item.domain.Item;
 import com.girigiri.kwrental.item.repository.ItemRepository;
 import com.girigiri.kwrental.reservation.domain.entity.RentalAmount;
 import com.girigiri.kwrental.reservation.domain.entity.RentalPeriod;
@@ -360,9 +361,18 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 	void updateEquipmentAndItems() {
 		// given
 		Equipment equipment = equipmentRepository.save(EquipmentFixture.create());
+		final Item item = ItemFixture.builder().assetId(equipment.getId()).build();
+		itemRepository.save(item);
+		final Item item2 = ItemFixture.builder().propertyNumber("22222222").assetId(equipment.getId()).build();
+		itemRepository.save(item2);
 
+		UpdateEquipmentRequest.UpdateItemRequest updateItemRequest1 = new UpdateEquipmentRequest.UpdateItemRequest(
+			item.getId(), "11111111");
+		UpdateEquipmentRequest.UpdateItemRequest updateItemRequest2 = new UpdateEquipmentRequest.UpdateItemRequest(null,
+			"33333333");
 		UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest("rentalPlace", "name()", "CAMERA",
-			"maker", "imgUrl", "component", "purpose", "description", 1, 1);
+			"maker", "imgUrl", "component", "purpose", "description", 1, 1,
+			List.of(updateItemRequest1, updateItemRequest2));
 
 		// when
 		RestAssured.given(this.requestSpec)
@@ -378,6 +388,8 @@ class EquipmentAcceptanceTest extends AcceptanceTest {
 			.all()
 			.statusCode(HttpStatus.NO_CONTENT.value())
 			.header(HttpHeaders.LOCATION, containsString("/api/equipments/" + equipment.getId()));
+		final Equipment updatedEquipment = equipmentRepository.findById(equipment.getId()).orElseThrow();
+		assertThat(updatedEquipment.getTotalQuantity()).isEqualTo(2);
 	}
 
 	@Test

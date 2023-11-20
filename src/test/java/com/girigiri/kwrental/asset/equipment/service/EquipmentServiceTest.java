@@ -19,10 +19,11 @@ import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.AddEquipmentWithItemsRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.AddItemRequest;
 import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest;
-import com.girigiri.kwrental.asset.equipment.dto.response.EquipmentDetailResponse;
+import com.girigiri.kwrental.asset.equipment.dto.request.UpdateEquipmentRequest.UpdateItemRequest;
 import com.girigiri.kwrental.asset.equipment.exception.DuplicateAssetNameException;
 import com.girigiri.kwrental.asset.equipment.exception.InvalidCategoryException;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
+import com.girigiri.kwrental.item.service.ItemsUpdateUseCase;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,11 +34,13 @@ class EquipmentServiceTest {
 	@Mock
 	private EquipmentRetriever equipmentRetriever;
 	@Mock
-	private ItemSaver itemSaver;
+	private ItemSaverPerEquipment itemSaverPerEquipment;
 	@Mock
 	private ApplicationEventPublisher eventPublisher;
 	@Mock
 	private EquipmentValidator equipmentValidator;
+	@Mock
+	private ItemsUpdateUseCase itemsUpdateUseCase;
 	@InjectMocks
 	private EquipmentService equipmentService;
 
@@ -59,7 +62,8 @@ class EquipmentServiceTest {
 		// then
 		assertThat(id).isOne();
 		verify(equipmentRepository).save(any());
-		verify(itemSaver).saveItems(any(), any());
+		verify(itemSaverPerEquipment).execute(
+			List.of(new ToBeSavedItem(addItemRequest.propertyNumber(), equipment.getId())));
 	}
 
 	@Test
@@ -117,18 +121,22 @@ class EquipmentServiceTest {
 	@DisplayName("기자재 수정 ")
 	void updateEquipment() {
 		// given
-		Equipment equipment = EquipmentFixture.create();
+		Equipment equipment = EquipmentFixture.builder().id(1L).build();
 		given(equipmentRetriever.getEquipment(any())).willReturn(equipment);
+
+		UpdateItemRequest updateItemRequest1 = new UpdateItemRequest(1L, "11111111");
+		UpdateItemRequest updateItemRequest2 = new UpdateItemRequest(null, "33333333");
 		UpdateEquipmentRequest updateEquipmentRequest = new UpdateEquipmentRequest(
 			"updatedDays", "updatedName",
 			"ETC", "updatedMaker", "updatedImgUrl",
-			"updatedComponent", "updatedPurpose", "updatedDescription", 2, 2);
+			"updatedComponent", "updatedPurpose", "updatedDescription", 2, 2,
+			List.of(updateItemRequest1, updateItemRequest2));
+		doNothing().when(itemsUpdateUseCase).saveOrUpdate(1L, List.of(updateItemRequest1, updateItemRequest2));
 
 		// when
-		EquipmentDetailResponse expect = equipmentService.update(1L, updateEquipmentRequest);
+		Long expect = equipmentService.update(1L, updateEquipmentRequest);
 
 		// then
-		assertThat(expect).usingRecursiveComparison()
-			.isEqualTo(EquipmentDetailResponse.from(equipment));
+		assertThat(expect).isEqualTo(equipment.getId());
 	}
 }

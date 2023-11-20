@@ -2,6 +2,7 @@ package com.girigiri.kwrental.operation.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.girigiri.kwrental.testsupport.RepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import com.girigiri.kwrental.testsupport.fixture.EntireOperationFixture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@RepositoryTest
 class EntireOperationRepositoryTest {
 	@Autowired
 	private EntireOperationRepository entireOperationRepository;
