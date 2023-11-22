@@ -29,7 +29,7 @@ import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentRespons
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.ReservedQuantityService;
 import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +42,7 @@ class EquipmentViewServiceTest {
 	@Mock
 	private EquipmentRepository equipmentRepository;
 	@Mock
-	private RemainingQuantityService remainingQuantityService;
+	private ReservedQuantityService reservedQuantityService;
 	@InjectMocks
 	private EquipmentViewService equipmentViewService;
 
@@ -70,7 +70,7 @@ class EquipmentViewServiceTest {
 		final LocalDate now = LocalDate.now();
 		given(equipmentRetriever.getEquipment(any())).willReturn(equipment);
 		final Map<LocalDate, Integer> reservedAmounts = Map.of(now, 10, now.plusDays(1), 5);
-		given(remainingQuantityService.getReservedAmountInclusive(any(), any(), any()))
+		given(reservedQuantityService.getReservedAmountInclusive(any(), any(), any()))
 			.willReturn(reservedAmounts);
 		given(assetService.getReservableCountPerDate(reservedAmounts, equipment))
 			.willReturn(new RemainQuantitiesPerDateResponse(List.of(new RemainQuantityPerDateResponse(now, 0),
@@ -95,7 +95,7 @@ class EquipmentViewServiceTest {
 		final Equipment equipment = EquipmentFixture.builder().id(2L).build();
 		given(equipmentRepository.findEquipmentBy(any(), any(), any()))
 			.willReturn(new PageImpl<>(List.of(equipment), pageable, 3));
-		given(remainingQuantityService.getRemainingQuantityByAssetIdAndDate(any(), any()))
+		given(reservedQuantityService.getRemainingQuantityByAssetIdAndDate(any(), any()))
 			.willReturn(Map.of(equipment.getId(), equipment.getTotalQuantity()));
 
 		// when

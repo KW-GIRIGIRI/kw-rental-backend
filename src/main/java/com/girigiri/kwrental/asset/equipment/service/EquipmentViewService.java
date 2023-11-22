@@ -17,7 +17,7 @@ import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentRespons
 import com.girigiri.kwrental.asset.equipment.dto.response.SimpleEquipmentWithRentalQuantityResponse;
 import com.girigiri.kwrental.asset.equipment.repository.EquipmentRepository;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.ReservedQuantityService;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class EquipmentViewService {
 	private final AssetService assetService;
 	private final EquipmentRetriever equipmentRetriever;
 	private final EquipmentRepository equipmentRepository;
-	private final RemainingQuantityService remainingQuantityService;
+	private final ReservedQuantityService reservedQuantityService;
 
 	public Page<SimpleEquipmentWithRentalQuantityResponse> findEquipmentsWithRentalQuantityBy(final Pageable pageable,
 		@Nullable final EquipmentSearchCondition searchCondition) {
@@ -46,7 +46,7 @@ public class EquipmentViewService {
 		final List<Long> ids = equipments.stream()
 			.map(Equipment::getId)
 			.toList();
-		return remainingQuantityService.getRemainingQuantityByAssetIdAndDate(ids, date);
+		return reservedQuantityService.getRemainingQuantityByAssetIdAndDate(ids, date);
 	}
 
 	public Page<SimpleEquipmentResponse> findEquipments(final Pageable pageable,
@@ -63,7 +63,7 @@ public class EquipmentViewService {
 	public RemainQuantitiesPerDateResponse getRemainQuantitiesPerDate(final Long equipmentId, final LocalDate from,
 		final LocalDate to) {
 		final Equipment equipment = equipmentRetriever.getEquipment(equipmentId);
-		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(equipmentId,
+		final Map<LocalDate, Integer> reservedAmounts = reservedQuantityService.getReservedAmountInclusive(equipmentId,
 			from, to);
 		return assetService.getReservableCountPerDate(reservedAmounts, equipment);
 	}

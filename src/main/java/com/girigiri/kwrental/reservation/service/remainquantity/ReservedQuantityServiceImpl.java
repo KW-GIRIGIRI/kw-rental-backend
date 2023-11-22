@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.ReservedQuantityService;
 import com.girigiri.kwrental.reservation.domain.entity.ReservationSpec;
 import com.girigiri.kwrental.reservation.domain.entity.ReservedAmount;
 import com.girigiri.kwrental.reservation.repository.ReservationSpecRepository;
@@ -23,11 +23,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
-public class RemainingQuantityServiceImpl implements RemainingQuantityService {
+public class ReservedQuantityServiceImpl implements ReservedQuantityService {
 
 	private final ReservationSpecRepository reservationSpecRepository;
 
 	@Override
+	// TODO: 2023-11-22 분리 대상
 	public Map<Long, Integer> getRemainingQuantityByAssetIdAndDate(final List<Long> rentableIds,
 		final LocalDate date) {
 		return reservationSpecRepository.findRentalAmountsByAssetIds(rentableIds, date)

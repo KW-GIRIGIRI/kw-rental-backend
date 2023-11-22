@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public interface RemainingQuantityService {
+public interface ReservedQuantityService {
 
 	Map<Long, Integer> getRemainingQuantityByAssetIdAndDate(List<Long> rentableIds, LocalDate date);
 

@@ -23,7 +23,7 @@ import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.ReservedQuantityService;
 import com.girigiri.kwrental.operation.service.OperationChecker;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomDailyBanFixture;
 import com.girigiri.kwrental.testsupport.fixture.LabRoomFixture;
@@ -34,7 +34,7 @@ class LabRoomRemainQuantityServiceTest {
 	@Mock
 	private LabRoomRetriever labRoomRetriever;
 	@Mock
-	private RemainingQuantityService remainingQuantityService;
+	private ReservedQuantityService reservedQuantityService;
 	@Mock
 	private LabRoomDailyBanRetriever labRoomDailyBanRetriever;
 	@Mock
@@ -79,7 +79,7 @@ class LabRoomRemainQuantityServiceTest {
 		LocalDate monday = LocalDate.of(2023, 9, 11);
 		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).build();
 		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
-		given(remainingQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
+		given(reservedQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
 			.willReturn(Map.of(monday, 1, monday.plusDays(1), 0));
 		given(operationChecker.getOperateDates(Set.of(monday, monday.plusDays(1)))).willReturn(
 			Set.of(monday, monday.plusDays(1)));
@@ -102,7 +102,7 @@ class LabRoomRemainQuantityServiceTest {
 		LocalDate monday = LocalDate.of(2023, 9, 11);
 		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).isAvailable(false).build();
 		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
-		given(remainingQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
+		given(reservedQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
 			.willReturn(Map.of(monday, 1, monday.plusDays(1), 0));
 		given(operationChecker.getOperateDates(Set.of(monday, monday.plusDays(1)))).willReturn(
 			Set.of(monday, monday.plusDays(1)));
@@ -125,7 +125,7 @@ class LabRoomRemainQuantityServiceTest {
 		LocalDate monday = LocalDate.of(2023, 9, 11);
 		LabRoom hwado = LabRoomFixture.builder().name("hwado").reservationCountPerDay(1).build();
 		given(labRoomRetriever.getLabRoomByName("hwado")).willReturn(hwado);
-		given(remainingQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
+		given(reservedQuantityService.getReservationCountInclusive(hwado.getId(), monday, monday.plusDays(1)))
 			.willReturn(Map.of(monday, 0, monday.plusDays(1), 0));
 		final LabRoomDailyBan ban1 = LabRoomDailyBanFixture.builder().labRoomId(hwado.getId()).banDate(monday).build();
 		given(labRoomDailyBanRetriever.getLabRoomBanByDates(any(), any(), any()))
