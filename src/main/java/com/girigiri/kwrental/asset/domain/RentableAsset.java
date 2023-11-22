@@ -87,5 +87,5 @@ public abstract class RentableAsset extends AbstractSuperEntity {
 		this.deletedAt = LocalDate.now();
 	}
 
-	public abstract Integer getRemainQuantity(int reservedCount);
+	public abstract int getRemainQuantity(int reservedCount);
 }

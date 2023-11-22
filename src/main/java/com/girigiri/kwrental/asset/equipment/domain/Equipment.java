@@ -70,7 +70,10 @@ public class Equipment extends RentableAsset {
 	public void reduceTotalCount(final int count) {
 		if (getTotalQuantity() < count)
 			throw new RentableAssetException("전체 수량을 0이하로 줄일 수 없습니다.");
-		this.setTotalQuantity(this.getTotalQuantity() - count);
+		int reducedTotalCount = this.getTotalQuantity() - count;
+		if (reducedTotalCount < this.getRentableQuantity())
+			throw new RentableAssetException("전체 수량을 줄일 때 대여 가능 갯수보다 작은 값으로 줄일 수 없습니다.");
+		this.setTotalQuantity(reducedTotalCount);
 	}
 
 	public void addTotalCount(final int count) {
@@ -78,9 +81,9 @@ public class Equipment extends RentableAsset {
 	}
 
 	@Override
-	public Integer getRemainQuantity(int reservedCount) {
+	public int getRemainQuantity(int reservedCount) {
 		if (reservedCount > getRentableQuantity()) {
-			throw new EquipmentException("대여 가능 갯수가 대여 된 갯수보다 크면 안됩니다!");
+			return 0;
 		}
 		return getRentableQuantity() - reservedCount;
 	}

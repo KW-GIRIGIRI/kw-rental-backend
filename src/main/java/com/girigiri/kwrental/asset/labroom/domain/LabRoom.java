@@ -37,7 +37,7 @@ public class LabRoom extends RentableAsset {
 	}
 
 	@Override
-	public Integer getRemainQuantity(final int reservedCount) {
+	public int getRemainQuantity(final int reservedCount) {
 		if (reservedCount > getRentableQuantity()) {
 			throw new LabRoomException("대여 가능 갯수가 대여 된 갯수보다 크면 안됩니다!");
 		}

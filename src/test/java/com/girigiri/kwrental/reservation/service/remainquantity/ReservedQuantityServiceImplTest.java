@@ -24,12 +24,12 @@ import com.girigiri.kwrental.testsupport.fixture.EquipmentFixture;
 import com.girigiri.kwrental.testsupport.fixture.ReservationSpecFixture;
 
 @ExtendWith(MockitoExtension.class)
-class RemainingQuantityServiceImplTest {
+class ReservedQuantityServiceImplTest {
 
 	@Mock
 	private ReservationSpecRepository reservationSpecRepository;
 	@InjectMocks
-	private RemainingQuantityServiceImpl remainingQuantityService;
+	private ReservedQuantityServiceImpl remainingQuantityService;
 
 	@Test
 	@DisplayName("기간 사이의 대여 신청 대여 갯수를 센다.")

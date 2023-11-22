@@ -16,7 +16,7 @@ import com.girigiri.kwrental.asset.labroom.domain.LabRoomDailyBan;
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountPerDateResponse;
 import com.girigiri.kwrental.asset.labroom.dto.response.RemainReservationCountsPerDateResponse;
 import com.girigiri.kwrental.asset.service.AssetService;
-import com.girigiri.kwrental.asset.service.RemainingQuantityService;
+import com.girigiri.kwrental.asset.service.ReservedQuantityService;
 import com.girigiri.kwrental.operation.service.OperationChecker;
 
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ public class LabRoomRemainQuantityService {
 
 	private final LabRoomDailyBanRetriever labRoomDailyBanRetriever;
 	private final LabRoomRetriever labRoomRetriever;
-	private final RemainingQuantityService remainingQuantityService;
+	private final ReservedQuantityService reservedQuantityService;
 	private final OperationChecker operationChecker;
 	private final AssetService assetService;
 
 	public RemainQuantitiesPerDateResponse getRemainQuantityByLabRoomName(final String name, final LocalDate from,
 		final LocalDate to) {
 		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(name);
-		final Map<LocalDate, Integer> reservedAmounts = remainingQuantityService.getReservedAmountInclusive(
+		final Map<LocalDate, Integer> reservedAmounts = reservedQuantityService.getReservedAmountInclusive(
 			labRoom.getId(), from, to);
 		final RemainQuantitiesPerDateResponse remainQuantitiesPerDateResponse = assetService.getReservableCountPerDate(
 			reservedAmounts, labRoom);
@@ -66,7 +66,7 @@ public class LabRoomRemainQuantityService {
 	public RemainReservationCountsPerDateResponse getRemainReservationCountByLabRoomName(final String name,
 		final LocalDate from, final LocalDate to) {
 		final LabRoom labRoom = labRoomRetriever.getLabRoomByName(name);
-		final Map<LocalDate, Integer> reservationCounts = remainingQuantityService.getReservationCountInclusive(
+		final Map<LocalDate, Integer> reservationCounts = reservedQuantityService.getReservationCountInclusive(
 			labRoom.getId(), from, to);
 		Map<LocalDate, LabRoomDailyBan> bans = labRoomDailyBanRetriever.getLabRoomBanByDates(labRoom.getId(), from, to);
 		final List<RemainReservationCountPerDateResponse> remainReservationCountPerDateResponses = getRemainReservationCountPerDateResponses(
