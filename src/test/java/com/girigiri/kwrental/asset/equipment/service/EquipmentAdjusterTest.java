@@ -30,11 +30,11 @@ class EquipmentAdjusterTest {
 		given(equipmentRetriever.getEquipment(any())).willReturn(equipment);
 
 		// when
-		equipmentAdjuster.adjustWhenItemDeleted(2, -1, 1L);
+		equipmentAdjuster.adjustWhenItemDeleted(2, -2, 1L);
 
 		// then
 		assertThat(equipment.getTotalQuantity()).isEqualTo(8);
-		assertThat(equipment.getRentableQuantity()).isEqualTo(9);
+		assertThat(equipment.getRentableQuantity()).isEqualTo(8);
 	}
 
 	@Test
