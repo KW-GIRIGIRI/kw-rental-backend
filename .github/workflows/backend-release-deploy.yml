@@ -1,0 +1,63 @@
+name: deploy eb backend
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Checkout source code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+        token: ${{ secrets.GH_ACCESS_TOKEN }}
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/release' }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Execute Gradle build
+      run: ./gradlew bootJar
+
+    - name: Copy jar to remote
+      uses: appleboy/scp-action@v0.1.6
+      with:
+        host: ${{ secrets.RELEASE_HOST }}
+        key: ${{ secrets.PEM_KEY }}
+        username: ubuntu
+        source: "./build/libs/kw-rental-0.0.1-SNAPSHOT.jar"
+        target: "/home/ubuntu"
+
+    - name: Copy script to remote
+      uses: appleboy/scp-action@v0.1.6
+      with:
+        host: ${{ secrets.RELEASE_HOST }}
+        key: ${{ secrets.PEM_KEY }}
+        username: ubuntu
+        source: "deploy.sh"
+        target: "/home/ubuntu"
+
+    - name: Execute script
+      uses: appleboy/ssh-action@v1.0.1
+      with:
+        username: ubuntu
+        host: ${{ secrets.RELEASE_HOST }}
+        key: ${{ secrets.PEM_KEY }}
+        script_stop: true
+        script: |
+          chmod +x /home/ubuntu/deploy.sh
+          sh /home/ubuntu/deploy.sh release
