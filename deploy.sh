@@ -14,7 +14,7 @@ fi
 
 # 배포 대상 포트에 jar를 실행
 PROFILE=$1
-nohup java -jar /home/ubuntu/kw-rental-0.0.1-SNAPSHOT.jar --Dspring.profiles.active=${PROFILE} --Dserver.port=${TARGET_PORT} &
+nohup java -jar /home/ubuntu/build/libs/kw-rental-0.0.1-SNAPSHOT.jar --Dspring.profiles.active=${PROFILE} --Dserver.port=${TARGET_PORT} &
 
 # 5회 헬스 체크
 TRIAL=0
