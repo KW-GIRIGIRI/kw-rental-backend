@@ -14,7 +14,7 @@ fi
 
 # 배포 대상 포트에 jar를 실행
 PROFILE=$1
-nohup java -jar /home/ubuntu/my-app-0.0.1-SNAPSHOT.jar --Dspring.profiles.active=${PROFILE} --Dserver.port=${TARGET_PORT} &
+nohup java -jar /home/ubuntu/kw-rental-0.0.1-SNAPSHOT.jar --Dspring.profiles.active=${PROFILE} --Dserver.port=${TARGET_PORT} &
 
 # 5회 헬스 체크
 TRIAL=0
@@ -27,7 +27,7 @@ while true; do
   fi
 
   curl http://localhost:${TARGET_PORT}
-  if [ $? -ne 0 ]; then
+  if [ $? -eq 0 ]; then
     echo 'Health Check successed'
     break;
   fi
@@ -36,4 +36,4 @@ while true; do
 done
 
 # nginx proxy 포트 변경
-sed -i "s/proxy_pass http:127.0.0.1:${STOP_PORT}/proxy_pass http:127.0.0.1:${TARGET_PORT}" /etc/nginx/sites-available/default
+sed -i "s/proxy_pass http:127.0.0.1:${STOP_PORT}/proxy_pass http:127.0.0.1:${TARGET_PORT}/" /etc/nginx/sites-available/default
