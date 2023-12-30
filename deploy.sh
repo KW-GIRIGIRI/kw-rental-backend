@@ -18,7 +18,7 @@ PROFILE=$1
 java -jar \
 -Dspring.profiles.active=${PROFILE} \
 -Dserver.port=${TARGET_PORT} \
-home/ubuntu/build/libs/kw-rental-0.0.1-SNAPSHOT.jar
+/home/ubuntu/build/libs/kw-rental-0.0.1-SNAPSHOT.jar
 
 # 5회 헬스 체크
 TRIAL=0
