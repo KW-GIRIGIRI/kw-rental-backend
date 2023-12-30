@@ -51,3 +51,4 @@ echo "killed $STOP_PORT port"
 
 # 배포 완료
 echo "Deploy complete"
+exit 0
