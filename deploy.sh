@@ -42,9 +42,7 @@ while true; do
 done
 
 # nginx proxy 포트 변경
-chmod +w /etc/nginx/sites-available/default
-sed -i "s/proxy_pass http:127.0.0.1:${STOP_PORT}/proxy_pass http:127.0.0.1:${TARGET_PORT}/" /etc/nginx/sites-available/default
-chmod -w /etc/nginx/sites-available/default
+sudo sed -i "s/proxy_pass http:127.0.0.1:${STOP_PORT}/proxy_pass http:127.0.0.1:${TARGET_PORT}/" /etc/nginx/sites-available/default
 echo "NGINX config updated"
 
 # 구버전 포트 프로세스 종료
