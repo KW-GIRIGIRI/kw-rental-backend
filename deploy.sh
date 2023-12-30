@@ -14,7 +14,11 @@ fi
 
 # 배포 대상 포트에 jar를 실행
 PROFILE=$1
-nohup java -jar /home/ubuntu/build/libs/kw-rental-0.0.1-SNAPSHOT.jar --Dspring.profiles.active=${PROFILE} --Dserver.port=${TARGET_PORT} &
+# 배포 대상 포트에 jar를 실행
+java -jar \
+-Dspring.profiles.active=${PROFILE} \
+-Dserver.port=${TARGET_PORT} \
+/var/libs/kw-rental-0.0.1-SNAPSHOT.jar
 
 # 5회 헬스 체크
 TRIAL=0
@@ -37,3 +41,11 @@ done
 
 # nginx proxy 포트 변경
 sed -i "s/proxy_pass http:127.0.0.1:${STOP_PORT}/proxy_pass http:127.0.0.1:${TARGET_PORT}/" /etc/nginx/sites-available/default
+echo "NGINX config updated"
+
+# 구버전 포트 프로세스 종료
+fuser -k ${STOP_PORT}/tcp
+echo "killed $STOP_PORT port"
+
+# 배포 완료
+echo "Deploy complete"
